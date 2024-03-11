@@ -12,7 +12,8 @@ class SongController extends Controller
      */
     public function index()
     {
-        //
+        $songs= song::all();
+        return response()->json($songs);
     }
 
     /**
