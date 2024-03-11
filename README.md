@@ -10,10 +10,10 @@ Un cop comenceu heu de canviar aquesta explicació amb la corresponent al vostre
 El projecte s'ha de poder desplegar en mode desenvolupament simplement fent docker compose up
 
 # Aquest fitxer ha de contenir com a mínim:
- * Nom dels integrants
- * Nom del projecte
+ * Raúl Espinosa, Pedro García, Miquel Moreno, David Salvador, Santi Pujol, Álvaro Kumenius
+ * Sound O'Clock
  * Petita descripció
- * Adreça del gestor de tasques (taiga, jira, trello...)
- * Adreça del prototip gràfic del projecte (Penpot, figma, moqups...)
+ * https://linear.app/institut-pedralbes/team/SOK/cycles
+ * https://www.figma.com/file/WuwwbTEYqXAJQBiOREW5lx/Sound-O'Clock?type=design&node-id=0-1&mode=design&t=gyrZXk1693f5ZfMy-0
  * URL de producció (quan la tingueu)
  * Estat: (explicació d'en quin punt està)
