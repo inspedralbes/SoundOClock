@@ -3,7 +3,12 @@
 </script>
 
 <template>
-    <Cercador></Cercador>
+    <div class="pt-8 flex flex-col items-center">
+        <Cercador></Cercador>
+        <div>
+            <BotoFiltre></BotoFiltre>
+        </div>
+    </div>
 </template>
 
 <style scoped>
