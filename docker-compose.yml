@@ -62,6 +62,7 @@ services:
       - 3000:3000
     environment:
       - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
     tmpfs: 
       - /tmp
     command: sh -c "npm install && npm run dev"
