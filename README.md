@@ -14,6 +14,6 @@ El projecte s'ha de poder desplegar en mode desenvolupament simplement fent dock
  * Sound O'Clock
  * Petita descripció
  * https://linear.app/institut-pedralbes/team/SOK/cycles
- * Adreça del prototip gràfic del projecte (Penpot, figma, moqups...)
+ * https://www.figma.com/file/WuwwbTEYqXAJQBiOREW5lx/Sound-O'Clock?type=design&node-id=0-1&mode=design&t=gyrZXk1693f5ZfMy-0
  * URL de producció (quan la tingueu)
  * Estat: (explicació d'en quin punt està)
