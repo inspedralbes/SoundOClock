@@ -13,7 +13,7 @@ El projecte s'ha de poder desplegar en mode desenvolupament simplement fent dock
  * Raúl Espinosa, Pedro García, Miquel Moreno, David Salvador, Santi Pujol, Álvaro Kumenius
  * Sound O'Clock
  * Petita descripció
- * Adreça del gestor de tasques (taiga, jira, trello...)
+ * https://linear.app/institut-pedralbes/team/SOK/cycles
  * Adreça del prototip gràfic del projecte (Penpot, figma, moqups...)
  * URL de producció (quan la tingueu)
  * Estat: (explicació d'en quin punt està)
