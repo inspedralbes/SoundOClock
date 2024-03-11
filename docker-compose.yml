@@ -2,12 +2,12 @@
 services:
 
   db:
-    container_name: songoclock_db
+    container_name: soundoclock_db
     image: mysql:8.2.0
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: songoclock
+      MYSQL_DATABASE: soundoclock
       MYSQL_USER: user
       MYSQL_PASSWORD: user
     ports:
@@ -18,7 +18,7 @@ services:
 
 
   phpmyadmin:
-    container_name: songoclock_phpmyadmin
+    container_name: soundoclock_phpmyadmin
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
@@ -27,7 +27,7 @@ services:
       - db
 
   # node:
-  #   container_name: songoclock_node
+  #   container_name: soundoclock_node
   #   image: node:20.11.1-bullseye-slim
   #   volumes:
   #     - ./node:/usr/src/app
@@ -39,7 +39,7 @@ services:
   #     - db
 
   laravel:
-    container_name: songoclock_laravel
+    container_name: soundoclock_laravel
     build: ./laravel
     volumes:
       - ./laravel:/var/www/html
@@ -47,13 +47,13 @@ services:
       - 8000:80
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html/public
-    command: /bin/sh -c "chown -R www-data:www-data * && php artisan migrate --force && apache2-foreground "
+    command: /bin/sh -c "chown -R www-data:www-data * && php artisan migrate --force && php artisan migrate:fresh --seed && apache2-foreground "
     restart: always
     depends_on:
       - db
   
   nuxt:
-    container_name: songoclock_nuxt
+    container_name: soundoclock_nuxt
     image: node:20.11.1-bullseye-slim
     working_dir: /usr/src/app
     volumes:
