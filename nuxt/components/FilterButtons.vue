@@ -70,8 +70,19 @@
     }
 
     .horizontal-scroll-container {
-      overflow: auto;
+      overflow-y: scroll; /* Add the ability to scroll */
       white-space: nowrap;
+    }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .horizontal-scroll-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .horizontal-scroll-container {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
     }
 
 </style>
