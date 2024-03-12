@@ -1,5 +1,8 @@
 <template>
     <div class="container">
+        <div class="starfield">
+            <Star v-for="(star, index) in stars" :key="index" :top="star.top" :left="star.left" :delay="star.delay" />
+        </div>
         <div class="blank-space"></div>
         <div class="title">
             <h1>VOTA LA CANÇÓ</h1>
@@ -31,7 +34,20 @@
 
 <script>
 export default {
-
+    data() {
+        return {
+            stars: []
+        }
+    },
+    mounted() {
+        for (let i = 0; i < 50; i++) {
+            this.stars.push({
+                top: Math.random() * window.innerHeight,
+                left: Math.random() * window.innerWidth,
+                delay: Math.random() * 100,
+            });
+        }
+    }
 };
 
 </script>
@@ -41,7 +57,6 @@ export default {
     display: flex;
     flex-direction: column;
     position: relative;
-    // justify-content: center;
     align-items: center;
     height: 100vh;
     overflow: hidden;
@@ -110,6 +125,16 @@ export default {
         bottom: -4rem;
         z-index: 98;
         background-color: red;
+    }
+
+    .starfield {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
     }
 }
 </style>
