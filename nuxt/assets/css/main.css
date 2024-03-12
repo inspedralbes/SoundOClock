@@ -1,0 +1,13 @@
+body {
+    background-color: #000000;
+    font-family: 'SF Pro', sans-serif;
+    width: 100vw;
+}
+
+@font-face {
+    font-family: 'SF Pro';
+    src: url('/fonts/SF-Pro.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
