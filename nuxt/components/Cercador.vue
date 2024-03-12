@@ -1,9 +1,23 @@
 <script>
-
+  export default {
+    name: 'FilterButtons',
+    data() {
+      return {
+        name: ""
+      }
+    },
+    methods: {
+      search() {
+        this.$emit('search', this.name);
+      },
+    }
+  };
 </script>
 
 <template>
-    <input class="cercador ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..."></input>
+    <div class="flex flex-row justify-center">
+        <input class="cercador ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..." v-model="name" @change="search()"></input>
+    </div>
 </template>
 
 <style scoped>
