@@ -2,7 +2,7 @@
     <div>
 
         <h1>Escollir C</h1>
-        <div v-for="song in llistat" :key="song.id">
+        <div v-for="song in list" :key="song.id">
             <h2>{{ song.title }}</h2>
             <p>{{ song.artist }}</p>
             <p>{{ song.year }}</p>
@@ -15,15 +15,15 @@
 export default {
     data() {
         return {
-            llistat: []
+            list: []
         }
     },
     mounted() {
-        fetch('/llistatM.json')
+        fetch('/listM.json')
             .then(response => response.json())
             .then(data => {
-                this.llistat = data
-                console.log(this.llistat);
+                this.list = data
+                console.log(this.list);
             })
     },
     methods: {
