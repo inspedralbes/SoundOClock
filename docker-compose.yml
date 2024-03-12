@@ -47,8 +47,8 @@ services:
       - 8000:80
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html/public
-    command: /bin/sh -c "chown -R www-data:www-data * && php artisan migrate --force && php artisan migrate:fresh --seed && apache2-foreground "
-    restart: always
+    command: /bin/sh -c "composer install && php artisan key:generate && chown -R www-data:www-data * && php artisan migrate --force && php artisan migrate:fresh --seed && php artisan serve --host=0.0.0.0 "
+    #restart: always
     depends_on:
       - db
   
