@@ -93,6 +93,7 @@ export default {
         align-items: center;
         padding: 10px 20px;
         color: white;
+        background-color: black;
         font-weight: bold;
         cursor: pointer;
         margin-top: 20px;
