@@ -10,7 +10,7 @@
     .cercador {
         background-color: white;
         border-radius: 24px;
-        width: 80%;
+        width: 100%;
         height: 40px;
     } 
 </style>
