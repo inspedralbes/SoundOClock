@@ -6,7 +6,7 @@ export default {
         }
     },
     mounted() {
-        fetch('http://127.0.0.1:8000/api/songs')
+        fetch('http://localhost:8000/api/songs')
             .then(response => response.json())
             .then(data => {
                 console.log(data);
