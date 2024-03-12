@@ -1,9 +1,6 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage to="/llista_propostes">About</NuxtPage>
-  </NuxtLayout>
+  <NuxtPage />
+  <!-- <NuxtPage to="/llista_propostes">About</NuxtPage> -->
 </template>
 
-<style scoped>
-    
-</style>
+<style scoped></style>

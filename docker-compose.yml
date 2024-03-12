@@ -26,17 +26,17 @@ services:
     depends_on:
       - db
 
-  # node:
-  #   container_name: soundoclock_node
-  #   image: node:20.11.1-bullseye-slim
-  #   volumes:
-  #     - ./node:/usr/src/app
-  #   working_dir: /usr/src/app
-  #   ports:
-  #     - 8080:8080
-  #   command: sh -c "npm install && npm run dev"
-  #   depends_on:
-  #     - db
+  node:
+    container_name: soundoclock_node
+    image: node:20.11.1-bullseye-slim
+    volumes:
+      - ./node:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 8080:8080
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - db
 
   laravel:
     container_name: soundoclock_laravel
@@ -47,9 +47,8 @@ services:
       - 8000:8000
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html/public
-    # command: /bin/sh -c "composer install && php artisan key:generate && chown -R www-data:www-data * && php artisan migrate --force && php artisan migrate:fresh --seed && php artisan serve --host=0.0.0.0 "
     command: /bin/sh -c "composer install && php artisan key:generate && chown -R www-data:www-data * && php artisan migrate --force && php artisan migrate:fresh --seed && php artisan serve --host=0.0.0.0 "
-    #restart: always
+    restart: always
     depends_on:
       - db
   
