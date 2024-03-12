@@ -32,7 +32,8 @@
 <script>
 export default {
 
-}
+};
+
 </script>
 
 <style lang="scss" scoped>
@@ -110,7 +111,5 @@ export default {
         z-index: 98;
         background-color: red;
     }
-
-
 }
 </style>
