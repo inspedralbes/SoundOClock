@@ -156,7 +156,7 @@ export default {
     flex-direction: column;
     margin: 0 4% 2% 0;
     padding: 2% 0 2% 0;
-    width: 18%;
+    width: 16%;
     color: black;
     background-color: #D9D9D9;
     border-radius: 10px;
@@ -164,7 +164,7 @@ export default {
 }
 
 .song>img {
-    width: 60%;
+    width: 70%;
     height: auto;
     border-radius: 10px;
 }
