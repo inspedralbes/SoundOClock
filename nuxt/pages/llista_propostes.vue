@@ -8,6 +8,7 @@ export default {
     },
     mounted() {
         fetch('http://localhost:8000/api/songs')
+        //http://localhost:8080/songs
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -19,9 +20,7 @@ export default {
             });
     },
     methods: {
-        applyFilter(filter){
-            //http://localhost:8080/songs
-            
+        applyFilter(filter){            
             switch (parseInt(filter)) {
                 case 1: 
                 this.sortByVotesDescending();
