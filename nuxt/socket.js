@@ -14,6 +14,10 @@ socket.on("connect", () => {
     console.log(num)
   });
 
+  socket.on("voteCasted", (status, songs) => {
+    console.log("SONGS", songs)
+  });
+
 });
 
 socket.on("disconnect", () => {

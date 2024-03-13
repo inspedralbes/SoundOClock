@@ -12,8 +12,7 @@ export default {
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                const songs = Object.values(data);
-                this.songs = songs;
+                this.songs = data;
                 this.filteredSongs = this.songs;
             })
             .catch(error => {
