@@ -7,8 +7,8 @@ export default {
         }
     },
     mounted() {
-        fetch('http://localhost:8000/api/songs')
-        //http://localhost:8080/songs
+        fetch('/llistatM.json')
+            //http://localhost:8080/songs
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -20,19 +20,19 @@ export default {
             });
     },
     methods: {
-        applyFilter(filter){            
+        applyFilter(filter) {
             switch (parseInt(filter)) {
-                case 1: 
-                this.sortByVotesDescending();
+                case 1:
+                    this.sortByVotesDescending();
                     break;
-                case 2: 
-                this.sortByVotesAscending();
+                case 2:
+                    this.sortByVotesAscending();
                     break;
-                case 3: 
-                this.sortByTitleAlphabetically();
+                case 3:
+                    this.sortByTitleAlphabetically();
                     break;
-                case 4: 
-                this.sortByArtistAlphabetically();
+                case 4:
+                    this.sortByArtistAlphabetically();
                     break;
                 default:
                     break;
@@ -50,7 +50,7 @@ export default {
         sortByArtistAlphabetically() {
             this.filteredSongs.sort((a, b) => a.artist.localeCompare(b.artist));
         },
-        search(name){
+        search(name) {
             console.log(name);
 
             this.filteredSongs = [];
@@ -63,7 +63,7 @@ export default {
         }
     },
     computed: {
-        
+
     }
 }
 
@@ -71,25 +71,23 @@ export default {
 
 <template>
     <div class="flex flex-col">
-        <div class="mt-8 px-10">
-            <Cercador @search="search"/>
+        <div class="mt-8 w-4/5 ml-auto mr-auto">
+            <Cercador @search="search" />
         </div>
-        <div class="mb-4 px-10">
-            <FilterButtons @applyFilter="applyFilter"/>
+        <div class="mb-4 w-4/5 ml-auto mr-auto">
+            <FilterButtons @applyFilter="applyFilter" />
         </div>
-        <div class="w-full mb-8 px-10 flex flex-col gap-3">
-            <Song v-for="song in filteredSongs" v-bind:song="song"/>
+        <div class="w-4/5 mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
+            <Song v-for="song in filteredSongs" v-bind:song="song" />
         </div>
     </div>
 </template>
 
 <style scoped>
-
 .contenidor {
     color: white;
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     margin: 0;
 }
-    
 </style>
