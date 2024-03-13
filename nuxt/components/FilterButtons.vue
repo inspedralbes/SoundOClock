@@ -1,4 +1,5 @@
 <script>
+  import { useAppStore } from '@/stores/app';
   export default {
     name: 'FilterButtons',
     data() {
@@ -8,9 +9,14 @@
     },
     methods: {
       applyFilter() {
-        this.$emit('applyFilter', this.filter);
+        this.store.setFilter(this.filter);
+        this.$emit('applyFilter');
       },
-    }
+    },
+    setup() {
+        const store = useAppStore();
+        return { store };
+    },
   };
 </script>
 
