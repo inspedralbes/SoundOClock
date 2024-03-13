@@ -17,22 +17,22 @@
 <template>
   <div class="flex flex-row horizontal-scroll-container">
     <div class="radio-card">
-      <input type="radio" id="option1" name="options" value="1" v-model="filter" @change="applyFilter()"/>
+      <input type="radio" id="option1" name="options" value="1" v-model="filter" :class="[this.filter == 1? 'selected': '']" @change="applyFilter()"/>
       <label for="option1">Més votat</label>
     </div>
 
     <div class="radio-card">
-      <input type="radio" id="option2" name="options"  value="2" v-model="filter" @change="applyFilter()" />
+      <input type="radio" id="option2" name="options"  value="2" v-model="filter" :class="[this.filter == 2? 'selected': '']" @change="applyFilter()" />
       <label for="option2">Menys votat</label>
     </div>
 
     <div class="radio-card">
-      <input type="radio" id="option3" name="options"  value="3" v-model="filter" @change="applyFilter()"/>
+      <input type="radio" id="option3" name="options"  value="3" v-model="filter" :class="[this.filter == 3? 'selected': '']" @change="applyFilter()"/>
       <label for="option3">Titol Alfabeticament</label>
     </div>
 
     <div class="radio-card">
-      <input type="radio" id="option4" name="options"  value="4" v-model="filter" @change="applyFilter()"/>
+      <input type="radio" id="option4" name="options"  value="4" v-model="filter" :class="[this.filter == 4? 'selected': '']" @change="applyFilter()"/>
       <label for="option4">Autor Alfabeticament</label>
     </div>
   </div>
@@ -64,7 +64,13 @@
         display: none; /* Amaga el radio button per defecte*/
     }
 
-    .radio-card:has(input[type="radio"]:checked) {
+    /* molt xulo pero nomes funciona en chrome */
+    /* .radio-card:has(input[type="radio"]:checked) {
+        background-color: #83AEE4;
+        border-color: #83AEE4;
+    } */
+
+    .selected {
         background-color: #83AEE4;
         border-color: #83AEE4;
     }

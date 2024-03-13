@@ -71,23 +71,43 @@ export default {
 
 <template>
     <div class="flex flex-col">
-        <div class="mt-8 w-4/5 ml-auto mr-auto">
+        <div class="ancho margen w-4/5 ml-auto mr-auto">
             <Cercador @search="search" />
         </div>
-        <div class="mb-4 w-4/5 ml-auto mr-auto">
+        <div class="ancho margenb mb-10 w-4/5 ml-auto mr-auto">
             <FilterButtons @applyFilter="applyFilter" />
         </div>
-        <div class="w-4/5 mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
+        <div class="ancho mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
             <Song v-for="song in filteredSongs" v-bind:song="song" />
         </div>
     </div>
 </template>
 
 <style scoped>
-.contenidor {
-    color: white;
-    height: 100%;
-    width: 100%;
-    margin: 0;
+
+.ancho {
+    width: 85%;
+}
+
+.margen {
+    margin-top: 1rem;
+}
+
+.margenb {
+    margin-bottom: 1rem;
+}
+
+@media screen and (min-width: 640px) {
+    .ancho {
+        width: 55%;
+    }
+
+    .margen {
+        margin-top: 2.5rem;
+    }
+
+    .margenb {
+        margin-bottom: 2.5rem;
+    }
 }
 </style>

@@ -62,7 +62,7 @@ export default {
 <style scoped>
 .contenidor-canço {
     background-color: rgb(56, 56, 56);
-    border: 1px solid rgb(163, 163, 163);
+    /* border: 1px solid rgb(163, 163, 163); */
     color: white;
 }
 
@@ -130,15 +130,10 @@ img {
         display: flex;
         flex-direction: row;
         flex-grow: 1;
+        max-width: 100%;
     }
 
-    .contenidor-butons {
-        margin-left: 0;
-    }
-
-    .contenidor-canço{
-        justify-content: space-between;
-    }
+    
 
 }
 </style>
