@@ -1,15 +1,20 @@
 <template>
-    <div class="container">
-        <div class="starfield">
+    <div class="flex flex-col items-center relative h-screen overflow-hidden container">
+        <div class="fixed top-0 left-0 w-full h-full overflow-hidden z-[-1] starfield">
             <Star v-for="(star, index) in stars" :key="index" :top="star.top" :left="star.left" :delay="star.delay" />
         </div>
-        <div class="blank-space"></div>
-        <div class="title">
+        <div class="h-10"></div>
+
+        <div class="title text-white text-center text-4xl font-bold my-4">
             <h1>VOTA LA CANÇÓ</h1>
-            <h2>SENSE DIFICULTAT</h2>
+            <h2 class="text-3xl text-lg bg-gradient-to-b from-purple-100 to-blue-500 text-transparent bg-clip-text">
+                SENSE DIFICULTAT</h2>
         </div>
-        <p>Registra't o inicia sessió per començar</p>
-        <button>
+
+        <p class="text-white mt-3">Registra't o inicia sessió per començar</p>
+
+        <button
+            class="flex justify-center items-center px-10 py-4 text-white bg-black font-bold cursor-pointer mt-5 border-2 border-white border-opacity-50 shadow-md rounded-full">
             <span>Inicia sessió amb</span>
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                 <path
@@ -27,8 +32,10 @@
                 <path d="M1 1h22v22H1z" fill="none" />
             </svg>
         </button>
-        <div class="circle"></div>
-        <div class="circle min"></div>
+
+        <div class="w-300 h-66 absolute bg-black rounded-full bottom-[10rem] z-50 circle"></div>
+        <div class="w-52 h-50 absolute bg-red rounded-full bottom-[4rem] z-40 circle min"></div>
+
     </div>
 </template>
 
@@ -53,89 +60,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
+.circle {
+    width: 300%;
+    height: 66%;
+    position: absolute;
+    background: rgb(0, 0, 0);
+    border-radius: 50%;
+    bottom: -10rem;
+    z-index: 99;
+}
 
-    .blank-space {
-        height: 10%;
-    }
-
-    .title {
-        color: #ffffff;
-        text-align: center;
-        font-size: 32px;
-        font-weight: bold;
-        margin: 1rem 0;
-
-        h2 {
-            font-weight: normal;
-            font-size: 26px;
-            background: linear-gradient(to bottom, #FCFBFD, #83AEE4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-    }
-
-    p {
-        color: #ffffff;
-        margin-top: 12px;
-        font-family: 'SF Pro Display', sans-serif;
-    }
-
-    button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 10px 20px;
-        color: white;
-        background-color: black;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 20px;
-
-        box-sizing: border-box;
-
-        border: 2px solid rgba(255, 255, 255, 0.49);
-        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-        border-radius: 20px;
-
-        span {
-            margin-right: 10px;
-        }
-    }
-
-    .circle {
-        width: 300%;
-        height: 66%;
-        position: absolute;
-        background: rgb(0, 0, 0);
-        border-radius: 50%;
-        bottom: -10rem;
-        z-index: 99;
-    }
-
-    .circle.min {
-        box-shadow: 0px 0px 152px 60px rgba(255, 255, 255, 0.44);
-        width: 52%;
-        height: 50%;
-        bottom: -4rem;
-        z-index: 98;
-        background-color: red;
-    }
-
-    .starfield {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        z-index: -1;
-    }
+.circle.min {
+    box-shadow: 0px 0px 152px 60px rgba(255, 255, 255, 0.44);
+    width: 52%;
+    height: 50%;
+    bottom: -4rem;
+    z-index: 98;
+    background-color: red;
 }
 </style>
