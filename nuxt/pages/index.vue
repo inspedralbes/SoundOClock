@@ -34,7 +34,7 @@
         </button>
 
         <div class="w-300 h-66 absolute bg-black rounded-full bottom-[10rem] z-50 circle"></div>
-        <div class="w-52 h-50 absolute bg-red rounded-full bottom-[4rem] z-40 shadow-circle-min circle"></div>
+        <div class="w-52 h-50 absolute bg-red rounded-full bottom-[4rem] z-40 circle min"></div>
 
     </div>
 </template>
@@ -60,7 +60,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.shadow-circle-min {
+.circle {
+    width: 300%;
+    height: 66%;
+    position: absolute;
+    background: rgb(0, 0, 0);
+    border-radius: 50%;
+    bottom: -10rem;
+    z-index: 99;
+}
+
+.circle.min {
     box-shadow: 0px 0px 152px 60px rgba(255, 255, 255, 0.44);
+    width: 52%;
+    height: 50%;
+    bottom: -4rem;
+    z-index: 98;
+    background-color: red;
 }
 </style>
