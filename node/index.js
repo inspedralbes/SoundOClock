@@ -118,6 +118,11 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Testing
+  socket.on('testing', (num) => {
+    socket.emit('testing', {num: num});
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });

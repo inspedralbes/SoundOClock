@@ -7,12 +7,12 @@ let url = "http://localhost:8080";
 export const socket = io(url);
 
 socket.on("connect", () => {
-  //console.log("user connected");
+  console.log("user connected");
   const pinia = useAppStore();
 
-  socket.on("sala-creada", (sala) => {
-    pinia.addSala(sala)
-  })
+  socket.on("testing", (num) => {
+    console.log(num)
+  });
 
 });
 
