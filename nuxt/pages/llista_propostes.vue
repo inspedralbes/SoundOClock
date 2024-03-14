@@ -3,22 +3,11 @@ import { useAppStore } from '@/stores/app';
 export default {
     data() {
         return {
-            songs: [],
             filteredSongs: []
         }
     },
     mounted() {
-        fetch('http://localhost:8080/songs')
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                const songs = Object.values(data);
-                this.songs = songs;
-                this.filteredSongs = this.songs;
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
+
     },
     methods: {
         applyFilter(){
@@ -52,21 +41,33 @@ export default {
         sortByArtistAlphabetically() {
             this.filteredSongs.sort((a, b) => a.artist.localeCompare(b.artist));
         },
-        search(name){
+        search(){
             this.filteredSongs = [];
 
             for (let i = 0; i < this.songs.length; i++) {
-                if (this.songs[i].artist.match(name) || this.songs[i].title.match(name)) {
+                if (this.songs[i].artist.match(this.searchEngineFilter) || this.songs[i].title.match(this.searchEngineFilter)) {
                     this.filteredSongs.push(this.songs[i]);
                 }
             }
 
             this.applyFilter();
+        },
+    },
+    watch: {
+        songs: { // Each time the prop course change execute updateChart() method
+            handler: 'search',
+            immediate: false,
         }
     },
     computed: {
+        searchEngineFilter() {
+            return this.store.getSearchEngineFilter();
+        },
         filter() {
             return this.store.getFilter();
+        },
+        songs() {
+            return this.store.getProposedSongs();
         }
     },
     setup() {

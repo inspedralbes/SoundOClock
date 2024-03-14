@@ -12,8 +12,7 @@ export default {
     },
     methods: {
         vote(songId) {
-            console.log("VOTED SONG", songId);
-            socket.emit('testing', 1);
+            socket.emit('castVote', 1, songId);
         }
     }
 }
