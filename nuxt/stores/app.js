@@ -5,7 +5,7 @@ export const useAppStore = defineStore('app', {
 
     user: '',
     proposedSongs: [],
-    filter: null,
+    filter: 1,
     searchEngineFilter: ""
 
   }),
