@@ -1,4 +1,5 @@
 <script>
+import { useAppStore } from '@/stores/app';
 export default {
     data() {
         return {
@@ -7,12 +8,12 @@ export default {
         }
     },
     mounted() {
-        fetch('/llistatM.json')
-            //http://localhost:8080/songs
+        fetch('http://localhost:8080/songs')
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                this.songs = data;
+                const songs = Object.values(data);
+                this.songs = songs;
                 this.filteredSongs = this.songs;
             })
             .catch(error => {
@@ -20,8 +21,9 @@ export default {
             });
     },
     methods: {
-        applyFilter(filter) {
-            switch (parseInt(filter)) {
+        applyFilter() {
+            console.log("AQUEST ES EL FILTRE", this.filter)
+            switch (parseInt(this.filter)) {
                 case 1:
                     this.sortByVotesDescending();
                     break;
@@ -51,8 +53,6 @@ export default {
             this.filteredSongs.sort((a, b) => a.artist.localeCompare(b.artist));
         },
         search(name) {
-            console.log(name);
-
             this.filteredSongs = [];
 
             for (let i = 0; i < this.songs.length; i++) {
@@ -60,11 +60,19 @@ export default {
                     this.filteredSongs.push(this.songs[i]);
                 }
             }
+
+            this.applyFilter();
         }
     },
     computed: {
-
-    }
+        filter() {
+            return this.store.getFilter();
+        }
+    },
+    setup() {
+        const store = useAppStore();
+        return { store };
+    },
 }
 
 </script>
@@ -84,7 +92,6 @@ export default {
 </template>
 
 <style scoped>
-
 .ancho {
     width: 85%;
 }

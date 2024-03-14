@@ -9,19 +9,14 @@ if(process.env.NODE_ENV === 'production') {
     apiURL = process.env.DEVELOPMENT_API_URL;
 }
 
-// async function getSongs() {
-//     const response = await fetch(apiURL + 'songs');
-//     const jsonResponse = await response.json();
-//     return jsonResponse;
-// }
-
 async function getUserInfo(token) {
-  const response = await fetch(apiURL + 'user', {
+  const response = await fetch(apiURL + 'userData', {
     method: 'GET',
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
-    }
+      "Authorization": "Bearer " + token,
+    },
   });
   const jsonResponse = await response.json();
   return jsonResponse;

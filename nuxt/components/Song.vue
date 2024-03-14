@@ -1,6 +1,7 @@
 <script>
+import { socket } from '../socket';
 export default {
-    name: 'Canço',
+    name: 'Song',
     props: {
         song: Object
     },
@@ -9,8 +10,13 @@ export default {
 
         }
     },
+    methods: {
+        vote(songId) {
+            console.log("VOTED SONG", songId);
+            socket.emit('testing', 1);
+        }
+    }
 }
-
 
 </script>
 
