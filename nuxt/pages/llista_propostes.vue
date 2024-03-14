@@ -3,7 +3,8 @@ import { useAppStore } from '@/stores/app';
 export default {
     data() {
         return {
-            filteredSongs: []
+            filteredSongs: [],
+            showModal: false
         }
     },
     mounted() {
@@ -52,6 +53,15 @@ export default {
 
             this.applyFilter();
         },
+        openModal() {
+            this.showModal = true;
+            setTimeout(() => {
+                this.closeModal();
+            }, 1500);
+        },
+        closeModal() {
+            this.showModal = false;
+        }
     },
     watch: {
         songs: { // Each time songs change execute search() method
@@ -87,7 +97,16 @@ export default {
             <FilterButtons @applyFilter="applyFilter" />
         </div>
         <div class="ancho mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
-            <Song v-for="song in filteredSongs" v-bind:song="song" />
+            <Song v-for="song in filteredSongs" @openModal="openModal" v-bind:song="song" />
+        </div>
+        <div @click="showModal = false">
+            <transition name="fade">
+                <div v-if="showModal" class="modal">
+                    <div class="modal-content">
+                        <p>JA HAS UTILITZAT ELS TEUS DOS VOTS</p>
+                    </div>
+                </div>
+            </transition>
         </div>
     </div>
 </template>
@@ -103,6 +122,38 @@ export default {
 
 .margenb {
     margin-bottom: 1rem;
+}
+
+/* */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 101;
+}
+
+.modal-content {
+    width: 60%;
+    text-align: center;
+    background-color: white;
+    padding: 30px;
+    border-radius: 5px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 
 @media screen and (min-width: 640px) {
