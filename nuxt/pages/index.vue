@@ -13,9 +13,9 @@
 
         <p class="text-white mt-3">Registra't o inicia sessió per començar</p>
 
-        <button
+        <button @click="loginGoogle"
             class="flex justify-center items-center px-10 py-4 text-white bg-black font-bold cursor-pointer mt-5 border-2 border-white border-opacity-50 shadow-md rounded-full">
-            <span>Inicia sessió amb</span>
+            <span class="mr-2">Inicia sessió amb</span>
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                 <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -40,6 +40,8 @@
 </template>
 
 <script>
+
+
 export default {
     data() {
         return {
@@ -53,6 +55,31 @@ export default {
                 left: Math.random() * window.innerWidth,
                 delay: Math.random() * 100,
             });
+        }
+    },
+    methods: {
+        loginGoogle() {
+            const clientId = this.$config.public.GOOGLE_CLIENT_ID;
+            const redirectUri = this.$config.public.GOOGLE_REDIRECT_URI;
+            const state = this.generateRandomString(16);
+            const scopes = [
+                'openid',
+                'profile',
+                'email',
+                'https://www.googleapis.com/auth/userinfo.profile',
+                'https://www.googleapis.com/auth/user.birthday.read'
+            ];
+            const scope = encodeURIComponent(scopes.join(' '));
+            const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&scope=${scope}&redirect_uri=${redirectUri}&state=${state}`;
+            window.location.href = url;
+        },
+        generateRandomString(length) {
+            let text = '';
+            const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            for (let i = 0; i < length; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            return text;
         }
     }
 };
