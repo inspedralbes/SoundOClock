@@ -8,9 +8,14 @@
     },
     methods: {
       search() {
-        this.$emit('search', this.name);
+        this.store.setSearchEngineFilter(this.name);
+        this.$emit('search');
       },
-    }
+    },
+    setup() {
+        const store = useAppStore();
+        return { store };
+    },
   };
 </script>
 

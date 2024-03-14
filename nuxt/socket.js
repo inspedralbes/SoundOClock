@@ -10,12 +10,28 @@ socket.on("connect", () => {
   console.log("user connected");
   const pinia = useAppStore();
 
-  socket.on("testing", (num) => {
-    console.log(num)
-  });
+  fetch('http://localhost:8080/songs')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        pinia.setProposedSongs(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
 
-  socket.on("voteCasted", (status, songs) => {
-    console.log("SONGS", songs)
+  socket.on("voteCasted", (data) => {
+    console.log("socket voteCasted data received: ", data.song);
+
+    fetch('http://localhost:8080/songs')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        pinia.setProposedSongs(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
   });
 
 });
