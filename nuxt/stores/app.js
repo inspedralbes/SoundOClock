@@ -3,7 +3,10 @@ import { defineStore } from 'pinia'
 export const useAppStore = defineStore('app', {
   state: () => ({
 
-    user: '',
+    user: {
+      email: "",
+      name: ""
+    },
     proposedSongs: [],
     filter: 1,
     searchEngineFilter: ""
@@ -26,8 +29,9 @@ export const useAppStore = defineStore('app', {
     },
 
     //setters
-    setUser(user) {
-      this.user = user
+    setUser(email, name) {
+      this.user.email = email;
+      this.user.name = name;
     },
     setProposedSongs(proposedSongs) {
       this.proposedSongs = proposedSongs

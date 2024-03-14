@@ -13,6 +13,7 @@
 
 <script>
 import axios from 'axios';
+import { socket } from '@/socket';
 
 export default {
     data() {
@@ -38,9 +39,9 @@ export default {
                 this.hd = url.searchParams.get('hd');
                 this.prompt = url.searchParams.get('prompt');
 
-                // setTimeout(() => {
-                //     this.fetchGoogle();
-                // }, 300);
+                setTimeout(() => {
+                    this.fetchGoogle();
+                }, 300);
             }
         },
         async fetchGoogle() {
@@ -64,19 +65,23 @@ export default {
                 const responseToken = await axios.post(authOptions.url, authOptions.data, {
                     headers: authOptions.headers
                 });
-                googleData.tokenInfo = responseToken.data;
+                googleData = responseToken.data;
+                console.log('Google token:', googleData);
+                console.log('Google token:', googleData.access_token);
 
-                axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
-                    headers: {
-                        Authorization: `Bearer ${responseToken.data.access_token}`
-                    }
-                }).then(response => {
-                    googleData.userInfo = response.data;
-                    console.log('Google data:', googleData);
-                }).catch(e => {
-                    console.error('Error during Google authentication:', e);
-                    throw new Error('Failed to authenticate with Google');
-                });
+                socket.emit('googleLogin', googleData.access_token);
+
+                // axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
+                //     headers: {
+                //         Authorization: `Bearer ${responseToken.data.access_token}`
+                //     }
+                // }).then(response => {
+                //     googleData.userInfo = response.data;
+                //     console.log('Google data:', googleData);
+                // }).catch(e => {
+                //     console.error('Error during Google authentication:', e);
+                //     throw new Error('Failed to authenticate with Google');
+                // });
             } catch (e) {
                 console.error('Error during Google authentication:', e);
                 throw new Error('Failed to authenticate with Google');

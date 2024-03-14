@@ -34,6 +34,11 @@ socket.on("connect", () => {
       });
   });
 
+  socket.on("loginData", (mail, name) => {
+    console.log("socket loginData data received: ", mail, name);
+    pinia.setUser(mail, name);
+  });
+
 });
 
 socket.on("disconnect", () => {
