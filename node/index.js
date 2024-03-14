@@ -1,9 +1,10 @@
-const express = require('express');
-const { createServer } = require('node:http');
-const { Server } = require('socket.io');
-const cors = require('cors');
-const { getUserInfo } = require('./communicationManager');
-const mongoose = require('mongoose');
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import { getUserInfo } from './communicationManager.js';
+import { Song, VotingRecord } from './models.js';
 
 const app = express();
 app.use(cors());
@@ -18,34 +19,10 @@ const port = process.env.PORT || 8080;
 
 // Mongoose setup
 mongoose.connect('mongodb://mongoadmin:mongopassword@mongodb:27017/soundoclock', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   authSource: "admin" // This is needed if you're using credentials to connect to MongoDB
 })
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
-
-const Schema = mongoose.Schema;
-
-const songSchema = new Schema({
-  id: Number,
-  title: String,
-  artist: String,
-  genre: String,
-  year: Number,
-  votes: { type: Number, default: 0 },
-  submitDate: Date,
-  submittedBy: String,
-});
-
-const votingRecordSchema = new Schema({
-  userId: Number,
-  submitted: { type: Boolean, default: false },
-  votedSongs: [Number],
-});
-
-const Song = mongoose.model('Song', songSchema);
-const VotingRecord = mongoose.model('VotingRecord', votingRecordSchema);
 
 async function insertDefaultsMongo() {
   const songs = [
@@ -203,3 +180,5 @@ io.on('connection', (socket) => {
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+export { server };

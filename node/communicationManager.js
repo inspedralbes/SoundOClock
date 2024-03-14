@@ -1,5 +1,6 @@
-const fetch = require('node-fetch');
-require('dotenv').config();
+import fetch from 'node-fetch';
+import { config } from 'dotenv';
+config();
 
 let apiURL;
 
@@ -22,4 +23,4 @@ async function getUserInfo(token) {
   return jsonResponse;
 }
 
-module.exports = { getUserInfo }
+export { getUserInfo };
