@@ -7,6 +7,7 @@
 <style scoped>
     .layout {
         background-color: black;
+        min-height: 100vh;
         margin: 0;
         padding: 0;
     }

@@ -10,20 +10,20 @@ export default {
 
     },
     methods: {
-        applyFilter(){
-            console.log("AQUEST ES EL FILTRE", this.filter)            
+        applyFilter() {
+            console.log("AQUEST ES EL FILTRE", this.filter)
             switch (parseInt(this.filter)) {
-                case 1: 
-                this.sortByVotesDescending();
+                case 1:
+                    this.sortByVotesDescending();
                     break;
-                case 2: 
-                this.sortByVotesAscending();
+                case 2:
+                    this.sortByVotesAscending();
                     break;
-                case 3: 
-                this.sortByTitleAlphabetically();
+                case 3:
+                    this.sortByTitleAlphabetically();
                     break;
-                case 4: 
-                this.sortByArtistAlphabetically();
+                case 4:
+                    this.sortByArtistAlphabetically();
                     break;
                 default:
                     break;
@@ -80,25 +80,42 @@ export default {
 
 <template>
     <div class="flex flex-col">
-        <div class="mt-8 px-10">
-            <Cercador @search="search"/>
+        <div class="ancho margen w-4/5 ml-auto mr-auto">
+            <Cercador @search="search" />
         </div>
-        <div class="mb-4 px-10">
-            <FilterButtons @applyFilter="applyFilter"/>
+        <div class="ancho margenb mb-10 w-4/5 ml-auto mr-auto">
+            <FilterButtons @applyFilter="applyFilter" />
         </div>
-        <div class="w-full mb-8 px-10 flex flex-col gap-3">
-            <Song v-for="song in filteredSongs" v-bind:song="song"/>
+        <div class="ancho mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
+            <Song v-for="song in filteredSongs" v-bind:song="song" />
         </div>
     </div>
 </template>
 
 <style scoped>
-
-.contenidor {
-    color: white;
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
+.ancho {
+    width: 85%;
 }
-    
+
+.margen {
+    margin-top: 1rem;
+}
+
+.margenb {
+    margin-bottom: 1rem;
+}
+
+@media screen and (min-width: 640px) {
+    .ancho {
+        width: 55%;
+    }
+
+    .margen {
+        margin-top: 2.5rem;
+    }
+
+    .margenb {
+        margin-bottom: 2.5rem;
+    }
+}
 </style>
