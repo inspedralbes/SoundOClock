@@ -41,7 +41,7 @@ export default {
         sortByArtistAlphabetically() {
             this.filteredSongs.sort((a, b) => a.artist.localeCompare(b.artist));
         },
-        search(){
+        search() {
             this.filteredSongs = [];
 
             for (let i = 0; i < this.songs.length; i++) {
@@ -68,6 +68,9 @@ export default {
         },
         songs() {
             return this.store.getProposedSongs();
+        },
+        loading() {
+            return this.store.getLoading();
         }
     },
     setup() {
@@ -80,20 +83,47 @@ export default {
 
 <template>
     <div class="flex flex-col">
-        <div class="ancho margen w-4/5 ml-auto mr-auto">
+        <div class="width margen w-4/5 ml-auto mr-auto">
             <Cercador @search="search" />
         </div>
-        <div class="ancho margenb mb-10 w-4/5 ml-auto mr-auto">
+        <div class="width margenb mb-10 w-4/5 ml-auto mr-auto">
             <FilterButtons @applyFilter="applyFilter" />
         </div>
-        <div class="ancho mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
+        <div v-if="loading" class="loading">
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin icon icon-tabler icon-tabler-loader-2"
+                    width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M12 3a9 9 0 1 0 9 9" />
+                </svg>
+            </span>
+            <span>
+                <p class="text-white">Processant...</p>
+            </span>
+        </div>
+        <div v-else class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
             <Song v-for="song in filteredSongs" v-bind:song="song" />
         </div>
     </div>
 </template>
 
 <style scoped>
-.ancho {
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.width {
     width: 85%;
 }
 
@@ -106,7 +136,7 @@ export default {
 }
 
 @media screen and (min-width: 640px) {
-    .ancho {
+    .width {
         width: 55%;
     }
 

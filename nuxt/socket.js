@@ -10,15 +10,17 @@ socket.on("connect", () => {
   console.log("user connected");
   const pinia = useAppStore();
 
+  pinia.setLoading(true);
   fetch('http://localhost:8080/songs')
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        pinia.setProposedSongs(data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      pinia.setProposedSongs(data);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+  pinia.setLoading(false);
 
   socket.on("voteCasted", (data) => {
     console.log("socket voteCasted data received: ", data.song);
