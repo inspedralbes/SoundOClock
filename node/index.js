@@ -65,7 +65,17 @@ app.get('/songs', async (req, res) => {
   } catch (err) {
     res.status(500).send(err);
   }
-}); 
+});
+
+// Get voting records per user id
+app.get('/votingRecords/:userId', async (req, res) => {
+  try {
+    const votingRecord = await VotingRecord.findOne({ userId: req.params.userId });
+    res.json(votingRecord);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
 
 // Sockets
 io.on('connection', (socket) => {
