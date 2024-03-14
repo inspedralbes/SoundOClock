@@ -10,13 +10,13 @@ socket.on("connect", () => {
   const pinia = useAppStore();
   console.log("user connected");
 
-
   getUserSelectedSongs(1);
   getSongs();
 
   socket.on("voteCasted", (data) => {
     console.log("socket voteCasted data received: ", data.song);
     getSongs();
+    getUserSelectedSongs(1);
   });
 
   function getUserSelectedSongs(id) {

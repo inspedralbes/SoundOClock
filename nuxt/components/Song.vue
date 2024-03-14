@@ -15,7 +15,7 @@ export default {
             if (this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
                 this.$emit('openModal');
             } else {
-                socket.emit('castVote', 1, songId);
+                socket.emit('castVote', "2|TwTwUL7tZ438DVbwujGiINYN2CLDgu1Twml2BaKe0c4fd8e0", songId);
             }
         },
         isSongVotedColor(songId) {
