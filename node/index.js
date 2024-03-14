@@ -98,7 +98,7 @@ io.on('connection', (socket) => {
   socket.on('postSong', async (userToken, songData) => {
     // Check that the user is authenticated with Laravel Sanctum
     let user = getUserInfo(userToken);
-    if (!user) return;
+    if (user.message) return;
   
     try {
       // Check if the song already exists
@@ -136,7 +136,7 @@ io.on('connection', (socket) => {
   socket.on('castVote', async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum
     let user = getUserInfo(userToken);
-    if (!user) return;
+    if (user.message) return;
   
     try {
       // Check if the song exists
@@ -174,7 +174,7 @@ io.on('connection', (socket) => {
   socket.on('deleteSong', async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = getUserInfo(userToken);
-    if (!user || !user.isAdmin) return;
+    if (user.message || user.is_admin === 0) return;
   
     try {
       // Check if the song exists and delete it
