@@ -132,9 +132,21 @@ io.on('connection', (socket) => {
         socket.emit('voteError', { status: 'error', message: 'Song not found' });
         return;
       }
-  
-      // Check if the user already voted
+
+      // Check if the user wants to undo the vote
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
+      if (votingRecord && votingRecord.votedSongs.includes(songId)) {
+        song.votes -= 1;
+        await song.save();
+
+        votingRecord.votedSongs = votingRecord.votedSongs.filter(id => id !== songId);
+        await votingRecord.save();
+
+        io.emit('voteCasted', { status: 'success', song });
+        return;
+      }
+  
+      // Check if the user already voted twice
       if (votingRecord && votingRecord.votedSongs.length > 1) {
         socket.emit('voteError', { status: 'error', message: 'User already voted' });
         return;
