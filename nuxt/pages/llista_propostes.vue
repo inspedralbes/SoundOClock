@@ -54,7 +54,7 @@ export default {
         },
     },
     watch: {
-        songs: { // Each time the prop course change execute updateChart() method
+        songs: { // Each time songs change execute search() method
             handler: 'search',
             immediate: false,
         }
