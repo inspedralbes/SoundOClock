@@ -35,8 +35,12 @@ export const useAppStore = defineStore('app', {
       return this.isLoadingVote
     },
 
+    getUser() {
+      return this.user
+    },
+
     //setters
-    setUser(email, name) {
+    setUser(email, name, token) {
       this.user.email = email;
       this.user.name = name;
       this.user.token = token;
