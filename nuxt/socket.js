@@ -1,7 +1,8 @@
 import { io } from "socket.io-client";
 import { useAppStore } from "./stores/app";
-// import router from "vue-router";
-// import router from "./router";
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 let url = "http://localhost:8080";
 
@@ -47,7 +48,7 @@ socket.on("connect", () => {
   socket.on("loginData", (mail, name, token) => {
     console.log("socket loginData data received: ", mail, name, token);
     pinia.setUser(mail, name, token);
-    // router.push("/llista_propostes");
+    navigateTo({ path: '/llista_propostes' })
   });
 
 });
