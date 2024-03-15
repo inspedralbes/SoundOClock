@@ -4,11 +4,22 @@ export default {
     data() {
         return {
             filteredSongs: [],
-            showModal: false
+            showModal: false,
+            loading: false,
         }
     },
     mounted() {
-
+        this.loading = true;
+        fetch(`http://localhost:8080/votingRecords/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("user: ", data);
+                pinia.setUserSelectedSongs(data);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        this.loading = false;
     },
     methods: {
         applyFilter() {
@@ -79,9 +90,6 @@ export default {
         songs() {
             return this.store.getProposedSongs();
         },
-        loading() {
-            return this.store.getLoading();
-        }
     },
     setup() {
         const store = useAppStore();
@@ -92,7 +100,10 @@ export default {
 </script>
 
 <template>
-    <div class="flex flex-col">
+    <div v-if="loading" class="loading">
+        <h2>Loading...</h2>
+    </div>
+    <div v-else class="flex flex-col">
         <div class="width margen w-4/5 ml-auto mr-auto">
             <Cercador @search="search" />
         </div>
@@ -165,12 +176,12 @@ export default {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 1s;
+    transition: opacity 1s;
 }
 
 .fade-enter,
 .fade-leave-to {
-  opacity: 0;
+    opacity: 0;
 }
 
 @media screen and (min-width: 640px) {
