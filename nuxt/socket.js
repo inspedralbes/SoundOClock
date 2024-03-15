@@ -19,6 +19,7 @@ socket.on("connect", () => {
     console.log("socket voteCasted data received: ", data.song);
     getSongs();
     getUserSelectedSongs(1);
+    pinia.setIsLoadingVote({state: false, selectedSong: null});
   });
 
   function getUserSelectedSongs(id) {

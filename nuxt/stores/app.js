@@ -13,6 +13,7 @@ export const useAppStore = defineStore('app', {
     proposedSongs: [],
     filter: 1,
     searchEngineFilter: "",
+    isLoadingVote: false
 
   }),
   actions: {
@@ -29,6 +30,9 @@ export const useAppStore = defineStore('app', {
     },
     getSearchEngineFilter() {
       return this.searchEngineFilter
+    },
+    getIsLoadingVote() {
+      return this.isLoadingVote
     },
 
     getUser() {
@@ -54,6 +58,9 @@ export const useAppStore = defineStore('app', {
     },
     setSearchEngineFilter(searchEngineFilter) {
       this.searchEngineFilter = searchEngineFilter
+    },
+    setIsLoadingVote(isLoadingVote) {
+      this.isLoadingVote = isLoadingVote
     },
 
   },
