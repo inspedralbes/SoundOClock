@@ -3,10 +3,16 @@ import { defineStore } from 'pinia'
 export const useAppStore = defineStore('app', {
   state: () => ({
 
+    user: {
+      email: "",
+      name: "",
+      token: ""
+    },
+
     userSelectedSongs: null,
     proposedSongs: [],
     filter: 1,
-    searchEngineFilter: ""
+    searchEngineFilter: "",
 
   }),
   actions: {
@@ -26,8 +32,14 @@ export const useAppStore = defineStore('app', {
     },
 
     //setters
+    setUser(email, name) {
+      this.user.email = email;
+      this.user.name = name;
+      this.user.token = token;
+
     setUserSelectedSongs(userSelectedSongs) {
       this.userSelectedSongs = userSelectedSongs
+
     },
     setProposedSongs(proposedSongs) {
       this.proposedSongs = proposedSongs
@@ -37,7 +49,7 @@ export const useAppStore = defineStore('app', {
     },
     setSearchEngineFilter(searchEngineFilter) {
       this.searchEngineFilter = searchEngineFilter
-    }
+    },
 
   },
 })

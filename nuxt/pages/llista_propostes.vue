@@ -42,7 +42,7 @@ export default {
         sortByArtistAlphabetically() {
             this.filteredSongs.sort((a, b) => a.artist.localeCompare(b.artist));
         },
-        search(){
+        search() {
             this.filteredSongs = [];
 
             for (let i = 0; i < this.songs.length; i++) {
@@ -78,6 +78,9 @@ export default {
         },
         songs() {
             return this.store.getProposedSongs();
+        },
+        loading() {
+            return this.store.getLoading();
         }
     },
     setup() {
@@ -90,10 +93,10 @@ export default {
 
 <template>
     <div class="flex flex-col">
-        <div class="ancho margen w-4/5 ml-auto mr-auto">
+        <div class="width margen w-4/5 ml-auto mr-auto">
             <Cercador @search="search" />
         </div>
-        <div class="ancho margenb mb-10 w-4/5 ml-auto mr-auto">
+        <div class="width margenb mb-10 w-4/5 ml-auto mr-auto">
             <FilterButtons @applyFilter="applyFilter" />
         </div>
         <div class="ancho mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
@@ -112,7 +115,21 @@ export default {
 </template>
 
 <style scoped>
-.ancho {
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.width {
     width: 85%;
 }
 
@@ -157,7 +174,7 @@ export default {
 }
 
 @media screen and (min-width: 640px) {
-    .ancho {
+    .width {
         width: 55%;
     }
 

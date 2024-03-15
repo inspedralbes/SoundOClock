@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
 import { useAppStore } from "./stores/app";
+// import router from "vue-router";
 // import router from "./router";
 
 let url = "http://localhost:8080";
@@ -42,6 +43,12 @@ socket.on("connect", () => {
       console.error('Error fetching data:', error);
     });
   }
+
+  socket.on("loginData", (mail, name, token) => {
+    console.log("socket loginData data received: ", mail, name, token);
+    pinia.setUser(mail, name, token);
+    // router.push("/llista_propostes");
+  });
 
 });
 

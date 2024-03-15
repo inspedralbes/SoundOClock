@@ -21,8 +21,8 @@ const port = process.env.PORT || 8080;
 mongoose.connect('mongodb://mongoadmin:mongopassword@mongodb:27017/soundoclock', {
   authSource: "admin" // This is needed if you're using credentials to connect to MongoDB
 })
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 async function insertDefaultsMongo() {
   const songs = [
@@ -52,7 +52,7 @@ async function insertDefaultsMongo() {
   // Upsert voting records
   for (const record of votingRecords) {
     await VotingRecord.updateOne({ userId: record.userId }, { $setOnInsert: record }, { upsert: true });
-  } 
+  }
 }
 
 insertDefaultsMongo();
@@ -81,12 +81,50 @@ app.get('/votingRecords/:userId', async (req, res) => {
 io.on('connection', (socket) => {
   console.log('a user connected');
 
+
+  socket.on('googleLogin', (userToken) => {
+
+    fetch('https://www.googleapis.com/oauth2/v1/userinfo', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${userToken}`
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        fetch('http://laravel:8000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            email: data.email,
+            name: data.name,
+          })
+        }).then(response => response.json())
+          .then(data => {
+            console.log("All",data);
+            console.log(data.user.email, data.user.name);
+            socket.emit('loginData', data.user.email, data.user.name, data.token);
+          })
+          .catch(err => {
+            console.log(err);
+          })
+      })
+
+
+  });
+
+
+
   // Post song checking for duplicates first
   socket.on('postSong', async (userToken, songData) => {
     // Check that the user is authenticated with Laravel Sanctum
     let user = getUserInfo(userToken);
     if (user.message) return;
-  
+
     try {
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
@@ -94,25 +132,25 @@ io.on('connection', (socket) => {
         socket.emit('postError', { status: 'error', message: 'Song already exists' });
         return;
       }
-  
+
       // Check if the user already submitted a song
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
       if (votingRecord && votingRecord.submitted) {
         socket.emit('postError', { status: 'error', message: 'User already submitted a song' });
         return;
       }
-  
+
       // Save the song and update the voting record
       const newSong = new Song(songData);
       await newSong.save();
-  
+
       if (!votingRecord) {
         await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [] }).save();
       } else {
         votingRecord.submitted = true;
         await votingRecord.save();
       }
-  
+
       io.emit('songPosted', { status: 'success', song: songData });
     } catch (err) {
       socket.emit('postError', { status: 'error', message: err.message });
@@ -124,7 +162,7 @@ io.on('connection', (socket) => {
     // Check that the user is authenticated with Laravel Sanctum
     let user = await getUserInfo(userToken);
     if (user.message) return;
-  
+
     try {
       // Check if the song exists
       const song = await Song.findOne({ id: songId });
@@ -151,7 +189,7 @@ io.on('connection', (socket) => {
         socket.emit('voteError', { status: 'error', message: 'User already voted' });
         return;
       }
-  
+
       // Save the vote and update the voting record
       song.votes += 1;
       await song.save();
@@ -162,7 +200,7 @@ io.on('connection', (socket) => {
         votingRecord.votedSongs.push(songId);
         await votingRecord.save();
       }
-  
+
       io.emit('voteCasted', { status: 'success', song });
     } catch (err) {
       socket.emit('voteError', { status: 'error', message: err.message });
@@ -174,7 +212,7 @@ io.on('connection', (socket) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = getUserInfo(userToken);
     if (user.message || user.is_admin === 0) return;
-  
+
     try {
       // Check if the song exists and delete it
       const song = await Song.findOneAndDelete({ id: songId });
@@ -182,7 +220,7 @@ io.on('connection', (socket) => {
         socket.emit('deleteError', { status: 'error', message: 'Song not found' });
         return;
       }
-  
+
       io.emit('songDeleted', { status: 'success', id: songId });
     } catch (err) {
       socket.emit('deleteError', { status: 'error', message: err.message });
@@ -191,7 +229,7 @@ io.on('connection', (socket) => {
 
   // Testing
   socket.on('testing', (num) => {
-    socket.emit('testing', {num: num});
+    socket.emit('testing', { num: num });
   });
 
   socket.on('disconnect', () => {
