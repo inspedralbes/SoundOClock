@@ -105,9 +105,9 @@ io.on('connection', (socket) => {
           })
         }).then(response => response.json())
           .then(data => {
-            console.log("All",data);
-            console.log(data.user.email, data.user.name);
-            socket.emit('loginData', data.user.email, data.user.name, data.token);
+            console.log("All", data);
+            console.log(data.user.email, data.user.name, data.token, data.user.id);
+            socket.emit('loginData', data.user.id, data.user.email, data.user.name, data.token);
           })
           .catch(err => {
             console.log(err);
@@ -181,7 +181,7 @@ io.on('connection', (socket) => {
         io.emit('voteCasted', { status: 'success', song });
         return;
       }
-  
+
       // Check if the user already voted twice
       if (votingRecord && votingRecord.votedSongs.length > 1) {
         socket.emit('voteError', { status: 'error', message: 'User already voted' });

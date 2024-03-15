@@ -4,6 +4,7 @@ export const useAppStore = defineStore('app', {
   state: () => ({
 
     user: {
+      id: 0,
       email: "",
       name: "",
       token: ""
@@ -40,7 +41,8 @@ export const useAppStore = defineStore('app', {
     },
 
     //setters
-    setUser(email, name, token) {
+    setUser(id, email, name, token) {
+      this.user.id = id;
       this.user.email = email;
       this.user.name = name;
       this.user.token = token;

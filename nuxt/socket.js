@@ -19,36 +19,36 @@ socket.on("connect", () => {
     console.log("socket voteCasted data received: ", data.song);
     getSongs();
     getUserSelectedSongs(1);
-    pinia.setIsLoadingVote({state: false, selectedSong: null});
+    pinia.setIsLoadingVote({ state: false, selectedSong: null });
   });
 
   function getUserSelectedSongs(id) {
     fetch(`http://localhost:8080/votingRecords/${id}`)
-    .then(response => response.json())
-    .then(data => {
-      console.log("user: ", data);
-      pinia.setUserSelectedSongs(data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-  }
-  
-  function getSongs() {
-    fetch('http://localhost:8080/songs')
-    .then(response => response.json())
-    .then(data => {
-      console.log("songs: ", data);
-      pinia.setProposedSongs(data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        console.log("user: ", data);
+        pinia.setUserSelectedSongs(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
   }
 
-  socket.on("loginData", (mail, name, token) => {
-    console.log("socket loginData data received: ", mail, name, token);
-    pinia.setUser(mail, name, token);
+  function getSongs() {
+    fetch('http://localhost:8080/songs')
+      .then(response => response.json())
+      .then(data => {
+        console.log("songs: ", data);
+        pinia.setProposedSongs(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }
+
+  socket.on("loginData", (id, mail, name, token) => {
+    console.log("socket loginData data received: ", id, mail, name, token);
+    pinia.setUser(id, mail, name, token);
     navigateTo({ path: '/llista_propostes' })
   });
 
