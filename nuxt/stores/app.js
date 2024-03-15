@@ -8,6 +8,8 @@ export const useAppStore = defineStore('app', {
       name: "",
       token: ""
     },
+
+    userSelectedSongs: null,
     proposedSongs: [],
     filter: 1,
     searchEngineFilter: "",
@@ -16,8 +18,8 @@ export const useAppStore = defineStore('app', {
   actions: {
 
     //getters
-    getUser() {
-      return this.user
+    getUserSelectedSongs() {
+      return this.userSelectedSongs
     },
     getProposedSongs() {
       return this.proposedSongs
@@ -34,6 +36,10 @@ export const useAppStore = defineStore('app', {
       this.user.email = email;
       this.user.name = name;
       this.user.token = token;
+
+    setUserSelectedSongs(userSelectedSongs) {
+      this.userSelectedSongs = userSelectedSongs
+
     },
     setProposedSongs(proposedSongs) {
       this.proposedSongs = proposedSongs

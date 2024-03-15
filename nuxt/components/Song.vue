@@ -12,9 +12,36 @@ export default {
     },
     methods: {
         vote(songId) {
-            socket.emit('castVote', 1, songId);
+            if (this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
+                this.$emit('openModal');
+            } else {
+                socket.emit('castVote', "2|TwTwUL7tZ438DVbwujGiINYN2CLDgu1Twml2BaKe0c4fd8e0", songId);
+            }
+        },
+        isSongVotedColor(songId) {
+            if (this.userSelectedSongs.votedSongs.includes(songId)) {
+                return "#83aee4";
+            } else {
+                return "currentColor";
+            }
+        },
+        isSongVotedFill(songId) {
+            if (this.userSelectedSongs.votedSongs.includes(songId)) {
+                return "#83aee4";
+            } else {
+                return "none";
+            }
+        },
+    },
+    computed: {
+        userSelectedSongs() {
+            return this.store.getUserSelectedSongs();
         }
-    }
+    },
+    setup() {
+        const store = useAppStore();
+        return { store };
+    },
 }
 
 </script>
@@ -50,15 +77,14 @@ export default {
                 </svg>
             </button>
             <button @click="vote(song.id)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" :fill="isSongVotedFill(song.id)"
+                    :stroke="isSongVotedColor(song.id)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="icon icon-tabler icons-tabler-outline icon-tabler-thumb-up">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path
                         d="M7 11v8a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1h3a4 4 0 0 0 4 -4v-1a2 2 0 0 1 4 0v5h3a2 2 0 0 1 2 2l-1 5a2 3 0 0 1 -2 2h-7a3 3 0 0 1 -3 -3" />
                 </svg>
             </button>
-
             <!--<svg  xmlns="http://www.w3.org/2000/svg"  width="36"  height="36"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-pause"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 4h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2z" /><path d="M17 4h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2z" /></svg>-->
         </div>
     </div>
@@ -137,8 +163,6 @@ img {
         flex-grow: 1;
         max-width: 100%;
     }
-
-    
 
 }
 </style>

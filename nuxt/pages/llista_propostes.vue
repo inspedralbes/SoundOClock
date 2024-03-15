@@ -3,7 +3,8 @@ import { useAppStore } from '@/stores/app';
 export default {
     data() {
         return {
-            filteredSongs: []
+            filteredSongs: [],
+            showModal: false
         }
     },
     mounted() {
@@ -52,6 +53,15 @@ export default {
 
             this.applyFilter();
         },
+        openModal() {
+            this.showModal = true;
+            setTimeout(() => {
+                this.closeModal();
+            }, 1500);
+        },
+        closeModal() {
+            this.showModal = false;
+        }
     },
     watch: {
         songs: { // Each time songs change execute search() method
@@ -89,21 +99,17 @@ export default {
         <div class="width margenb mb-10 w-4/5 ml-auto mr-auto">
             <FilterButtons @applyFilter="applyFilter" />
         </div>
-        <div v-if="loading" class="loading">
-            <span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin icon icon-tabler icon-tabler-loader-2"
-                    width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M12 3a9 9 0 1 0 9 9" />
-                </svg>
-            </span>
-            <span>
-                <p class="text-white">Processant...</p>
-            </span>
+        <div class="ancho mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
+            <Song v-for="song in filteredSongs" @openModal="openModal" v-bind:song="song" />
         </div>
-        <div v-else class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
-            <Song v-for="song in filteredSongs" v-bind:song="song" />
+        <div @click="showModal = false">
+            <transition name="fade">
+                <div v-if="showModal" class="modal">
+                    <div class="modal-content">
+                        <p>JA HAS UTILITZAT ELS TEUS DOS VOTS</p>
+                    </div>
+                </div>
+            </transition>
         </div>
     </div>
 </template>
@@ -133,6 +139,38 @@ export default {
 
 .margenb {
     margin-bottom: 1rem;
+}
+
+/* */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 101;
+}
+
+.modal-content {
+    width: 60%;
+    text-align: center;
+    background-color: white;
+    padding: 30px;
+    border-radius: 5px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 
 @media screen and (min-width: 640px) {
