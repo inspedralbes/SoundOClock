@@ -112,7 +112,7 @@ export default {
         <div class="width margenb mb-10 w-4/5 ml-auto mr-auto">
             <FilterButtons @applyFilter="applyFilter" />
         </div>
-        <div class="ancho mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
+        <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
             <Song v-for="song in filteredSongs" @openModal="openModal" v-bind:song="song" />
         </div>
         <div @click="showModal = false">
@@ -186,7 +186,7 @@ export default {
     opacity: 0;
 }
 
-@media screen and (max-width: 640px) {
+@media screen and (min-width: 640px) {
     .width {
         width: 55%;
     }

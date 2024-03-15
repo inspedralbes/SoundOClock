@@ -12,10 +12,11 @@ export default {
     },
     methods: {
         vote(songId) {
+            console.log(this.store.getUser().token);
             if (this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
                 this.$emit('openModal');
             } else {
-                socket.emit('castVote', "2|TwTwUL7tZ438DVbwujGiINYN2CLDgu1Twml2BaKe0c4fd8e0", songId);
+                socket.emit('castVote', this.store.getUser().token, songId);
             }
         },
         isSongVotedColor(songId) {
@@ -60,9 +61,9 @@ export default {
         </div>
 
         <div class="song-data">
-            <p class="font-black basis-1/4">{{ song.title }}</p>
-            <p class="basis-2/4">{{ song.artist }}</p>
-            <p class="basis-1/4">{{ song.votes }} vots</p>
+            <p class="font-black basis-1/3">{{ song.title }}</p>
+            <p class="basis-1/3">{{ song.artist }}</p>
+            <p class="basis-1/3">{{ song.votes }} vots</p>
         </div>
 
         <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
@@ -133,7 +134,7 @@ export default {
 }
 
 .song-data {
-    max-width: 60%;
+    max-width: 100%;
     min-width: 5%;
 }
 

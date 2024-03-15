@@ -31,6 +31,10 @@ export const useAppStore = defineStore('app', {
       return this.searchEngineFilter
     },
 
+    getUser() {
+      return this.user
+    },
+
     //setters
     setUser(email, name, token) {
       this.user.email = email;
