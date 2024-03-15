@@ -33,17 +33,17 @@ socket.on("connect", () => {
     });
   }
   
-  // function getSongs() {
-  //   fetch('http://localhost:8080/songs')
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     console.log("songs: ", data);
-  //     pinia.setProposedSongs(data);
-  //   })
-  //   .catch(error => {
-  //     console.error('Error fetching data:', error);
-  //   });
-  // }
+  function getSongs() {
+    fetch('http://localhost:8080/songs')
+    .then(response => response.json())
+    .then(data => {
+      console.log("songs: ", data);
+      pinia.setProposedSongs(data);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+  }
 
   socket.on("loginData", (mail, name, token) => {
     console.log("socket loginData data received: ", mail, name, token);

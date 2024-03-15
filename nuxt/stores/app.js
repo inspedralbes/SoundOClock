@@ -10,7 +10,7 @@ export const useAppStore = defineStore('app', {
     },
 
     userSelectedSongs: null,
-    // proposedSongs: [],
+    proposedSongs: [],
     filter: 1,
     searchEngineFilter: "",
 
@@ -21,9 +21,9 @@ export const useAppStore = defineStore('app', {
     getUserSelectedSongs() {
       return this.userSelectedSongs
     },
-    // getProposedSongs() {
-    //   return this.proposedSongs
-    // },
+    getProposedSongs() {
+      return this.proposedSongs
+    },
     getFilter() {
       return this.filter
     },
@@ -46,9 +46,9 @@ export const useAppStore = defineStore('app', {
       this.userSelectedSongs = userSelectedSongs
 
     },
-    // setProposedSongs(proposedSongs) {
-    //   this.proposedSongs = proposedSongs
-    // },
+    setProposedSongs(proposedSongs) {
+      this.proposedSongs = proposedSongs
+    },
     setFilter(filter) {
       this.filter = filter
     },
