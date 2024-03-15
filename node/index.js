@@ -122,7 +122,7 @@ io.on('connection', (socket) => {
   // Cast a vote for a song
   socket.on('castVote', async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum
-    let user = getUserInfo(userToken);
+    let user = await getUserInfo(userToken);
     if (user.message) return;
   
     try {
