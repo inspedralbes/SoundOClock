@@ -226,8 +226,8 @@ io.on('connection', (socket) => {
   });
 
   // Testing
-  socket.on('testing', (num) => {
-    socket.emit('testing', { num: num });
+  socket.on('testing', (msg) => {
+    socket.emit('testing', msg);
   });
 
   socket.on('disconnect', () => {
@@ -239,4 +239,4 @@ server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-export { server };
+export { port };
