@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
 import { useAppStore } from "./stores/app";
+// import router from "vue-router";
 // import router from "./router";
 
 let url = "http://localhost:8080";
@@ -10,7 +11,6 @@ socket.on("connect", () => {
   console.log("user connected");
   const pinia = useAppStore();
 
-  pinia.setLoading(true);
   fetch('http://localhost:8080/songs')
     .then(response => response.json())
     .then(data => {
@@ -20,7 +20,6 @@ socket.on("connect", () => {
     .catch(error => {
       console.error('Error fetching data:', error);
     });
-  pinia.setLoading(false);
 
   socket.on("voteCasted", (data) => {
     console.log("socket voteCasted data received: ", data.song);
@@ -36,9 +35,10 @@ socket.on("connect", () => {
       });
   });
 
-  socket.on("loginData", (mail, name) => {
-    console.log("socket loginData data received: ", mail, name);
-    pinia.setUser(mail, name);
+  socket.on("loginData", (mail, name, token) => {
+    console.log("socket loginData data received: ", mail, name, token);
+    pinia.setUser(mail, name, token);
+    // router.push("/llista_propostes");
   });
 
 });

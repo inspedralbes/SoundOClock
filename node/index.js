@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
           .then(data => {
             console.log("All",data);
             console.log(data.user.email, data.user.name);
-            socket.emit('loginData', data.user.email, data.user.name);
+            socket.emit('loginData', data.user.email, data.user.name, data.token);
           })
           .catch(err => {
             console.log(err);

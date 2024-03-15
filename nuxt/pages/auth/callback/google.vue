@@ -68,20 +68,7 @@ export default {
                 googleData = responseToken.data;
                 console.log('Google token:', googleData);
                 console.log('Google token:', googleData.access_token);
-
                 socket.emit('googleLogin', googleData.access_token);
-
-                // axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
-                //     headers: {
-                //         Authorization: `Bearer ${responseToken.data.access_token}`
-                //     }
-                // }).then(response => {
-                //     googleData.userInfo = response.data;
-                //     console.log('Google data:', googleData);
-                // }).catch(e => {
-                //     console.error('Error during Google authentication:', e);
-                //     throw new Error('Failed to authenticate with Google');
-                // });
             } catch (e) {
                 console.error('Error during Google authentication:', e);
                 throw new Error('Failed to authenticate with Google');

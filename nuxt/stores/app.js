@@ -5,12 +5,12 @@ export const useAppStore = defineStore('app', {
 
     user: {
       email: "",
-      name: ""
+      name: "",
+      token: ""
     },
     proposedSongs: [],
     filter: 1,
     searchEngineFilter: "",
-    loading: false,
 
   }),
   actions: {
@@ -28,14 +28,12 @@ export const useAppStore = defineStore('app', {
     getSearchEngineFilter() {
       return this.searchEngineFilter
     },
-    getLoading() {
-      return this.loading
-    },
 
     //setters
     setUser(email, name) {
       this.user.email = email;
       this.user.name = name;
+      this.user.token = token;
     },
     setProposedSongs(proposedSongs) {
       this.proposedSongs = proposedSongs
@@ -45,9 +43,6 @@ export const useAppStore = defineStore('app', {
     },
     setSearchEngineFilter(searchEngineFilter) {
       this.searchEngineFilter = searchEngineFilter
-    },
-    setLoading(loading) {
-      this.loading = loading
     },
 
   },
