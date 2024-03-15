@@ -36,6 +36,7 @@ export const useAppStore = defineStore('app', {
       this.user.email = email;
       this.user.name = name;
       this.user.token = token;
+    },
 
     setUserSelectedSongs(userSelectedSongs) {
       this.userSelectedSongs = userSelectedSongs
