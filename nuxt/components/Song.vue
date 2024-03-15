@@ -12,10 +12,13 @@ export default {
     },
     methods: {
         vote(songId) {
-            if (this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
-                this.$emit('openModal');
-            } else {
-                socket.emit('castVote', "2|TwTwUL7tZ438DVbwujGiINYN2CLDgu1Twml2BaKe0c4fd8e0", songId);
+            if (!this.isLoadingVote.state) {
+                if (this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
+                    this.$emit('openModal');
+                } else {
+                    this.store.setIsLoadingVote({state: true, selectedSong: songId});
+                    socket.emit('castVote', "3|butvvSQ187V6ZyPuORUmqTziHsq0juGWDgIRoru1f2568e29", songId);
+                }
             }
         },
         isSongVotedColor(songId) {
@@ -36,6 +39,9 @@ export default {
     computed: {
         userSelectedSongs() {
             return this.store.getUserSelectedSongs();
+        },
+        isLoadingVote() {
+            return this.store.getIsLoadingVote();
         }
     },
     setup() {
@@ -76,7 +82,8 @@ export default {
                     <path d="M12 16h.01" />
                 </svg>
             </button>
-            <button @click="vote(song.id)">
+            <svg v-if="isLoadingVote.state == true && isLoadingVote.selectedSong == song.id" width="36" height="36" fill="#83aee4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" class="spinner-loader"/></svg>
+            <button v-else @click="vote(song.id)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" :fill="isSongVotedFill(song.id)"
                     :stroke="isSongVotedColor(song.id)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="icon icon-tabler icons-tabler-outline icon-tabler-thumb-up">
@@ -91,6 +98,23 @@ export default {
 </template>
 
 <style scoped>
+
+.spinner-loader {
+    transform-origin:center;
+    animation: rotate .75s infinite linear;
+    color: white;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg); /* Initial rotation angle */
+    }
+    to {
+        transform: rotate(360deg); /* Final rotation angle */
+    }
+}
+
+
 .contenidor-canço {
     background-color: rgb(56, 56, 56);
     /* border: 1px solid rgb(163, 163, 163); */
