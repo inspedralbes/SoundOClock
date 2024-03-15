@@ -117,13 +117,11 @@ io.on('connection', (socket) => {
 
   });
 
-
-
   // Post song checking for duplicates first
   socket.on('postSong', async (userToken, songData) => {
     // Check that the user is authenticated with Laravel Sanctum
-    let user = getUserInfo(userToken);
-    if (user.message) return;
+    let user = await getUserInfo(userToken);
+    if (!user.id) return;
 
     try {
       // Check if the song already exists
@@ -161,7 +159,7 @@ io.on('connection', (socket) => {
   socket.on('castVote', async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum
     let user = await getUserInfo(userToken);
-    if (user.message) return;
+    if (!user.id) return;
 
     try {
       // Check if the song exists
@@ -210,8 +208,8 @@ io.on('connection', (socket) => {
   // Delete a song
   socket.on('deleteSong', async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
-    let user = getUserInfo(userToken);
-    if (user.message || user.is_admin === 0) return;
+    let user = await getUserInfo(userToken);
+    if (!user.id || user.is_admin === 0) return;
 
     try {
       // Check if the song exists and delete it
