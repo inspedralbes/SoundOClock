@@ -3,6 +3,7 @@ import { useAppStore } from '@/stores/app';
 export default {
     data() {
         return {
+            proposedSongs: [],
             filteredSongs: [],
             showModal: false,
             loading: false,
@@ -10,11 +11,11 @@ export default {
     },
     mounted() {
         this.loading = true;
-        fetch(`http://localhost:8080/votingRecords/${id}`)
+        fetch('http://localhost:8080/songs')
             .then(response => response.json())
             .then(data => {
-                console.log("user: ", data);
-                pinia.setUserSelectedSongs(data);
+                console.log("songs: ", data);
+                this.proposedSongs = data;
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
@@ -88,7 +89,8 @@ export default {
             return this.store.getFilter();
         },
         songs() {
-            return this.store.getProposedSongs();
+            // return this.store.getProposedSongs();
+            return this.proposedSongs;
         },
     },
     setup() {
