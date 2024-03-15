@@ -32,7 +32,7 @@ export const useAppStore = defineStore('app', {
     },
 
     //setters
-    setUser(email, name) {
+    setUser(email, name, token) {
       this.user.email = email;
       this.user.name = name;
       this.user.token = token;
