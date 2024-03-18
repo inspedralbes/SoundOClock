@@ -15,15 +15,11 @@ INSERT INTO blacklist (nom, spotify_id) VALUES
 INSERT INTO class_groups (name, is_public) VALUES
 ('ESO',1),
 ('Batxillerat',1),
+('Batxillerat Internacional',1),
 ('SMX',1),
 ('DAW',1),
 ('DAM',1),
-('DAM-VOID',1),
+('DAM-VIOD',1),
 ('ASIX',1),
 ('A3D',1),
-('Professors',0),
-('Administració',0),
-('Secretaria',0),
-('Cuina',0),
-('Neteja',0),
 ('Direcció',0);
