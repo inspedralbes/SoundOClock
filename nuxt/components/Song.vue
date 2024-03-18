@@ -16,7 +16,8 @@ export default {
               if (this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
                   this.$emit('openModal');
               } else {
-                  socket.emit('castVote', this.store.getUser().token, songId);
+                  this.store.setIsLoadingVote({ state: true, selectedSong: songId });
+                  socket.emit('castVote', "1|0rqQk3rnYE8xPjSAB6lyzi9fPh0CvXq7WDDEE05xf433cf4a", songId);
               }
           }
         },
