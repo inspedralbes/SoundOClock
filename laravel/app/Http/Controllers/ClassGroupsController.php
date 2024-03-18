@@ -12,7 +12,8 @@ class ClassGroupsController extends Controller
      */
     public function index()
     {
-        //
+        $classGroups = classGroups::all();
+        return json_encode($classGroups);
     }
 
     /**
