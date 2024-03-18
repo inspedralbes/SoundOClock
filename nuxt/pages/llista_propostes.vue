@@ -5,7 +5,9 @@ export default {
         return {
             filteredSongs: [],
             showModal: false,
+            showReportModal: false,
             loading: false,
+            reportedSong: ""
         }
     },
     mounted() {
@@ -72,6 +74,13 @@ export default {
         },
         closeModal() {
             this.showModal = false;
+        },
+        openReportModal(data) {
+            this.reportedSong = data;
+            this.showReportModal = true;
+        },
+        closeReportModal() {
+            this.showReportModal = false;
         }
     },
     watch: {
@@ -111,7 +120,7 @@ export default {
             <FilterButtons @applyFilter="applyFilter" />
         </div>
         <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
-            <Song v-for="song in filteredSongs" @openModal="openModal" v-bind:song="song" />
+            <Song v-for="song in filteredSongs" @openModal="openModal" @openReportModal="openReportModal" v-bind:song="song" />
         </div>
         <div @click="showModal = false">
             <transition name="fade">
@@ -121,6 +130,16 @@ export default {
                     </div>
                 </div>
             </transition>
+        </div>
+        <div v-if="showReportModal" class="modal">
+            <div class="report-modal-content">
+                <button type="button" class="float-end bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <p class="clear-both">REPORTAR CANÇÓ {{ reportedSong }}</p>
+            </div>
         </div>
     </div>
 </template>
@@ -171,6 +190,14 @@ export default {
     text-align: center;
     background-color: white;
     padding: 30px;
+    border-radius: 5px;
+}
+
+.report-modal-content {
+    width: 60%;
+    text-align: center;
+    background-color: white;
+    padding: 15px;
     border-radius: 5px;
 }
 
