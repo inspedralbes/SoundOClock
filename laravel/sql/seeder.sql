@@ -7,6 +7,11 @@ INSERT INTO users (name, email, created_at, updated_at, is_admin) VALUES
 ('raul', 'raul@gmail.com', NOW(), NOW(), 0),
 ('admin', 'admin@gmail.com', NOW(), NOW(), 1);
 
+INSERT INTO blacklist (nom, spotify_id) VALUES
+('Anaconda', 1),
+('Drugstory', 2),
+('Bitch Mode', 3);
+
 INSERT INTO class_groups (name, is_public) VALUES
 ('ESO',1),
 ('Batxillerat',1),
