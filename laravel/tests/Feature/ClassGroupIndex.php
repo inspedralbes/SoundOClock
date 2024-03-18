@@ -13,7 +13,7 @@ class ClassGroupIndex extends TestCase
      */
     public function test_ClassGroupIndex_returns_class_groups(): void
     {
-        $response = $this->get('/api/classgroups');
+        $response = $this->get('/api/classgroups/');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
