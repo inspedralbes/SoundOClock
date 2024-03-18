@@ -12,6 +12,15 @@ class BlacklistController extends Controller
      */
     public function index()
     {
+
+        // Validar que l'usuari sigui administrador
+        if (auth()->user()->is_admin === 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No tens permisos d\'administrador.'
+            ], 404);
+        }
+
         $songs = Blacklist::all();
 
         return response()->json($songs);
@@ -37,13 +46,13 @@ class BlacklistController extends Controller
             'spotify_id' => 'required|numeric',
         ]);
 
-        // // Validar que l'usuari sigui administrador
-        // if (auth()->user()->is_admin === 0) {
-        //     return response()->json([
-        //         'status' => 'error',
-        //         'message' => 'No tens permisos d\'administrador.'
-        //     ], 404);
-        // }
+        // Validar que l'usuari sigui administrador
+        if (auth()->user()->is_admin === 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No tens permisos d\'administrador.'
+            ], 404);
+        }
         
         // Insertar cançó a la blacklist
         $song = new Blacklist();
@@ -59,6 +68,15 @@ class BlacklistController extends Controller
      */
     public function show($id)
     {
+        
+        // Validar que l'usuari sigui administrador
+        if (auth()->user()->is_admin === 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No tens permisos d\'administrador.'
+            ], 404);
+        }
+
         $song = Blacklist::findOrFail($id);
 
         return response()->json($song);
@@ -77,7 +95,7 @@ class BlacklistController extends Controller
      */
     public function update(Request $request, Blacklist $Blacklist)
     {
-        Blacklist::find($id)->update($request->all());
+        //
     }
 
     /**
@@ -86,16 +104,24 @@ class BlacklistController extends Controller
     public function destroy($id)
     {
 
-        // // Validar que l'usuari sigui administrador
-        // if (auth()->user()->is_admin === 0) {
-        //     return response()->json([
-        //         'status' => 'error',
-        //         'message' => 'No tens permisos d\'administrador.'
-        //     ], 404);
-        // }
-
+        // Validar que l'usuari sigui administrador
+        if (auth()->user()->is_admin === 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No tens permisos d\'administrador.'
+            ], 404);
+        }
         
+        // Validar que la cançó existeix
+        $song = Blacklist::find($id);
+        if ($song == null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'La cançó no existeix.'
+            ], 404);
+        }
 
         Blacklist::destroy($id);
+        return response()->json($song);
     }
 }

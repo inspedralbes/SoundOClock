@@ -24,12 +24,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class,'register']);
 Route::post('/login', [AuthController::class,'login']);
 
-Route::get('/blacklist', [BlacklistController::class,'index']);
-Route::get('/blacklist/{id}', [BlacklistController::class,'show']);
-Route::post('/blacklist', [BlacklistController::class,'store']);
-
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class,'logout']);
     Route::post('/userData', [AuthController::class,'getUser']);
+
+    Route::get('/blacklist', [BlacklistController::class,'index']);
+    Route::get('/blacklist/{id}', [BlacklistController::class,'show']);
+    Route::post('/blacklist', [BlacklistController::class,'store']);
+    Route::delete('/blacklist/{id}', [BlacklistController::class,'destroy']);
 });
