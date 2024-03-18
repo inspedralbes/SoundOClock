@@ -53,6 +53,7 @@ export default {
 </script>
 
 <template>
+    <!---->
     <div class="contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
         <div class="contenidor-img">
             <img src="/img/mora-primer-dia-de-clases.jpg" alt="" class="rounded-lg">
