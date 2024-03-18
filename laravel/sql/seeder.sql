@@ -7,18 +7,18 @@ INSERT INTO users (name, email, created_at, updated_at, is_admin) VALUES
 ('raul', 'raul@gmail.com', NOW(), NOW(), 0),
 ('admin', 'admin@gmail.com', NOW(), NOW(), 1);
 
-INSERT INTO class_groups (name, is_public) VALUES
-('ESO',1),
-('Batxillerat',1),
-('SMX',1),
-('DAW',1),
-('DAM',1),
-('DAM-VOID',1),
-('ASIX',1),
-('A3D',1),
-('Professors',0),
-('Administració',0),
-('Secretaria',0),
-('Cuina',0),
-('Neteja',0),
-('Direcció',0);
+INSERT INTO class_groups (name, abbreviation, is_public) VALUES
+('ESO', 'ES', 1),
+('Batxillerat', 'BAT', 1),
+('SMX', 'SMX', 1),
+('DAW', 'DAW', 1),
+('DAM', 'DAM', 1),
+('DAM-VOID', 'DAMV', 1),
+('ASIX', 'ASIX', 1),
+('A3D', 'A3D', 1),
+('Professors', 'PROF', 0),
+('Administració', 'ADM', 0),
+('Secretaria', 'SEC', 0),
+('Cuina', 'CUIN', 0),
+('Neteja', 'NET', 0),
+('Direcció', 'DIR', 0);

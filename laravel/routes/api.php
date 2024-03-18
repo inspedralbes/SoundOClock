@@ -32,4 +32,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::group(['prefix' => 'classgroups'], function () {
     Route::get('/', [ClassGroupsController::class, 'index']);
+    Route::post('/create', [ClassGroupsController::class, 'create']);
+    Route::post('/update', [ClassGroupsController::class, 'update']);
+    Route::post('/delete', [ClassGroupsController::class, 'destroy']);
 });
