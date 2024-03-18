@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlacklistController;
+use App\Http\Controllers\ClassGroupsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,9 +29,12 @@ Route::post('/login', [AuthController::class,'login']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class,'logout']);
     Route::post('/userData', [AuthController::class,'getUser']);
-
     Route::get('/blacklist', [BlacklistController::class,'index']);
     Route::get('/blacklist/{id}', [BlacklistController::class,'show']);
     Route::post('/blacklist', [BlacklistController::class,'store']);
     Route::delete('/blacklist/{id}', [BlacklistController::class,'destroy']);
+});
+
+Route::group(['prefix' => 'classgroups'], function () {
+    Route::get('/', [ClassGroupsController::class, 'index']);
 });

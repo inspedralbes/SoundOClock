@@ -19,6 +19,8 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->boolean('is_admin')->default(false);
+            // $table->bigInteger('class_group_id')->unsigned()->nullable();
+            // $table->foreign('class_group_id')->references('id')->on('class_groups');
         });
     }
 
