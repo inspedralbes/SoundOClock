@@ -46,10 +46,14 @@ socket.on("connect", () => {
       });
   }
 
-  socket.on("loginData", (id, mail, name, token) => {
-    console.log("socket loginData data received: ", id, mail, name, token);
-    pinia.setUser(id, mail, name, token);
-    navigateTo({ path: '/llista_propostes' })
+  socket.on("loginData", (id, mail, name, group, token) => {
+    console.log("socket loginData data received: ", id, mail, name, group, token);
+    pinia.setUser(id, mail, name, group, token);
+    if (pinia.getUser().group){
+      navigateTo({ path: '/llista_propostes' }); 
+    } else {
+      navigateTo({ path: '/escollirGrup' });
+    }
   });
 
 });

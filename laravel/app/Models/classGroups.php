@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class classGroups extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'abbreviation',
+        'is_public'
+    ];
 }

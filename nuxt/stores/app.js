@@ -7,6 +7,7 @@ export const useAppStore = defineStore('app', {
       id: 0,
       email: "",
       name: "",
+      group: "",
       token: ""
     },
 
@@ -20,6 +21,9 @@ export const useAppStore = defineStore('app', {
   actions: {
 
     //getters
+    getUser() {
+      return this.user
+    },
     getUserSelectedSongs() {
       return this.userSelectedSongs
     },
@@ -36,21 +40,16 @@ export const useAppStore = defineStore('app', {
       return this.isLoadingVote
     },
 
-    getUser() {
-      return this.user
-    },
-
     //setters
-    setUser(id, email, name, token) {
+    setUser(id, email, name, group, token) {
       this.user.id = id;
       this.user.email = email;
       this.user.name = name;
+      this.user.group = group;
       this.user.token = token;
     },
-
     setUserSelectedSongs(userSelectedSongs) {
       this.userSelectedSongs = userSelectedSongs
-
     },
     setProposedSongs(proposedSongs) {
       this.proposedSongs = proposedSongs
@@ -64,6 +63,5 @@ export const useAppStore = defineStore('app', {
     setIsLoadingVote(isLoadingVote) {
       this.isLoadingVote = isLoadingVote
     },
-
   },
 })
