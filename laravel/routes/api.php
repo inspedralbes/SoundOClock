@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BlacklistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Public routes
 Route::post('/register', [AuthController::class,'register']);
 Route::post('/login', [AuthController::class,'login']);
+
+Route::get('/blacklist', [BlacklistController::class,'index']);
+Route::get('/blacklist/{id}', [BlacklistController::class,'show']);
+Route::post('/blacklist', [BlacklistController::class,'store']);
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
