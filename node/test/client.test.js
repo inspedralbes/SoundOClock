@@ -2,12 +2,13 @@ import { expect } from 'chai';
 import { io as ioClient } from 'socket.io-client';
 import { Song, VotingRecord } from '../models.js';
 import mongoose from 'mongoose';
+import { loginUserAndAdmin, getUserInfo, logout } from '../communicationManager.js';
 
 describe('Listen the Server sockets', function () {
   let clientSocket;
-  let userToken = 'pRIK15Ofa9ExbEvysW9hCuJeqKej4FEXQ2Th0Itlf1d84bae'
-  let adminToken = 'J7qWhUoGrLMk9jc2l2uZtqur6JthHr5WEyyt76Cp29d829f4'
-  let userId = 4;
+  let userToken;
+  let adminToken;
+  let userId;
   this.timeout(10000);  // 10 seconds
 
   let testSong = {
@@ -21,14 +22,20 @@ describe('Listen the Server sockets', function () {
     submitDate: "2024-03-18T10:47:30.104Z"
   }
 
-  before((done) => {
+  before(async () => {
     const serverAddr = `http://localhost:8080`;
     clientSocket = ioClient(serverAddr);
-    clientSocket.on('connect', done);
+    await new Promise((resolve) => clientSocket.on('connect', resolve));
     // Mongoose setup for accesing directly to the database
     mongoose.connect('mongodb://mongoadmin:mongopassword@mongodb:27017/soundoclock', { authSource: "admin" })
       .then(() => console.log('MongoDB connected'))
       .catch(err => console.error('MongoDB connection error:', err));
+    // Logins to get the tokens
+    let tokens = await loginUserAndAdmin();
+    userToken = tokens.userToken;
+    adminToken = tokens.adminToken;
+    let userInfo = await getUserInfo(userToken);
+    userId = userInfo.id;
   });
 
   after(async () => {
@@ -36,6 +43,8 @@ describe('Listen the Server sockets', function () {
     await Song.deleteOne({ id: testSong.id });
     await VotingRecord.deleteOne({ userId: userId });
     await mongoose.disconnect();
+    await logout(userToken);
+    await logout(adminToken);
     clientSocket.close();
   });
 
