@@ -22,6 +22,10 @@ socket.on("connect", () => {
     pinia.setIsLoadingVote({ state: false, selectedSong: null });
   });
 
+  socket.on("songReported", (data) => {
+    console.log("socket songReported data received: ", data.message);
+  });
+
   function getUserSelectedSongs(id) {
     fetch(`http://localhost:8080/votingRecords/${id}`)
       .then(response => response.json())
