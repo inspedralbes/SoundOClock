@@ -1,16 +1,41 @@
 import { expect } from 'chai';
 import { io as ioClient } from 'socket.io-client';
+import { Song, VotingRecord } from '../models.js';
+import mongoose from 'mongoose';
 
-describe('Socket.IO Server', () => {
+describe('Listen the Server sockets', function () {
   let clientSocket;
+  let userToken = 'pRIK15Ofa9ExbEvysW9hCuJeqKej4FEXQ2Th0Itlf1d84bae'
+  let adminToken = 'J7qWhUoGrLMk9jc2l2uZtqur6JthHr5WEyyt76Cp29d829f4'
+  let userId = 4;
+  this.timeout(10000);  // 10 seconds
+
+  let testSong = {
+    id: 1000,
+    title: 'test song',
+    artist: 'test artist',
+    votes: 0,
+    genre: 'test genre',
+    year: 2021,
+    submittedBy: 'test user',
+    submitDate: "2024-03-18T10:47:30.104Z"
+  }
 
   before((done) => {
     const serverAddr = `http://localhost:8080`;
     clientSocket = ioClient(serverAddr);
     clientSocket.on('connect', done);
+    // Mongoose setup for accesing directly to the database
+    mongoose.connect('mongodb://mongoadmin:mongopassword@mongodb:27017/soundoclock', { authSource: "admin" })
+      .then(() => console.log('MongoDB connected'))
+      .catch(err => console.error('MongoDB connection error:', err));
   });
 
-  after(() => {
+  after(async () => {
+    // Clean up
+    await Song.deleteOne({ id: testSong.id });
+    await VotingRecord.deleteOne({ userId: userId });
+    await mongoose.disconnect();
     clientSocket.close();
   });
 
@@ -22,4 +47,159 @@ describe('Socket.IO Server', () => {
 
     clientSocket.emit('testing', 'bitches be crazy');
   });
+
+  it('should post a song', (done) => {
+    console.log("POST SONG TEST")
+    clientSocket.on('songPosted', async (message) => {
+      // Check if the song has been posted
+      expect(message.status).to.equal('success');
+      expect(message.song).to.deep.equal(testSong);
+      // Check if the song has been recorded in the database
+      let song = await Song.findOne({ id: testSong.id });
+      expect(song.id).to.equal(testSong.id);
+      // Check if the user has been recorded in the database
+      let votingRecord = await VotingRecord.findOne({ userId: userId });
+      expect(votingRecord.submitted).to.be.true;
+      done();
+    });
+
+    clientSocket.emit('postSong', userToken, testSong);
+  });
+
+  it("should not post a song if the user already submitted one", async () => {
+    // Delete the song from the database first
+    await Song.deleteOne({ id: testSong.id });
+
+    const postErrorPromise = new Promise((resolve, reject) => {
+      clientSocket.once('postError', (message) => {
+        try {
+          expect(message.status).to.equal('error');
+          expect(message.message).to.equal('User already submitted a song');
+          resolve(); // Resolve the promise if the assertions pass
+        } catch (error) {
+          reject(error); // Reject the promise if the assertions fail
+        }
+      });
+    });
+
+    // Emit the event to trigger the async operation
+    clientSocket.emit('postSong', userToken, testSong);
+
+    // Wait for the promise to resolve or reject
+    await postErrorPromise;
+  });
+
+
+  it("should not post a song already in the database", async () => {
+    // Add the song to the database first
+    const newSong = new Song(testSong);
+    await newSong.save();
+
+    const postErrorPromise = new Promise((resolve, reject) => {
+      clientSocket.once('postError', (message) => {
+        try {
+          expect(message.status).to.equal('error');
+          expect(message.message).to.equal('Song already exists');
+          resolve(); // Resolve the promise if the assertions pass
+        } catch (error) {
+          reject(error); // Reject the promise if the assertions fail
+        }
+      });
+    });
+
+    // Emit the event to trigger the async operation
+    clientSocket.emit('postSong', userToken, testSong);
+
+    // Wait for the promise to resolve or reject
+    await postErrorPromise;
+  });
+
+  it("should not vote for a song not in the database", async () => {
+    console.log("CAST VOTE TEST")
+    // Delete the song from the database first
+    await Song.deleteOne({ id: testSong.id });
+
+    const voteErrorPromise = new Promise((resolve, reject) => {
+      clientSocket.once('voteError', (message) => {
+        try {
+          expect(message.status).to.equal('error');
+          expect(message.message).to.equal('Song not found');
+          resolve(); // Resolve the promise if the assertions pass
+        } catch (error) {
+          reject(error); // Reject the promise if the assertions fail
+        }
+      });
+    });
+
+    clientSocket.emit('castVote', userToken, testSong.id);
+
+    await voteErrorPromise;
+  });
+
+  it("should cast a vote", async () => {
+    // Add the song to the database first
+    const newSong = new Song(testSong);
+    await newSong.save();
+
+    const voteErrorPromise = new Promise((resolve, reject) => {
+      clientSocket.once('voteCasted', async (message) => {
+        try {
+          // Check if the vote has been casted
+          expect(message.status).to.equal('success');
+          expect(message.song.votes).to.equal(1);
+          // Check voting record
+          let votingRecord = await VotingRecord.findOne({ userId: userId });
+          expect(votingRecord.votedSongs).to.include(testSong.id);
+          resolve(); // Resolve the promise if the assertions pass
+        } catch (error) {
+          reject(error); // Reject the promise if the assertions fail
+        }
+      });
+    });
+
+    // Emit the event to trigger the async operation
+    clientSocket.emit('castVote', userToken, testSong.id);
+
+    // Wait for the promise to resolve or reject
+    await voteErrorPromise;
+  })
+
+  it("should undo a vote", (done) => {
+    clientSocket.on('voteCasted', async (message) => {
+      // Check if the vote has been casted
+      expect(message.status).to.equal('success');
+      expect(message.song.votes).to.equal(0);
+      // Check voting record
+      let votingRecord = await VotingRecord.findOne({ userId: userId });
+      expect(votingRecord.votedSongs).to.not.include(testSong.id);
+      done();
+    });
+
+    clientSocket.emit('castVote', userToken, testSong.id);
+  })
+
+
+  it("should delete a song", (done) => {
+    console.log("REMOVE SONG TEST");
+    clientSocket.on('songDeleted', async (message) => {
+      // Check if the song has been removed
+      expect(message.status).to.equal('success');
+      // Check if the song has been removed from the database
+      let song = await Song.findOne({ id: testSong.id });
+      expect(song).to.be.null;
+      done();
+    });
+
+    clientSocket.emit('deleteSong', adminToken, testSong.id);
+  })
+
+  it("should not delete a song if it doesn't exist", (done) => {
+    clientSocket.on('deleteError', (message) => {
+      expect(message.status).to.equal('error');
+      expect(message.message).to.equal('Song not found');
+      done();
+    });
+
+    clientSocket.emit('deleteSong', adminToken, testSong.id);
+  })
 });
