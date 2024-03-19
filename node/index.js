@@ -206,13 +206,11 @@ io.on('connection', (socket) => {
     let user = await getUserInfo(userToken);
     if (!user.id) return;
 
-    console.log(user)
-
     try {
       // Check if the song exists
       const song = await Song.findOne({ id: reportedSong.songId });
       if (!song) {
-        socket.emit('voteError', { status: 'error', message: 'Song not found' });
+        socket.emit('reportError', { status: 'error', message: 'Song not found' });
         return;
       }
 
@@ -227,6 +225,10 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
+  });
+
+  socket.on('testing', (data) => {
+    socket.emit('testing', data);
   });
 });
 
