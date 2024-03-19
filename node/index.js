@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import { getUserInfo } from './communicationManager.js';
-import { Song, VotingRecord } from './models.js';
+import { Song, VotingRecord, ReportSong } from './models.js';
 
 const app = express();
 app.use(cors());
@@ -225,9 +225,30 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Testing
-  socket.on('testing', (msg) => {
-    socket.emit('testing', msg);
+  // Report a song
+  socket.on('reportSong', async (userToken, reportedSong) => {
+
+    // Check that the user is authenticated with Laravel Sanctum
+    let user = await getUserInfo(userToken);
+    if (!user.id) return;
+
+    console.log(user)
+
+    try {
+      // Check if the song exists
+      const song = await Song.findOne({ id: reportedSong.songId });
+      if (!song) {
+        socket.emit('voteError', { status: 'error', message: 'Song not found' });
+        return;
+      }
+
+      // Add a register in ReportSong table
+      await new ReportSong({ userId: user.id, songId: song.id, reason: reportedSong.option }).save();
+
+      io.emit('songReported', { status: 'success', message: `La cançó ${song.title} ha sigut reportada` });
+    } catch (err) {
+      socket.emit('reportError', { status: 'error', message: err.message });
+    }
   });
 
   socket.on('disconnect', () => {
