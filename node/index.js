@@ -39,9 +39,9 @@ async function insertDefaultsMongo() {
   ];
 
   const votingRecords = [
-    { userId: 1, submitted: true, votedSongs: [1, 4] },
-    { userId: 2, submitted: false, votedSongs: [] },
-    { userId: 3, submitted: false, votedSongs: [2] },
+    { userId: 1, submitted: true, votedSongs: [1, 4], group: 1 },
+    { userId: 2, submitted: false, votedSongs: [], group: 2 },
+    { userId: 3, submitted: false, votedSongs: [2], group: 1 },
   ];
 
   // Upsert songs
@@ -143,7 +143,7 @@ io.on('connection', (socket) => {
       await newSong.save();
 
       if (!votingRecord) {
-        await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [] }).save();
+        await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], group: user.class_group_id }).save();
       } else {
         votingRecord.submitted = true;
         await votingRecord.save();
@@ -193,7 +193,7 @@ io.on('connection', (socket) => {
       await song.save();
 
       if (!votingRecord) {
-        await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [songId] }).save();
+        await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [songId], group: user.class_group_id }).save();
       } else {
         votingRecord.votedSongs.push(songId);
         await votingRecord.save();
