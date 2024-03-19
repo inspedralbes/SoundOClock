@@ -17,13 +17,13 @@ export default {
                   this.$emit('openModal');
               } else {
                   this.store.setIsLoadingVote({ state: true, selectedSong: songId });
-                  socket.emit('castVote', "1|0rqQk3rnYE8xPjSAB6lyzi9fPh0CvXq7WDDEE05xf433cf4a", songId);
+                  socket.emit('castVote', this.store.getUser().token, songId);
               }
           }
         },
         report() {
-            console.log(this.song.title)
-            this.$emit('openReportModal', this.song.title);
+            const song = {id: this.song.id, title: this.song.title, artist: this.song.artist}
+            this.$emit('openReportModal', song);
         },
         isSongVotedColor(songId) {
             if (this.userSelectedSongs.votedSongs.includes(songId)) {
