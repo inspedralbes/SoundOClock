@@ -3,7 +3,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { getUserInfo } from './communicationManager.js';
+import { getUserInfo, googleLogin } from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 
 const app = express();
@@ -81,40 +81,14 @@ app.get('/votingRecords/:userId', async (req, res) => {
 io.on('connection', (socket) => {
   console.log('a user connected');
 
-
   socket.on('googleLogin', (userToken) => {
-
-    fetch('https://www.googleapis.com/oauth2/v1/userinfo', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${userToken}`
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        fetch('http://laravel:8000/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            email: data.email,
-            name: data.name,
-          })
-        }).then(response => response.json())
-          .then(data => {
-            console.log("All", data);
-            console.log(data.user.email, data.user.name, data.token, data.user.id, data.user.group);
-            socket.emit('loginData', data.user.id, data.user.email, data.user.name, data.user.group, data.token);
-          })
-          .catch(err => {
-            console.log(err);
-          })
+    googleLogin(userToken)
+      .then((userData) => {
+        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, data.token);
       })
-
-
+      .catch((err) => {
+        console.error(err);
+      });
   });
 
   // Post song checking for duplicates first
