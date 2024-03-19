@@ -17,9 +17,13 @@ export default {
                   this.$emit('openModal');
               } else {
                   this.store.setIsLoadingVote({ state: true, selectedSong: songId });
-                  socket.emit('castVote', "1|0rqQk3rnYE8xPjSAB6lyzi9fPh0CvXq7WDDEE05xf433cf4a", songId);
+                  socket.emit('castVote', this.store.getUser().token, songId);
               }
           }
+        },
+        report() {
+            const song = {id: this.song.id, title: this.song.title, artist: this.song.artist}
+            this.$emit('openReportModal', song);
         },
         isSongVotedColor(songId) {
             if (this.userSelectedSongs.votedSongs.includes(songId)) {
@@ -72,7 +76,7 @@ export default {
         </div>
 
         <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
-            <button>
+            <button @click="report()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="icon icon-tabler icons-tabler-outline icon-tabler-alert-circle">

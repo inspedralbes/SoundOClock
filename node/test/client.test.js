@@ -1,13 +1,14 @@
 import { expect } from 'chai';
 import { io as ioClient } from 'socket.io-client';
-import { Song, VotingRecord } from '../models.js';
+import { Song, VotingRecord, ReportSong } from '../models.js';
 import mongoose from 'mongoose';
+import { loginUserAndAdmin, getUserInfo, logout } from '../communicationManager.js';
 
 describe('Listen the Server sockets', function () {
   let clientSocket;
-  let userToken = 'pRIK15Ofa9ExbEvysW9hCuJeqKej4FEXQ2Th0Itlf1d84bae'
-  let adminToken = 'J7qWhUoGrLMk9jc2l2uZtqur6JthHr5WEyyt76Cp29d829f4'
-  let userId = 4;
+  let userToken;
+  let adminToken;
+  let userId;
   this.timeout(10000);  // 10 seconds
 
   let testSong = {
@@ -21,21 +22,30 @@ describe('Listen the Server sockets', function () {
     submitDate: "2024-03-18T10:47:30.104Z"
   }
 
-  before((done) => {
+  before(async () => {
     const serverAddr = `http://localhost:8080`;
     clientSocket = ioClient(serverAddr);
-    clientSocket.on('connect', done);
+    await new Promise((resolve) => clientSocket.on('connect', resolve));
     // Mongoose setup for accesing directly to the database
     mongoose.connect('mongodb://mongoadmin:mongopassword@mongodb:27017/soundoclock', { authSource: "admin" })
       .then(() => console.log('MongoDB connected'))
       .catch(err => console.error('MongoDB connection error:', err));
+    // Logins to get the tokens
+    let tokens = await loginUserAndAdmin();
+    userToken = tokens.userToken;
+    adminToken = tokens.adminToken;
+    let userInfo = await getUserInfo(userToken);
+    userId = userInfo.id;
   });
 
   after(async () => {
     // Clean up
     await Song.deleteOne({ id: testSong.id });
     await VotingRecord.deleteOne({ userId: userId });
+    await ReportSong.deleteOne({ userId: userId });
     await mongoose.disconnect();
+    await logout(userToken);
+    await logout(adminToken);
     clientSocket.close();
   });
 
@@ -201,5 +211,53 @@ describe('Listen the Server sockets', function () {
     });
 
     clientSocket.emit('deleteSong', adminToken, testSong.id);
+  })
+
+  it("should report a song", async () => {
+    console.log("REPORT SONG TEST")
+    // Add the song to the database first
+    const newSong = new Song(testSong);
+    await newSong.save();
+
+    const reportErrorPromise = new Promise((resolve, reject) => {
+      clientSocket.once('songReported', (message) => {
+        try {
+          expect(message.status).to.equal('success');
+          expect(message.message).to.equal(`La cançó ${testSong.title} ha sigut reportada`);
+          resolve(); // Resolve the promise if the assertions pass
+        } catch (error) {
+          reject(error); // Reject the promise if the assertions fail
+        }
+      });
+    });
+
+    // Emit the event to trigger the async operation
+    clientSocket.emit('reportSong', userToken, { songId: testSong.id, option: 'Contingut inapropiat' });
+
+    // Wait for the promise to resolve or reject
+    await reportErrorPromise;
+  })
+
+  it("should not report a song that doesn't exist", async () => {
+    // Delete the song from the database first
+    await Song.deleteOne({ id: testSong.id });
+
+    const reportErrorPromise = new Promise((resolve, reject) => {
+      clientSocket.once('reportError', (message) => {
+        try {
+          expect(message.status).to.equal('error');
+          expect(message.message).to.equal('Song not found');
+          resolve(); // Resolve the promise if the assertions pass
+        } catch (error) {
+          reject(error); // Reject the promise if the assertions fail
+        }
+      });
+    });
+
+    // Emit the event to trigger the async operation
+    clientSocket.emit('reportSong', userToken, { songId: testSong.id, option: 'Contingut inapropiat' });
+
+    // Wait for the promise to resolve or reject
+    await reportErrorPromise;
   })
 });
