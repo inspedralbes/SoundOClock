@@ -26,7 +26,7 @@
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 flag
             </span>
-            <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Reports</span>
+            <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Informes</span>
         </button>
         <!-- --------- -->
         <!-- 
