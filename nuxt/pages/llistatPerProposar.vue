@@ -4,21 +4,24 @@
             <input class="cercador w-full ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..."
                 v-model="query" @keyup.enter="getSongs()"></input>
         </div>
-        <div class="width mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
+        <div v-for="track in tracks"
+            class="width mb-3 mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
             <div class="contenidor-img">
-                <img src="/img/mora-primer-dia-de-clases.jpg" alt="" class="rounded-lg">
-                <button class="rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                        class="icon icon-tabler icons-tabler-filled icon-tabler-player-play">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" />
-                    </svg>
+                <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="rounded-lg">
+                <button @click="playTrack(track.id)" class="rounded-lg" :class="{ playingC: isPlaying, noPlaying: !isPlaying }">
+                    <!-- fer amb computed la classe -->
+                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded">
+                        pause
+                    </span>
+                    <span v-else class="material-symbols-rounded">
+                        play_arrow
+                    </span>
                 </button>
             </div>
 
             <div class="song-data">
-                <p class="font-black basis-1/2">titol</p>
-                <p class="basis-1/2">artista</p>
+                <p class="font-black basis-1/2">{{ track.name }}</p>
+                <p class="basis-1/2">{{ track.artists[0].name }}</p>
             </div>
 
             <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
@@ -51,11 +54,55 @@ export default {
             tracks: [],
             currentTrack: null,
             currentTrackId: null,
-            currentTrackStatus: 'stopped'
+            isPlaying: false,
         }
     },
     mounted() {
-        fetch
+
+        socket.on('searchResult', (results) => {
+            this.tracks = results;
+        });
+
+        socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
+
+            // Crear un elemento HTML temporal
+            const tempElement = document.createElement('div');
+
+            // Establecer el HTML recibido en el elemento temporal
+            tempElement.innerHTML = htmlSpotify;
+
+            // Obtener el script por su id
+            const scriptElement = tempElement.querySelector('#__NEXT_DATA__');
+
+            // Verificar si se encontró el elemento
+            if (scriptElement) {
+                // Acceder al contenido JSON dentro del script y convertirlo a objeto JavaScript
+                const jsonData = JSON.parse(scriptElement.textContent);
+
+                // Acceder al AudioPreviewURL
+                const AudioPreviewURL = jsonData.props.pageProps.state.data.entity.audioPreview.url;
+
+                // Ahora AudioPreviewURL contiene la URL del audio
+                console.log("URL del audio:", AudioPreviewURL);
+
+                // Fetch to AudioPreviewURL to get the audio file .mp3 and play it
+                fetch(AudioPreviewURL)
+                    .then(response => response.blob())
+                    .then(blob => { // blob is the file track.mp3
+                        const audioURL = URL.createObjectURL(blob);
+                        this.currentTrack = new Audio(audioURL);
+                        this.currentTrackId = songId;
+                        this.currentTrack.play();
+                        this.isPlaying = true;
+                        console.log("Playing song:", this.currentTrackId);
+                    })
+                    .catch(error => {
+                        console.error('Error getting the audio file:', error);
+                    });
+            } else {
+                console.error('No se encontró el script con el id "__NEXT_DATA__" en el HTML recibido');
+            }
+        });
     },
     methods: {
         onFileChange(e) {
@@ -75,54 +122,26 @@ export default {
             };
         },
         getSongs() {
-            // socket.emit('searchSong', this.query);
+            socket.emit('searchSong', this.query);
             console.log('Searching songs:', this.query);
         },
         playTrack(id) {
 
             if (this.currentTrackId == id) {
-                if (this.currentTrackStatus == 'playing') {
+                if (this.isPlaying == true) {
                     console.log('Pausing song:', this.currentTrackId);
                     this.currentTrack.pause();
-                    this.currentTrackStatus = 'paused';
+                    this.isPlaying = false;
                 } else {
                     console.log('Playing song:', this.currentTrackId);
                     this.currentTrack.play();
-                    this.currentTrackStatus = 'playing';
+                    this.isPlaying = true;
                 }
-            }
-
-            else {
-                socket.emit('searchId', id);
-                let url = `https://api.spotify.com/v1/tracks/${id}`;
-
-                console.log('Fectch', url);
-                // fetch to /songs/:id to get the song file .mp3 and play it
-                fetch(url, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Data:', data);
-                        // const previewURL = data.preview_url;
-                        const previewURL = 'https://p.scdn.co/mp3-preview/7aeb039fe573d76389e79dc52c228e9208604fd7'
-                        return fetch(previewURL);
-                    })
-                    .then(response => response.blob())
-                    .then(blob => { // blob is the file track.mp3
-                        const audioURL = URL.createObjectURL(blob);
-                        this.currentTrack = new Audio(audioURL);
-                        this.currentTrackId = id;
-                        this.currentTrackStatus = 'playing';
-                        this.currentTrack.play();
-                        console.log("Playing song:", this.currentTrackId);
-                    })
-                    .catch(error => {
-                        console.error('Error getting the audio file:', error);
-                    });
+            } else {
+                if (this.currentTrack) {
+                    this.currentTrack.pause();
+                }
+                socket.emit('getHtmlSpotify', id);
             }
         },
     },
@@ -157,11 +176,21 @@ export default {
     width: fit-content;
 }
 
-.contenidor-img>button {
-    display: none;
-}
+/* .contenidor-img>button {
+    display: flex;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    right: 0;
+    top: 0;
+    background-color: rgb(0, 0, 0, 0.3);
+    cursor: pointer;
+    z-index: 100;
+} */
 
-.contenidor-img:hover>button>svg {
+.contenidor-img>button>svg {
     width: 80%;
     height: auto;
 }
@@ -180,8 +209,24 @@ export default {
     z-index: 100;
 }
 
+.playingC {
+    display: flex;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    right: 0;
+    top: 0;
+    background-color: rgb(0, 0, 0, 0.3);
+    cursor: pointer;
+    z-index: 100;
+}
+
 .song-data {
     display: flex;
+    flex-direction: column;
+    overflow: hidden;
     justify-content: space-evenly;
     flex-grow: 1;
     align-items: center;
@@ -205,6 +250,10 @@ export default {
 img {
     width: 60px;
     height: 60px;
+}
+
+.noPlaying {
+    display: none;
 }
 
 @media screen and (min-width: 768px) {

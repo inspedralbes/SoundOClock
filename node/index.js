@@ -283,8 +283,8 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('searchSong', async (search) => {
-    let limit = 5;
+  socket.on('searchSong', (search) => {
+    let limit = 15;
     let url = `https://api.spotify.com/v1/search?query=${search}&type=track&offset=0&limit=${limit}`;
     fetch(url, {
       headers: {
@@ -300,7 +300,7 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('searchId', async (id) => {
+  socket.on('searchId', (id) => {
     let url = `https://api.spotify.com/v1/tracks/${id}`;
     fetch(url, {
       headers: {
