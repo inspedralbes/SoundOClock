@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { io as ioClient } from 'socket.io-client';
-import { Song, VotingRecord } from '../models.js';
+import { Song, VotingRecord, ReportSong } from '../models.js';
 import mongoose from 'mongoose';
 import { loginUserAndAdmin, getUserInfo, logout } from '../communicationManager.js';
 
@@ -42,6 +42,7 @@ describe('Listen the Server sockets', function () {
     // Clean up
     await Song.deleteOne({ id: testSong.id });
     await VotingRecord.deleteOne({ userId: userId });
+    await ReportSong.deleteOne({ userId: userId });
     await mongoose.disconnect();
     await logout(userToken);
     await logout(adminToken);
@@ -210,5 +211,53 @@ describe('Listen the Server sockets', function () {
     });
 
     clientSocket.emit('deleteSong', adminToken, testSong.id);
+  })
+
+  it("should report a song", async () => {
+    console.log("REPORT SONG TEST")
+    // Add the song to the database first
+    const newSong = new Song(testSong);
+    await newSong.save();
+
+    const reportErrorPromise = new Promise((resolve, reject) => {
+      clientSocket.once('songReported', (message) => {
+        try {
+          expect(message.status).to.equal('success');
+          expect(message.message).to.equal(`La cançó ${testSong.title} ha sigut reportada`);
+          resolve(); // Resolve the promise if the assertions pass
+        } catch (error) {
+          reject(error); // Reject the promise if the assertions fail
+        }
+      });
+    });
+
+    // Emit the event to trigger the async operation
+    clientSocket.emit('reportSong', userToken, { songId: testSong.id, option: 'Contingut inapropiat' });
+
+    // Wait for the promise to resolve or reject
+    await reportErrorPromise;
+  })
+
+  it("should not report a song that doesn't exist", async () => {
+    // Delete the song from the database first
+    await Song.deleteOne({ id: testSong.id });
+
+    const reportErrorPromise = new Promise((resolve, reject) => {
+      clientSocket.once('reportError', (message) => {
+        try {
+          expect(message.status).to.equal('error');
+          expect(message.message).to.equal('Song not found');
+          resolve(); // Resolve the promise if the assertions pass
+        } catch (error) {
+          reject(error); // Reject the promise if the assertions fail
+        }
+      });
+    });
+
+    // Emit the event to trigger the async operation
+    clientSocket.emit('reportSong', userToken, { songId: testSong.id, option: 'Contingut inapropiat' });
+
+    // Wait for the promise to resolve or reject
+    await reportErrorPromise;
   })
 });

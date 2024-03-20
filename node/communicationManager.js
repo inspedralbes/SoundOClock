@@ -23,9 +23,26 @@ async function getUserInfo(token) {
   return jsonResponse;
 }
 
+async function googleLogin(userToken) {
+  // Get user info from google
+  const response = await fetch('https://www.googleapis.com/oauth2/v1/userinfo', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${userToken}`
+    }
+  });
+  const data = await response.json();
+
+  // Send user info to the server
+  const userData = await login(data.name, data.email);
+  return userData;
+}
+
 async function loginUserAndAdmin() {
-  let userToken = await login("miquel", "miquel@gmail.com");
-  let adminToken = await login("admin", "admin@gmail.com");
+  let userInfo = await login("miquel", "miquel@gmail.com");
+  let adminIndo = await login("admin", "admin@gmail.com");
+  let userToken = userInfo.token;
+  let adminToken = adminIndo.token;
   return { userToken, adminToken };
 }
 
@@ -42,7 +59,7 @@ async function login(name, email) {
     })
   });
   const jsonResponse = await response.json();
-  return jsonResponse.token;
+  return jsonResponse;
 }
 
 async function logout(token) {
@@ -57,4 +74,4 @@ async function logout(token) {
   return response;
 }
 
-export { getUserInfo, loginUserAndAdmin, logout };
+export { getUserInfo, loginUserAndAdmin, logout, googleLogin };
