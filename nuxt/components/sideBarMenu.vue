@@ -19,6 +19,11 @@
             </button>
         </div>
 
+        <h3 :class="{'transition-opacity duration-300 ease-in-out text-lightgray-500 text-xs uppercase mb-2':true,'opacity-0':!isOpen}">Menú</h3>
+        <div>
+            <slot></slot>
+        </div>
+
 
     </aside>
 </template>

@@ -5,6 +5,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import { getUserInfo, googleLogin } from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
+import axios from 'axios';
 
 const app = express();
 app.use(cors());
@@ -54,6 +55,23 @@ async function insertDefaultsMongo() {
     await VotingRecord.updateOne({ userId: record.userId }, { $setOnInsert: record }, { upsert: true });
   }
 }
+
+//FETCH TO GET HTML FROM SPOTIFY
+async function fetchSpotifyPage(id) {
+  try {
+    const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching Spotify page:', error);
+    return null;
+  }
+}
+// fetchSpotifyPage('5lwWpQ71GKN3sWmk8zZr9g').then(html => {
+//   if (html) {
+//     console.log(html);
+//   }
+// });
+
 
 insertDefaultsMongo();
 
@@ -221,6 +239,15 @@ io.on('connection', (socket) => {
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
     }
+  });
+
+  socket.on('getHtmlSpotify', (songId) => {
+    fetchSpotifyPage(songId).then(html => {
+      if (html) {
+        console.log(html);
+        socket.emit('sendHtmlSpotify', html);
+      }
+    });
   });
 
   socket.on('disconnect', () => {

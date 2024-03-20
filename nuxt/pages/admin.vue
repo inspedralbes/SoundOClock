@@ -1,5 +1,9 @@
 <template>
-    <SideBarMenu></SideBarMenu>
+    <SideBarMenu>
+        <button>
+
+        </button>
+    </SideBarMenu>
 </template>
 
 <script>
