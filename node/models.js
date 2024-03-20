@@ -20,6 +20,7 @@ const votingRecordSchema = new mongoose.Schema({
 
 const reportSongSchema = new mongoose.Schema({
   userId: Number,
+  userName: String,
   songId: Number,
   reason: String
 });

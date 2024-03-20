@@ -18,6 +18,7 @@ export default {
               } else {
                   this.store.setIsLoadingVote({ state: true, selectedSong: songId });
                   socket.emit('castVote', this.store.getUser().token, songId);
+                //   socket.emit('castVote', this.store.getUser().token, songId);
               }
           }
         },

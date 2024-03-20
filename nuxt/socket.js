@@ -26,6 +26,12 @@ socket.on("connect", () => {
     console.log("socket songReported data received: ", data.message);
   });
 
+  socket.on("songDeleted", (data) => {
+    console.log("socket songDeleted data received: ", data.song);
+    getSongs();
+    getAdminSongs();
+  });
+
   function getUserSelectedSongs(id) {
     fetch(`http://localhost:8080/votingRecords/${id}`)
       .then(response => response.json())
@@ -50,11 +56,23 @@ socket.on("connect", () => {
       });
   }
 
+  function getAdminSongs() {
+    fetch('http://localhost:8080/adminSongs')
+      .then(response => response.json())
+      .then(data => {
+        console.log("songs: ", data);
+        pinia.setProposedSongsAdminView(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }
+
   socket.on("loginData", (id, mail, name, group, token) => {
     console.log("socket loginData data received: ", id, mail, name, group, token);
     pinia.setUser(id, mail, name, group, token);
-    if (pinia.getUser().group){
-      navigateTo({ path: '/llista_propostes' }); 
+    if (pinia.getUser().group) {
+      navigateTo({ path: '/llista_propostes' });
     } else {
       navigateTo({ path: '/escollirGrup' });
     }
