@@ -31,13 +31,14 @@ export default {
         }
     },
     mounted() {
-        // socket.on('sendHtmlSpotify', (htmlSpotify) => {
-        //     console.log(htmlSpotify);
-        // });
+        socket.on('sendHtmlSpotify', (htmlSpotify) => {
+            console.log(htmlSpotify);
+        });
     },
     methods: {
-        getHtml(id) {
-            // socket.emit('getHtmlSpotify', id);
+        getHtmlSpotify(id) {
+            console.log("getHtmlSpotify", id)
+            socket.emit('getHtmlSpotify', id);
         },
         onFileChange(e) {
             this.songFile = e.target.files[0]; // this is the file
