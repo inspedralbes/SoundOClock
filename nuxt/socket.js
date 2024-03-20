@@ -33,7 +33,7 @@ socket.on("connect", () => {
   });
 
   function getUserSelectedSongs(id) {
-    fetch(`http://localhost:8080/votingRecords/${id}`)
+    fetch(`${url}/votingRecords/${id}`)
       .then(response => response.json())
       .then(data => {
         console.log("user: ", data);
@@ -45,7 +45,7 @@ socket.on("connect", () => {
   }
 
   function getSongs() {
-    fetch('http://localhost:8080/songs')
+    fetch(`${url}/songs`)
       .then(response => response.json())
       .then(data => {
         console.log("songs: ", data);
@@ -57,7 +57,7 @@ socket.on("connect", () => {
   }
 
   function getAdminSongs() {
-    fetch('http://localhost:8080/adminSongs')
+    fetch(`${url}/adminSongs`)
       .then(response => response.json())
       .then(data => {
         console.log("songs: ", data);

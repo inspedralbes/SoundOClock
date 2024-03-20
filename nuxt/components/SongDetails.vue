@@ -14,7 +14,7 @@ export default {
   methods: {
     deleteSong(songId) {
       console.log("HAS AFEGIT A LA LLISTA NEGRA", songId);
-      // socket.emit('deleteSong', "1|3rr0fm3LWsIKCuOPlV3QPPhYCdRppe7ApBpSlLFJ4092d823", songId);
+      //socket.emit('deleteSong', "2|55iAgsjlWiRBSFiJctJfMl6hkc5VCxc3YnxJa0AK8d7f90b8", songId);
       socket.emit('deleteSong', this.store.getUser().token, songId);
     }
   },
