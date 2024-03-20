@@ -95,6 +95,39 @@ app.get('/votingRecords/:userId', async (req, res) => {
   }
 });
 
+
+const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
+const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+const headers = {
+  'Content-Type': 'application/x-www-form-urlencoded',
+};
+let spotifyToken = '';
+
+// Función para obtener y actualizar el token de Spotify
+async function obtenerActualizarTokenSpotify() {
+  try {
+    const response = await axios.post('https://accounts.spotify.com/api/token', {
+      grant_type: 'client_credentials',
+      client_id: spotifyClientId,
+      client_secret: spotifyClientSecret,
+    }, { headers });
+    if (response.data.access_token) {
+      spotifyToken = response.data.access_token;
+      console.log('Token de Spotify actualizado:', spotifyToken);
+    } else {
+      console.error('No se pudo obtener el token de Spotify.');
+    }
+  } catch (error) {
+    console.error('Error al obtener el token de Spotify:', error);
+  }
+}
+
+// Obtener y actualizar el token de Spotify cada 59 minutos
+setInterval(obtenerActualizarTokenSpotify, 59 * 60 * 1000);
+
+// Obtener y actualizar el token de Spotify al iniciar el servidor
+obtenerActualizarTokenSpotify();
+
 // Sockets
 io.on('connection', (socket) => {
   console.log('a user connected');
@@ -248,6 +281,10 @@ io.on('connection', (socket) => {
         socket.emit('sendHtmlSpotify', html);
       }
     });
+  });
+
+  socket.on('searchSong', async (search) => {
+
   });
 
   socket.on('disconnect', () => {
