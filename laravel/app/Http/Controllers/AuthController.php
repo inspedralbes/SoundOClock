@@ -7,30 +7,43 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller {
-    // public function register(Request $request) {
-    //     $fields = $request->validate([
-    //         'name' => 'required|string',
-    //         'email' => 'required|string|unique:users,email',
-    //         'password' => 'required|string|confirmed',
-    //     ]);
+     
 
-    //     $user = User::create([
-    //         'name' => $fields['name'],
-    //         'email' => $fields['email'],
-    //         'password' => bcrypt($fields['password']),
-    //     ]);
-
-    //     $token = $user->createToken('soundoclock')->plainTextToken;
-
-    //     $response = [
-    //         'user' => $user,
-    //         'token' => $token
-    //     ];
-
-    //     return response($response, 201);
-    // }
-
-
+/**
+ * @OA\Post(
+ *     path="/api/login",
+ *     operationId="login",
+ *     tags={"Authentication"},
+ *     summary="User login",
+ *     description="Logs in a user with email and name.",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="application/x-www-form-urlencoded",
+ *             @OA\Schema(
+ *                 required={"email", "name"},
+ *                 @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *                 @OA\Property(property="name", type="string", example="John Doe")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="User logged in successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Validation error",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+ *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}})
+ *         )
+ *     )
+ * )
+ */
     public function login(Request $request) {
         $fields = $request->validate([
             'email' => 'required|string',
@@ -52,7 +65,6 @@ class AuthController extends Controller {
 
         return response($response, 201);
     }
-
 
     public function logout(Request $request) {
         auth()->user()->tokens()->delete();

@@ -8,8 +8,29 @@ use Illuminate\Http\Request;
 class ClassGroupsController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/api/classgroups",
+     *     operationId="getClassGroups",
+     *     tags={"Class Groups"},
+     *     summary="Get all class groups",
+     *     description="Retrieves all class groups from the database.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="ESO"),
+     *                 @OA\Property(property="abbreviation", type="string", example="ES"),
+     *                 @OA\Property(property="is_public", type="integer", example=1)
+     *             )
+     *         )
+     *     )
+     * )
      */
+
+    
     public function index()
     {
         $classGroups = classGroups::all();
@@ -17,9 +38,43 @@ class ClassGroupsController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @OA\Post(
+     *     path="/api/classGroups",
+     *     operationId="createClassGroup",
+     *     tags={"Class Groups"},
+     *     summary="Create a new class group",
+     *     description="Creates a new class group with provided data.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 required={"name", "abbreviation", "is_public"},
+     *                 @OA\Property(property="name", type="string", example="ESO"),
+     *                 @OA\Property(property="abbreviation", type="string", example="ES"),
+     *                 @OA\Property(property="is_public", type="integer", example=1)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Class group created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Class Group Created")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
      */
-    public function create(Request $request)
+
+    public function store(Request $request)
     {
         $fields = $request->validate([
             'name' => 'required|string',
@@ -34,30 +89,6 @@ class ClassGroupsController extends Controller
         ]);
 
         return response('Class Group Created', 201);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(classGroups $classGroups)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(classGroups $classGroups)
-    {
-        //
     }
 
     /**
