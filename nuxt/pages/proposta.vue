@@ -31,7 +31,7 @@ export default {
         }
     },
     mounted() {
-        socket.on('sendHtmlSpotify', (htmlSpotify) => {
+        socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
 
             // Crear un elemento HTML temporal
             const tempElement = document.createElement('div');
@@ -59,7 +59,7 @@ export default {
                     .then(blob => { // blob is the file track.mp3
                         const audioURL = URL.createObjectURL(blob);
                         this.currentTrack = new Audio(audioURL);
-                        this.currentTrackId = id;
+                        this.currentTrackId = songId;
                         this.currentTrackStatus = 'playing';
                         this.currentTrack.play();
                         console.log("Playing song:", this.currentTrackId);
