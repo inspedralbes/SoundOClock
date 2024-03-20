@@ -90,6 +90,7 @@ export default {
         },
         report() {
             const song = {songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
+            // socket.emit('reportSong', "1|3rr0fm3LWsIKCuOPlV3QPPhYCdRppe7ApBpSlLFJ4092d823", song);
             socket.emit('reportSong', this.store.getUser().token, song);
         }
     },

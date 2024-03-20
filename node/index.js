@@ -272,7 +272,7 @@ io.on('connection', (socket) => {
       }
 
       // Add a register in ReportSong table
-      await new ReportSong({ userId: user.id, songId: song.id, reason: reportedSong.option }).save();
+      await new ReportSong({ userId: user.id, userName: user.name, songId: song.id, reason: reportedSong.option }).save();
 
       io.emit('songReported', { status: 'success', message: `La cançó ${song.title} ha sigut reportada` });
     } catch (err) {

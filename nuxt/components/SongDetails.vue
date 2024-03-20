@@ -14,7 +14,8 @@ export default {
   methods: {
     deleteSong(songId) {
       console.log("HAS AFEGIT A LA LLISTA NEGRA", songId);
-      socket.emit('deleteSong', "2|E6rVwPrAM3oimkCh18ehdjSlBlYZapJcjHgbEge0999d9dfa", songId);
+      // socket.emit('deleteSong', "1|3rr0fm3LWsIKCuOPlV3QPPhYCdRppe7ApBpSlLFJ4092d823", songId);
+      socket.emit('deleteSong', this.store.getUser().token, songId);
     }
   },
   setup() {
@@ -44,7 +45,7 @@ export default {
       <p class="mb-2 text-xl">NÚMERO DE REPORTS: {{ song.reports.length }}</p>
       <div v-for="report in song.reports" class="contenidor-report p-4 flex flex-row justify-between rounded-lg">
         <p>{{ report.reason }}</p>
-        <p>ID_USUARI: {{ report.userId }}</p>
+        <p>{{ report.userName }}</p>
       </div>
     </div>
   </div>

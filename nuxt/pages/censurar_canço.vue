@@ -42,11 +42,11 @@
 </template>
 
 <script>
+import { useAppStore } from '@/stores/app';
 export default {
     data() {
         return {
             loading: true,
-            songs: [],
             song: null,
         }
     },
@@ -61,15 +61,22 @@ export default {
             .then(response => response.json())
             .then(data => {
                 console.log("CANÇONS: ", data);
-                this.songs = data;
+                this.store.setProposedSongsAdminView(data);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
         this.loading = false;
     },
-
-
+    computed: {
+        songs() {
+            return this.store.getProposedSongsAdminView();
+        },
+    },
+    setup() {
+        const store = useAppStore();
+        return { store };
+    },
 }
 </script>
 
