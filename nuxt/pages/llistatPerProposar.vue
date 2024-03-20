@@ -2,7 +2,7 @@
     <div>
         <div class="width mx-auto my-5 flex flex-row justify-center">
             <input class="cercador w-full ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..."
-                v-model="name" @change="search()"></input>
+                v-model="query" @keyup.enter="getSongs()"></input>
         </div>
         <div class="width mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
             <div class="contenidor-img">
@@ -40,6 +40,8 @@
 
 <script>
 
+import { socket } from '@/socket';
+
 export default {
     data() {
         return {
@@ -72,19 +74,9 @@ export default {
                 console.log('Audio duration:', minutes + ':' + seconds); // log the duration
             };
         },
-        getSongs(query) {
-            let token = "BQDHYS3B6e1y9imeOZGd8YEXjF1yscw5Ag48s-bB95FyfjIC8b2sGpDP0Ejzq0XAjLEtxTbkQkn5Vn1R5z-ZypWmLBrz3KNE5THyNsu_6M6Amqm8Lso"
-            let url = `https://api.spotify.com/v1/search?query=${query}&type=track&offset=0&limit=20`;
-            fetch(url, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(response => response.json())
-                .then(data => {
-                    this.tracks = data.tracks.items;
-
-                });
+        getSongs() {
+            // socket.emit('searchSong', this.query);
+            console.log('Searching songs:', this.query);
         },
         playTrack(id) {
 
@@ -101,7 +93,7 @@ export default {
             }
 
             else {
-                let token = "BQDHYS3B6e1y9imeOZGd8YEXjF1yscw5Ag48s-bB95FyfjIC8b2sGpDP0Ejzq0XAjLEtxTbkQkn5Vn1R5z-ZypWmLBrz3KNE5THyNsu_6M6Amqm8Lso"
+                socket.emit('searchId', id);
                 let url = `https://api.spotify.com/v1/tracks/${id}`;
 
                 console.log('Fectch', url);
