@@ -28,7 +28,7 @@ Route::post('/login', [AuthController::class,'login']);
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class,'logout']);
-    Route::post('/userData', [AuthController::class,'getUser']);
+    Route::post('/getUser', [AuthController::class,'getUser']);
     Route::get('/blacklist', [BlacklistController::class,'index']);
     Route::get('/blacklist/{id}', [BlacklistController::class,'show']);
     Route::post('/blacklist', [BlacklistController::class,'store']);
@@ -37,4 +37,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::group(['prefix' => 'classgroups'], function () {
     Route::get('/', [ClassGroupsController::class, 'index']);
+    Route::post('/create', [ClassGroupsController::class, 'create']);
+    Route::post('/update', [ClassGroupsController::class, 'update']);
+    Route::post('/delete', [ClassGroupsController::class, 'destroy']);
 });

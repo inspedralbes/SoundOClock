@@ -3,8 +3,8 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { getUserInfo } from './communicationManager.js';
-import { Song, VotingRecord } from './models.js';
+import { getUserInfo, googleLogin } from './communicationManager.js';
+import { Song, VotingRecord, ReportSong } from './models.js';
 
 const app = express();
 app.use(cors());
@@ -39,9 +39,9 @@ async function insertDefaultsMongo() {
   ];
 
   const votingRecords = [
-    { userId: 1, submitted: true, votedSongs: [1, 4] },
-    { userId: 2, submitted: false, votedSongs: [] },
-    { userId: 3, submitted: false, votedSongs: [2] },
+    { userId: 1, submitted: true, votedSongs: [1, 4], group: 1 },
+    { userId: 2, submitted: false, votedSongs: [], group: 2 },
+    { userId: 3, submitted: false, votedSongs: [2], group: 1 },
   ];
 
   // Upsert songs
@@ -81,40 +81,14 @@ app.get('/votingRecords/:userId', async (req, res) => {
 io.on('connection', (socket) => {
   console.log('a user connected');
 
-
   socket.on('googleLogin', (userToken) => {
-
-    fetch('https://www.googleapis.com/oauth2/v1/userinfo', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${userToken}`
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        fetch('http://laravel:8000/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            email: data.email,
-            name: data.name,
-          })
-        }).then(response => response.json())
-          .then(data => {
-            console.log("All", data);
-            console.log(data.user.email, data.user.name, data.token, data.user.id);
-            socket.emit('loginData', data.user.id, data.user.email, data.user.name, data.token);
-          })
-          .catch(err => {
-            console.log(err);
-          })
+    googleLogin(userToken)
+      .then((userData) => {
+        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, data.token);
       })
-
-
+      .catch((err) => {
+        console.error(err);
+      });
   });
 
   // Post song checking for duplicates first
@@ -143,7 +117,7 @@ io.on('connection', (socket) => {
       await newSong.save();
 
       if (!votingRecord) {
-        await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [] }).save();
+        await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], group: user.class_group_id }).save();
       } else {
         votingRecord.submitted = true;
         await votingRecord.save();
@@ -193,7 +167,7 @@ io.on('connection', (socket) => {
       await song.save();
 
       if (!votingRecord) {
-        await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [songId] }).save();
+        await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [songId], group: user.class_group_id }).save();
       } else {
         votingRecord.votedSongs.push(songId);
         await votingRecord.save();
@@ -225,13 +199,36 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Testing
-  socket.on('testing', (msg) => {
-    socket.emit('testing', msg);
+  // Report a song
+  socket.on('reportSong', async (userToken, reportedSong) => {
+
+    // Check that the user is authenticated with Laravel Sanctum
+    let user = await getUserInfo(userToken);
+    if (!user.id) return;
+
+    try {
+      // Check if the song exists
+      const song = await Song.findOne({ id: reportedSong.songId });
+      if (!song) {
+        socket.emit('reportError', { status: 'error', message: 'Song not found' });
+        return;
+      }
+
+      // Add a register in ReportSong table
+      await new ReportSong({ userId: user.id, songId: song.id, reason: reportedSong.option }).save();
+
+      io.emit('songReported', { status: 'success', message: `La cançó ${song.title} ha sigut reportada` });
+    } catch (err) {
+      socket.emit('reportError', { status: 'error', message: err.message });
+    }
   });
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
+  });
+
+  socket.on('testing', (data) => {
+    socket.emit('testing', data);
   });
 });
 

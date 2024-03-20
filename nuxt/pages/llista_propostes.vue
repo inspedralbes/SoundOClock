@@ -1,11 +1,18 @@
 <script>
 import { useAppStore } from '@/stores/app';
+import { socket } from '../socket';
 export default {
     data() {
         return {
             filteredSongs: [],
             showModal: false,
+            showReportModal: false,
             loading: false,
+            reportSongData: {
+                reportedSong: null,
+                options: ["La cançó té contingut inadequat", "La cançó no s'adequa a la temàtica"],
+                selectedOption: "La cançó té contingut inadequat"
+            }
         }
     },
     mounted() {
@@ -72,6 +79,18 @@ export default {
         },
         closeModal() {
             this.showModal = false;
+        },
+        openReportModal(data) {
+            this.reportSongData.reportedSong = data;
+            this.showReportModal = true;
+        },
+        closeReportModal() {
+            this.reportSongData.reportedSong = null;
+            this.showReportModal = false;
+        },
+        report() {
+            const song = {songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
+            socket.emit('reportSong', this.store.getUser().token, song);
         }
     },
     watch: {
@@ -111,7 +130,7 @@ export default {
             <FilterButtons @applyFilter="applyFilter" />
         </div>
         <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
-            <Song v-for="song in filteredSongs" @openModal="openModal" v-bind:song="song" />
+            <Song v-for="song in filteredSongs" @openModal="openModal" @openReportModal="openReportModal" v-bind:song="song" />
         </div>
         <div @click="showModal = false">
             <transition name="fade">
@@ -121,6 +140,33 @@ export default {
                     </div>
                 </div>
             </transition>
+        </div>
+        <div v-if="showReportModal" class="modal">
+            <div class="report-modal-content">
+                <button type="button" class="float-end bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none" @click="closeReportModal()">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <div class="clear-both flex flex-col justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="#960019" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-alert-circle mb-4">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                        <path d="M12 8v4" />
+                        <path d="M12 16h.01" />
+                    </svg>
+                    <p class="mb-8">Per quin motiu vols reportar la cançó {{ reportSongData.reportedSong.title }} de {{ reportSongData.reportedSong.artist}}?</p>
+                    <div class="flex flex-col justify-start items-start mb-4">
+                        <label v-for="(option, index) in reportSongData.options" class="mb-2">
+                            <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
+                            <span class="ml-2">{{ option }}</span>
+                        </label>
+                    </div>
+                    <button @click="report()" class="self-end bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">REPORTAR</button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -171,6 +217,14 @@ export default {
     text-align: center;
     background-color: white;
     padding: 30px;
+    border-radius: 5px;
+}
+
+.report-modal-content {
+    width: 90%;
+    text-align: center;
+    background-color: white;
+    padding: 20px;
     border-radius: 5px;
 }
 

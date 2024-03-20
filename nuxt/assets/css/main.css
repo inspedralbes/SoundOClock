@@ -1,3 +1,7 @@
+:root {
+    --pedralbes-blue: #00ADEF;
+}
+
 body {
     background-color: #000000;
     font-family: 'SF Pro', sans-serif;

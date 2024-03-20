@@ -13,11 +13,19 @@ const songSchema = new mongoose.Schema({
 
 const votingRecordSchema = new mongoose.Schema({
   userId: Number,
+  group: Number,
   submitted: { type: Boolean, default: false },
   votedSongs: [Number],
 });
 
+const reportSongSchema = new mongoose.Schema({
+  userId: Number,
+  songId: Number,
+  reason: String
+});
+
 const VotingRecord = mongoose.model('VotingRecord', votingRecordSchema);
 const Song = mongoose.model('Song', songSchema);
+const ReportSong = mongoose.model('ReportSong', reportSongSchema);
 
-export { Song, VotingRecord }
+export { Song, VotingRecord, ReportSong }
