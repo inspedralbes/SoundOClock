@@ -77,6 +77,35 @@ app.get('/votingRecords/:userId', async (req, res) => {
   }
 });
 
+app.get('/reportSongs/:songId', async (req, res) => {
+  try {
+    const reports = await ReportSong.find({ songId: req.params.songId });
+    res.json(reports);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get('/adminSongs', async (req, res) => {
+  try {
+    // Query all songs
+    const songs = await Song.find();
+
+    // Iterate through each song and find its reported versions
+    const songsWithReports = await Promise.all(songs.map(async (song) => {
+      const reports = await ReportSong.find({ songId: song.id });
+      song = song.toObject();
+      song.reports = reports;
+      return song;
+    }));
+
+    res.json(songsWithReports);
+
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 // Sockets
 io.on('connection', (socket) => {
   console.log('a user connected');
@@ -219,7 +248,7 @@ io.on('connection', (socket) => {
         return;
       }
 
-      io.emit('songDeleted', { status: 'success', id: songId });
+      io.emit('songDeleted', { status: 'success', song: song });
     } catch (err) {
       socket.emit('deleteError', { status: 'error', message: err.message });
     }

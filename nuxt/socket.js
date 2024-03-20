@@ -26,6 +26,10 @@ socket.on("connect", () => {
     console.log("socket songReported data received: ", data.message);
   });
 
+  socket.on("songDeleted", (data) => {
+    console.log("socket songDeleted data received: ", data.song);
+  });
+
   function getUserSelectedSongs(id) {
     fetch(`http://localhost:8080/votingRecords/${id}`)
       .then(response => response.json())

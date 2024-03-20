@@ -164,7 +164,7 @@ export default {
                             <span class="ml-2">{{ option }}</span>
                         </label>
                     </div>
-                    <button @click="report()" class="self-end bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">REPORTAR</button>
+                    <button @click="report()" class="self-end bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">REPORTAR</button>
                 </div>
             </div>
         </div>
