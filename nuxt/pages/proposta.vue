@@ -31,8 +31,45 @@ export default {
         }
     },
     mounted() {
-        socket.on('sendHtmlSpotify', (htmlSpotify) => {
-            console.log(htmlSpotify);
+        socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
+
+            // Crear un elemento HTML temporal
+            const tempElement = document.createElement('div');
+
+            // Establecer el HTML recibido en el elemento temporal
+            tempElement.innerHTML = htmlSpotify;
+
+            // Obtener el script por su id
+            const scriptElement = tempElement.querySelector('#__NEXT_DATA__');
+
+            // Verificar si se encontró el elemento
+            if (scriptElement) {
+                // Acceder al contenido JSON dentro del script y convertirlo a objeto JavaScript
+                const jsonData = JSON.parse(scriptElement.textContent);
+
+                // Acceder al AudioPreviewURL
+                const AudioPreviewURL = jsonData.props.pageProps.state.data.entity.audioPreview.url;
+
+                // Ahora AudioPreviewURL contiene la URL del audio
+                console.log("URL del audio:", AudioPreviewURL);
+
+                // Fetch to AudioPreviewURL to get the audio file .mp3 and play it
+                fetch(AudioPreviewURL)
+                    .then(response => response.blob())
+                    .then(blob => { // blob is the file track.mp3
+                        const audioURL = URL.createObjectURL(blob);
+                        this.currentTrack = new Audio(audioURL);
+                        this.currentTrackId = songId;
+                        this.currentTrackStatus = 'playing';
+                        this.currentTrack.play();
+                        console.log("Playing song:", this.currentTrackId);
+                    })
+                    .catch(error => {
+                        console.error('Error getting the audio file:', error);
+                    });
+            } else {
+                console.error('No se encontró el script con el id "__NEXT_DATA__" en el HTML recibido');
+            }
         });
     },
     methods: {
@@ -99,21 +136,29 @@ export default {
                     .then(response => response.json())
                     .then(data => {
                         console.log('Data:', data);
-                        // const previewURL = data.preview_url;
-                        const previewURL = 'https://p.scdn.co/mp3-preview/7aeb039fe573d76389e79dc52c228e9208604fd7'
-                        return fetch(previewURL);
+                        const previewURL = data.preview_url;
+                        return previewURL;
                     })
-                    .then(response => response.blob())
-                    .then(blob => { // blob is the file track.mp3
-                        const audioURL = URL.createObjectURL(blob);
-                        this.currentTrack = new Audio(audioURL);
-                        this.currentTrackId = id;
-                        this.currentTrackStatus = 'playing';
-                        this.currentTrack.play();
-                        console.log("Playing song:", this.currentTrackId);
-                    })
-                    .catch(error => {
-                        console.error('Error getting the audio file:', error);
+                    .then(previewURL => {
+                        if (previewURL == null) {
+                            console.error('No preview URL');
+                            socket.emit('getHtmlSpotify', id);
+                        }
+                        else {
+                            fetch(previewURL)
+                                .then(response => response.blob())
+                                .then(blob => { // blob is the file track.mp3
+                                    const audioURL = URL.createObjectURL(blob);
+                                    this.currentTrack = new Audio(audioURL);
+                                    this.currentTrackId = id;
+                                    this.currentTrackStatus = 'playing';
+                                    this.currentTrack.play();
+                                    console.log("Playing song:", this.currentTrackId);
+                                })
+                                .catch(error => {
+                                    console.error('Error getting the audio file:', error);
+                                });
+                        }
                     });
             }
 

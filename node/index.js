@@ -278,7 +278,7 @@ io.on('connection', (socket) => {
     fetchSpotifyPage(songId).then(html => {
       if (html) {
         console.log(html);
-        socket.emit('sendHtmlSpotify', html);
+        socket.emit('sendHtmlSpotify', html, songId);
       }
     });
   });
