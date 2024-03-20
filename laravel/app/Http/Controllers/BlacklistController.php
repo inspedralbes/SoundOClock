@@ -10,8 +10,7 @@ class BlacklistController extends Controller
     /**
      * Get the courses data in which a user is enrolled.
      */
-    public function index()
-    {
+    public function index() {
 
         // Validar que l'usuari sigui administrador
         if (auth()->user()->is_admin === 0) {
@@ -27,23 +26,14 @@ class BlacklistController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
 
         // Validar els camps
         $request->validate([
             'nom' => 'required|string',
-            'spotify_id' => 'required|numeric',
+            'spotify_id' => 'required|int',
         ]);
 
         // Validar que l'usuari sigui administrador
@@ -66,8 +56,7 @@ class BlacklistController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
-    {
+    public function show($id) {
         
         // Validar que l'usuari sigui administrador
         if (auth()->user()->is_admin === 0) {
@@ -83,14 +72,6 @@ class BlacklistController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Blacklist $Blacklist)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Blacklist $Blacklist)
@@ -101,8 +82,7 @@ class BlacklistController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
 
         // Validar que l'usuari sigui administrador
         if (auth()->user()->is_admin === 0) {
@@ -121,7 +101,6 @@ class BlacklistController extends Controller
             ], 404);
         }
 
-        Blacklist::destroy($id);
-        return response()->json($song);
+        return Blacklist::destroy($id);
     }
 }

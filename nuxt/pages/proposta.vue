@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Proposta</h1>
+        <h1>Proposta <button @click="getHtmlSpotify('5lwWpQ71GKN3sWmk8zZr9g')">getHtmlSpotify</button></h1>
         <!-- browser for getSongs -->
         <input type="text" v-model="query" @keyup.enter="getSongs(query)" placeholder="Search for songs">
 
@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { socket } from '@/socket';
 
 export default {
     data() {
@@ -30,9 +31,15 @@ export default {
         }
     },
     mounted() {
-
+        socket.on('sendHtmlSpotify', (htmlSpotify) => {
+            console.log(htmlSpotify);
+        });
     },
     methods: {
+        getHtmlSpotify(id) {
+            console.log("getHtmlSpotify", id)
+            socket.emit('getHtmlSpotify', id);
+        },
         onFileChange(e) {
             this.songFile = e.target.files[0]; // this is the file
 
