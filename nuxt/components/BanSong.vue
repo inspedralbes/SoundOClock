@@ -36,7 +36,7 @@
                     </button>
                 </div>
             </div>
-            <div class="w-2/3 text-white text-center ml-4 mr-8">
+            <div class="w-2/3 text-white text-center ml-4 mr-4">
                 <SongDetails v-bind:song="song" />
             </div>
         </div>
