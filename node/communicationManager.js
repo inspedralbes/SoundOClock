@@ -4,10 +4,10 @@ config();
 
 let apiURL;
 
-if(process.env.NODE_ENV === 'production') {
-    apiURL = process.env.PRODUCTION_API_URL;
+if (process.env.NODE_ENV === 'production') {
+  apiURL = process.env.PRODUCTION_API_URL;
 } else if (process.env.NODE_ENV === 'development') {
-    apiURL = process.env.DEVELOPMENT_API_URL;
+  apiURL = process.env.DEVELOPMENT_API_URL;
 }
 
 async function getUserInfo(token) {
@@ -89,5 +89,65 @@ async function addSongToBlackList(token, song) {
   });
   return response;
 }
+async function getPlaylists(playlist, limit, token) {
+  console.log("Playlist start", playlist, limit, token);
+  let url = `https://api.spotify.com/v1/search?q=${playlist}&type=playlist&limit=${limit}`;
+  console.log("url", url);
+  let response = await fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ' + token
+    }
+  })
+  let jsonResponse = await response.json();
+  console.log("respuesta", jsonResponse.playlists.items);
+  if (jsonResponse.playlists.items) {
+    console.log("playlistID:", jsonResponse.playlists.items[0].id);
+    let songs = await getPlaylistSongs(jsonResponse.playlists.items[0].id, token);
+    console.log("Playlist Songs:", songs);
+    return songs;
+  }
+}
 
-export { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList };
+async function getPlaylistSongs(id, token) {
+  let limit = 15;
+  console.log("Playlist Songs start");
+  console.log(id);
+  let url = `https://api.spotify.com/v1/playlists/${id}/tracks?offset=0&limit=${limit}`;
+  let response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "authorization": "Bearer " + token,
+    }
+  });
+  let jsonResponse = await response.json();
+  return jsonResponse;
+}
+
+async function searchSong(search, limit, token) {
+  let url = `https://api.spotify.com/v1/search?query=${search}&type=track&offset=0&limit=${limit}`;
+  let songs = await fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ' + token
+    }
+  });
+  let jsonResponse = await songs.json();
+  return jsonResponse;
+}
+
+async function searchSongId(id, token) {
+  let url = `https://api.spotify.com/v1/tracks/${id}`;
+  let song = await fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ' + token
+    }
+  });
+  let jsonResponse = await song.json();
+  return jsonResponse;
+}
+
+export { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList, getPlaylists, searchSong, searchSongId };

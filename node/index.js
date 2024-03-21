@@ -1,9 +1,9 @@
 import express from 'express';
-import { createServer } from 'http';
+import { createServer, get } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { getUserInfo, googleLogin, addSongToBlackList } from './communicationManager.js';
+import { getUserInfo, loginUserAndAdmin, logout, googleLogin,addSongToBlackList, getPlaylists, searchSong, searchSongId } from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 
@@ -123,6 +123,38 @@ app.get('/adminSongs', async (req, res) => {
     res.status(500).send(err);
   }
 });
+
+const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
+const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+const headers = {
+  'Content-Type': 'application/x-www-form-urlencoded',
+};
+let spotifyToken = '';
+
+// Función para obtener y actualizar el token de Spotify
+async function obtenerActualizarTokenSpotify() {
+  try {
+    const response = await axios.post('https://accounts.spotify.com/api/token', {
+      grant_type: 'client_credentials',
+      client_id: spotifyClientId,
+      client_secret: spotifyClientSecret,
+    }, { headers });
+    if (response.data.access_token) {
+      spotifyToken = response.data.access_token;
+      console.log('Token de Spotify actualizado:', spotifyToken);
+    } else {
+      console.error('No se pudo obtener el token de Spotify.');
+    }
+  } catch (error) {
+    console.error('Error al obtener el token de Spotify:', error);
+  }
+}
+
+// Obtener y actualizar el token de Spotify cada 59 minutos
+setInterval(obtenerActualizarTokenSpotify, 59 * 60 * 1000);
+
+// Obtener y actualizar el token de Spotify al iniciar el servidor
+obtenerActualizarTokenSpotify();
 
 // Sockets
 io.on('connection', (socket) => {
@@ -279,6 +311,49 @@ io.on('connection', (socket) => {
         socket.emit('sendHtmlSpotify', html, songId);
       }
     });
+  });
+
+
+  socket.on('getTopSongs', (playlist) => {
+    console.log('getTopSongsStart');
+    let limit = 1;
+    let songsToEmit = [];
+    getPlaylists(playlist, limit, spotifyToken)
+      .then(data => {
+        if (data) {
+          console.log(data);
+          console.log("emit topSongs", data);
+          console.log("track", data.items[0].track);
+          data.items.forEach(song => {
+            songsToEmit.push(song.track);
+          });
+          socket.emit('topSongs', songsToEmit);
+        }
+      });
+  });
+
+  socket.on('searchSong', (search) => {
+    let limit = 15;
+    console.log('searchSongStart');
+    searchSong(search, limit, spotifyToken)
+      .then(data => {
+        if (data) {
+          console.log(data);
+          socket.emit('searchResult', data.tracks.items);
+        }
+      });
+
+  });
+
+  socket.on('searchId', (id) => {
+    console.log('searchIdStart');
+    searchSongId(id, spotifyToken)
+      .then(data => {
+        if (data) {
+          console.log(data);
+          socket.emit('searchResultId', data);
+        }
+      });
   });
 
   socket.on('disconnect', () => {
