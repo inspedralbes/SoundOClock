@@ -3,7 +3,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { getUserInfo, googleLogin } from './communicationManager.js';
+import { getUserInfo, googleLogin, addSongToBlackList } from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 
@@ -131,7 +131,7 @@ io.on('connection', (socket) => {
   socket.on('googleLogin', (userToken) => {
     googleLogin(userToken)
       .then((userData) => {
-        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, data.token);
+        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, userData.token);
       })
       .catch((err) => {
         console.error(err);
@@ -239,6 +239,8 @@ io.on('connection', (socket) => {
         socket.emit('deleteError', { status: 'error', message: 'Song not found' });
         return;
       }
+
+      addSongToBlackList(userToken, song);
 
       io.emit('songDeleted', { status: 'success', song: song });
     } catch (err) {

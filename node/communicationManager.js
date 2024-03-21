@@ -74,4 +74,20 @@ async function logout(token) {
   return response;
 }
 
-export { getUserInfo, loginUserAndAdmin, logout, googleLogin };
+async function addSongToBlackList(token, song) {
+  const response = await fetch(apiURL + 'blacklist', {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify({
+      nom: song.title,
+      spotify_id: song.id,
+    })
+  });
+  return response;
+}
+
+export { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList };

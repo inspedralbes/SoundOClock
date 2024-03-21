@@ -1,6 +1,9 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import { socket } from '../socket';
+import { setUserFromLocalStorage } from '../utils';
+import { getUserSelectedSongs, getSongs } from '../communicationManager';
+
 export default {
     data() {
         return {
@@ -17,6 +20,10 @@ export default {
     },
     mounted() {
         this.loading = true;
+
+        setUserFromLocalStorage();
+        getUserSelectedSongs(this.store.getUser().id);
+
         fetch('http://localhost:8080/songs')
             .then(response => response.json())
             .then(data => {
@@ -26,6 +33,7 @@ export default {
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
+        
         this.loading = false;
     },
     methods: {
@@ -90,7 +98,6 @@ export default {
         },
         report() {
             const song = {songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
-            // socket.emit('reportSong', "1|3rr0fm3LWsIKCuOPlV3QPPhYCdRppe7ApBpSlLFJ4092d823", song);
             socket.emit('reportSong', this.store.getUser().token, song);
         }
     },

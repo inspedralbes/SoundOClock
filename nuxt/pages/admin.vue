@@ -42,9 +42,9 @@
       </template>
     </SideBarMenu>
 
+    <!--<BanSong v-if="active_screen == 'reports'"></BanSong>-->
     <component :is="active_screen" />
     <!-- <AdminGroupsCrud /> -->
-
 
 </template>
 

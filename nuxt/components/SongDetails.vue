@@ -13,8 +13,7 @@ export default {
   },
   methods: {
     deleteSong(songId) {
-      console.log("HAS AFEGIT A LA LLISTA NEGRA", songId);
-      // socket.emit('deleteSong', "1|3rr0fm3LWsIKCuOPlV3QPPhYCdRppe7ApBpSlLFJ4092d823", songId);
+      console.log("user token", this.store.getUser().token);
       socket.emit('deleteSong', this.store.getUser().token, songId);
     }
   },
@@ -29,7 +28,7 @@ export default {
   <div v-if="song == null">
   </div>
   <div v-else class="contenidor-canço rounded-lg h-screen text-left p-4">
-    <div class="flex flex-row mb-4">
+    <div class="flex flex-row mb-10">
       <img src="/img/mora-primer-dia-de-clases.jpg" alt="" class="w-1/3 rounded-lg">
       <div class="w-2/3 ml-4 flex flex-col justify-between">
         <div>
