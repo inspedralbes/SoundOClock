@@ -89,6 +89,7 @@ async function addSongToBlackList(token, song) {
   });
   return response;
 }
+
 async function getPlaylists(playlist, limit, token) {
   console.log("Playlist start", playlist, limit, token);
   let url = `https://api.spotify.com/v1/search?q=${playlist}&type=playlist&limit=${limit}`;
