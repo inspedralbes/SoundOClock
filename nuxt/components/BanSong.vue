@@ -46,6 +46,7 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import { setUserFromLocalStorage } from '../utils';
+import { getAdminSongs } from '../communicationManager';
 
 export default {
     data() {
@@ -61,17 +62,8 @@ export default {
     },
     mounted() {
         this.loading = true;
-        fetch('http://localhost:8080/adminSongs')
-            .then(response => response.json())
-            .then(data => {
-                this.store.setProposedSongsAdminView(data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-
         setUserFromLocalStorage();
-        
+        getAdminSongs();
         this.loading = false;
     },
     computed: {

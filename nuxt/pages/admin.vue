@@ -59,7 +59,7 @@ export default {
             screens:{
                 // 0: resolveComponent('AdminAlarmsCrud'),
                 1: resolveComponent('AdminGroupsCrud'),
-                // 2: resolveComponent('AdminReportsCrud'),
+                2: resolveComponent('BanSong'),
                 // 3: resolveComponent('AdminSettingsCrud')
             }
         }

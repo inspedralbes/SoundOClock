@@ -23,17 +23,7 @@ export default {
 
         setUserFromLocalStorage();
         getUserSelectedSongs(this.store.getUser().id);
-
-        fetch('http://localhost:8080/songs')
-            .then(response => response.json())
-            .then(data => {
-                console.log("songs: ", data);
-                this.store.setProposedSongs(data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-        
+        getSongs();
         this.loading = false;
     },
     methods: {
