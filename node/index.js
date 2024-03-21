@@ -131,7 +131,7 @@ io.on('connection', (socket) => {
   socket.on('googleLogin', (userToken) => {
     googleLogin(userToken)
       .then((userData) => {
-        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, data.token);
+        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, userData.token);
       })
       .catch((err) => {
         console.error(err);

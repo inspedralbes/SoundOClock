@@ -32,7 +32,6 @@ async function googleLogin(userToken) {
     }
   });
   const data = await response.json();
-  console.log("RESPONSE TO GOOGLE LOGIN", data);
 
   // Send user info to the server
   const userData = await login(data.name, data.email);

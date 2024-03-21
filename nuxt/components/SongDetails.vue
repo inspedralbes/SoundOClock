@@ -13,7 +13,6 @@ export default {
   },
   methods: {
     deleteSong(songId) {
-      //socket.emit('deleteSong', "2|55iAgsjlWiRBSFiJctJfMl6hkc5VCxc3YnxJa0AK8d7f90b8", songId);
       console.log("user token", this.store.getUser().token);
       socket.emit('deleteSong', this.store.getUser().token, songId);
     }

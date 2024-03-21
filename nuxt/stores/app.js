@@ -8,7 +8,7 @@ export const useAppStore = defineStore('app', {
       email: "",
       name: "",
       group: "",
-      token: ""
+      token: null
     },
 
     userSelectedSongs: null,
@@ -51,6 +51,8 @@ export const useAppStore = defineStore('app', {
       this.user.name = name;
       this.user.group = group;
       this.user.token = token;
+
+      localStorage.setItem("user", JSON.stringify(this.user));
     },
     setUserSelectedSongs(userSelectedSongs) {
       this.userSelectedSongs = userSelectedSongs
