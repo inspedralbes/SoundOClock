@@ -48,10 +48,6 @@ export default {
 </script>
 
 <style lang="css">
-/* * {
-    color: white;
-} */
-
 aside {
     transition: 0.2s ease-in-out;
 }
@@ -74,7 +70,7 @@ aside img {
     background-color: gray;
 }
 
-.button:hover span{
+.button:hover span:not(.text){
     color: var(--pedralbes-blue);
 }
 
@@ -83,7 +79,8 @@ aside img {
     border-right:5px solid var(--pedralbes-blue);
 }
 
-.isActive span{
+.isActive span:not(.text) {
     color: var(--pedralbes-blue);
 }
+
 </style>
