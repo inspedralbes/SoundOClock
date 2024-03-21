@@ -12,7 +12,7 @@ INSERT INTO blacklist (nom, spotify_id) VALUES
 ('Drugstory', 2),
 ('Bitch Mode', 3);
 
-INSERT INTO class_groups (name, abbreviation, is_public) VALUES
+INSERT INTO `groups` (name, abbreviation, is_public) VALUES
 ('ESO', 'ES', 1),
 ('Batxillerat', 'BAT', 1),
 ('SMX', 'SMX', 1),
