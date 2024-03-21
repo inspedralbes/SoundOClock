@@ -5,7 +5,7 @@ use App\Models\ClassGroup;
 
 use Illuminate\Http\Request;
 
-class GroupsController extends Controller
+class ClassGroupsController extends Controller
 {
     /**
      * Display a listing of the resource.
