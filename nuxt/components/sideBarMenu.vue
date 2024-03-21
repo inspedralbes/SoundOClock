@@ -9,7 +9,7 @@
         </div>
 
         <div
-            :class="{ 'menu-toggle-wrap flex justify-end mb-4 relative top-4 transition duration-200 left-1/5': true, 'top-[-3.5rem]': isOpen }">
+            :class="{ 'menu-toggle-wrap flex justify-end mb-4 relative top-4 transition duration-200 left-1/5': true, 'top-[-3rem]': isOpen }">
             <button
                 :class="{ 'menu-toggle transition duration-200 bg-transparent border-none cursor-pointer': true, 'transform rotate-180 margin-right-10': isOpen }"
                 @click="toggleMenu">
