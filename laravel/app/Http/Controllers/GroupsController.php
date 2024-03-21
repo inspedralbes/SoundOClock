@@ -18,6 +18,14 @@ class GroupsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request) {
+        // Validate that user is admin
+        if (auth()->user()->is_admin === 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You do not have admin permissions.'
+            ], 404);
+        }
+
         $fields = $request->validate([
             'name' => 'required|string',
             'abbreviation' => 'required|string',
@@ -39,6 +47,14 @@ class GroupsController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id) {
+        // Validate that user is admin
+        if (auth()->user()->is_admin === 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You do not have admin permissions.'
+            ], 404);
+        }
+
         $fields = $request->validate([
             'name' => 'required|string',
             'abbreviation' => 'required|string',
@@ -54,6 +70,23 @@ class GroupsController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id) {
+        // Validate that user is admin
+        if (auth()->user()->is_admin === 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You do not have admin permissions.'
+            ], 404);
+        }
+
+        // Validate that the group exists
+        $group = Group::find($id);
+        if ($group == null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'The group does not exist.'
+            ], 404);
+        }
+
         return Group::destroy($id);
     }
 
