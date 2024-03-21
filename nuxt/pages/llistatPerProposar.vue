@@ -8,7 +8,8 @@
             class="width mb-3 mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
             <div class="contenidor-img">
                 <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="rounded-lg">
-                <button @click="playTrack(track.id)" class="rounded-lg" :class="{ playingC: isPlaying, noPlaying: !isPlaying }">
+                <button @click="playTrack(track.id)" class="rounded-lg"
+                    :class="{ playingC: isPlayingCheck(track.id), noPlaying: !isPlayingCheck(track.id) }">
                     <!-- fer amb computed la classe -->
                     <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded">
                         pause
@@ -57,8 +58,17 @@ export default {
             isPlaying: false,
         }
     },
-    mounted() {
+    computed: {
 
+    },
+    mounted() {
+        socket.emit('getTopSongs', 'TopGlobal');
+
+        socket.on('topSongs', (results) => {
+            console.log(results);
+            this.tracks = results;
+            console.log('Top songs:', this.tracks);
+        });
         socket.on('searchResult', (results) => {
             this.tracks = results;
         });
@@ -144,10 +154,14 @@ export default {
                 socket.emit('getHtmlSpotify', id);
             }
         },
+        isPlayingCheck(id) {
+            if (this.isPlaying && this.currentTrackId == id) {
+                return true;
+            } else if (!this.isPlaying && this.currentTrackId == id) {
+                return false;
+            }
+        },
     },
-    computed: {
-
-    }
 }
 </script>
 
@@ -176,19 +190,10 @@ export default {
     width: fit-content;
 }
 
-/* .contenidor-img>button {
-    display: flex;
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    right: 0;
-    top: 0;
-    background-color: rgb(0, 0, 0, 0.3);
-    cursor: pointer;
-    z-index: 100;
-} */
+.contenidor-img>button>span {
+    font-size: 40px;
+    color: white;
+}
 
 .contenidor-img>button>svg {
     width: 80%;

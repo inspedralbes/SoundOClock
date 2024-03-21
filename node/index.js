@@ -1,9 +1,9 @@
 import express from 'express';
-import { createServer } from 'http';
+import { createServer, get } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { getUserInfo, googleLogin } from './communicationManager.js';
+import { getUserInfo, loginUserAndAdmin, logout, googleLogin, getPlaylists, searchSong, searchSongId } from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 
@@ -135,7 +135,7 @@ io.on('connection', (socket) => {
   socket.on('googleLogin', (userToken) => {
     googleLogin(userToken)
       .then((userData) => {
-        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, data.token);
+        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, userData.token);
       })
       .catch((err) => {
         console.error(err);
@@ -283,31 +283,41 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('searchSong', (search) => {
-    let limit = 15;
-    let url = `https://api.spotify.com/v1/search?query=${search}&type=track&offset=0&limit=${limit}`;
-    fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ' + spotifyToken
-      }
-    }).then(response => response.json())
+
+  socket.on('getTopSongs', (playlist) => {
+    console.log('getTopSongsStart');
+    let limit = 1;
+    let songsToEmit = [];
+    getPlaylists(playlist, limit, spotifyToken)
       .then(data => {
-        if (data.tracks) {
-          console.log(data.tracks.items);
-          socket.emit('searchResult', data.tracks.items);
+        if (data) {
+          console.log(data);
+          console.log("emit topSongs", data);
+          console.log("track", data.items[0].track);
+          data.items.forEach(song => {
+            songsToEmit.push(song.track);
+          });
+          socket.emit('topSongs', songsToEmit);
         }
       });
   });
 
+  socket.on('searchSong', (search) => {
+    let limit = 15;
+    console.log('searchSongStart');
+    searchSong(search, limit, spotifyToken)
+      .then(data => {
+        if (data) {
+          console.log(data);
+          socket.emit('searchResult', data.tracks.items);
+        }
+      });
+    
+  });
+
   socket.on('searchId', (id) => {
-    let url = `https://api.spotify.com/v1/tracks/${id}`;
-    fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ' + spotifyToken
-      }
-    }).then(response => response.json())
+    console.log('searchIdStart');
+    searchSongId(id, spotifyToken)
       .then(data => {
         if (data) {
           console.log(data);
