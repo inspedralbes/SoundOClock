@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\ClassGroup;
+use App\Models\Group;
 
 use Illuminate\Http\Request;
 
@@ -11,7 +11,7 @@ class GroupsController extends Controller
      * Display a listing of the resource.
      */
     public function index() {
-        return ClassGroup::all();
+        return Group::all();
     }
 
     /**
@@ -24,7 +24,7 @@ class GroupsController extends Controller
             'is_public' => 'required|int',
         ]);
 
-        return ClassGroup::create($request->all());
+        return Group::create($request->all());
     }
 
     /**
@@ -32,7 +32,7 @@ class GroupsController extends Controller
      */
     public function show(string $id)
     {
-        return ClassGroup::findOrfail($id);
+        return Group::findOrfail($id);
     }
 
     /**
@@ -45,7 +45,7 @@ class GroupsController extends Controller
             'is_public' => 'required|int',
         ]);
 
-        $group = ClassGroup::findOrfail($id);
+        $group = Group::findOrfail($id);
         $group->update($request->all());
         return $group;
     }
@@ -54,6 +54,6 @@ class GroupsController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id) {
-        return ClassGroup::destroy($id);
+        return Group::destroy($id);
     }
 }
