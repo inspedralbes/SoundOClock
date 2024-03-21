@@ -32,15 +32,22 @@
 </template>
 
 <script>
+import { useAppStore } from '@/stores/app';
+import {computed} from 'vue';
+
 export default {
     data() {
+        const store = useAppStore();
         return {
-            isOpen: false,
+            isOpen: computed(()=>store.getOpenMenu()),
         }
     },
     methods: {
         toggleMenu() {
+            const store = useAppStore();
+
             this.isOpen = !this.isOpen;
+            store.setOpenMenu(this.isOpen);
             this.$emit('toggle-menu', this.isOpen);
         }
     }

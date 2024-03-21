@@ -5,13 +5,13 @@ use App\Models\ClassGroup;
 
 use Illuminate\Http\Request;
 
-class GroupsController extends Controller
+class ClassGroupsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index() {
-        return ClassGroup::all();
+        return ClassGroup::where('is_public', '<>', 0)->get();
     }
 
     /**

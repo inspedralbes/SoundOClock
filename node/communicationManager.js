@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import axios from 'axios';
 import { config } from 'dotenv';
 config();
 
@@ -74,4 +75,18 @@ async function logout(token) {
   return response;
 }
 
-export { getUserInfo, loginUserAndAdmin, logout, googleLogin };
+async function getGroups(token){
+  const response = await axios.get(`${apiURL}classgroups`);
+  return response.data;
+}
+
+const comManager = {
+  getUserInfo,
+  googleLogin,
+  loginUserAndAdmin,
+  login,
+  logout,
+  getGroups,
+};
+
+export default comManager;

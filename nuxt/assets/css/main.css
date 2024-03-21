@@ -5,6 +5,7 @@
 
 body {
     font-family: 'SF Pro', sans-serif;
+    width: 100vw;
 }
 
 .material-symbols-rounded{

@@ -10,7 +10,6 @@ export const socket = io(url);
 
 socket.on("connect", () => {
   const pinia = useAppStore();
-  console.log("user connected");
 
   getUserSelectedSongs(1);
   // getSongs();
@@ -32,41 +31,7 @@ socket.on("connect", () => {
     getAdminSongs();
   });
 
-  function getUserSelectedSongs(id) {
-    fetch(`http://localhost:8080/votingRecords/${id}`)
-      .then(response => response.json())
-      .then(data => {
-        console.log("user: ", data);
-        pinia.setUserSelectedSongs(data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }
 
-  function getSongs() {
-    fetch('http://localhost:8080/songs')
-      .then(response => response.json())
-      .then(data => {
-        console.log("songs: ", data);
-        pinia.setProposedSongs(data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }
-
-  function getAdminSongs() {
-    fetch('http://localhost:8080/adminSongs')
-      .then(response => response.json())
-      .then(data => {
-        console.log("songs: ", data);
-        pinia.setProposedSongsAdminView(data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }
 
   socket.on("loginData", (id, mail, name, group, token) => {
     console.log("socket loginData data received: ", id, mail, name, group, token);
@@ -78,7 +43,52 @@ socket.on("connect", () => {
     }
   });
 
+  socket.on('sendGroups', (data) => {
+    pinia.setClassGroups(data);
+  });
+
+  socket.on("disconnect", () => {
+  
+  });
+
+  // FUNCTIONS START
+function getUserSelectedSongs(id) {
+  fetch(`${url}/votingRecords/${id}`)
+    .then(response => response.json())
+    .then(data => {
+      // console.log("user: ", data);
+      pinia.setUserSelectedSongs(data);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+}
+
+function getSongs() {
+  fetch('${url}/songs')
+    .then(response => response.json())
+    .then(data => {
+      console.log("songs: ", data);
+      pinia.setProposedSongs(data);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+}
+
+function getAdminSongs() {
+  fetch('${url}/adminSongs')
+    .then(response => response.json())
+    .then(data => {
+      console.log("songs: ", data);
+      pinia.setProposedSongsAdminView(data);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+}
 });
 
-socket.on("disconnect", () => {
-});
+
+
+
