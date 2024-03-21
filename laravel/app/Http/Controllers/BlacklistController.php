@@ -106,13 +106,12 @@ class BlacklistController extends Controller
      *      )
      * )
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
 
         // Validar els camps
         $request->validate([
             'nom' => 'required|string',
-            'spotify_id' => 'required|numeric',
+            'spotify_id' => 'required|int',
         ]);
 
         // Validar que l'usuari sigui administrador
@@ -133,48 +132,7 @@ class BlacklistController extends Controller
     }
 
     /**
-     * @OA\Get(
-     *      path="/api/blacklist/{id}",
-     *      operationId="showBlacklist",
-     *      tags={"Blacklist"},
-     *      summary="Mostrar canción de la lista negra",
-     *      security={{"bearer_token":{}}},
-     *      description="Muestra los detalles de una canción específica en la lista negra.",
-     *      @OA\Parameter(
-     *          name="id",
-     *          in="path",
-     *          required=true,
-     *          description="ID de la canción",
-     *          @OA\Schema(type="integer")
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Detalles de la canción en la lista negra",
-     *          @OA\JsonContent(
-     *              type="object",
-     *              @OA\Property(property="id", type="integer", example=1),
-     *              @OA\Property(property="nom", type="string", example="Anaconda"),
-     *              @OA\Property(property="spotify_id", type="integer", example=1),
-     *              @OA\Property(property="created_at", type="string", format="date-time", example="2022-03-21T12:00:00Z"),
-     *              @OA\Property(property="updated_at", type="string", format="date-time", example="2022-03-21T12:00:00Z")
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="No autenticado",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Canción no encontrada o no tienes permisos de administrador",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="status", type="string", example="error"),
-     *              @OA\Property(property="message", type="string", example="No tienes permisos de administrador.")
-     *          )
-     *      )
-     * )
+     * Display the specified resource.
      */
     public function show($id)
     {
@@ -251,8 +209,7 @@ class BlacklistController extends Controller
      *      )
      * )
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
 
         // Validar que l'usuari sigui administrador
         if (auth()->user()->is_admin === 0) {
@@ -271,7 +228,6 @@ class BlacklistController extends Controller
             ], 404);
         }
 
-        Blacklist::destroy($id);
-        return response()->json($song);
+        return Blacklist::destroy($id);
     }
 }

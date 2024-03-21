@@ -1,17 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\ClassGroup;
+
 use Illuminate\Http\Request;
 
-class ClassGroupsController extends Controller
+class GroupsController extends Controller
 {
-     public function index() {
+    /**
+     * Display a listing of the resource.
+     */
+    public function index() {
         return ClassGroup::all();
     }
 
-     public function store(Request $request) {
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request) {
         $fields = $request->validate([
             'name' => 'required|string',
             'abbreviation' => 'required|string',
@@ -21,45 +27,34 @@ class ClassGroupsController extends Controller
         return ClassGroup::create($request->all());
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        return ClassGroup::findOrfail($id);
+    }
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
-    {
-        //
+    public function update(Request $request, string $id) {
         $fields = $request->validate([
-            'id' => 'required|int',
             'name' => 'required|string',
             'abbreviation' => 'required|string',
             'is_public' => 'required|int',
         ]);
 
-        $classGroup = classGroups::find($fields['id']);
-
-        $classGroup->name = $fields['name'];
-        $classGroup->abbreviation = $fields['abbreviation'];
-        $classGroup->is_public = $fields['is_public'];
-        $classGroup->save();
-
-        return response('Class Group Updated', 200);
-
+        $group = ClassGroup::findOrfail($id);
+        $group->update($request->all());
+        return $group;
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request)
-    {
-        //
-        $fields = $request->validate([
-            'id' => 'required|int',
-        ]);
-
-        $classGroup = classGroups::find($fields['id']);
-
-        $classGroup->delete();
-
-        return response('Class Group Deleted', 200);
+    public function destroy(string $id) {
+        return ClassGroup::destroy($id);
     }
 }

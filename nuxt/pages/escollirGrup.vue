@@ -16,19 +16,19 @@ export default {
             groups: [],
         }
     },
-    mounted() {
-        this.loading = true;
-        fetch('http://localhost:8080/api/groups')
-            .then(response => response.json())
-            .then(data => {
-                console.log("groups: ", data);
-                this.groups = data;
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-        this.loading = false;
-    },
+    // mounted() {
+    //     this.loading = true;
+    //     fetch('http://localhost:8080/api/groups')
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             console.log("groups: ", data);
+    //             this.groups = data;
+    //         })
+    //         .catch(error => {
+    //             console.error('Error fetching data:', error);
+    //         });
+    //     this.loading = false;
+    // },
 
 
 }

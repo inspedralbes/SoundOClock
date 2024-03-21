@@ -1,5 +1,6 @@
 <script>
 import { socket } from '../socket';
+import { useAppStore } from '@/stores/app';
 export default {
     name: 'Song',
     props: {

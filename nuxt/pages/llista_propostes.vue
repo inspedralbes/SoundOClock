@@ -1,6 +1,9 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import { socket } from '../socket';
+import { setUserFromLocalStorage } from '../utils';
+import { getUserSelectedSongs, getSongs } from '../communicationManager';
+
 export default {
     data() {
         return {
@@ -17,6 +20,10 @@ export default {
     },
     mounted() {
         this.loading = true;
+
+        setUserFromLocalStorage();
+        getUserSelectedSongs(this.store.getUser().id);
+
         fetch('http://localhost:8080/songs')
             .then(response => response.json())
             .then(data => {
@@ -26,6 +33,7 @@ export default {
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
+        
         this.loading = false;
     },
     methods: {
@@ -164,7 +172,7 @@ export default {
                             <span class="ml-2">{{ option }}</span>
                         </label>
                     </div>
-                    <button @click="report()" class="self-end bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">REPORTAR</button>
+                    <button @click="report()" class="self-end bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">REPORTAR</button>
                 </div>
             </div>
         </div>

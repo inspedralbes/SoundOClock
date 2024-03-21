@@ -8,11 +8,12 @@ export const useAppStore = defineStore('app', {
       email: "",
       name: "",
       group: "",
-      token: ""
+      token: null
     },
 
     userSelectedSongs: null,
     proposedSongs: [],
+    proposedSongsAdminView: [],
     filter: 1,
     searchEngineFilter: "",
     isLoadingVote: false
@@ -29,6 +30,9 @@ export const useAppStore = defineStore('app', {
     },
     getProposedSongs() {
       return this.proposedSongs
+    },
+    getProposedSongsAdminView() {
+      return this.proposedSongsAdminView
     },
     getFilter() {
       return this.filter
@@ -47,12 +51,17 @@ export const useAppStore = defineStore('app', {
       this.user.name = name;
       this.user.group = group;
       this.user.token = token;
+
+      localStorage.setItem("user", JSON.stringify(this.user));
     },
     setUserSelectedSongs(userSelectedSongs) {
       this.userSelectedSongs = userSelectedSongs
     },
     setProposedSongs(proposedSongs) {
       this.proposedSongs = proposedSongs
+    },
+    setProposedSongsAdminView(proposedSongsAdminView) {
+      this.proposedSongsAdminView = proposedSongsAdminView
     },
     setFilter(filter) {
       this.filter = filter

@@ -1,10 +1,11 @@
 import express from 'express';
-import { createServer } from 'http';
+import { createServer, get } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { getUserInfo, googleLogin } from './communicationManager.js';
+import { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList, getPlaylists, searchSong, searchSongId } from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
+import axios from 'axios';
 
 const app = express();
 app.use(cors());
@@ -55,6 +56,23 @@ async function insertDefaultsMongo() {
   }
 }
 
+//FETCH TO GET HTML FROM SPOTIFY
+async function fetchSpotifyPage(id) {
+  try {
+    const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching Spotify page:', error);
+    return null;
+  }
+}
+// fetchSpotifyPage('5lwWpQ71GKN3sWmk8zZr9g').then(html => {
+//   if (html) {
+//     console.log(html);
+//   }
+// });
+
+
 insertDefaultsMongo();
 
 // API routes
@@ -77,6 +95,67 @@ app.get('/votingRecords/:userId', async (req, res) => {
   }
 });
 
+app.get('/reportSongs/:songId', async (req, res) => {
+  try {
+    const reports = await ReportSong.find({ songId: req.params.songId });
+    res.json(reports);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get('/adminSongs', async (req, res) => {
+  try {
+    // Query all songs
+    const songs = await Song.find();
+
+    // Iterate through each song and find its reported versions
+    const songsWithReports = await Promise.all(songs.map(async (song) => {
+      const reports = await ReportSong.find({ songId: song.id });
+      song = song.toObject();
+      song.reports = reports;
+      return song;
+    }));
+
+    res.json(songsWithReports);
+
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
+const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+const headers = {
+  'Content-Type': 'application/x-www-form-urlencoded',
+};
+let spotifyToken = '';
+
+// Función para obtener y actualizar el token de Spotify
+async function obtenerActualizarTokenSpotify() {
+  try {
+    const response = await axios.post('https://accounts.spotify.com/api/token', {
+      grant_type: 'client_credentials',
+      client_id: spotifyClientId,
+      client_secret: spotifyClientSecret,
+    }, { headers });
+    if (response.data.access_token) {
+      spotifyToken = response.data.access_token;
+      console.log('Token de Spotify actualizado:', spotifyToken);
+    } else {
+      console.error('No se pudo obtener el token de Spotify.');
+    }
+  } catch (error) {
+    console.error('Error al obtener el token de Spotify:', error);
+  }
+}
+
+// Obtener y actualizar el token de Spotify cada 59 minutos
+setInterval(obtenerActualizarTokenSpotify, 59 * 60 * 1000);
+
+// Obtener y actualizar el token de Spotify al iniciar el servidor
+obtenerActualizarTokenSpotify();
+
 // Sockets
 io.on('connection', (socket) => {
   console.log('a user connected');
@@ -84,7 +163,7 @@ io.on('connection', (socket) => {
   socket.on('googleLogin', (userToken) => {
     googleLogin(userToken)
       .then((userData) => {
-        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, data.token);
+        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, userData.token);
       })
       .catch((err) => {
         console.error(err);
@@ -193,7 +272,9 @@ io.on('connection', (socket) => {
         return;
       }
 
-      io.emit('songDeleted', { status: 'success', id: songId });
+      addSongToBlackList(userToken, song);
+
+      io.emit('songDeleted', { status: 'success', song: song });
     } catch (err) {
       socket.emit('deleteError', { status: 'error', message: err.message });
     }
@@ -215,12 +296,64 @@ io.on('connection', (socket) => {
       }
 
       // Add a register in ReportSong table
-      await new ReportSong({ userId: user.id, songId: song.id, reason: reportedSong.option }).save();
+      await new ReportSong({ userId: user.id, userName: user.name, songId: song.id, reason: reportedSong.option }).save();
 
       io.emit('songReported', { status: 'success', message: `La cançó ${song.title} ha sigut reportada` });
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
     }
+  });
+
+  socket.on('getHtmlSpotify', (songId) => {
+    fetchSpotifyPage(songId).then(html => {
+      if (html) {
+        console.log(html);
+        socket.emit('sendHtmlSpotify', html, songId);
+      }
+    });
+  });
+
+
+  socket.on('getTopSongs', (playlist) => {
+    console.log('getTopSongsStart');
+    let limit = 1;
+    let songsToEmit = [];
+    getPlaylists(playlist, limit, spotifyToken)
+      .then(data => {
+        if (data) {
+          console.log(data);
+          console.log("emit topSongs", data);
+          console.log("track", data.items[0].track);
+          data.items.forEach(song => {
+            songsToEmit.push(song.track);
+          });
+          socket.emit('topSongs', songsToEmit);
+        }
+      });
+  });
+
+  socket.on('searchSong', (search) => {
+    let limit = 15;
+    console.log('searchSongStart');
+    searchSong(search, limit, spotifyToken)
+      .then(data => {
+        if (data) {
+          console.log(data);
+          socket.emit('searchResult', data.tracks.items);
+        }
+      });
+
+  });
+
+  socket.on('searchId', (id) => {
+    console.log('searchIdStart');
+    searchSongId(id, spotifyToken)
+      .then(data => {
+        if (data) {
+          console.log(data);
+          socket.emit('searchResultId', data);
+        }
+      });
   });
 
   socket.on('disconnect', () => {
