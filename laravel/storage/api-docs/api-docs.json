@@ -3,7 +3,7 @@
     "info": {
         "title": "Documentació dels endpoints",
         "contact": {
-            "name": "Equip de Spottunes",
+            "name": "Equip de desenvolupament",
             "email": "a20pedgarguz@inspedralbes.cat"
         },
         "license": {
@@ -90,17 +90,117 @@
                 }
             }
         },
-        "/api/classgroups": {
-            "get": {
+        "/api/logout": {
+            "post": {
                 "tags": [
-                    "Class Groups"
+                    "Authentication"
                 ],
-                "summary": "Get all class groups",
-                "description": "Retrieves all class groups from the database.",
-                "operationId": "getClassGroups",
+                "summary": "User logout",
+                "description": "Logs out the authenticated user by deleting all access tokens. Requires a bearer token for authentication.",
+                "operationId": "logout",
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Successfully logged out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/getUser": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get user information",
+                "description": "Retrieves information about the authenticated user.",
+                "operationId": "getUser",
+                "responses": {
+                    "200": {
+                        "description": "User information retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "john@example.com"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2022-03-19T12:00:00Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2022-03-19T12:00:00Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/blacklist": {
+            "get": {
+                "tags": [
+                    "Blacklist"
+                ],
+                "summary": "Obtener lista negra",
+                "description": "Obtiene todas las canciones en la lista negra.",
+                "operationId": "getBlacklist",
+                "responses": {
+                    "200": {
+                        "description": "Lista de canciones en la lista negra",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -111,17 +211,23 @@
                                                 "type": "integer",
                                                 "example": 1
                                             },
-                                            "name": {
+                                            "nom": {
                                                 "type": "string",
-                                                "example": "ESO"
+                                                "example": "Anaconda"
                                             },
-                                            "abbreviation": {
-                                                "type": "string",
-                                                "example": "ES"
-                                            },
-                                            "is_public": {
+                                            "spotify_id": {
                                                 "type": "integer",
                                                 "example": 1
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": null
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": null
                                             }
                                         },
                                         "type": "object"
@@ -129,40 +235,75 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No tienes permisos de administrador",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No tienes permisos de administrador."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
-            }
-        },
-        "/api/classGroups": {
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
-                    "Class Groups"
+                    "Blacklist"
                 ],
-                "summary": "Create a new class group",
-                "description": "Creates a new class group with provided data.",
-                "operationId": "createClassGroup",
+                "summary": "Añadir canción a lista negra",
+                "description": "Añade una canción a la lista negra.",
+                "operationId": "store",
                 "requestBody": {
+                    "description": "Datos de la canción a añadir",
                     "required": true,
                     "content": {
                         "application/x-www-form-urlencoded": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "abbreviation",
-                                    "is_public"
+                                    "nom",
+                                    "spotify_id"
                                 ],
                                 "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "example": "ESO"
+                                    "nom": {
+                                        "description": "Nombre de la canción",
+                                        "type": "string"
                                     },
-                                    "abbreviation": {
-                                        "type": "string",
-                                        "example": "ES"
-                                    },
-                                    "is_public": {
-                                        "type": "integer",
-                                        "example": 1
+                                    "spotify_id": {
+                                        "description": "ID de Spotify de la canción",
+                                        "type": "integer"
                                     }
                                 },
                                 "type": "object"
@@ -172,14 +313,18 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Class group created successfully",
+                        "description": "Canción añadida a la lista negra",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
+                                        "nom": {
                                             "type": "string",
-                                            "example": "Class Group Created"
+                                            "example": "Canción de ejemplo"
+                                        },
+                                        "spotify_id": {
+                                            "type": "integer",
+                                            "example": 12345
                                         }
                                     },
                                     "type": "object"
@@ -187,18 +332,35 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Validation error",
+                    "401": {
+                        "description": "No autenticado",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "The given data was invalid."
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No tienes permisos de administrador",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
                                         },
-                                        "errors": {
-                                            "type": "object"
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No tienes permisos de administrador."
                                         }
                                     },
                                     "type": "object"
@@ -206,7 +368,216 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/blacklist/{id}": {
+            "get": {
+                "tags": [
+                    "Blacklist"
+                ],
+                "summary": "Mostrar canción de la lista negra",
+                "description": "Muestra los detalles de una canción específica en la lista negra.",
+                "operationId": "showBlacklist",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la canción",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalles de la canción en la lista negra",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "nom": {
+                                            "type": "string",
+                                            "example": "Anaconda"
+                                        },
+                                        "spotify_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2022-03-21T12:00:00Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2022-03-21T12:00:00Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Canción no encontrada o no tienes permisos de administrador",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No tienes permisos de administrador."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Blacklist"
+                ],
+                "summary": "Eliminar canción de la lista negra",
+                "description": "Elimina una canción específica de la lista negra.",
+                "operationId": "deleteBlacklist",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la canción",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Canción eliminada de la lista negra",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "nom": {
+                                            "type": "string",
+                                            "example": "Anaconda"
+                                        },
+                                        "spotify_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2022-03-21T12:00:00Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2022-03-21T12:00:00Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Canción no encontrada o no tienes permisos de administrador",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "La canción no existe o no tienes permisos de administrador."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearer_token": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
             }
         }
     }

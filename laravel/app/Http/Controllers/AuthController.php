@@ -66,6 +66,23 @@ class AuthController extends Controller {
         return response($response, 201);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     operationId="logout",
+     *     tags={"Authentication"},
+     *     summary="User logout",
+     *     description="Logs out the authenticated user by deleting all access tokens. Requires a bearer token for authentication.",
+     *      security={{"bearer_token":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully logged out",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Logged out")
+     *         )
+     *     )
+     * )
+     */
     public function logout(Request $request) {
         auth()->user()->tokens()->delete();
 
@@ -74,6 +91,35 @@ class AuthController extends Controller {
         ];
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/getUser",
+     *     operationId="getUser",
+     *     tags={"Authentication"},
+     *     summary="Get user information",
+     *     description="Retrieves information about the authenticated user.",
+     *     security={{"bearer_token":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User information retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", example="john@example.com"),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2022-03-19T12:00:00Z"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2022-03-19T12:00:00Z")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="User not found")
+     *         )
+     *     )
+     * )
+     */
     public function getUser(Request $request) {
         $user = auth()->user();
     

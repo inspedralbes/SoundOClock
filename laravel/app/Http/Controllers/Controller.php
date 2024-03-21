@@ -11,13 +11,18 @@ use Illuminate\Routing\Controller as BaseController;
  *      title="Documentació dels endpoints",
  *      version="1.0.0",
  *      @OA\Contact(
- *          name="Equip de Spottunes",
+ *          name="Equip de desenvolupament",
  *          email="a20pedgarguz@inspedralbes.cat"
  *      ),
  *      @OA\License(
  *          name="Licencia API",
  *          url="http://www.example.com/licenses/api"
  *      )
+ * )
+ * @OAS\SecurityScheme(
+ *      securityScheme="bearer_token",
+ *      type="http",
+ *      scheme="bearer"
  * )
  */
 class Controller extends BaseController
