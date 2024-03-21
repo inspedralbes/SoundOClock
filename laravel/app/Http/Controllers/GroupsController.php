@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Group;
+use App\Models\User;
 
 use Illuminate\Http\Request;
 
@@ -90,6 +91,12 @@ class GroupsController extends Controller
         return Group::destroy($id);
     }
 
+    // Return all groups from the user
+    public function getGroupsFromUser(string $user_id) {
+        $user = User::findOrfail($user_id);
+        return $user->groups;
+    }
+
     // Add groups to the user
     public function addGroupsToUser(Request $request, string $user_id) {
         $fields = $request->validate([
@@ -98,7 +105,8 @@ class GroupsController extends Controller
 
         $user = User::findOrfail($user_id);
         $user->groups()->attach($fields['groups']);
-        return $user;
+        // Return the user with its groups
+        return $user->groups;
     }
 
     // Remove all groups from the user and add the new ones
@@ -110,7 +118,7 @@ class GroupsController extends Controller
         $user = User::findOrfail($user_id);
         // This will remove all groups from the user and add the new ones
         $user->groups()->sync($fields['groups']);
-        return $user;
+        return $user->groups;
     }
 
     // Remove all groups from the user
