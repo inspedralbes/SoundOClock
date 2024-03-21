@@ -140,4 +140,19 @@ class BlacklistTest extends TestCase {
                 'message' => 'No tens permisos d\'administrador.'
             ]);
     }
+
+    public function test_destroy_non_existent_song(): void {
+        // Login as admin
+        $admin = $this->loginAsAdmin();
+
+        // Delete a non-existent song from the blacklist
+        $response = $this->actingAs($admin)
+            ->delete("/api/blacklist/1");
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'status' => 'error',
+                'message' => 'La cançó no existeix.'
+            ]);
+    }
 }

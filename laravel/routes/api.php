@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlacklistController;
-use App\Http\Controllers\ClassGroupsController;
+use App\Http\Controllers\GroupsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Public routes
 Route::post('/login', [AuthController::class,'login']);
-Route::get('/classgroups', [ClassGroupsController::class, 'index']);
+Route::get('/groups', [GroupsController::class, 'index']);
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -35,9 +35,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/blacklist', [BlacklistController::class,'store']);
     Route::delete('/blacklist/{id}', [BlacklistController::class,'destroy']);
 
-    // ClassGroups routes
-    Route::post('/classGroups', [ClassGroupsController::class, 'store']);
-    Route::get('/classGroups/{id}', [ClassGroupsController::class, 'show']);
-    Route::put('/classGroups/{id}', [ClassGroupsController::class, 'update']);
-    Route::delete('/classGroups/{id}', [ClassGroupsController::class, 'destroy']);
+    // Groups routes
+    Route::post('/groups', [GroupsController::class, 'store']);
+    Route::get('/groups/{id}', [GroupsController::class, 'show']);
+    Route::put('/groups/{id}', [GroupsController::class, 'update']);
+    Route::delete('/groups/{id}', [GroupsController::class, 'destroy']);
+
+    // Groups & Users routes
+    Route::get('/getGroupsFromUser/{user_id}', [GroupsController::class, 'getGroupsFromUser']);
+    Route::post('/addGroupsToUser/{user_id}', [GroupsController::class, 'addGroupsToUser']);
+    Route::put('/updateGroupsToUser/{user_id}', [GroupsController::class, 'updateGroupsToUser']);
+    Route::delete('/removeGroupsFromUser/{user_id}', [GroupsController::class, 'removeGroupsFromUser']);
 });
