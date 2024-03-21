@@ -69,7 +69,6 @@ class AuthTest extends TestCase {
                 'created_at',
                 'updated_at',
                 'is_admin',
-                'class_group_id'
             ]);
     }
 }
