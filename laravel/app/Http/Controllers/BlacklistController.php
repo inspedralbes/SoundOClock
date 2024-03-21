@@ -11,18 +11,7 @@ class BlacklistController extends Controller
      * Get the courses data in which a user is enrolled.
      */
     public function index() {
-
-        // Validar que l'usuari sigui administrador
-        if (auth()->user()->is_admin === 0) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'No tens permisos d\'administrador.'
-            ], 404);
-        }
-
-        $songs = Blacklist::all();
-
-        return response()->json($songs);
+        return Blacklist::all();
     }
 
     /**
@@ -57,18 +46,7 @@ class BlacklistController extends Controller
      * Display the specified resource.
      */
     public function show($id) {
-        
-        // Validar que l'usuari sigui administrador
-        if (auth()->user()->is_admin === 0) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'No tens permisos d\'administrador.'
-            ], 404);
-        }
-
-        $song = Blacklist::findOrFail($id);
-
-        return response()->json($song);
+        return Blacklist::findOrFail($id);
     }
 
     /**
