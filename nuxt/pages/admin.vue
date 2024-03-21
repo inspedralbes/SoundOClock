@@ -43,14 +43,11 @@
     </SideBarMenu>
 
     <component :is="active_screen" />
-    <!-- <AdminGroupsCrud /> -->
 
 
 </template>
 
 <script>
-import { AdminGroupsCrud } from '#components';
-
 export default {
     data() {
         return {

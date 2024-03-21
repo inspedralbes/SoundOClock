@@ -47,7 +47,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="css">
 /* * {
     color: white;
 } */
