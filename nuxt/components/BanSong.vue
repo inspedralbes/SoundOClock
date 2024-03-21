@@ -1,26 +1,28 @@
 <template>
     <div>
-        <h1 class="text-white text-center mb-8">CENSURAR CANÇÓ</h1>
-        <div class="flex flex-row">
+        <!--<h1 class="text-white text-center mb-8">CENSURAR CANÇÓ</h1>-->
+        <div class="flex flex-row mt-8">
             <div class="w-1/3 ml-20">
                 <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
                     <button v-for="song in songs" @click="selectSong(song)"
-                        class="contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
-                        <div class="contenidor-img">
-                            <img src="/img/mora-primer-dia-de-clases.jpg" alt="" class="rounded-lg">
-                            <button class="rounded-lg">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                    class="icon icon-tabler icons-tabler-filled icon-tabler-player-play">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path
-                                        d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="song-data">
-                            <p class="font-black basis-1/3">{{ song.title }}</p>
-                            <p class="basis-1/3">{{ song.artist }}</p>
-                            <p class="basis-1/3">{{ song.votes }} vots</p>
+                        class="contenidor-canço flex flex-row justify-between items-center rounded-lg p-3">
+                        <div class="flex flex-row items-center gap-2">
+                            <div class="contenidor-img">
+                                <img src="/img/mora-primer-dia-de-clases.jpg" alt="" class="rounded-lg">
+                                <button class="rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                        class="icon icon-tabler icons-tabler-filled icon-tabler-player-play">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path
+                                            d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="song-data text-start">
+                                <p class="font-black basis-1/3">{{ song.title }}</p>
+                                <p class="basis-1/3">{{ song.artist }}</p>
+                                <p class="basis-1/3">{{ song.votes }} vots</p>
+                            </div>
                         </div>
                         <div v-if="song.reports.length > 0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"

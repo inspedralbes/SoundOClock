@@ -24,7 +24,7 @@
         <!-- --------- -->
         <button @click="active_screen='reports'" :class="{'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4':true,'isActive':active_screen==='reports'}">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
-                flag
+                warning
             </span>
             <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Informes</span>
         </button>
@@ -41,6 +41,7 @@
             </button>
       </template>
     </SideBarMenu>
+    <BanSong v-if="active_screen == 'reports'"></BanSong>
 </template>
 
 <script>
