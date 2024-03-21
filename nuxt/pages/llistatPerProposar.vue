@@ -27,14 +27,10 @@
 
             <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
 
-                <button class="hover:rounded-lg hover:bg-black">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="44"
-                        height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M12 5l0 14" />
-                        <path d="M5 12l14 0" />
-                    </svg>
+                <button @click="" class="hover:rounded-lg hover:bg-black w-fit flex">
+                    <span class="material-symbols-rounded text-4xl">
+                        add
+                    </span>
                 </button>
 
             </div>
@@ -191,11 +187,11 @@ export default {
 }
 
 .contenidor-img>button>span {
-    font-size: 40px;
+    font-size: 3rem;
     color: white;
 }
 
-.contenidor-img>button>svg {
+.contenidor-img>button>span {
     width: 80%;
     height: auto;
 }
@@ -235,6 +231,7 @@ export default {
     justify-content: space-evenly;
     flex-grow: 1;
     align-items: center;
+    height: 100%;
     max-width: 100%;
     min-width: 5%;
     text-align: center;
@@ -248,6 +245,8 @@ export default {
 
 .contenidor-butons {
     max-width: 20%;
+    height: 100%;
+    flex-grow: 1;
     min-width: fit-content;
     align-self: center;
 }
@@ -267,11 +266,14 @@ img {
         display: flex;
         flex-direction: row;
         flex-grow: 1;
+
         max-width: 100%;
     }
 
     .contenidor-butons {
         max-width: 20%;
+        height: 100%;
+        flex-grow: 1;
         min-width: fit-content;
         align-self: center;
     }
