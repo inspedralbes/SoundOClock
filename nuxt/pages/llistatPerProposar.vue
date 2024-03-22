@@ -8,7 +8,7 @@
             class="width mb-3 mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
             <div class="contenidor-img">
                 <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="rounded-lg">
-                <button @click="playTrack(track.id)" class="rounded-lg"
+                <button @click="playTrack(track)" class="rounded-lg"
                     :class="{ playingC: isPlayingCheck(track.id), noPlaying: !isPlayingCheck(track.id) }">
                     <!-- fer amb computed la classe -->
                     <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded">
@@ -27,7 +27,7 @@
 
             <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
 
-                <button @click="" class="hover:rounded-lg hover:bg-black w-fit flex">
+                <button @click="proposeSong(track)" class="hover:rounded-lg hover:bg-black w-fit flex">
                     <span class="material-symbols-rounded text-4xl">
                         add
                     </span>
@@ -41,6 +41,7 @@
 <script>
 
 import { socket } from '@/socket';
+import { useAppStore } from '@/stores/app';
 
 export default {
     data() {
@@ -52,6 +53,7 @@ export default {
             currentTrack: null,
             currentTrackId: null,
             isPlaying: false,
+            store: useAppStore(),
         }
     },
     computed: {
@@ -91,20 +93,15 @@ export default {
                 // Ahora AudioPreviewURL contiene la URL del audio
                 console.log("URL del audio:", AudioPreviewURL);
 
+                // add AudioPreviewURL to the track object with the songId
+                this.tracks.forEach(item => {
+                    if (item.id == songId) {
+                        item.preview_url = AudioPreviewURL;
+                    }
+                });
+
                 // Fetch to AudioPreviewURL to get the audio file .mp3 and play it
-                fetch(AudioPreviewURL)
-                    .then(response => response.blob())
-                    .then(blob => { // blob is the file track.mp3
-                        const audioURL = URL.createObjectURL(blob);
-                        this.currentTrack = new Audio(audioURL);
-                        this.currentTrackId = songId;
-                        this.currentTrack.play();
-                        this.isPlaying = true;
-                        console.log("Playing song:", this.currentTrackId);
-                    })
-                    .catch(error => {
-                        console.error('Error getting the audio file:', error);
-                    });
+                this.getMp3(AudioPreviewURL, songId);
             } else {
                 console.error('No se encontró el script con el id "__NEXT_DATA__" en el HTML recibido');
             }
@@ -131,32 +128,77 @@ export default {
             socket.emit('searchSong', this.query);
             console.log('Searching songs:', this.query);
         },
-        playTrack(id) {
-
-            if (this.currentTrackId == id) {
-                if (this.isPlaying == true) {
+        playTrack(track) {
+            console.log('Playing track start');
+            if (this.currentTrackId == track.id) {
+                if (this.isPlaying) {
                     console.log('Pausing song:', this.currentTrackId);
                     this.currentTrack.pause();
                     this.isPlaying = false;
                 } else {
                     console.log('Playing song:', this.currentTrackId);
-                    this.currentTrack.play();
-                    this.isPlaying = true;
+                    this.playCurrentTrack();
                 }
             } else {
                 if (this.currentTrack) {
                     this.currentTrack.pause();
                 }
-                socket.emit('getHtmlSpotify', id);
+                if (track.preview_url != null) {
+                    console.log(track.preview_url);
+                    this.getMp3(track.preview_url, track.id);
+                } else {
+                    console.log('Getting HTML Spotify:', track.id);
+                    socket.emit('getHtmlSpotify', track.id);
+                }
             }
         },
         isPlayingCheck(id) {
-            if (this.isPlaying && this.currentTrackId == id) {
-                return true;
-            } else if (!this.isPlaying && this.currentTrackId == id) {
-                return false;
+            if (this.currentTrackId == id) {
+                return this.isPlaying;
             }
         },
+        proposeSong(track) {
+            console.log('Proposing song:', track);
+            if (track.preview_url == null) {
+                socket.emit('getHtmlSpotify', track.id);
+            }
+            let song = {
+                id: track.id,
+                title: track.name,
+                artist: track.artists[0].name,
+                date: track.album.release_date,
+                img: track.album.images[1].url,
+                previewUrl: track.preview_url,
+                submitDate: new Date().toISOString(),
+                // submitedBy: this.store.getUser().id,
+                submittedBy: 8,
+            }
+            // socket.emit('postSong', this.store.getUser.token, song);
+            socket.emit('postSong', "2|4FZyA5cQg5LFVwjHXWiKyvH59d6tErfkiVXwysMr1193e9eb", song);
+        },
+        getMp3(AudioPreviewURL, songId) {
+            fetch(AudioPreviewURL)
+                .then(response => response.blob())
+                .then(blob => { // blob is the file track.mp3
+                    const audioURL = URL.createObjectURL(blob);
+                    this.currentTrack = new Audio(audioURL);
+                    this.currentTrackId = songId;
+                    this.playCurrentTrack();
+                })
+                .catch(error => {
+                    console.error('Error getting the audio file:', error);
+                });
+        },
+        playCurrentTrack() {
+            this.currentTrack.play();
+            this.isPlaying = true;
+            console.log("Playing song:", this.currentTrackId);
+        },
+    },
+    beforeDestroy() {
+        socket.off('topSongs');
+        socket.off('searchResult');
+        socket.off('sendHtmlSpotify');
     },
 }
 </script>
