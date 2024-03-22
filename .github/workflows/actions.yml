@@ -21,6 +21,9 @@ jobs:
         run: |
           cd laravel 
           composer install
+          php artisan key:generate
+          php artisan migrate --force
+          php artisan migrate:fresh --seed
           php artisan test
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
