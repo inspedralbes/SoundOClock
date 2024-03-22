@@ -151,4 +151,17 @@ async function searchSongId(id, token) {
   return jsonResponse;
 }
 
-export { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList, getPlaylists, searchSong, searchSongId };
+async function getUsers(token) {
+  const response = await fetch(apiURL + 'users', {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
+export { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList, getPlaylists, searchSong, searchSongId, getUsers };

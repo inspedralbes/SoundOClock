@@ -1,11 +1,11 @@
-INSERT INTO users (name, email, created_at, updated_at, is_admin) VALUES
-('santi', 'santi@gmail.com', NOW(), NOW(), 0),
-('alvaro', 'alvaro@gmail.com', NOW(), NOW(), 0),
-('david', 'david@gmail.com', NOW(), NOW(), 0),
-('miquel', 'miquel@gmail.com', NOW(), NOW(), 0),
-('pedro', 'pedro@gmail.com', NOW(), NOW(), 0),
-('raul', 'raul@gmail.com', NOW(), NOW(), 0),
-('admin', 'admin@gmail.com', NOW(), NOW(), 1);
+INSERT INTO users (name, email, created_at, updated_at, is_admin, vote_banned_until, propose_banned_until) VALUES
+('santi', 'santi@gmail.com', NOW(), NOW(), 0, null, null),
+('alvaro', 'alvaro@gmail.com', NOW(), NOW(), 0, '2024-06-29', '2024-06-29'),
+('david', 'david@gmail.com', NOW(), NOW(), 0, null, null),
+('miquel', 'miquel@gmail.com', NOW(), NOW(), 0, null, null),
+('pedro', 'pedro@gmail.com', NOW(), NOW(), 0, null, '2024-05-15'),
+('raul', 'raul@gmail.com', NOW(), NOW(), 0, '2024-04-02', null),
+('admin', 'admin@gmail.com', NOW(), NOW(), 1, null, null);
 
 INSERT INTO blacklist (nom, spotify_id) VALUES
 ('Anaconda', 1),

@@ -14,6 +14,7 @@ export const useAppStore = defineStore('app', {
     userSelectedSongs: null,
     proposedSongs: [],
     proposedSongsAdminView: [],
+    usersAdminView: [],
     filter: 1,
     searchEngineFilter: "",
     isLoadingVote: false
@@ -33,6 +34,9 @@ export const useAppStore = defineStore('app', {
     },
     getProposedSongsAdminView() {
       return this.proposedSongsAdminView
+    },
+    getUsersAdminView() {
+      return this.usersAdminView
     },
     getFilter() {
       return this.filter
@@ -59,6 +63,9 @@ export const useAppStore = defineStore('app', {
     },
     setProposedSongs(proposedSongs) {
       this.proposedSongs = proposedSongs
+    },
+    setUsersAdminView(usersAdminView) {
+      this.usersAdminView = usersAdminView
     },
     setProposedSongsAdminView(proposedSongsAdminView) {
       this.proposedSongsAdminView = proposedSongsAdminView

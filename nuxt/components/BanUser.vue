@@ -4,27 +4,17 @@
         <div class="flex flex-row mt-8">
             <div class="w-1/3 ml-20">
                 <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
-                    <button v-for="song in songs" @click="selectSong(song)"
+                    <button v-for="user in users" @click="selectUser(user)"
                         class="contenidor-canço flex flex-row justify-between items-center rounded-lg p-3">
                         <div class="flex flex-row items-center gap-2">
                             <div class="contenidor-img">
                                 <img src="/img/mora-primer-dia-de-clases.jpg" alt="" class="rounded-lg">
-                                <button class="rounded-lg">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                        class="icon icon-tabler icons-tabler-filled icon-tabler-player-play">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path
-                                            d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" />
-                                    </svg>
-                                </button>
                             </div>
                             <div class="song-data text-start">
-                                <p class="font-black basis-1/3">{{ song.title }}</p>
-                                <p class="basis-1/3">{{ song.artist }}</p>
-                                <p class="basis-1/3">{{ song.votes }} vots</p>
+                                <p class="font-black basis-1/3">{{ user.name }}</p>
                             </div>
                         </div>
-                        <div v-if="song.reports.length > 0">
+                        <div v-if="user.vote_banned_until || user.propose_banned_until">
                             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
                                 fill="rgb(239 68 68)"
                                 class="icon icon-tabler icons-tabler-filled icon-tabler-alert-circle">
@@ -36,6 +26,9 @@
                     </button>
                 </div>
             </div>
+            <div class="w-2/3 text-white text-center ml-4 mr-4">
+                <UserDetails v-bind:user="user" />
+            </div>
         </div>
     </div>
 </template>
@@ -43,29 +36,29 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import { setUserFromLocalStorage } from '../utils';
-import { getAdminSongs } from '../communicationManager';
+import { getUsers } from '../communicationManager';
 
 export default {
     data() {
         return {
             loading: true,
-            song: null,
+            user: null,
         }
     },
     methods: {
-        selectSong(selectedSong) {
-            this.song = selectedSong;
+        selectUser(selectedUser) {
+            this.user = selectedUser;
         }
     },
     mounted() {
         this.loading = true;
         setUserFromLocalStorage();
-        getAdminSongs();
+        this.users = getUsers();
         this.loading = false;
     },
     computed: {
-        songs() {
-            return this.store.getProposedSongsAdminView();
+        users() {
+            return this.store.getUsersAdminView();
         },
     },
     setup() {
