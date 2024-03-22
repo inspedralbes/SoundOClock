@@ -39,7 +39,7 @@ export default {
     data() {
         const store = useAppStore();
         return {
-            isOpen: computed(()=>store.getOpenMenu()),
+            isOpen: false,
         }
     },
     methods: {
@@ -47,7 +47,7 @@ export default {
             const store = useAppStore();
 
             this.isOpen = !this.isOpen;
-            store.setOpenMenu(this.isOpen);
+            // store.setOpenMenu(this.isOpen);
             this.$emit('toggle-menu', this.isOpen);
         }
     }
