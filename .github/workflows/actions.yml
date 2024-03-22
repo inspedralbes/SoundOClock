@@ -6,12 +6,17 @@ on:
       - actions
 
 jobs:
-  build:
+  LARAVEL TEST:
     runs-on: ubuntu-latest
     steps:
       - name: Obtenint el codi del respositori
         uses: actions/checkout@v4
 
+      - name: Levantar MySQL
+        run: |
+          docker run -d -p 3306:3306 --name mysql-container -e MYSQL_ROOT_PASSWORD=secret mysql
+
+      
       - name: Comprovant Laravel
         run: |
           cd laravel 
