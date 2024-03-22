@@ -152,8 +152,8 @@ async function searchSongId(id, token) {
   return jsonResponse;
 }
 
-async function getGroups(token) {
-  const response = await axios.get(`${apiURL}classgroups`);
+async function getGroups(token){
+  const response = await axios.get(`${apiURL}groups`);
   return response.data;
 }
 
