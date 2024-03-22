@@ -29,6 +29,13 @@
             <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Informes</span>
         </button>
         <!-- --------- -->
+        <button @click="selected_screen=4" :class="{'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4':true,'isActive':selected_screen===4}">
+            <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
+                playlist_remove
+            </span>
+            <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">BlackList</span>
+        </button>
+        <!-- --------- -->
         <!-- 
             El contenido que vaya dentro del template v-slot:footer se mostrará al final del sidebar-menu.
          -->
@@ -61,6 +68,7 @@ export default {
                 1: resolveComponent('AdminGroupsCrud'),
                 // 2: resolveComponent('AdminReportsCrud'),
                 // 3: resolveComponent('AdminSettingsCrud')
+                4: resolveComponent('AdminBlackListCrud')
             }
         }
     },
