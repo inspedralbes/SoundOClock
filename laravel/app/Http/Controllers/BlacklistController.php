@@ -115,7 +115,7 @@ class BlacklistController extends Controller
         ]);
 
         // Check that the user is an admin
-        if (auth()->user()->is_admin === 0) {
+        if (auth()->user()->role_id !== 1) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'
@@ -137,7 +137,7 @@ class BlacklistController extends Controller
     {
         
         // Check that the user is an admin
-        if (auth()->user()->is_admin === 0) {
+        if (auth()->user()->role_id !== 1) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'
@@ -211,7 +211,7 @@ class BlacklistController extends Controller
     public function destroy($id) {
 
         // Check that the user is an admin
-        if (auth()->user()->is_admin === 0) {
+        if (auth()->user()->role_id !== 1) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'

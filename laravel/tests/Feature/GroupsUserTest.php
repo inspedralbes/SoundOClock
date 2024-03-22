@@ -16,7 +16,7 @@ class GroupsUserTest extends TestCase {
         $user = User::factory()->create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
-            'is_admin' => 1
+            'role_id' => 1
         ]);
         return $user;
     }

@@ -68,7 +68,7 @@ class AuthTest extends TestCase {
                 'email',
                 'created_at',
                 'updated_at',
-                'is_admin',
+                'role_id',
             ]);
     }
 }

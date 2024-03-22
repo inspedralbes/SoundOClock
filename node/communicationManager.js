@@ -157,6 +157,16 @@ async function getGroups(token){
   return response.data;
 }
 
+async function fetchSpotifyPage(id) {
+  try {
+    const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching Spotify page:', error);
+    return null;
+  }
+}
+
 
 const comManager = {
   getUserInfo,
@@ -170,6 +180,7 @@ const comManager = {
   searchSong,
   searchSongId,
   getGroups,
+  fetchSpotifyPage,
 };
 
 export default comManager;
