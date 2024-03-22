@@ -59,7 +59,7 @@ class AuthTest extends TestCase {
 
         // Get user
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->post('/api/getUser');
+            ->get('/api/getUser');
         
         $response->assertStatus(200)
             ->assertJsonStructure([

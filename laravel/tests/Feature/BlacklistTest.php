@@ -65,7 +65,7 @@ class BlacklistTest extends TestCase {
         $response->assertStatus(404)
             ->assertJson([
                 'status' => 'error',
-                'message' => 'No tens permisos d\'administrador.'
+                'message' => 'You do not have admin permissions.'
             ]);
     }
 
@@ -137,7 +137,7 @@ class BlacklistTest extends TestCase {
         $response->assertStatus(404)
             ->assertJson([
                 'status' => 'error',
-                'message' => 'No tens permisos d\'administrador.'
+                'message' => 'You do not have admin permissions.'
             ]);
     }
 
@@ -152,7 +152,7 @@ class BlacklistTest extends TestCase {
         $response->assertStatus(404)
             ->assertJson([
                 'status' => 'error',
-                'message' => 'La cançó no existeix.'
+                'message' => 'The song does not exist.'
             ]);
     }
 }
