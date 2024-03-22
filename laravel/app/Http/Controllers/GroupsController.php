@@ -12,7 +12,7 @@ class GroupsController extends Controller
      * Display a listing of the resource.
      */
     public function index() {
-        return Group::all();
+        return Group::where('is_public', '<>', 0)->get();
     }
 
     /**
