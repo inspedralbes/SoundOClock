@@ -3,7 +3,7 @@ import { createServer, get } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList, getPlaylists, searchSong, searchSongId } from './communicationManager.js';
+import comManager from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 
@@ -14,6 +14,7 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*',
+    methods: ["GET", "POST"],
   }
 });
 const port = process.env.PORT || 8080;
@@ -161,7 +162,7 @@ io.on('connection', (socket) => {
   console.log('a user connected');
 
   socket.on('googleLogin', (userToken) => {
-    googleLogin(userToken)
+    comManager.googleLogin(userToken)
       .then((userData) => {
         socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, userData.token);
       })
@@ -173,7 +174,7 @@ io.on('connection', (socket) => {
   // Post song checking for duplicates first
   socket.on('postSong', async (userToken, songData) => {
     // Check that the user is authenticated with Laravel Sanctum
-    let user = await getUserInfo(userToken);
+    let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
 
     try {
@@ -356,6 +357,69 @@ io.on('connection', (socket) => {
       });
   });
 
+  socket.on('getGroups',(token) => {
+    comManager.getGroups(token)
+      .then((groups) => {
+        socket.emit('sendGroups', groups);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  })
+
+
+  socket.on('getTopSongs', (playlist) => {
+    console.log('getTopSongsStart');
+    let limit = 1;
+    let songsToEmit = [];
+    getPlaylists(playlist, limit, spotifyToken)
+      .then(data => {
+        if (data) {
+          console.log(data);
+          console.log("emit topSongs", data);
+          console.log("track", data.items[0].track);
+          data.items.forEach(song => {
+            songsToEmit.push(song.track);
+          });
+          socket.emit('topSongs', songsToEmit);
+        }
+      });
+  });
+
+  socket.on('searchSong', (search) => {
+    let limit = 15;
+    console.log('searchSongStart');
+    searchSong(search, limit, spotifyToken)
+      .then(data => {
+        if (data) {
+          console.log(data);
+          socket.emit('searchResult', data.tracks.items);
+        }
+      });
+
+  });
+
+  socket.on('searchId', (id) => {
+    console.log('searchIdStart');
+    searchSongId(id, spotifyToken)
+      .then(data => {
+        if (data) {
+          console.log(data);
+          socket.emit('searchResultId', data);
+        }
+      });
+  });
+
+  socket.on('getGroups',(token) => {
+    comManager.getGroups(token)
+      .then((groups) => {
+        socket.emit('sendGroups', groups);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  })
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
@@ -363,6 +427,7 @@ io.on('connection', (socket) => {
   socket.on('testing', (data) => {
     socket.emit('testing', data);
   });
+
 });
 
 server.listen(port, () => {

@@ -44,12 +44,13 @@
 
     <!--<BanSong v-if="active_screen == 'reports'"></BanSong>-->
     <component :is="active_screen" />
-    <!-- <AdminGroupsCrud /> -->
 
 </template>
 
 <script>
-import { AdminGroupsCrud } from '#components';
+import { socket } from '@/socket';
+import { useAppStore } from '@/stores/app';
+import {computed} from 'vue';
 
 export default {
     data() {
@@ -63,6 +64,13 @@ export default {
                 // 3: resolveComponent('AdminSettingsCrud')
             }
         }
+    },
+    setup() {
+            const store = useAppStore();
+            return { store };
+        },
+    created() {
+            socket.emit('getGroups', this.store.getUser().token);
     },
     methods: {
 

@@ -16,9 +16,15 @@ export const useAppStore = defineStore('app', {
     proposedSongsAdminView: [],
     filter: 1,
     searchEngineFilter: "",
-    isLoadingVote: false
+    isLoadingVote: false,
+    classGroups: [],
+    openMenu: false
 
   }),
+  persist:{
+    storage: persistedState.localStorage,
+    paths:['openMenu']
+  },
   actions: {
 
     //getters
@@ -42,6 +48,12 @@ export const useAppStore = defineStore('app', {
     },
     getIsLoadingVote() {
       return this.isLoadingVote
+    },
+    getClassGroups() {
+      return this.classGroups
+    },
+    getOpenMenu() {
+      return this.openMenu
     },
 
     //setters
@@ -72,5 +84,11 @@ export const useAppStore = defineStore('app', {
     setIsLoadingVote(isLoadingVote) {
       this.isLoadingVote = isLoadingVote
     },
+    setClassGroups(classGroups) {
+      this.classGroups = classGroups
+    },
+    setOpenMenu(menuState) {
+      this.openMenu = menuState
+    }
   },
 })

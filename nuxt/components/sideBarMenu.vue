@@ -32,26 +32,29 @@
 </template>
 
 <script>
+import { useAppStore } from '@/stores/app';
+import {computed} from 'vue';
+
 export default {
     data() {
+        const store = useAppStore();
         return {
             isOpen: false,
         }
     },
     methods: {
         toggleMenu() {
+            const store = useAppStore();
+
             this.isOpen = !this.isOpen;
+            // store.setOpenMenu(this.isOpen);
             this.$emit('toggle-menu', this.isOpen);
         }
     }
 }
 </script>
 
-<style>
-/* * {
-    color: white;
-} */
-
+<style lang="css">
 aside {
     transition: 0.2s ease-in-out;
 }
@@ -74,7 +77,7 @@ aside img {
     background-color: gray;
 }
 
-.button:hover span{
+.button:hover span:not(.text){
     color: var(--pedralbes-blue);
 }
 
@@ -83,7 +86,8 @@ aside img {
     border-right:5px solid var(--pedralbes-blue);
 }
 
-.isActive span{
+.isActive span:not(.text) {
     color: var(--pedralbes-blue);
 }
+
 </style>
