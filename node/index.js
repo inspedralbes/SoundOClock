@@ -262,7 +262,7 @@ io.on('connection', (socket) => {
   // Delete a song
   socket.on('deleteSong', async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
-    let user = await getUserInfo(userToken);
+    let user = await comManager.getUserInfo(userToken);
     if (!user.id || user.is_admin === 0) return;
 
     try {
@@ -273,7 +273,7 @@ io.on('connection', (socket) => {
         return;
       }
 
-      addSongToBlackList(userToken, song);
+      comManager.addSongToBlackList(userToken, song);
 
       io.emit('songDeleted', { status: 'success', song: song });
     } catch (err) {
@@ -319,7 +319,7 @@ io.on('connection', (socket) => {
     console.log('getTopSongsStart');
     let limit = 1;
     let songsToEmit = [];
-    getPlaylists(playlist, limit, spotifyToken)
+    comManager.getPlaylists(playlist, limit, spotifyToken)
       .then(data => {
         if (data) {
           console.log(data);
@@ -336,7 +336,7 @@ io.on('connection', (socket) => {
   socket.on('searchSong', (search) => {
     let limit = 15;
     console.log('searchSongStart');
-    searchSong(search, limit, spotifyToken)
+    comManager.searchSong(search, limit, spotifyToken)
       .then(data => {
         if (data) {
           console.log(data);
@@ -348,7 +348,7 @@ io.on('connection', (socket) => {
 
   socket.on('searchId', (id) => {
     console.log('searchIdStart');
-    searchSongId(id, spotifyToken)
+    comManager.searchSongId(id, spotifyToken)
       .then(data => {
         if (data) {
           console.log(data);
@@ -389,7 +389,7 @@ io.on('connection', (socket) => {
   socket.on('searchSong', (search) => {
     let limit = 15;
     console.log('searchSongStart');
-    searchSong(search, limit, spotifyToken)
+    comManager.searchSong(search, limit, spotifyToken)
       .then(data => {
         if (data) {
           console.log(data);
@@ -401,7 +401,7 @@ io.on('connection', (socket) => {
 
   socket.on('searchId', (id) => {
     console.log('searchIdStart');
-    searchSongId(id, spotifyToken)
+    comManager.searchSongId(id, spotifyToken)
       .then(data => {
         if (data) {
           console.log(data);
