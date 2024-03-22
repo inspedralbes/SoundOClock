@@ -57,20 +57,6 @@ async function insertDefaultsMongo() {
 }
 
 //FETCH TO GET HTML FROM SPOTIFY
-async function fetchSpotifyPage(id) {
-  try {
-    const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching Spotify page:', error);
-    return null;
-  }
-}
-// fetchSpotifyPage('5lwWpQ71GKN3sWmk8zZr9g').then(html => {
-//   if (html) {
-//     console.log(html);
-//   }
-// });
 
 
 insertDefaultsMongo();
@@ -310,7 +296,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('getHtmlSpotify', (songId) => {
-    fetchSpotifyPage(songId).then(html => {
+    comManager.fetchSpotifyPage(songId).then(html => {
       if (html) {
         console.log(html);
         socket.emit('sendHtmlSpotify', html, songId);
@@ -361,7 +347,7 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('getGroups',(token) => {
+  socket.on('getGroups', (token) => {
     comManager.getGroups(token)
       .then((groups) => {
         socket.emit('sendGroups', groups);
@@ -376,7 +362,7 @@ io.on('connection', (socket) => {
     console.log('getTopSongsStart');
     let limit = 1;
     let songsToEmit = [];
-    getPlaylists(playlist, limit, spotifyToken)
+    comManager.getPlaylists(playlist, limit, spotifyToken)
       .then(data => {
         if (data) {
           console.log(data);
@@ -414,7 +400,7 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('getGroups',(token) => {
+  socket.on('getGroups', (token) => {
     comManager.getGroups(token)
       .then((groups) => {
         socket.emit('sendGroups', groups);

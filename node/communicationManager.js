@@ -152,9 +152,19 @@ async function searchSongId(id, token) {
   return jsonResponse;
 }
 
-async function getGroups(token){
+async function getGroups(token) {
   const response = await axios.get(`${apiURL}classgroups`);
   return response.data;
+}
+
+async function fetchSpotifyPage(id) {
+  try {
+    const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching Spotify page:', error);
+    return null;
+  }
 }
 
 
@@ -170,6 +180,7 @@ const comManager = {
   searchSong,
   searchSongId,
   getGroups,
+  fetchSpotifyPage,
 };
 
 export default comManager;
