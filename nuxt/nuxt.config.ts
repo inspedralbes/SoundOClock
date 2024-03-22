@@ -2,7 +2,7 @@
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss", '@pinia/nuxt', 'nuxt-socket-io'],
+  modules: ["@nuxtjs/tailwindcss", '@pinia/nuxt', 'nuxt-socket-io', '@samk-dev/nuxt-vcalendar'],
   css: ['~/assets/css/main.css'],
   app: {
     head: {
