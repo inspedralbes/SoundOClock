@@ -16,17 +16,17 @@ class GroupsTest extends TestCase {
         $user = User::factory()->create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
-            'is_admin' => 1
+            'role_id' => 1
         ]);
         return $user;
     }
 
-    // Helper function to login as a normal user
-    private function loginAsUser() {
+    // Helper function to login as a student
+    private function loginAsStudent() {
         $user = User::factory()->create([
             'name' => 'santi',
             'email' => 'santi@gmail.com',
-            'is_admin' => 0
+            'role_id' => 4
         ]);
         return $user;
     }
@@ -57,8 +57,8 @@ class GroupsTest extends TestCase {
     }
 
     public function test_insert_not_admin(): void {
-        // Login as a normal user
-        $user = $this->loginAsUser();
+        // Login as a student
+        $user = $this->loginAsStudent();
 
         // Create a group
         $response = $this->createGroup($user, 'group1', 'g1', 1);
@@ -70,11 +70,27 @@ class GroupsTest extends TestCase {
             ]);
     }
 
-    public function test_index(): void {
+    public function test_index_all_public(): void {
         // Login as admin
         $admin = $this->loginAsAdmin();
 
-        // Create 2 groups
+        // Create 2 groups (both public)
+        $this->createGroup($admin, 'group1', 'g1', 1);
+        $this->createGroup($admin, 'group2', 'g2', 1);
+
+        // Get all groups
+        $response = $this->actingAs($admin)
+            ->get('/api/groups');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2);
+    }
+
+    public function test_index_private_groups(): void {
+        // Login as admin
+        $admin = $this->loginAsAdmin();
+
+        // Create 2 groups (1 public and 1 private)
         $this->createGroup($admin, 'group1', 'g1', 1);
         $this->createGroup($admin, 'group2', 'g2', 0);
 
@@ -83,7 +99,7 @@ class GroupsTest extends TestCase {
             ->get('/api/groups');
 
         $response->assertStatus(200)
-            ->assertJsonCount(2);
+            ->assertJsonCount(1);
     }
 
     public function test_show(): void {
@@ -102,7 +118,9 @@ class GroupsTest extends TestCase {
             ->assertJson([
                 'name' => 'group1',
                 'abbreviation' => 'g1',
-                'is_public' => 1
+                'is_public' => 1,
+                'max_courses' => 4,
+                'max_lines' => 26
             ]);
     }
 
@@ -138,8 +156,8 @@ class GroupsTest extends TestCase {
         $response = $this->createGroup($admin, 'group1', 'g1', 1);
         $id = $response->json('id');
 
-        // Login as a normal user
-        $user = $this->loginAsUser();
+        // Login as a student
+        $user = $this->loginAsStudent();
 
         // Update the group
         $response = $this->actingAs($user)
@@ -179,8 +197,8 @@ class GroupsTest extends TestCase {
         $response = $this->createGroup($admin, 'group1', 'g1', 1);
         $id = $response->json('id');
 
-        // Login as a normal user
-        $user = $this->loginAsUser();
+        // Login as a student
+        $user = $this->loginAsStudent();
 
         // Delete the group
         $response = $this->actingAs($user)

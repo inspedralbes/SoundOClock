@@ -12,7 +12,7 @@ class GroupsController extends Controller
      * Display a listing of the resource.
      */
     public function index() {
-        return Group::all();
+        return Group::where('is_public', '<>', 0)->get();
     }
 
     /**
@@ -20,7 +20,7 @@ class GroupsController extends Controller
      */
     public function store(Request $request) {
         // Validate that user is admin
-        if (auth()->user()->is_admin === 0) {
+        if (auth()->user()->role_id !== 1) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'
@@ -49,7 +49,7 @@ class GroupsController extends Controller
      */
     public function update(Request $request, string $id) {
         // Validate that user is admin
-        if (auth()->user()->is_admin === 0) {
+        if (auth()->user()->role_id !== 1) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'
@@ -72,7 +72,7 @@ class GroupsController extends Controller
      */
     public function destroy(string $id) {
         // Validate that user is admin
-        if (auth()->user()->is_admin === 0) {
+        if (auth()->user()->role_id !== 1) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'

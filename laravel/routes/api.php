@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlacklistController;
 use App\Http\Controllers\GroupsController;
+use App\Http\Controllers\RolesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,4 +47,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/addGroupsToUser/{user_id}', [GroupsController::class, 'addGroupsToUser']);
     Route::put('/updateGroupsToUser/{user_id}', [GroupsController::class, 'updateGroupsToUser']);
     Route::delete('/removeGroupsFromUser/{user_id}', [GroupsController::class, 'removeGroupsFromUser']);
+
+    // Roles routes
+    Route::get('/roles', [RolesController::class, 'index']);
+    Route::post('/roles', [RolesController::class, 'store']);
+    Route::get('/roles/{id}', [RolesController::class, 'show']);
+    Route::put('/roles/{id}', [RolesController::class, 'update']);
+    Route::delete('/roles/{id}', [RolesController::class, 'destroy']);
 });
