@@ -152,4 +152,24 @@ async function searchSongId(id, token) {
   return jsonResponse;
 }
 
-export { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList, getPlaylists, searchSong, searchSongId };
+async function getGroups(token){
+  const response = await axios.get(`${apiURL}classgroups`);
+  return response.data;
+}
+
+
+const comManager = {
+  getUserInfo,
+  googleLogin,
+  loginUserAndAdmin,
+  login,
+  logout,
+  addSongToBlackList,
+  getPlaylists,
+  getPlaylistSongs,
+  searchSong,
+  searchSongId,
+  getGroups,
+};
+
+export default comManager;
