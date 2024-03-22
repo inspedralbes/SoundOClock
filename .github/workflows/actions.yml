@@ -14,7 +14,7 @@ jobs:
 
       - name: Levantar MySQL
         run: |
-          docker run -d -p 3306:3306 --name mysql-container -e MYSQL_ROOT_PASSWORD=secret mysql
+          docker run -d -p 3306:3306 --name db -e MYSQL_ROOT_PASSWORD=root
 
       
       - name: Comprovant Laravel
