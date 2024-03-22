@@ -170,11 +170,9 @@ export default {
                 img: track.album.images[1].url,
                 previewUrl: track.preview_url,
                 submitDate: new Date().toISOString(),
-                // submitedBy: this.store.getUser().id,
-                submittedBy: 8,
+                submitedBy: this.store.getUser().id,
             }
-            // socket.emit('postSong', this.store.getUser.token, song);
-            socket.emit('postSong', "2|4FZyA5cQg5LFVwjHXWiKyvH59d6tErfkiVXwysMr1193e9eb", song);
+            socket.emit('postSong', this.store.getUser.token, song);
         },
         getMp3(AudioPreviewURL, songId) {
             fetch(AudioPreviewURL)
