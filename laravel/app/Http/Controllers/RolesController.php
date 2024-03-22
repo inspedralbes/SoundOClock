@@ -81,7 +81,15 @@ class RolesController extends Controller
             ], 404);
         }
 
-        $role = Role::findOrFail($id);
+        // Validate that role exists
+        $role = Role::find($id);
+        if (!$role) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Role not found'
+            ], 404);
+        }
+
         $role->delete();
         return response()->json([
             'status' => 'success',
