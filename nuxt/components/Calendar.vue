@@ -1,17 +1,24 @@
 <script>
 import { ref } from '#imports'
+import { formatDate } from '../utils';
 export default {
     name: 'Calendar',
     props: {
-        data: Object
+        user: Object
     },
     data() {
         return {
-            date: ref(new Date())
+            range: ref({
+                start: this.user.,
+                end: new Date(2024, 3, 19),
+            }),
+            selectedColor: ref('red')
         }
     },
     methods: {
-
+        formatDate(date) {
+            return formatDate(date);
+        }
     },
     // setup() {
     //     const store = useAppStore();
@@ -21,7 +28,8 @@ export default {
 </script>
 
 <template>
-    <VDatePicker v-model="date" mode="date" expanded/>
+    <VDatePicker v-model.range="range" :color="selectedColor" mode="date" expanded />
+    {{ formatDate(range.end.toISOString().substring(0, 10)) }}
 </template>
 
 <style scoped></style>

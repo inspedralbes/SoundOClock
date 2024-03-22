@@ -1,6 +1,7 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import { socket } from '../socket';
+import { formatDate } from '../utils';
 export default {
   name: 'UserDetails',
   props: {
@@ -13,13 +14,14 @@ export default {
   },
   methods: {
     formatDate(date) {
-      const year = date.substring(0, 4);
-      const month = date.substring(5, 7);
-      const day = date.substring(8, 10);
-
-      return `${day}-${month}-${year}`;
-    }
-
+      return formatDate(date);
+    },
+    banVotingCapacity() {
+      console.log(`L'usuari ${this.user.name} no pot votar cançons fins`)
+    },
+    banProposingCapacity() {
+      console.log(`L'usuari ${this.user.name} no pot proposar cançons fins`)
+    },
   },
   setup() {
     const store = useAppStore();
@@ -38,17 +40,19 @@ export default {
     formatDate(user.vote_banned_until) }}</p>
       <p v-if="user.propose_banned_until" class="text-2xl font-black">L'usuari no pot proposar cançons fins el {{
     formatDate(user.propose_banned_until) }}</p>
-      <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">LIMITAR ACCÉS A
-        L'APLICACIÓ</button>
     </div>
     <div class="flex flex-row gap-8">
       <div class="w-1/2">
-        <h2 class="text-center">LIMITAR VOTAR CANÇONS</h2>
-        <Calendar />
+        <h2 class="text-2xl mb-2 text-center">LIMITAR VOTAR CANÇONS</h2>
+        <Calendar class="mb-8" v-bind:user="user"/>
+        <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          @click="banVotingCapacity()">LIMITAR VOTACIONS</button>
       </div>
       <div class="w-1/2">
-        <h2>LIMITAR PROPOSAR CANÇONS</h2>
-        <Calendar />
+        <h2 class="text-2xl mb-2 text-center">LIMITAR PROPOSAR CANÇONS</h2>
+        <Calendar class="mb-8" v-bind:user="user"/>
+        <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          @click="banProposingCapacity()">LIMITAR PROPOSTES</button>
       </div>
     </div>
   </div>
