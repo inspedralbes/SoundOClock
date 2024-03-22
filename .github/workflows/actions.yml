@@ -7,14 +7,16 @@ on:
 
 jobs:
   build:
+    TEST LARAVEL:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Obtenint el codi del respositori
+        uses: actions/checkout@v4
 
-      - name: Start Docker container
-        run: docker compose up
+      - name: Comprovant Laravel
+        run: |
+          cd laravel 
+          composer install
+          php artisan test
 
-      - name: Verify Docker container
-        run: docker ps -a | grep my-docker-container
+      - run: echo "🍏 This job's status is ${{ job.status }}."
