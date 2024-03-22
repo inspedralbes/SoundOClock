@@ -6,7 +6,7 @@ on:
       - actions
 
 jobs:
-  LARAVEL TEST:
+  LARAVEL-TEST:
     runs-on: ubuntu-latest
     steps:
       - name: Obtenint el codi del respositori
