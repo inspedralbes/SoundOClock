@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useAppStore = defineStore('app', {
   state: () => ({
 
-    user: {
+    user: JSON.parse(localStorage.getItem('user')) || {
       id: 0,
       email: "",
       name: "",
@@ -21,9 +21,9 @@ export const useAppStore = defineStore('app', {
     openMenu: false
 
   }),
-  persist:{
+  persist: {
     storage: persistedState.localStorage,
-    paths:['openMenu']
+    paths: ['openMenu']
   },
   actions: {
 
@@ -64,7 +64,7 @@ export const useAppStore = defineStore('app', {
       this.user.group = group;
       this.user.token = token;
 
-      localStorage.setItem("user", JSON.stringify(this.user));
+      localStorage.setItem('user', JSON.stringify(this.user));
     },
     setUserSelectedSongs(userSelectedSongs) {
       this.userSelectedSongs = userSelectedSongs
