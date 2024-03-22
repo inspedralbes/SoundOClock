@@ -153,7 +153,7 @@ async function searchSongId(id, token) {
 }
 
 async function getGroups(token){
-  const response = await axios.get(`${apiURL}classgroups`);
+  const response = await axios.get(`${apiURL}groups`);
   return response.data;
 }
 

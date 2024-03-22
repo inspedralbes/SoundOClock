@@ -42,9 +42,7 @@
       </template>
     </SideBarMenu>
 
-    <!--<BanSong v-if="active_screen == 'reports'"></BanSong>-->
     <component :is="active_screen" />
-
 </template>
 
 <script>
@@ -62,7 +60,8 @@ export default {
                 1: resolveComponent('AdminGroupsCrud'),
                 2: resolveComponent('BanSong'),
                 // 3: resolveComponent('AdminSettingsCrud')
-            }
+            },
+            modalOpened: false
         }
     },
     setup() {
