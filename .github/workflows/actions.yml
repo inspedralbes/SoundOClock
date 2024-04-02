@@ -6,7 +6,7 @@ on:
       - actions
 
 jobs:
-  LARAVEL-TEST:
+  NODE-TEST:
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -16,6 +16,10 @@ jobs:
           MYSQL_DATABASE: soundoclock
         ports:
           - 3306:3306
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
 
     steps:
       - name: Obtenint el codi del respositori
@@ -28,4 +32,10 @@ jobs:
           cp .env.example .env
           php artisan migrate --env=testing
           php artisan migrate:fresh --seed
+          cd ..
+          cd node
+          npm install
+          cp .env.example .env
+          npm run test
       - run: echo "🍏 This job's status is ${{ job.status }}."
+  
