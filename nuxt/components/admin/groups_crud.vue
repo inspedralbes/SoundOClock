@@ -34,6 +34,7 @@
 <script>
 import { computed } from 'vue';
 import { useAppStore } from '@/stores/app';
+import { socket } from '@/socket';
 
 export default {
     data() {
@@ -63,6 +64,7 @@ export default {
         },
         deleteGroup(index) {
             this.classGroups.splice(index, 1);
+            socket.emit('deleteGroup', this.store.getUser().token, this.classGroups[index].id);
         },
     },
 }

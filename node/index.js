@@ -357,6 +357,10 @@ io.on('connection', (socket) => {
       });
   })
 
+  socket.on('deleteGroup', (token, groupId) => {
+    console.log('deleteGroup', token, groupId);
+  });
+
 
   socket.on('getTopSongs', (playlist) => {
     console.log('getTopSongsStart');
