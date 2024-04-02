@@ -20,7 +20,7 @@ const io = new Server(server, {
 const port = process.env.PORT || 8080;
 
 // Mongoose setup
-mongoose.connect('mongodb://mongoadmin:mongopassword@mongodb:27017/soundoclock', {
+mongoose.connect('mongodb://mongoadmin:mongopassword@127.0.0.1:27017/soundoclock', {
   authSource: "admin" // This is needed if you're using credentials to connect to MongoDB
 })
   .then(() => console.log('MongoDB connected'))
