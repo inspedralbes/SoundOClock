@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === 'production') {
 
 async function getUserInfo(token) {
   const response = await fetch(apiURL + 'getUser', {
-    method: 'POST',
+    method: 'GET',
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",

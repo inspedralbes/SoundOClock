@@ -162,7 +162,7 @@ io.on('connection', (socket) => {
     // Check that the user is authenticated with Laravel Sanctum
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
-    console.log('user', user);
+
     try {
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
@@ -202,7 +202,7 @@ io.on('connection', (socket) => {
   // Cast a vote for a song
   socket.on('castVote', async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum
-    let user = await getUserInfo(userToken);
+    let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
 
     try {
@@ -275,7 +275,7 @@ io.on('connection', (socket) => {
   socket.on('reportSong', async (userToken, reportedSong) => {
 
     // Check that the user is authenticated with Laravel Sanctum
-    let user = await getUserInfo(userToken);
+    let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
 
     try {
