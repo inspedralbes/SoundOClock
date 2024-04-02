@@ -28,7 +28,6 @@ jobs:
           cd laravel 
           composer install
           cp .env.example .env
-          php artisan key:generate
           php artisan migrate --env=testing
           php artisan migrate:fresh --seed
           php artisan test
