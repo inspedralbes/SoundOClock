@@ -23,10 +23,6 @@ jobs:
       - name: Obtenint el codi del respositori
         uses: actions/checkout@v4
 
-      - name: Levantar MySQL
-        run: |
-          docker run -d -p 3306:3306 --name db -e MYSQL_ROOT_PASSWORD=root mysql
-
       - name: Comprovant Laravel
         run: |
           cd laravel 
