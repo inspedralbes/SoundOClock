@@ -33,7 +33,7 @@ jobs:
           php artisan migrate --env=testing
           php artisan migrate:fresh --seed
           php artisan serve
-          cd ..
+      - name: Comprovant Node
           cd node
           npm install
           cp .env.example .env
