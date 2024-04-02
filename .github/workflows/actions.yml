@@ -30,4 +30,6 @@ jobs:
           cp .env.example .env
           php artisan migrate --env=testing
           php artisan migrate:fresh --seed
+          php artisan test
+          echo "Acabao"
       - run: echo "🍏 This job's status is ${{ job.status }}."
