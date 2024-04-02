@@ -1,14 +1,15 @@
 import mongoose from 'mongoose';
 
 const songSchema = new mongoose.Schema({
-  id: Number,
+  id: String,
   title: String,
   artist: String,
-  genre: String,
   year: Number,
+  img: String,
+  previewUrl: String,
   votes: { type: Number, default: 0 },
   submitDate: Date,
-  submittedBy: String,
+  submittedBy: Number,
 });
 
 const votingRecordSchema = new mongoose.Schema({
