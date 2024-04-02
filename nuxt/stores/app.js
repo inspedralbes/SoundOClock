@@ -23,7 +23,7 @@ export const useAppStore = defineStore('app', {
   }),
   persist:{
     storage: persistedState.localStorage,
-    paths:['openMenu']
+    paths:['user']
   },
   actions: {
 
