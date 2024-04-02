@@ -2,7 +2,7 @@ import { useAppStore } from './stores/app.js';
 
 const url = "http://localhost:8080"; // development environment
 
-export function getUserSelectedSongs(id) {
+function getUserSelectedSongs(id) {
     const store = useAppStore();
     fetch(`${url}/votingRecords/${id}`)
         .then(response => response.json())
@@ -15,7 +15,7 @@ export function getUserSelectedSongs(id) {
         });
 }
 
-export function getSongs() {
+function getSongs() {
     const store = useAppStore();
     fetch(`${url}/songs`)
         .then(response => response.json())
@@ -28,7 +28,7 @@ export function getSongs() {
         });
 }
 
-export function getAdminSongs() {
+function getAdminSongs() {
     const store = useAppStore();
     fetch(`${url}/adminSongs`)
         .then(response => response.json())
@@ -40,3 +40,11 @@ export function getAdminSongs() {
             console.error('Error fetching data:', error);
         });
 }
+
+const comManager={
+    getUserSelectedSongs,
+    getSongs,
+    getAdminSongs
+};
+
+export default comManager;

@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 import { useAppStore } from "./stores/app";
 import { useRouter } from 'vue-router';
-import { getUserSelectedSongs, getSongs, getAdminSongs } from './communicationManager';
+import comManager from './communicationManager';
 
 const router = useRouter();
 
@@ -12,13 +12,13 @@ export const socket = io(url);
 socket.on("connect", () => {
   const pinia = useAppStore();
 
-  getUserSelectedSongs(1);
+  comManager.getUserSelectedSongs(1);
   // getSongs();
 
   socket.on("voteCasted", (data) => {
     console.log("socket voteCasted data received: ", data.song);
-    getSongs();
-    getUserSelectedSongs(pinia.getUser().id);
+    comManager.getSongs();
+    comManager.getUserSelectedSongs(pinia.getUser().id);
     pinia.setIsLoadingVote({ state: false, selectedSong: null });
   });
 
@@ -28,8 +28,8 @@ socket.on("connect", () => {
 
   socket.on("songDeleted", (data) => {
     console.log("socket songDeleted data received: ", data.song);
-    getSongs();
-    getAdminSongs();
+    comManager.getSongs();
+    comManager.getAdminSongs();
   });
 
 

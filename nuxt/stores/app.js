@@ -3,13 +3,14 @@ import { defineStore } from 'pinia'
 export const useAppStore = defineStore('app', {
   state: () => ({
 
-    user: {
-      id: 0,
-      email: "",
-      name: "",
-      group: "",
-      token: null
-    },
+    user: typeof window !== 'undefined' && window.localStorage.getItem('user')
+      ? JSON.parse(localStorage.getItem('user')) : {
+        id: 0,
+        email: "",
+        name: "",
+        group: "",
+        token: null
+      },
 
     userSelectedSongs: null,
     proposedSongs: [],
@@ -21,10 +22,6 @@ export const useAppStore = defineStore('app', {
     openMenu: false
 
   }),
-  persist:{
-    storage: persistedState.localStorage,
-    paths:['openMenu']
-  },
   actions: {
 
     //getters

@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === 'production') {
 
 async function getUserInfo(token) {
   const response = await fetch(apiURL + 'getUser', {
-    method: 'POST',
+    method: 'GET',
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -153,7 +153,7 @@ async function searchSongId(id, token) {
 }
 
 async function getGroups(token){
-  const response = await axios.get(`${apiURL}groups`);
+  const response = await axios.get(`${apiURL}groupsAll`);
   return response.data;
 }
 
