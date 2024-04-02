@@ -19,11 +19,13 @@ export default {
     },
     banVotingCapacity() {
       console.log(`L'usuari ${this.user.name} no pot votar cançons fins ${this.votingBannedUntil}`);
-      socket.emit('banUserVotingCapacity', this.store.getUser().token, this.user.id);
+      this.user.vote_banned_until = this.votingBannedUntil;
+      socket.emit('banUserVotingCapacity', this.store.getUser().token, this.user);
     },
     banProposingCapacity() {
       console.log(`L'usuari ${this.user.name} no pot proposar cançons fins ${this.proposingBannedUntil}`);
-      socket.emit('deleteSong', this.store.getUser().token, songId);
+      this.user.propose_banned_until = this.proposingBannedUntil;
+      //socket.emit('deleteSong', this.store.getUser().token, songId);
     },
     changeDate(range, isVotingBannedDate) {
 

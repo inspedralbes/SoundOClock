@@ -164,4 +164,19 @@ async function getUsers(token) {
   return jsonResponse;
 }
 
-export { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList, getPlaylists, searchSong, searchSongId, getUsers };
+async function banUser(token, user) {
+  const response = await fetch(apiURL + 'ban/' + user.id, {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify({
+      vote_banned_until: user.vote_banned_until,
+    })
+  });
+  return response;
+}
+
+export { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList, getPlaylists, searchSong, searchSongId, getUsers, banUser };

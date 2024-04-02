@@ -3,7 +3,7 @@ import { createServer, get } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList, getPlaylists, searchSong, searchSongId, getUsers } from './communicationManager.js';
+import { getUserInfo, loginUserAndAdmin, logout, googleLogin, addSongToBlackList, getPlaylists, searchSong, searchSongId, getUsers, banUser } from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 
@@ -363,6 +363,22 @@ io.on('connection', (socket) => {
           socket.emit('searchResultId', data);
         }
       });
+  });
+
+  socket.on('banUserVotingCapacity', async (userToken, bannedUser) => {
+    // Check that the user is authenticated with Laravel Sanctum and is an admin
+    let user = await getUserInfo(userToken);
+    if (!user.id || user.is_admin === 0) return;
+
+    try {
+
+      // Ban user
+      banUser(userToken, bannedUser);
+
+      io.emit('songReported', { status: 'success', message: `La cançó ${song.title} ha sigut reportada` });
+    } catch (err) {
+      socket.emit('reportError', { status: 'error', message: err.message });
+    }
   });
 
   socket.on('disconnect', () => {
