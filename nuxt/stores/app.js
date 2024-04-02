@@ -17,7 +17,8 @@ export const useAppStore = defineStore('app', {
     usersAdminView: [],
     filter: 1,
     searchEngineFilter: "",
-    isLoadingVote: false
+    isLoadingVote: false,
+    adminSelectedUser: null
 
   }),
   actions: {
@@ -46,6 +47,9 @@ export const useAppStore = defineStore('app', {
     },
     getIsLoadingVote() {
       return this.isLoadingVote
+    },
+    getAdminSelectedUser() {
+      return this.adminSelectedUser
     },
 
     //setters
@@ -78,6 +82,9 @@ export const useAppStore = defineStore('app', {
     },
     setIsLoadingVote(isLoadingVote) {
       this.isLoadingVote = isLoadingVote
+    },
+    setAdminSelectedUser(adminSelectedUser) {
+      this.adminSelectedUser = adminSelectedUser
     },
   },
 })

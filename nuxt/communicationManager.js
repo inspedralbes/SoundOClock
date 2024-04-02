@@ -48,6 +48,7 @@ export function getUsers() {
         .then(data => {
             console.log("users: ", data);
             store.setUsersAdminView(data);
+            store.setAdminSelectedUser(data[0]);
         })
         .catch(error => {
             console.error('Error fetching data:', error);

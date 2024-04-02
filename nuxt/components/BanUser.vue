@@ -1,11 +1,11 @@
 <template>
-    <div>
+    <div v-if="!loading">
         <h1 class="text-white text-center mb-8">CENSURAR USUARIS</h1>
         <div class="flex flex-row mt-8">
             <div class="w-1/3 ml-20">
                 <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
                     <button v-for="user in users" @click="selectUser(user)"
-                        class="contenidor-canço flex flex-row justify-between items-center rounded-lg p-3">
+                        class="flex flex-row justify-between items-center rounded-lg p-3" :class="isSelected(user)">
                         <div class="flex flex-row items-center gap-2">
                             <div class="contenidor-img">
                                 <img src="/img/mora-primer-dia-de-clases.jpg" alt="" class="rounded-lg">
@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="w-2/3 text-white text-center ml-4 mr-4">
-                <UserDetails v-bind:user="user" />
+                <UserDetails v-bind:user="selectedUser" />
             </div>
         </div>
     </div>
@@ -42,13 +42,21 @@ export default {
     data() {
         return {
             loading: true,
-            user: null,
         }
     },
     methods: {
         selectUser(selectedUser) {
-            this.user = selectedUser;
-        }
+            this.store.setAdminSelectedUser(selectedUser);
+        },
+        isSelected(user) {
+            let style = "contenidor-canço--not-selected";
+
+            if (user.id == this.selectedUser.id) {
+                style = "contenidor-canço--selected";
+            }
+
+            return style;
+        },
     },
     mounted() {
         this.loading = true;
@@ -60,6 +68,9 @@ export default {
         users() {
             return this.store.getUsersAdminView();
         },
+        selectedUser() {
+            return this.store.getAdminSelectedUser();
+        },
     },
     setup() {
         const store = useAppStore();
@@ -69,10 +80,14 @@ export default {
 </script>
 
 <style scoped>
-.contenidor-canço {
+.contenidor-canço--not-selected {
     background-color: rgb(56, 56, 56);
-    /* border: 1px solid rgb(163, 163, 163); */
     color: white;
+}
+
+.contenidor-canço--selected {
+    background-color: white;
+    color: rgb(56, 56, 56);
 }
 
 .contenidor-canço>*:last-child {

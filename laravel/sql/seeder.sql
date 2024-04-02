@@ -1,5 +1,5 @@
 INSERT INTO users (name, email, created_at, updated_at, is_admin, vote_banned_until, propose_banned_until) VALUES
-('santi', 'santi@gmail.com', NOW(), NOW(), 0, null, null),
+('santi', 'santi@gmail.com', NOW(), NOW(), 0, '2024-06-29', '2024-06-29'),
 ('alvaro', 'alvaro@gmail.com', NOW(), NOW(), 0, '2024-06-29', '2024-06-29'),
 ('david', 'david@gmail.com', NOW(), NOW(), 0, null, null),
 ('miquel', 'miquel@gmail.com', NOW(), NOW(), 0, null, null),
