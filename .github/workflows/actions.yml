@@ -17,8 +17,6 @@ jobs:
         ports:
           - 3306:3306
 
-
-
     steps:
       - name: Obtenint el codi del respositori
         uses: actions/checkout@v4
