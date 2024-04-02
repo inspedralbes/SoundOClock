@@ -7,8 +7,7 @@
         <div v-for="track in filteredTracks"
             class="width mb-3 mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
             <div class="contenidor-img">
-                <img :src=track.img
-                    :alt="track.title + '_img'" class="rounded-lg">
+                <img :src=track.img :alt="track.title + '_img'" class="rounded-lg">
                 <button @click="playTrack(track.id)" class="rounded-lg"
                     :class="{ playingC: isPlayingCheck(track.id), noPlaying: !isPlayingCheck(track.id) }">
                     <!-- fer amb computed la classe -->
@@ -28,11 +27,40 @@
 
             <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
 
-                <button class="hover:rounded-lg hover:bg-black flex">
+                <button @click="modalActual = track.id" class="hover:rounded-lg hover:bg-black flex">
                     <span class="material-symbols-outlined options-span">
-                        menu
+                        unarchive
                     </span>
                 </button>
+                <ModularModal v-if="modalActual === track.id" @close="modalActual = null"
+                    @confirm="removeFromBlacklist(track.id)">
+                    <template v-slot:title>
+                        <h2>Segur que vols treure aquesta cançó de la blacklist?</h2>
+                    </template>
+                    <template v-slot:content>
+                        <div class="mx-auto contenidor-canço flex flex-row items-center rounded-lg gap-2">
+                            <div class="contenidor-img">
+                                <img :src=track.img :alt="track.title + '_img'" class="rounded-lg">
+                                <button @click="playTrack(track.id)" class="rounded-lg"
+                                    :class="{ playingC: isPlayingCheck(track.id), noPlaying: !isPlayingCheck(track.id) }">
+                                    <!-- fer amb computed la classe -->
+                                    <span v-if="currentTrackId === track.id && isPlaying"
+                                        class="material-symbols-rounded">
+                                        pause
+                                    </span>
+                                    <span v-else class="material-symbols-rounded">
+                                        play_arrow
+                                    </span>
+                                </button>
+                            </div>
+
+                            <div class="song-data">
+                                <p class="font-black basis-1/2">{{ track.title }}</p>
+                                <p class="basis-1/2">{{ track.artist }}</p>
+                            </div>
+                        </div>
+                    </template>
+                </ModularModal>
 
             </div>
         </div>
@@ -54,6 +82,7 @@ export default {
             currentTrack: null,
             currentTrackId: null,
             isPlaying: false,
+            modalActual: null,
         }
     },
     computed: {
@@ -61,12 +90,26 @@ export default {
     },
     mounted() {
 
+        const songs = [
+            { id: 1, title: 'Blinding Lights', artist: 'The Weeknd', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5', previewUrl: 'https://example.com/blinding-lights-preview', votes: 150, submitDate: new Date('2020-11-29'), submittedBy: 'User1' },
+            { id: 2, title: 'Shot in the Dark', artist: 'AC/DC', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5', previewUrl: 'https://example.com/shot-in-the-dark-preview', votes: 75, submitDate: new Date('2020-10-07'), submittedBy: 'User2' },
+            { id: 3, title: 'Don\'t Start Now', artist: 'Dua Lipa', year: 2019, img: 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5', previewUrl: 'https://example.com/dont-start-now-preview', votes: 200, submitDate: new Date('2019-11-01'), submittedBy: 'User3' },
+            { id: 4, title: 'Fear Inoculum', artist: 'Tool', year: 2019, img: 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5', previewUrl: 'https://example.com/fear-inoculum-preview', votes: 90, submitDate: new Date('2019-08-30'), submittedBy: 'User4' },
+            { id: 5, title: 'God\'s Plan', artist: 'Drake', year: 2018, img: 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5', previewUrl: 'https://example.com/gods-plan-preview', votes: 250, submitDate: new Date('2018-01-19'), submittedBy: 'User5' },
+            { id: 6, title: 'HARDWIRE', artist: 'Metallica', year: 2016, img: 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5', previewUrl: 'https://example.com/hardwire-preview', votes: 65, submitDate: new Date('2016-08-18'), submittedBy: 'User6' },
+            { id: 7, title: 'Hello', artist: 'Adele', year: 2015, img: 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5', previewUrl: 'https://example.com/hello-preview', votes: 300, submitDate: new Date('2015-10-23'), submittedBy: 'User7' },
+            { id: 8, title: 'Doom and Gloom', artist: 'The Rolling Stones', year: 2012, img: 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5', previewUrl: 'https://example.com/doom-and-gloom-preview', votes: 80, submitDate: new Date('2012-10-11'), submittedBy: 'User8' },
+            { id: 9, title: 'Royals', artist: 'Lorde', year: 2013, img: 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5', previewUrl: 'https://example.com/royals-preview', votes: 220, submitDate: new Date('2013-03-08'), submittedBy: 'User9' },
+            { id: 10, title: 'R U Mine?', artist: 'Arctic Monkeys', year: 2013, img: 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5', previewUrl: 'https://example.com/r-u-mine-preview', votes: 110, submitDate: new Date('2013-02-27'), submittedBy: 'User10' }
+        ];
+
         // SE HA DE CABIAR POR UNA PETICIÓN AL NODE 
         // QUE DEVUELVA LAS CANCIONES OBTENIDAS DE LA API DE LARAVEL
         fetch('http://localhost:8080/songs')
             .then(response => response.json())
             .then(data => {
                 console.log("songs: ", data);
+                data = songs;
                 this.tracks = data;
                 this.filteredTracks = data;
             })
@@ -151,6 +194,13 @@ export default {
             } else if (!this.isPlaying && this.currentTrackId == id) {
                 return false;
             }
+        },
+        removeFromBlacklist(trackId) {
+            console.log('Removing track with id:', trackId);
+            // Remove track from blacklist
+            this.tracks = this.tracks.filter(track => track.id !== trackId);
+            this.filteredTracks = this.filteredTracks.filter(track => track.id !== trackId);
+            // socket.emit('removeFromBlacklist', trackId);
         },
     },
 }
