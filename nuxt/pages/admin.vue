@@ -61,7 +61,7 @@ export default {
     data() {
         return {
             isOpen: false,
-            selected_screen: 0,
+            selected_screen: 1,
             screens:{
                 // 0: resolveComponent('AdminAlarmsCrud'),
                 1: resolveComponent('AdminGroupsCrud'),

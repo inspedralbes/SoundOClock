@@ -13,6 +13,14 @@ class GroupsController extends Controller
      */
     public function index() {
         return Group::where('is_public', '<>', 0)->get();
+        // return Group::all();
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function indexAll() {
+        return Group::all();
     }
 
     /**

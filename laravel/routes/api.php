@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Public routes
 Route::post('/login', [AuthController::class,'login']);
 Route::get('/groups', [GroupsController::class, 'index']);
+Route::get('/groupsAll', [GroupsController::class, 'indexAll']);
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -41,7 +42,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/groups/{id}', [GroupsController::class, 'show']);
     Route::put('/groups/{id}', [GroupsController::class, 'update']);
     Route::delete('/groups/{id}', [GroupsController::class, 'destroy']);
-
+    
     // Groups & Users routes
     Route::get('/getGroupsFromUser/{user_id}', [GroupsController::class, 'getGroupsFromUser']);
     Route::post('/addGroupsToUser/{user_id}', [GroupsController::class, 'addGroupsToUser']);
