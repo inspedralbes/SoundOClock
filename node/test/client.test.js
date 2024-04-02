@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { io as ioClient } from 'socket.io-client';
 import { Song, VotingRecord, ReportSong } from '../models.js';
 import mongoose from 'mongoose';
-import { loginUserAndAdmin, logout } from '../communicationManager.js';
+import comManager from '../communicationManager.js';
 
 describe('Listen the Server sockets', function () {
   let clientSocket;
@@ -12,13 +12,13 @@ describe('Listen the Server sockets', function () {
   this.timeout(10000);  // 10 seconds
 
   let testSong = {
-    id: 1000,
+    id: "1000",
     title: 'test song',
     artist: 'test artist',
     votes: 0,
     genre: 'test genre',
     year: 2021,
-    submittedBy: 'test user',
+    submittedBy: 1,
     submitDate: "2024-03-18T10:47:30.104Z"
   }
 
@@ -31,10 +31,10 @@ describe('Listen the Server sockets', function () {
       .then(() => console.log('MongoDB connected'))
       .catch(err => console.error('MongoDB connection error:', err));
     // Logins to get the tokens
-    let tokens = await loginUserAndAdmin();
+    let tokens = await comManager.loginUserAndAdmin();
     userToken = tokens.userToken;
     adminToken = tokens.adminToken;
-    let userInfo = await getUserInfo(userToken);
+    let userInfo = await comManager.getUserInfo(userToken);
     userId = userInfo.id;
   });
 
@@ -44,8 +44,8 @@ describe('Listen the Server sockets', function () {
     await VotingRecord.deleteOne({ userId: userId });
     await ReportSong.deleteOne({ userId: userId });
     await mongoose.disconnect();
-    await logout(userToken);
-    await logout(adminToken);
+    await comManager.logout(userToken);
+    await comManager.logout(adminToken);
     clientSocket.close();
   });
 
