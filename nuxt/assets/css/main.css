@@ -13,6 +13,18 @@ body {
     font-variation-settings: 'FILL' 1;
 }
 
+.vc-weekdays {
+    margin-bottom: 1em;
+}
+
+.vc-week {
+    margin-bottom: 1.5em;
+}
+
+.vc-week:last-child {
+    margin-bottom: 0;
+}
+
 @font-face {
     font-family: 'SF Pro';
     src: url('/fonts/SF-Pro.ttf') format('truetype');

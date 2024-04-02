@@ -4,7 +4,8 @@ import { formatDate } from '../utils';
 export default {
     name: 'Calendar',
     props: {
-        date: Date
+        date: Date,
+        isVotingBannedDate: Boolean
     },
     data() {
         return {
@@ -24,12 +25,15 @@ export default {
             return formatDate(date);
         },
         changeDate(){
-            console.log("datacanviada", this.range.end);
-            this.$emit('changeDate', this.range);
+            if (this.range) {
+                this.$emit('changeDate', this.range, this.isVotingBannedDate);
+            }
         },
         updateDate() {
-            this.range.start = null;
-            this.range.end = null;
+            this.range = ref({
+                start: null,
+                end: null
+            });
 
             if (this.date) {
                 this.range.start = new Date();
@@ -44,18 +48,16 @@ export default {
         date: { // Each time the prop user change execute updateDate() method
             handler: 'updateDate',
         },
-    },
-    // setup() {
-    //     const store = useAppStore();
-    //     return { store };
-    // },
+    }
 };
 </script>
 
 <template>
     <VDatePicker v-model.range="range" :color="selectedColor" mode="date" expanded />
-    {{ range }}
+    
 
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>
