@@ -17,17 +17,17 @@ class BlacklistTest extends TestCase {
         $user = User::factory()->create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
-            'is_admin' => 1
+            'role_id' => 1
         ]);
         return $user;
     }
 
-    // Helper function to login as a normal user
-    private function loginAsUser() {
+    // Helper function to login as a student
+    private function loginAsStudent() {
         $user = User::factory()->create([
             'name' => 'santi',
             'email' => 'santi@gmail.com',
-            'is_admin' => 0
+            'role_id' => 4
         ]);
         return $user;
     }
@@ -56,8 +56,8 @@ class BlacklistTest extends TestCase {
     }
 
     public function test_insert_not_admin(): void {
-        // Login as a normal user
-        $user = $this->loginAsUser();
+        // Login as a student
+        $user = $this->loginAsStudent();
 
         // Insert a song into the blacklist
         $response = $this->insertSong($user, 'song1', 1);
@@ -65,7 +65,7 @@ class BlacklistTest extends TestCase {
         $response->assertStatus(404)
             ->assertJson([
                 'status' => 'error',
-                'message' => 'No tens permisos d\'administrador.'
+                'message' => 'You do not have admin permissions.'
             ]);
     }
 
@@ -127,8 +127,8 @@ class BlacklistTest extends TestCase {
         $response = $this->insertSong($admin, 'song1', 1);
         $id = $response->json('id');
 
-        // Login as a normal user
-        $user = $this->loginAsUser();
+        // Login as a student
+        $user = $this->loginAsStudent();
 
         // Delete the song from the blacklist
         $response = $this->actingAs($user)
@@ -137,7 +137,7 @@ class BlacklistTest extends TestCase {
         $response->assertStatus(404)
             ->assertJson([
                 'status' => 'error',
-                'message' => 'No tens permisos d\'administrador.'
+                'message' => 'You do not have admin permissions.'
             ]);
     }
 
@@ -152,7 +152,7 @@ class BlacklistTest extends TestCase {
         $response->assertStatus(404)
             ->assertJson([
                 'status' => 'error',
-                'message' => 'La cançó no existeix.'
+                'message' => 'The song does not exist.'
             ]);
     }
 }

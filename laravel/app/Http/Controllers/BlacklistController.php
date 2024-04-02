@@ -108,21 +108,20 @@ class BlacklistController extends Controller
      */
     public function store(Request $request) {
 
-        // Validar els camps
+        // Validate the request data
         $request->validate([
             'nom' => 'required|string',
             'spotify_id' => 'required|int',
         ]);
 
-        // Validar que l'usuari sigui administrador
-        if (auth()->user()->is_admin === 0) {
+        // Check that the user is an admin
+        if (auth()->user()->role_id !== 1) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'No tens permisos d\'administrador.'
+                'message' => 'You do not have admin permissions.'
             ], 404);
         }
         
-        // Insertar cançó a la blacklist
         $song = new Blacklist();
         $song->nom = $request->nom;
         $song->spotify_id = $request->spotify_id;
@@ -137,11 +136,11 @@ class BlacklistController extends Controller
     public function show($id)
     {
         
-        // Validar que l'usuari sigui administrador
-        if (auth()->user()->is_admin === 0) {
+        // Check that the user is an admin
+        if (auth()->user()->role_id !== 1) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'No tens permisos d\'administrador.'
+                'message' => 'You do not have admin permissions.'
             ], 404);
         }
 
@@ -211,20 +210,20 @@ class BlacklistController extends Controller
      */
     public function destroy($id) {
 
-        // Validar que l'usuari sigui administrador
-        if (auth()->user()->is_admin === 0) {
+        // Check that the user is an admin
+        if (auth()->user()->role_id !== 1) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'No tens permisos d\'administrador.'
+                'message' => 'You do not have admin permissions.'
             ], 404);
         }
         
-        // Validar que la cançó existeix
+        // Check that the song exists
         $song = Blacklist::find($id);
         if ($song == null) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'La cançó no existeix.'
+                'message' => 'The song does not exist.'
             ], 404);
         }
 
