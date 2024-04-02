@@ -27,6 +27,7 @@ jobs:
         run: |
           cd laravel 
           composer install
+          cp .env.example .env
           php artisan migrate --force
           php artisan migrate:fresh --seed
           php artisan test
