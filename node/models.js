@@ -16,7 +16,7 @@ const votingRecordSchema = new mongoose.Schema({
   userId: Number,
   group: Number,
   submitted: { type: Boolean, default: false },
-  votedSongs: [Number],
+  votedSongs: [String],
 });
 
 const reportSongSchema = new mongoose.Schema({
