@@ -35,8 +35,8 @@ jobs:
           cp .env.example .env
           php artisan migrate --env=testing
           php artisan migrate:fresh --seed
-          php artisan test
           php artisan serve > /dev/null 2>&1 &
+          php artisan test
 
       - name: Comprovant Node
         run: |
