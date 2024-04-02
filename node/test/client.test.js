@@ -23,7 +23,7 @@ describe('Listen the Server sockets', function () {
   }
 
   before(async () => {
-    const serverAddr = `http://localhost:8080`;
+    const serverAddr = `http://127.0.0.1:8080`;
     clientSocket = ioClient(serverAddr);
     await new Promise((resolve) => clientSocket.on('connect', resolve));
     // Mongoose setup for accesing directly to the database
