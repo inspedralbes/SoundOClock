@@ -32,5 +32,4 @@ jobs:
           php artisan migrate --env=testing
           php artisan migrate:fresh --seed
           php artisan test
-
       - run: echo "🍏 This job's status is ${{ job.status }}."
