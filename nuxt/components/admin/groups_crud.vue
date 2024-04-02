@@ -4,21 +4,21 @@
             <span>ID</span>
             <span>Abreviatura</span>
             <span>Grup</span>
-            <span>Núm.Grups</span>
-            <span>Núm.Linies</span>
+            <span>Núm. Grups</span>
+            <span>Núm. Linies</span>
             <span>Public</span>
             <span>Accions</span>
         </div>
         <div v-for="group, index in classGroups" :key="group.id" class="grid group">
             <span>{{ group.id }}</span>
-            <input type="text" v-model="group.abbreviation" :disabled="!toggleEdit[index]">
-            <input type="text" v-model="group.name" :disabled="!toggleEdit[index]">
-            <input type="number" v-model="group.max_courses" min="1" :disabled="!toggleEdit[index]">
-            <input type="number" v-model="group.max_lines" min="1" :disabled="!toggleEdit[index]">
+            <input type="text" v-model="group.abbreviation" :disabled="!group.editing">
+            <input type="text" v-model="group.name" :disabled="!group.editing">
+            <input type="number" v-model="group.max_courses" min="1" :disabled="!group.editing">
+            <input type="number" v-model="group.max_lines" min="1" :disabled="!group.editing">
             <ModularSwitch :value="group.is_public" @input="group.is_public = $event" />
-            <span v-if="!toggleEdit[index]">
-                <button class="edit" @click="toggleEdit[index] = !toggleEdit[index]">Editar</button>
-                <button class="delete">Eliminar</button>
+            <span v-if="!group.editing">
+                <button class="edit" @click="startEditing(index)">Editar</button>
+                <button class="delete" @click="deleteGroup(index)">Eliminar</button>
             </span>
             <span v-else>
                 <button class="save">Guardar</button>
@@ -40,8 +40,7 @@ export default {
         const store = useAppStore();
         return {
             classGroups: computed(() => store.getClassGroups()),
-            // classGroupsRecover: JSON.parse(JSON.stringify(computed(() => store.getClassGroups()))),
-            toggleEdit: [],
+            originalValues: [],
         }
     },
     setup() {
@@ -49,14 +48,22 @@ export default {
         return { store };
     },
     created() {
-        this.toggleEdit = new Array(this.classGroups.length).fill(false);
+    
     },
     methods: {
+        startEditing(index) {
+            const group = this.classGroups[index];
+            this.originalValues[index] = { ...group };
+            group.editing = true;
+        },
         cancelEdit(index) {
-            this.classGroups[index] = this.classGroupsRecover[index];
-            this.toggleEdit[index] = !this.toggleEdit[index];
-            console.log('Groups:', this.classGroupsRecover);
-        }
+            const group = this.classGroups[index];
+            Object.assign(group, this.originalValues[index]);
+            group.editing = false;
+        },
+        deleteGroup(index) {
+            this.classGroups.splice(index, 1);
+        },
     },
 }
 </script>

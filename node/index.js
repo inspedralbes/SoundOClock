@@ -400,16 +400,6 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('getGroups', (token) => {
-    comManager.getGroups(token)
-      .then((groups) => {
-        socket.emit('sendGroups', groups);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  })
-
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
