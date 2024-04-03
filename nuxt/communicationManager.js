@@ -41,10 +41,17 @@ function getAdminSongs() {
         });
 }
 
+async function getPublicGroups() {
+    const response = await fetch(`${url}/publicGroups`);
+    const data = await response.json();
+    return data;
+}
+
 const comManager={
     getUserSelectedSongs,
     getSongs,
-    getAdminSongs
+    getAdminSongs,
+    getPublicGroups
 };
 
 export default comManager;
