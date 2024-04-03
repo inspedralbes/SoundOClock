@@ -157,6 +157,15 @@ async function getGroups(token){
   return response.data;
 }
 
+async function getPublicGroups(token){
+  const response = await axios.get(`${apiURL}groups`, {
+    headers: {
+      "Authorization": "Bearer " + token,
+    }
+  });
+  return response.data;
+}
+
 async function fetchSpotifyPage(id) {
   try {
     const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
@@ -180,6 +189,7 @@ const comManager = {
   searchSong,
   searchSongId,
   getGroups,
+  getPublicGroups,
   fetchSpotifyPage,
 };
 

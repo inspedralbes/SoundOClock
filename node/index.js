@@ -110,6 +110,15 @@ app.get('/adminSongs', async (req, res) => {
   }
 });
 
+app.get('/publicGroups', async (req, res) => {
+  try {
+    const groups = await comManager.getPublicGroups();
+    res.json(groups);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {
