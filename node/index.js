@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import comManager from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
+const { mongoose, connectToDatabase } = require('./moongoseConfig');
 
 const app = express();
 app.use(cors());
@@ -20,9 +21,7 @@ const io = new Server(server, {
 const port = process.env.PORT || 8080;
 
 // Mongoose setup
-mongoose.connect('mongodb://mongoadmin:mongopassword@127.0.0.1:27017/soundoclock', {
-  authSource: "admin" // This is needed if you're using credentials to connect to MongoDB
-})
+await connectToDatabase(process.env.MONGO_HOST)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
