@@ -41,7 +41,7 @@ jobs:
           cd node
           npm install
           cp .env.example .env
-          npm run dev > node.log 2>&1 &
+          npm run dev -- --host=127.0.0.1 > node.log 2>&1 &
           npm run test -- --host=127.0.0.1
       - run: echo "🍏 This job's status is ${{ job.status }}."
   
