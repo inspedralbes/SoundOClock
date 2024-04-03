@@ -33,7 +33,7 @@
     <Transition name="fade">
         <ModularModal v-if="modals.deleteGroup" title="Eliminar grup" @confirm="deleteGroup" @close="modals.deleteGroup=false">
             <template #title>
-                <h2>El·liminar grup</h2>
+                <h2>Eliminar grup</h2>
             </template>
             <template #content>
                 <p>Estàs segur que vols eliminar aquest grup?</p>

@@ -37,7 +37,7 @@
             },
             msg:{
                 type: String,
-                default: 'El·liminar'
+                default: 'Eliminar'
             }
         },
         data(){
