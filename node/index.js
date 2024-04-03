@@ -368,8 +368,7 @@ io.on('connection', (socket) => {
   socket.on('banUser', async (userToken, bannedUser) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await getUserInfo(userToken);
-    // if (!user.id || user.is_admin === 0) return;
-    if (!user.id) return
+    if (!user.id || user.is_admin === 0) return;
 
     try {
       // Ban user

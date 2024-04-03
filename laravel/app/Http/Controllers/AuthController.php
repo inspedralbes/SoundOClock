@@ -138,15 +138,29 @@ class AuthController extends Controller {
 
     public function update(Request $request, $id) {
 
-        // $fields = $request->validate([
-        //     'vote_banned_until' => 'required|date',
-        // ]);
+        // Validar que l'usuari sigui administrador
+        if (auth()->user()->is_admin === 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No tens permisos d\'administrador.'
+            ], 404);
+        }
 
         // Find user
         $user = User::find($id);
 
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'L\'usuari no existeix.'
+            ], 404);
+        }
+
         // Update user
-        $user->update($request->all());
+        $user->update([
+            'vote_banned_until' => $request->input('vote_banned_until'),
+            'propose_banned_until' => $request->input('propose_banned_until'),
+        ]);
 
         return response()->json($user);
     }
