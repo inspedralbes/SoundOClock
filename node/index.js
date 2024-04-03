@@ -2,7 +2,6 @@ import express from 'express';
 import { createServer, get } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import mongoose from 'mongoose';
 import comManager from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';

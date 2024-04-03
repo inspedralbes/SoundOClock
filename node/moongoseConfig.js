@@ -1,5 +1,3 @@
-// archivo de configuración inicial (config.js)
-
 const mongoose = require('mongoose');
 
 function connectToDatabase(host) {
