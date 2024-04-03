@@ -29,8 +29,8 @@ describe('Listen the Server sockets', function () {
     clientSocket = ioClient(serverAddr);
     await new Promise((resolve) => clientSocket.on('connect', resolve));
     // Mongoose setup for accesing directly to the database
-    mongoose.connect('mongodb://mongoadmin:mongopassword@${host}:27017/soundoclock', { authSource: "admin" })
-      .then(() => console.log('MongoDB connected'))
+    mongoose.connect('mongodb://mongoadmin:mongopassword@'+ host + ':27017/soundoclock', { authSource: "admin" })
+    .then(() => console.log('MongoDB connected'))
       .catch(err => console.error('MongoDB connection error:', err));
     // Logins to get the tokens
     let tokens = await comManager.loginUserAndAdmin();
