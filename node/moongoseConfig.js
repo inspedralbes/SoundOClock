@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 export function connectToDatabase(host) {
   const defaultConfig = {
     host: host || process.env.MONGO_HOST || 'mongodb',
-    port: '27017',
+    port: 27017,
     database: 'soundoclock',
     username: 'mongoadmin',
     password: 'mongopassword',
