@@ -7,7 +7,7 @@ import comManager from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 
-const host = process.env.MONGO_HOST || 'mongodb';
+const host = process.argv[2] || 'mongodb';
 const app = express();
 app.use(cors());
 
