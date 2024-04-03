@@ -42,6 +42,7 @@
 
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
+import { setUserFromLocalStorage } from '../utils';
 
 export default {
     data() {
@@ -60,6 +61,9 @@ export default {
 
     },
     mounted() {
+
+        setUserFromLocalStorage();
+
         socket.emit('getTopSongs', 'TopGlobal');
 
         socket.on('topSongs', (results) => {
@@ -172,7 +176,7 @@ export default {
                 submitDate: new Date().toISOString(),
                 submitedBy: this.store.getUser().id,
             }
-            socket.emit('postSong', this.store.getUser.token, song);
+            socket.emit('postSong', this.store.getUser().token, song);
         },
         getMp3(AudioPreviewURL, songId) {
             fetch(AudioPreviewURL)
