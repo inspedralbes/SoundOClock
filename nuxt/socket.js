@@ -53,46 +53,50 @@ socket.on("connect", () => {
     pinia.deleteGroup(data.group_id);
   });
 
+  socket.on('groupUpdated', (data) => {
+    console.log("socket groupUpdated data received: ", data);
+  });
+
   socket.on("disconnect", () => {
-  
+
   });
 
   // FUNCTIONS START
-function getUserSelectedSongs(id) {
-  fetch(`${url}/votingRecords/${id}`)
-    .then(response => response.json())
-    .then(data => {
-      // console.log("user: ", data);
-      pinia.setUserSelectedSongs(data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-}
+  function getUserSelectedSongs(id) {
+    fetch(`${url}/votingRecords/${id}`)
+      .then(response => response.json())
+      .then(data => {
+        // console.log("user: ", data);
+        pinia.setUserSelectedSongs(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }
 
-function getSongs() {
-  fetch('${url}/songs')
-    .then(response => response.json())
-    .then(data => {
-      console.log("songs: ", data);
-      pinia.setProposedSongs(data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-}
+  function getSongs() {
+    fetch('${url}/songs')
+      .then(response => response.json())
+      .then(data => {
+        console.log("songs: ", data);
+        pinia.setProposedSongs(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }
 
-function getAdminSongs() {
-  fetch('${url}/adminSongs')
-    .then(response => response.json())
-    .then(data => {
-      console.log("songs: ", data);
-      pinia.setProposedSongsAdminView(data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-}
+  function getAdminSongs() {
+    fetch('${url}/adminSongs')
+      .then(response => response.json())
+      .then(data => {
+        console.log("songs: ", data);
+        pinia.setProposedSongsAdminView(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }
 });
 
 

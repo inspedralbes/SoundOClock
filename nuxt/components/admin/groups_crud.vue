@@ -21,7 +21,7 @@
                 <button class="delete" @click="openModal('deleteGroup',index,group.id)">Eliminar</button>
             </span>
             <span v-else>
-                <button class="save">Guardar</button>
+                <button class="save" @click="saveEdit(index,group)">Guardar</button>
                 <button class="delete" @click="cancelEdit(index)">Cancel·lar</button>
             </span>
         </div>
@@ -83,8 +83,11 @@ export default {
         },
         deleteGroup() {
             const { index, id } = this.tempValues;
-            // this.classGroups.splice(index, 1);
             socket.emit('deleteGroup', this.store.getUser().token, id);
+        },
+        saveEdit(index, group) {
+            group.editing = false;
+            socket.emit('updateGroup', this.store.getUser().token, group);
         },
     },
 }
