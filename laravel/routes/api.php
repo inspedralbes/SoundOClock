@@ -33,6 +33,7 @@ Route::put('/groups/{id}', [GroupsController::class, 'update']);
 Route::get('/classgroups', [ClassGroupsController::class, 'index']);
 Route::get('/users', [AuthController::class, 'index']);
 
+
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     // Auth routes
@@ -45,6 +46,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/user/{id}', [AuthController::class, 'update']);
 
     // Groups routes
+    Route::post('/groups', [GroupsController::class, 'store']);
+    Route::delete('/groups/{id}', [GroupsController::class, 'destroy']);
+    Route::get('/groups/{id}', [GroupsController::class, 'show']);
+    Route::put('/groups/{id}', [GroupsController::class, 'update']);
     
     // Groups & Users routes
     Route::get('/getGroupsFromUser/{user_id}', [GroupsController::class, 'getGroupsFromUser']);

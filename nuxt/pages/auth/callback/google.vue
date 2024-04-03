@@ -8,6 +8,7 @@
 <script>
 import axios from 'axios';
 import { socket } from '@/socket';
+import { useAppStore } from "@/stores/app";
 
 export default {
     data() {
@@ -21,7 +22,10 @@ export default {
         }
     },
     created() {
+        const store = useAppStore();
+
         this.getURIparams();
+        store.deleteUser();
     },
     methods: {
         getURIparams() {

@@ -157,6 +157,24 @@ async function getGroups(token){
   return response.data;
 }
 
+async function updateGroup(token,group){
+  const response = await axios.put(`${apiURL}groups/${group.id}`, group, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  return response.data;
+}
+
+async function deleteGroup(token,id){
+  const response = await axios.delete(`${apiURL}groups/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  return response.data;
+}
+
 async function fetchSpotifyPage(id) {
   try {
     const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
@@ -209,7 +227,9 @@ const comManager = {
   getGroups,
   fetchSpotifyPage,
   getUsers,
-  banUser
+  banUser,
+  deleteGroup,
+  updateGroup
 };
 
 export default comManager;
