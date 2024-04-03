@@ -1,8 +1,9 @@
 import { expect } from 'chai';
 import { io as ioClient } from 'socket.io-client';
 import { Song, VotingRecord, ReportSong } from '../models.js';
+import mongoose from 'mongoose';
 import comManager from '../communicationManager.js';
-import { mongoose, connectToDatabase } from '../moongoseConfig.js';
+import { mongoose, connectToDatabase } from './moongoseConfig.js';
 
 describe('Listen the Server sockets', function () {
   let clientSocket;
@@ -27,7 +28,7 @@ describe('Listen the Server sockets', function () {
     clientSocket = ioClient(serverAddr);
     await new Promise((resolve) => clientSocket.on('connect', resolve));
     // Mongoose setup for accesing directly to the database
-    connectToDatabase(process.env.MONGO_HOST)
+    connectToDatabase(process.env.MONGO_HOST, { authSource: "admin" })
       .then(() => console.log('MongoDB connected'))
       .catch(err => console.error('MongoDB connection error:', err));
     // Logins to get the tokens
