@@ -35,7 +35,7 @@ socket.on("connect", () => {
 
 
   socket.on("loginData", (id, mail, name, group, token) => {
-    console.log("socket loginData data received: ", id, mail, name, group, token);
+    // console.log("socket loginData data received: ", id, mail, name, group, token);
     pinia.setUser(id, mail, name, group, token);
     if (pinia.getUser().group) {
       navigateTo({ path: '/llista_propostes' });
@@ -49,12 +49,10 @@ socket.on("connect", () => {
   });
 
   socket.on('groupDeleted', (data) => {
-    console.log("socket groupDeleted data received: ", data);
     pinia.deleteGroup(data.group_id);
   });
 
   socket.on('groupUpdated', (data) => {
-    console.log("socket groupUpdated data received: ", data);
   });
 
   socket.on("disconnect", () => {
