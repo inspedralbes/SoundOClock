@@ -20,7 +20,7 @@ const io = new Server(server, {
 const port = process.env.PORT || 8080;
 
 // Mongoose setup
-await connectToDatabase(process.env.MONGO_HOST)
+connectToDatabase(process.env.MONGO_HOST)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 

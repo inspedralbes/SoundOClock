@@ -27,7 +27,7 @@ describe('Listen the Server sockets', function () {
     clientSocket = ioClient(serverAddr);
     await new Promise((resolve) => clientSocket.on('connect', resolve));
     // Mongoose setup for accesing directly to the database
-    await connectToDatabase(process.env.MONGO_HOST)
+    connectToDatabase(process.env.MONGO_HOST)
       .then(() => console.log('MongoDB connected'))
       .catch(err => console.error('MongoDB connection error:', err));
     // Logins to get the tokens
