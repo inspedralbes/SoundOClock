@@ -3,7 +3,6 @@ import { io as ioClient } from 'socket.io-client';
 import { Song, VotingRecord, ReportSong } from '../models.js';
 import mongoose from 'mongoose';
 import comManager from '../communicationManager.js';
-s
 const host = process.argv[2] || 'mongodb';
 
 describe('Listen the Server sockets', function () {
