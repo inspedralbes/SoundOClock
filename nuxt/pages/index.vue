@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col items-center relative h-screen overflow-hidden container">
+    <div class="flex flex-col items-center relative h-screen overflow-hidden w-full">
         <div class="fixed top-0 left-0 w-full h-full overflow-hidden z-[-1] starfield">
             <Star v-for="(star, index) in stars" :key="index" :top="star.top" :left="star.left" :delay="star.delay" />
         </div>
