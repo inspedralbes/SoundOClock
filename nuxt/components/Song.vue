@@ -60,7 +60,7 @@ export default {
 <template>
     <div class="contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
         <div class="contenidor-img">
-            <img src="/img/mora-primer-dia-de-clases.jpg" alt="" class="rounded-lg">
+            <img :src="song.img" alt="" class="rounded-lg">
             <button class="rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                     class="icon icon-tabler icons-tabler-filled icon-tabler-player-play">

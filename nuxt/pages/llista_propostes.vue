@@ -108,7 +108,9 @@ export default {
             return this.store.getFilter();
         },
         songs() {
-            return this.store.getProposedSongs();
+            let songs = this.store.getProposedSongs();
+            console.log("SONGS", songs);
+            return songs;
         },
     },
     setup() {
@@ -130,14 +132,24 @@ export default {
             </div>
 
         </div>
-        <div class="width margenb mb-10 w-4/5 ml-auto mr-auto">
-            <FilterButtons @applyFilter="applyFilter" />
+        <div class="width margenb mb-10 w-4/5 h-fit ml-auto mr-auto flex items-center justify-center gap-1">
+            <!-- <div class="grow basis-2/3"> -->
+                <FilterButtons @applyFilter="applyFilter" class="grow basis-3/4" />
+            <!-- </div> -->
+            <div
+                class="flex items-center justify-center basis-1/4">
+                <button @click="goToProposar()" class="bg-gray-600 hover:bg-gray-700 h-full w-full md:w-1/2 flex items-center justify-center rounded">
+                    <span class="material-symbols-rounded text-white font-bold text-4xl">
+                        add
+                    </span>
+                </button>
+            </div>
         </div>
         <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
             <Song v-for="song in filteredSongs" @openModal="openModal" @openReportModal="openReportModal"
                 v-bind:song="song" />
         </div>
-        <div class="h-16 w-1/4 bg-gray-600 hover:bg-gray-700 rounded flex items-center justify-center mx-auto mb-10">
+        <div class="h-16 w-1/2 md:w-1/4 bg-gray-600 hover:bg-gray-700 rounded flex items-center justify-center mx-auto mb-10">
             <button @click="goToProposar()" class="h-full w-full flex items-center justify-center px-10">
                 <span class="material-symbols-rounded text-white font-bold text-4xl">
                     add
