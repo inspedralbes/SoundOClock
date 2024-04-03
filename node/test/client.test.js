@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { io as ioClient } from 'socket.io-client';
 import { Song, VotingRecord, ReportSong } from '../models.js';
-import mongoose from 'mongoose';
 import comManager from '../communicationManager.js';
 import { mongoose, connectToDatabase } from './moongoseConfig.js';
 
