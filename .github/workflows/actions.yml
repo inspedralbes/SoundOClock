@@ -36,6 +36,7 @@ jobs:
           php artisan migrate --env=testing
           php artisan migrate:fresh --seed
           php artisan serve > /dev/null 2>&1 &
+          php artisan test
       - name: Comprovant Node
         run: |
           cd node
