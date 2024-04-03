@@ -22,6 +22,10 @@ export const useAppStore = defineStore('app', {
     openMenu: false
 
   }),
+  persist:{
+    storage: persistedState.localStorage,
+    paths:['user']
+  },
   actions: {
 
     //getters
@@ -86,6 +90,21 @@ export const useAppStore = defineStore('app', {
     },
     setOpenMenu(menuState) {
       this.openMenu = menuState
+    },
+
+    ///Deletes
+    deleteUser() {
+      this.user = {
+        id: 0,
+        email: "",
+        name: "",
+        group: "",
+        token: null
+      }
+    },
+    deleteGroup(id) {
+      id = parseInt(id);
+      this.classGroups = this.classGroups.filter(group => group.id !== id);
     }
   },
 })

@@ -4,17 +4,18 @@ INSERT INTO `roles` (name, description) VALUES
 ('Professor', 'User that will vote on more than one group (class)'),
 ('Student', 'User that will vote in only one group (class)');
 
-INSERT INTO users (name, email, created_at, updated_at, role_id) VALUES
-('admin', 'admin@gmail.com', NOW(), NOW(), 1),
-('moderator', 'moderator@gmail.com', NOW(), NOW(), 2),
-('professor', 'professor@gmail.com', NOW(), NOW(), 3),
-('student', 'student@gmail.com', NOW(), NOW(), 4),
-('santi', 'santi@gmail.com', NOW(), NOW(), 4),
-('alvaro', 'alvaro@gmail.com', NOW(), NOW(), 4),
-('david', 'david@gmail.com', NOW(), NOW(), 4),
-('miquel', 'miquel@gmail.com', NOW(), NOW(), 4),
-('pedro', 'pedro@gmail.com', NOW(), NOW(), 4),
-('raul', 'raul@gmail.com', NOW(), NOW(), 4);
+INSERT INTO `users` (`id`, `name`, `email`, `role_id`, `email_verified_at`, `remember_token`, `created_at`, `updated_at`) VALUES
+(1, 'admin', 'admin@gmail.com', 1, NULL, NULL, '2024-04-02 09:46:01', '2024-04-02 09:46:01'),
+(2, 'moderator', 'moderator@gmail.com', 2, NULL, NULL, '2024-04-02 09:46:01', '2024-04-02 09:46:01'),
+(3, 'professor', 'professor@gmail.com', 3, NULL, NULL, '2024-04-02 09:46:01', '2024-04-02 09:46:01'),
+(4, 'student', 'student@gmail.com', 4, NULL, NULL, '2024-04-02 09:46:01', '2024-04-02 09:46:01'),
+(5, 'santi', 'santi@gmail.com', 4, NULL, NULL, '2024-04-02 09:46:01', '2024-04-02 09:46:01'),
+(6, 'alvaro', 'alvaro@gmail.com', 4, NULL, NULL, '2024-04-02 09:46:01', '2024-04-02 09:46:01'),
+(7, 'david', 'david@gmail.com', 4, NULL, NULL, '2024-04-02 09:46:01', '2024-04-02 09:46:01'),
+(8, 'miquel', 'miquel@gmail.com', 4, NULL, NULL, '2024-04-02 09:46:01', '2024-04-02 09:46:01'),
+(9, 'pedro', 'pedro@gmail.com', 4, NULL, NULL, '2024-04-02 09:46:01', '2024-04-02 09:46:01'),
+(10, 'Raúl A22 Espinosa Gómez', 'a22rauespgom@inspedralbes.cat', 1, NULL, NULL, '2024-04-02 10:55:36', '2024-04-02 10:55:36');
+
 
 INSERT INTO blacklist (nom, spotify_id) VALUES
 ('Anaconda', 1),

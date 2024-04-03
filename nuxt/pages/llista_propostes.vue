@@ -1,7 +1,7 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import { socket } from '../socket';
-import { setUserFromLocalStorage } from '../utils';
+// import { setUserFromLocalStorage } from '../utils';
 import comManager from '../communicationManager';
 
 export default {
@@ -20,7 +20,8 @@ export default {
     },
     mounted() {
         this.loading = true;
-        setUserFromLocalStorage();
+
+        // setUserFromLocalStorage();
         comManager.getUserSelectedSongs(this.store.getUser().id);
         comManager.getSongs();
         this.loading = false;

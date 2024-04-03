@@ -96,7 +96,12 @@ class GroupsController extends Controller
             ], 404);
         }
 
-        return Group::destroy($id);
+        Group::destroy($id);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Group successfully deleted.',
+            'group_id' => $id
+        ],200);
     }
 
     // Return all groups from the user
