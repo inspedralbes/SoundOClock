@@ -102,8 +102,8 @@ export const useAppStore = defineStore('app', {
       }
     },
     deleteGroup(id) {
+      id = parseInt(id);
       this.classGroups = this.classGroups.filter(group => group.id !== id);
-      console.log("group deleted: ", this.classGroups);
     }
   },
 })
