@@ -41,10 +41,25 @@ function getAdminSongs() {
         });
 }
 
+export function getUsers() {
+    const store = useAppStore();
+    fetch(`${url}/users/${store.getUser().token}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("users: ", data);
+            store.setUsersAdminView(data);
+            store.setAdminSelectedUser(data[0]);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+}
+
 const comManager={
     getUserSelectedSongs,
     getSongs,
-    getAdminSongs
+    getAdminSongs,
+    getUsers
 };
 
 export default comManager;

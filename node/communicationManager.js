@@ -167,6 +167,33 @@ async function fetchSpotifyPage(id) {
   }
 }
 
+async function getUsers(token) {
+  const response = await fetch(apiURL + 'users', {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
+async function banUser(token, user) {
+  const response = await fetch(apiURL + 'user/' + user.id, {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify(user)
+  });
+  console.log("BAN USER", response);
+  return response;
+}
+
 
 const comManager = {
   getUserInfo,
@@ -181,6 +208,8 @@ const comManager = {
   searchSongId,
   getGroups,
   fetchSpotifyPage,
+  getUsers,
+  banUser
 };
 
 export default comManager;

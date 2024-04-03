@@ -15,11 +15,13 @@ export const useAppStore = defineStore('app', {
     userSelectedSongs: null,
     proposedSongs: [],
     proposedSongsAdminView: [],
+    usersAdminView: [],
     filter: 1,
     searchEngineFilter: "",
     isLoadingVote: false,
     classGroups: [],
-    openMenu: false
+    openMenu: false,
+    adminSelectedUser: null
 
   }),
   actions: {
@@ -37,6 +39,9 @@ export const useAppStore = defineStore('app', {
     getProposedSongsAdminView() {
       return this.proposedSongsAdminView
     },
+    getUsersAdminView() {
+      return this.usersAdminView
+    },
     getFilter() {
       return this.filter
     },
@@ -51,6 +56,9 @@ export const useAppStore = defineStore('app', {
     },
     getOpenMenu() {
       return this.openMenu
+    },
+    getAdminSelectedUser() {
+      return this.adminSelectedUser
     },
 
     //setters
@@ -68,6 +76,9 @@ export const useAppStore = defineStore('app', {
     },
     setProposedSongs(proposedSongs) {
       this.proposedSongs = proposedSongs
+    },
+    setUsersAdminView(usersAdminView) {
+      this.usersAdminView = usersAdminView
     },
     setProposedSongsAdminView(proposedSongsAdminView) {
       this.proposedSongsAdminView = proposedSongsAdminView
@@ -87,5 +98,8 @@ export const useAppStore = defineStore('app', {
     setOpenMenu(menuState) {
       this.openMenu = menuState
     }
+    setAdminSelectedUser(adminSelectedUser) {
+      this.adminSelectedUser = adminSelectedUser
+    },
   },
 })

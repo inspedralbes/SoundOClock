@@ -32,7 +32,9 @@ socket.on("connect", () => {
     comManager.getAdminSongs();
   });
 
-
+  socket.on("userBanned", (data) => {
+    console.log("socket userBanned data received: ", data.message);
+  });
 
   socket.on("loginData", (id, mail, name, group, token) => {
     console.log("socket loginData data received: ", id, mail, name, group, token);

@@ -110,6 +110,15 @@ app.get('/adminSongs', async (req, res) => {
   }
 });
 
+app.get('/users/:userToken', async (req, res) => {
+  try {
+    let users = await getUsers(req.params.userToken);
+    res.json(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {
@@ -398,6 +407,21 @@ io.on('connection', (socket) => {
           socket.emit('searchResultId', data);
         }
       });
+  });
+
+  socket.on('banUser', async (userToken, bannedUser) => {
+    // Check that the user is authenticated with Laravel Sanctum and is an admin
+    let user = await getUserInfo(userToken);
+    if (!user.id || user.is_admin === 0) return;
+
+    try {
+      // Ban user
+      banUser(userToken, bannedUser);
+      
+      io.emit('userBanned', { status: 'success', message: `L'usuari' ${bannedUser.name} ha sigut bloquejat` });
+    } catch (err) {
+      socket.emit('reportError', { status: 'error', message: err.message });
+    }
   });
 
   socket.on('disconnect', () => {
