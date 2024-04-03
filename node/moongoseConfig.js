@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-function connectToDatabase(host) {
+export function connectToDatabase(host) {
   const defaultConfig = {
     host: host || process.env.MONGO_HOST || 'mongodb',
     port: '27017',
@@ -16,7 +16,4 @@ function connectToDatabase(host) {
   return mongoose.connect(connectionString, options);
 }
 
-module.exports = {
-  mongoose,
-  connectToDatabase
-};
+export { mongoose };

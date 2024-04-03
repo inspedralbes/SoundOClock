@@ -5,7 +5,7 @@ import cors from 'cors';
 import comManager from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
-const { mongoose, connectToDatabase } = require('./moongoseConfig');
+import { mongoose, connectToDatabase } from './moongoseConfig.js';
 
 const app = express();
 app.use(cors());

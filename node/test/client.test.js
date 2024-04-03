@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { io as ioClient } from 'socket.io-client';
 import { Song, VotingRecord, ReportSong } from '../models.js';
 import comManager from '../communicationManager.js';
-const { mongoose, connectToDatabase } = require('./moongoseConfig');
+import { mongoose, connectToDatabase } from './moongoseConfig.js';
 
 describe('Listen the Server sockets', function () {
   let clientSocket;
