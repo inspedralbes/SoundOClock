@@ -48,6 +48,11 @@ socket.on("connect", () => {
     pinia.setClassGroups(data);
   });
 
+  socket.on('groupDeleted', (data) => {
+    console.log("socket groupDeleted data received: ", data);
+    pinia.deleteGroup(data.group_id);
+  });
+
   socket.on("disconnect", () => {
   
   });

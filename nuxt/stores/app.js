@@ -89,6 +89,21 @@ export const useAppStore = defineStore('app', {
     },
     setOpenMenu(menuState) {
       this.openMenu = menuState
+    },
+
+    ///Deletes
+    deleteUser() {
+      this.user = {
+        id: 0,
+        email: "",
+        name: "",
+        group: "",
+        token: null
+      }
+    },
+    deleteGroup(id) {
+      this.classGroups = this.classGroups.filter(group => group.id !== id);
+      console.log("group deleted: ", this.classGroups);
     }
   },
 })

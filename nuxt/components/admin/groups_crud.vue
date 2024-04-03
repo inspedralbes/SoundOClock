@@ -18,7 +18,7 @@
             <ModularSwitch :value="group.is_public" @input="group.is_public = $event" />
             <span v-if="!group.editing">
                 <button class="edit" @click="startEditing(index)">Editar</button>
-                <button class="delete" @click="deleteGroup(index)">Eliminar</button>
+                <button class="delete" @click="openModal('deleteGroup',index,group.id)">Eliminar</button>
             </span>
             <span v-else>
                 <button class="save">Guardar</button>
@@ -29,6 +29,17 @@
             <Loader />
         </div>
     </div>
+
+    <Transition name="fade">
+        <ModularModal v-if="modals.deleteGroup" title="Eliminar grup" @confirm="deleteGroup" @close="modals.deleteGroup=false">
+            <template #title>
+                <h2>El·liminar grup</h2>
+            </template>
+            <template #content>
+                <p>Estàs segur que vols eliminar aquest grup?</p>
+            </template>
+        </ModularModal>
+    </Transition>
 </template>
 
 <script>
@@ -42,6 +53,10 @@ export default {
         return {
             classGroups: computed(() => store.getClassGroups()),
             originalValues: [],
+            tempValues: {},
+            modals: {
+                deleteGroup: false,
+            },
         }
     },
     setup() {
@@ -52,6 +67,10 @@ export default {
     
     },
     methods: {
+        openModal(name,index,id){
+            this.modals[name] = true;
+            this.tempValues = {index,id};
+        },
         startEditing(index) {
             const group = this.classGroups[index];
             this.originalValues[index] = { ...group };
@@ -62,9 +81,10 @@ export default {
             Object.assign(group, this.originalValues[index]);
             group.editing = false;
         },
-        deleteGroup(index) {
-            this.classGroups.splice(index, 1);
-            socket.emit('deleteGroup', this.store.getUser().token, this.classGroups[index].id);
+        deleteGroup() {
+            const { index, id } = this.tempValues;
+            // this.classGroups.splice(index, 1);
+            socket.emit('deleteGroup', this.store.getUser().token, id);
         },
     },
 }
@@ -85,7 +105,7 @@ export default {
     backdrop-filter: blur(10px);
     top: 0;
     position: sticky;
-    z-index: 99999;
+    z-index: 1001;
 }
 
 input {
@@ -124,5 +144,13 @@ button.delete {
 
 button.save {
     background-color: #63C132;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .2s ease-in-out;
+}
+
+.fade-enter-from, .fade-leave-to {
+    opacity: 0;
 }
 </style>

@@ -358,7 +358,13 @@ io.on('connection', (socket) => {
   })
 
   socket.on('deleteGroup', (token, groupId) => {
-    console.log('deleteGroup', token, groupId);
+    comManager.deleteGroups(token, groupId)
+      .then((response) => {
+        socket.emit('groupDeleted', response);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   });
 
 
