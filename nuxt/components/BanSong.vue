@@ -1,6 +1,6 @@
 <template>
     <div>
-        <!--<h1 class="text-white text-center mb-8">CENSURAR CANÇÓ</h1>-->
+        <h2 class="text-white text-center mb-8">CENSURAR CANÇÓ</h2>
         <div class="flex flex-row mt-8">
             <div class="w-1/3 ml-20">
                 <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">

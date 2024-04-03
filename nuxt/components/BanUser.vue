@@ -1,6 +1,6 @@
 <template>
     <div v-if="!loading">
-        <h1 class="text-white text-center mb-8">CENSURAR USUARIS</h1>
+        <h1 class="text-4xl text-white text-center font-black mt-4 mb-8">BLOQUEJAR USUARIS</h1>
         <div class="flex flex-row mt-8">
             <div class="w-1/3 ml-20">
                 <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">

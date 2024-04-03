@@ -17,14 +17,24 @@ export default {
     formatDate(date) {
       return formatDate(date);
     },
-    banVotingCapacity() {
-      this.user.vote_banned_until = this.formatDateToLaravel(this.votingBannedUntil);
-      console.log(`L'usuari ${this.user.name} no pot votar cançons fins ${this.user.vote_banned_until}`);
+    banUser(isVotingBeingBanned) {
+      if (isVotingBeingBanned) {
+        this.user.vote_banned_until = this.formatDateToLaravel(this.votingBannedUntil);
+        console.log(`L'usuari ${this.user.name} no pot votar cançons fins ${this.user.vote_banned_until}.`);
+      } else {
+        this.user.propose_banned_until = this.formatDateToLaravel(this.proposingBannedUntil);
+        console.log(`L'usuari ${this.user.name} no pot proposar cançons fins ${this.user.propose_banned_until}.`);
+      }
       socket.emit('banUser', this.store.getUser().token, this.user);
     },
-    banProposingCapacity() {
-      this.user.propose_banned_until = this.formatDateToLaravel(this.proposingBannedUntil);
-      console.log(`L'usuari ${this.user.name} no pot proposar cançons fins ${this.user.propose_banned_until}`);
+    enableUser(isVotingBeingEnabled) {
+      if (isVotingBeingEnabled) {
+        this.user.vote_banned_until = null;
+        console.log(`L'usuari ${this.user.name} pot tornar a votar cançons.`);
+      } else {
+        this.user.propose_banned_until = null;
+        console.log(`L'usuari ${this.user.name} pot tornar a proposar cançons.`);
+      }
       socket.emit('banUser', this.store.getUser().token, this.user);
     },
     changeDate(range, isVotingBannedDate) {
@@ -56,7 +66,7 @@ export default {
 <template>
   <div v-if="user == null">
   </div>
-  <div v-else class="contenidor-canço rounded-lg h-screen text-left p-4">
+  <div v-else class="contenidor-detalls-usuari rounded-lg text-left p-4">
     <div class="mb-10">
       <p class="text-5xl font-black">{{ user.name }}</p>
     </div>
@@ -68,8 +78,10 @@ export default {
         <p v-else class="mb-8 text-xl text-center font-black">L'usuari no té limitada la capacitat de votar cançons</p>
         <h2 class="text-2xl mb-4 text-center">LIMITAR VOTAR CANÇONS</h2>
         <Calendar class="mb-8" v-bind:date="user.vote_banned_until" isVotingBannedDate=true @changeDate="changeDate" />
-        <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          @click="banVotingCapacity()">LIMITAR VOTACIONS</button>
+        <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded me-2"
+          @click="banUser(true)">LIMITAR VOTACIONS</button>
+        <button class="w-fit bg-gray-400 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded"
+          @click="enableUser(true)">HABILITAR VOTACIONS</button>
       </div>
       <div class="w-1/2">
         <p v-if="user.propose_banned_until" class="mb-8 text-xl text-center font-black">L'usuari no pot proposar cançons
@@ -80,16 +92,18 @@ export default {
         <h2 class="text-2xl mb-4 text-center">LIMITAR PROPOSAR CANÇONS</h2>
         <Calendar class="mb-8" v-bind:date="user.propose_banned_until" isVotingBannedDate=false
           @changeDate="changeDate" />
-        <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          @click="banProposingCapacity()">LIMITAR PROPOSTES</button>
+        <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded me-2"
+          @click="banUser(false)">LIMITAR PROPOSTES</button>
+        <button class="w-fit bg-gray-400 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded"
+          @click="enableUser(false)">HABILITAR PROPOSTES</button>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.contenidor-canço,
-.contenidor-report {
+.contenidor-detalls-usuari {
   background-color: rgb(56, 56, 56);
+  height: 85vh;
 }
 </style>
