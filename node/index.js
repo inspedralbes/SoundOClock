@@ -6,8 +6,11 @@ import mongoose from 'mongoose';
 import comManager from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
+import minimist from 'minimist';
 
-const host = process.argv[2] || 'mongodb';
+const argv = minimist(process.argv.slice(2));
+const host = argv.host || 'mongodb';
+
 const app = express();
 app.use(cors());
 
@@ -21,8 +24,8 @@ const io = new Server(server, {
 const port = process.env.PORT || 8080;
 
 // Mongoose setup
-mongoose.connect('mongodb://mongoadmin:mongopassword@'+ host + ':27017/soundoclock', { authSource: "admin" })
-  .then(() => console.log('MongoDB connected'))
+mongoose.connect('mongodb://mongoadmin:mongopassword@' + host +':27017/soundoclock', { authSource: "admin" })
+.then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
 async function insertDefaultsMongo() {

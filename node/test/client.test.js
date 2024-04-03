@@ -3,7 +3,10 @@ import { io as ioClient } from 'socket.io-client';
 import { Song, VotingRecord, ReportSong } from '../models.js';
 import mongoose from 'mongoose';
 import comManager from '../communicationManager.js';
-const host = process.argv[2] || 'mongodb';
+import minimist from 'minimist';
+
+const argv = minimist(process.argv.slice(2));
+const host = argv.host || 'mongodb';
 
 describe('Listen the Server sockets', function () {
   let clientSocket;
@@ -24,11 +27,11 @@ describe('Listen the Server sockets', function () {
   }
 
   before(async () => {
-    const serverAddr = `http://127.0.0.1:8080`;
+    const serverAddr = `http://localhost:8080`;
     clientSocket = ioClient(serverAddr);
     await new Promise((resolve) => clientSocket.on('connect', resolve));
     // Mongoose setup for accesing directly to the database
-    mongoose.connect('mongodb://mongoadmin:mongopassword@'+ host + ':27017/soundoclock', { authSource: "admin" })
+    mongoose.connect('mongodb://mongoadmin:mongopassword@' + host +':27017/soundoclock', { authSource: "admin" })
     .then(() => console.log('MongoDB connected'))
       .catch(err => console.error('MongoDB connection error:', err));
     // Logins to get the tokens
