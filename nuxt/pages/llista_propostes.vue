@@ -2,7 +2,7 @@
 import { useAppStore } from '@/stores/app';
 import { socket } from '../socket';
 import { setUserFromLocalStorage } from '../utils';
-import { getUserSelectedSongs, getSongs } from '../communicationManager';
+import comManager from '../communicationManager';
 
 export default {
     data() {
@@ -20,10 +20,9 @@ export default {
     },
     mounted() {
         this.loading = true;
-
         setUserFromLocalStorage();
-        getUserSelectedSongs(this.store.getUser().id);
-        getSongs();
+        comManager.getUserSelectedSongs(this.store.getUser().id);
+        comManager.getSongs();
         this.loading = false;
     },
     methods: {
@@ -133,12 +132,10 @@ export default {
 
         </div>
         <div class="width margenb mb-10 w-4/5 h-fit ml-auto mr-auto flex items-center justify-center gap-1">
-            <!-- <div class="grow basis-2/3"> -->
-                <FilterButtons @applyFilter="applyFilter" class="grow basis-3/4" />
-            <!-- </div> -->
-            <div
-                class="flex items-center justify-center basis-1/4">
-                <button @click="goToProposar()" class="bg-gray-600 hover:bg-gray-700 h-full w-full md:w-1/2 flex items-center justify-center rounded">
+            <FilterButtons @applyFilter="applyFilter" class="grow basis-3/4" />
+            <div class="flex items-center justify-center basis-1/4">
+                <button @click="goToProposar()"
+                    class="bg-gray-600 hover:bg-gray-700 h-full w-full md:w-1/2 md:ml-auto flex items-center justify-center rounded">
                     <span class="material-symbols-rounded text-white font-bold text-4xl">
                         add
                     </span>
@@ -149,7 +146,8 @@ export default {
             <Song v-for="song in filteredSongs" @openModal="openModal" @openReportModal="openReportModal"
                 v-bind:song="song" />
         </div>
-        <div class="h-16 w-1/2 md:w-1/4 bg-gray-600 hover:bg-gray-700 rounded flex items-center justify-center mx-auto mb-10">
+        <div
+            class="h-16 w-1/2 md:w-1/4 bg-gray-600 hover:bg-gray-700 rounded flex items-center justify-center mx-auto mb-10">
             <button @click="goToProposar()" class="h-full w-full flex items-center justify-center px-10">
                 <span class="material-symbols-rounded text-white font-bold text-4xl">
                     add
