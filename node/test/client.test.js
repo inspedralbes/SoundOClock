@@ -7,8 +7,8 @@ import minimist from 'minimist';
 
 const argv = minimist(process.argv.slice(2));
 
-const host = argv.host || 'mongodb';
-console.log('Host:', host);
+const hostMongo = argv.host || 'mongodb';
+const host = argv.host || 'localhost';
 
 describe('Listen the Server sockets', function () {
   let clientSocket;
@@ -29,11 +29,11 @@ describe('Listen the Server sockets', function () {
   }
 
   before(async () => {
-    const serverAddr = `http://localhost:8080`;
+    const serverAddr = `http://${host}:8080`;
     clientSocket = ioClient(serverAddr);
     await new Promise((resolve) => clientSocket.on('connect', resolve));
     // Mongoose setup for accesing directly to the database
-    mongoose.connect('mongodb://mongoadmin:mongopassword@' + host +':27017/soundoclock', { authSource: "admin" })
+    mongoose.connect('mongodb://mongoadmin:mongopassword@' + hostMongo +':27017/soundoclock', { authSource: "admin" })
     .then(() => console.log('MongoDB connected'))
       .catch(err => console.error('MongoDB connection error:', err));
     // Logins to get the tokens
