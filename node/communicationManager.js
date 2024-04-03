@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'production') {
 
 async function getUserInfo(token) {
   const response = await fetch(apiURL + 'getUser', {
-    method: 'POST',
+    method: 'GET',
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -165,17 +165,16 @@ async function getUsers(token) {
 }
 
 async function banUser(token, user) {
-  const response = await fetch(apiURL + 'ban/' + user.id, {
+  const response = await fetch(apiURL + 'user/' + user.id, {
     method: 'PUT',
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
       "Authorization": "Bearer " + token,
     },
-    body: JSON.stringify({
-      vote_banned_until: user.vote_banned_until,
-    })
+    body: JSON.stringify(user)
   });
+  console.log("BAN USER", response);
   return response;
 }
 

@@ -53,7 +53,7 @@ export default {
 </script>
 
 <template>
-    <VDatePicker v-model.range="range" :color="selectedColor" mode="date" expanded />
+    <VDatePicker :min-date='new Date()' v-model.range="range" :color="selectedColor" mode="date" expanded />
     
 
 </template>

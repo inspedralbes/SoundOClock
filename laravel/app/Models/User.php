@@ -20,6 +20,8 @@ class User extends Authenticatable
     protected $fillable = [
         'email',
         'name',
+        'vote_banned_until',
+        'propose_banned_until',
     ];
 
     /**

@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/login', [AuthController::class,'login']);
 Route::get('/classgroups', [ClassGroupsController::class, 'index']);
 Route::get('/users', [AuthController::class, 'index']);
+Route::put('/user/{id}', [AuthController::class, 'update']);
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -35,6 +36,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/blacklist/{id}', [BlacklistController::class,'show']);
     Route::post('/blacklist', [BlacklistController::class,'store']);
     Route::delete('/blacklist/{id}', [BlacklistController::class,'destroy']);
+
 
     // ClassGroups routes
     Route::post('/classGroups', [ClassGroupsController::class, 'store']);

@@ -136,18 +136,17 @@ class AuthController extends Controller {
         return User::all();
     }
 
-    public function banUser(Request $request, $id) {
+    public function update(Request $request, $id) {
 
-        $fields = $request->validate([
-            'vote_banned_until' => 'required|date',
-        ]);
+        // $fields = $request->validate([
+        //     'vote_banned_until' => 'required|date',
+        // ]);
 
         // Find user
         $user = User::find($id);
-        // Update the vote_banned_until column
-        $user->update([
-        'vote_banned_until' => $fields['vote_banned_until']
-        ]);
+
+        // Update user
+        $user->update($request->all());
 
         return response()->json($user);
     }

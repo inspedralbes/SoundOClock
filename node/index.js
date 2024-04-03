@@ -365,17 +365,17 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('banUserVotingCapacity', async (userToken, bannedUser) => {
+  socket.on('banUser', async (userToken, bannedUser) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await getUserInfo(userToken);
-    if (!user.id || user.is_admin === 0) return;
+    // if (!user.id || user.is_admin === 0) return;
+    if (!user.id) return
 
     try {
-
       // Ban user
       banUser(userToken, bannedUser);
-
-      io.emit('songReported', { status: 'success', message: `La cançó ${song.title} ha sigut reportada` });
+      
+      io.emit('userBanned', { status: 'success', message: `L'usuari' ${bannedUser.name} ha sigut bloquejat` });
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
     }

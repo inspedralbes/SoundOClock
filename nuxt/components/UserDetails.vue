@@ -18,14 +18,14 @@ export default {
       return formatDate(date);
     },
     banVotingCapacity() {
-      console.log(`L'usuari ${this.user.name} no pot votar cançons fins ${this.votingBannedUntil}`);
-      this.user.vote_banned_until = this.votingBannedUntil;
-      socket.emit('banUserVotingCapacity', this.store.getUser().token, this.user);
+      this.user.vote_banned_until = this.formatDateToLaravel(this.votingBannedUntil);
+      console.log(`L'usuari ${this.user.name} no pot votar cançons fins ${this.user.vote_banned_until}`);
+      socket.emit('banUser', this.store.getUser().token, this.user);
     },
     banProposingCapacity() {
-      console.log(`L'usuari ${this.user.name} no pot proposar cançons fins ${this.proposingBannedUntil}`);
-      this.user.propose_banned_until = this.proposingBannedUntil;
-      //socket.emit('deleteSong', this.store.getUser().token, songId);
+      this.user.propose_banned_until = this.formatDateToLaravel(this.proposingBannedUntil);
+      console.log(`L'usuari ${this.user.name} no pot proposar cançons fins ${this.user.propose_banned_until}`);
+      socket.emit('banUser', this.store.getUser().token, this.user);
     },
     changeDate(range, isVotingBannedDate) {
 
@@ -38,6 +38,13 @@ export default {
         this.proposingBannedUntil = range.end;
       }
     },
+    formatDateToLaravel(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+
+      return `${year}-${month}-${day}`;
+    }
   },
   setup() {
     const store = useAppStore();
@@ -55,20 +62,24 @@ export default {
     </div>
     <div class="flex flex-row gap-8">
       <div class="w-1/2">
-        <p v-if="user.vote_banned_until" class="mb-8 text-xl text-center font-black">L'usuari no pot votar cançons fins el {{
+        <p v-if="user.vote_banned_until" class="mb-8 text-xl text-center font-black">L'usuari no pot votar cançons fins
+          el {{
     formatDate(user.vote_banned_until) }}</p>
         <p v-else class="mb-8 text-xl text-center font-black">L'usuari no té limitada la capacitat de votar cançons</p>
         <h2 class="text-2xl mb-4 text-center">LIMITAR VOTAR CANÇONS</h2>
-        <Calendar class="mb-8" v-bind:date="user.vote_banned_until" isVotingBannedDate=true @changeDate="changeDate"/>
+        <Calendar class="mb-8" v-bind:date="user.vote_banned_until" isVotingBannedDate=true @changeDate="changeDate" />
         <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
           @click="banVotingCapacity()">LIMITAR VOTACIONS</button>
       </div>
       <div class="w-1/2">
-        <p v-if="user.propose_banned_until" class="mb-8 text-xl text-center font-black">L'usuari no pot proposar cançons fins el {{
+        <p v-if="user.propose_banned_until" class="mb-8 text-xl text-center font-black">L'usuari no pot proposar cançons
+          fins el {{
     formatDate(user.propose_banned_until) }}</p>
-        <p v-else class="mb-8 text-xl text-center font-black">L'usuari no té limitada la capacitat de proposar cançons</p>
+        <p v-else class="mb-8 text-xl text-center font-black">L'usuari no té limitada la capacitat de proposar cançons
+        </p>
         <h2 class="text-2xl mb-4 text-center">LIMITAR PROPOSAR CANÇONS</h2>
-        <Calendar class="mb-8" v-bind:date="user.propose_banned_until" isVotingBannedDate=false @changeDate="changeDate" />
+        <Calendar class="mb-8" v-bind:date="user.propose_banned_until" isVotingBannedDate=false
+          @changeDate="changeDate" />
         <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
           @click="banProposingCapacity()">LIMITAR PROPOSTES</button>
       </div>
