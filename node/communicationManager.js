@@ -169,7 +169,16 @@ async function updateGroup(token,group){
 async function deleteGroup(token,id){
   const response = await axios.delete(`${apiURL}groups/${id}`, {
     headers: {
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+    }
+  });
+  return response.data;
+}
+
+async function getPublicGroups(token){
+  const response = await axios.get(`${apiURL}groups`, {
+    headers: {
+      "Authorization": "Bearer " + token,
     }
   });
   return response.data;
@@ -225,6 +234,7 @@ const comManager = {
   searchSong,
   searchSongId,
   getGroups,
+  getPublicGroups,
   fetchSpotifyPage,
   getUsers,
   banUser,

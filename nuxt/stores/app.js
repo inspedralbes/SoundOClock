@@ -9,6 +9,7 @@ export const useAppStore = defineStore('app', {
         email: "",
         name: "",
         group: "",
+        course: "",
         token: null
       },
 
@@ -66,12 +67,19 @@ export const useAppStore = defineStore('app', {
     },
 
     //setters
-    setUser(id, email, name, group, token) {
+    setUser(id, email, name, group, course, token) {
       this.user.id = id;
       this.user.email = email;
       this.user.name = name;
       this.user.group = group;
+      this.user.course = course;
       this.user.token = token;
+
+      localStorage.setItem("user", JSON.stringify(this.user));
+    },
+    setUserGroupAndCourse(group, course) {
+      this.user.group = group;
+      this.user.course = course;
 
       localStorage.setItem("user", JSON.stringify(this.user));
     },
