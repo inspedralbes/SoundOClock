@@ -6,7 +6,9 @@ import comManager from '../communicationManager.js';
 import minimist from 'minimist';
 
 const argv = minimist(process.argv.slice(2));
+
 const host = argv.host || 'mongodb';
+console.log('Host:', host);
 
 describe('Listen the Server sockets', function () {
   let clientSocket;
