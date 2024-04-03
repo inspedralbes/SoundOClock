@@ -2,11 +2,12 @@ import express from 'express';
 import { createServer, get } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import mongoose from 'mongoose';
 import comManager from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
-import { mongoose, connectToDatabase } from './moongoseConfig.js';
 
+const host = process.argv[2] || '127.0.0.1';
 const app = express();
 app.use(cors());
 
@@ -20,7 +21,7 @@ const io = new Server(server, {
 const port = process.env.PORT || 8080;
 
 // Mongoose setup
-connectToDatabase(process.env.MONGO_HOST, { authSource: "admin" })
+mongoose.connect('mongodb://mongoadmin:mongopassword@${host}:27017/soundoclock', { authSource: "admin" })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
