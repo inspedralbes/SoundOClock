@@ -4,7 +4,7 @@ import { Song, VotingRecord, ReportSong } from '../models.js';
 import mongoose from 'mongoose';
 import comManager from '../communicationManager.js';
 
-const host = process.argv[2] || 'mongodb';
+const host = process.env.MONGO_HOST || 'mongodb';
 
 describe('Listen the Server sockets', function () {
   let clientSocket;
