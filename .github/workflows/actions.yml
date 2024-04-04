@@ -6,6 +6,37 @@ on:
       - actions
 
 jobs:
+  LARAVEL TEST:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: soundoclock
+        ports:
+          - 3306:3306
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: mongoadmin
+          MONGO_INITDB_ROOT_PASSWORD: mongopassword
+
+    steps:
+      - name: Obtenint el codi del respositori
+        uses: actions/checkout@v4
+
+      - name: Comprovant Laravel
+        run: |
+          cd laravel 
+          composer install
+          cp .env.example .env
+          php artisan migrate --env=testing
+          php artisan migrate:fresh --seed
+          php artisan test
+      - run: echo "🍏 This job's status is ${{ job.status }}."
   NODE-TEST:
     runs-on: ubuntu-latest
     services:
@@ -36,7 +67,6 @@ jobs:
           php artisan migrate --env=testing
           php artisan migrate:fresh --seed
           php artisan serve > /dev/null 2>&1 &
-          php artisan test
       - name: Comprovant Node
         run: |
           cd node
