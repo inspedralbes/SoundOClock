@@ -14,12 +14,7 @@ INSERT INTO users (name, email, created_at, updated_at, role_id, vote_banned_unt
 ('david', 'david@gmail.com', NOW(), NOW(), 4, '2024-04-02', null),
 ('miquel', 'miquel@gmail.com', NOW(), NOW(), 4, null, null),
 ('pedro', 'pedro@gmail.com', NOW(), NOW(), 4, null, null),
-('raul', 'r@gmail.com', NOW(), NOW(), 4, null, null),
-('raul', 'ra@gmail.com', NOW(), NOW(), 4, null, null),
-('raul', 'rul@gmail.com', NOW(), NOW(), 4, null, null),
-('raul', 'rl@gmail.com', NOW(), NOW(), 4, null, null),
-('raul', 'aul@gmail.com', NOW(), NOW(), 4, null, null),
-('raul', 'al@gmail.com', NOW(), NOW(), 4, null, null);
+('raul', 'raul@gmail.com', NOW(), NOW(), 4, null, null);
 
 INSERT INTO blacklist (nom, spotify_id) VALUES
 ('Anaconda', 1),
