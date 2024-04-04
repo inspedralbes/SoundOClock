@@ -12,7 +12,6 @@ export const socket = io(url);
 socket.on("connect", () => {
   const pinia = useAppStore();
 
-  comManager.getUserSelectedSongs(1);
   // getSongs();
 
   socket.on("voteCasted", (data) => {

@@ -18,17 +18,15 @@ export default {
             }
         }
     },
-    mounted() {
+    created() {
         this.loading = true;
-
         // setUserFromLocalStorage();
-        comManager.getUserSelectedSongs(this.store.getUser().id);
+        // comManager.getUserSelectedSongs(this.store.getUser().id);
         comManager.getSongs();
         this.loading = false;
     },
     methods: {
         applyFilter() {
-            console.log("AQUEST ES EL FILTRE", this.filter)
             switch (parseInt(this.filter)) {
                 case 1:
                     this.sortByVotesDescending();
