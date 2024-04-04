@@ -32,7 +32,6 @@
 
 <script>
 import { useAppStore } from '@/stores/app';
-import { setUserFromLocalStorage } from '../utils';
 import { getUsers } from '../communicationManager';
 
 export default {
@@ -57,7 +56,6 @@ export default {
     },
     mounted() {
         this.loading = true;
-        // setUserFromLocalStorage();
         this.users = getUsers();
         this.loading = false;
     },
