@@ -90,5 +90,5 @@ jobs:
           echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
           chmod 600 ~/prod_key.pem
           cd ${{ github.workspace }}
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "echo Successfully connected to Oracle Cloud"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "echo Successfully connected to Oracle Cloud"
       - run: echo "🍏 This job's status is ${{ job.status }}."
