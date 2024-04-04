@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-center items-center fixed inset-0 bg-black bg-opacity-20 z-50">
+    <div class="bounce flex justify-center items-center fixed inset-0 bg-black bg-opacity-60 z-[1002]">
         <div class="rounded-xl p-8 grid grid-cols-[0.1fr,1fr] bg-white w-[40%] max-w-screen-md text-black">
             <div class="w-12 h-12 rounded-full flex justify-center items-center mr-4" :class="typeClass">
                 <span class="material-symbols-rounded text-[2rem]" >
@@ -20,7 +20,7 @@
                 <div class="w-full">
                     <div class="flex justify-end">
                         <button @click="$emit('close')" class="border border-gray-300 m-4 w-1/4 px-4 py-2 rounded-md text-[1.1rem]">Cancel·la</button>
-                        <button @click="$emit('confirm')" class="m-4 px-4 py-2 rounded-md w-1/4 text-[1.1rem]" :class="buttonTypeClass">{{ msg }}</button>
+                        <button @click="confirm" class="m-4 px-4 py-2 rounded-md w-1/4 text-[1.1rem]" :class="buttonTypeClass">{{ msg }}</button>
                     </div>
                 </div>
             </div>
@@ -37,7 +37,7 @@
             },
             msg:{
                 type: String,
-                default: 'El·liminar'
+                default: 'Eliminar'
             }
         },
         data(){
@@ -66,10 +66,28 @@
             }
         },
         methods:{
+            confirm(){
+                this.$emit('confirm');
+                this.$emit('close');
+            }
         }
     }
 </script>
 
 <style scoped>
+.bounce{
+    animation: bounce .5s ease-in-out;
+}
 
+@keyframes bounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 </style>

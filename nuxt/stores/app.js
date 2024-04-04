@@ -9,19 +9,26 @@ export const useAppStore = defineStore('app', {
         email: "",
         name: "",
         group: "",
+        course: "",
         token: null
       },
 
     userSelectedSongs: null,
     proposedSongs: [],
     proposedSongsAdminView: [],
+    usersAdminView: [],
     filter: 1,
     searchEngineFilter: "",
     isLoadingVote: false,
     classGroups: [],
-    openMenu: false
+    openMenu: false,
+    adminSelectedUser: null
 
   }),
+  persist:{
+    storage: persistedState.localStorage,
+    paths:['user']
+  },
   actions: {
 
     //getters
@@ -36,6 +43,9 @@ export const useAppStore = defineStore('app', {
     },
     getProposedSongsAdminView() {
       return this.proposedSongsAdminView
+    },
+    getUsersAdminView() {
+      return this.usersAdminView
     },
     getFilter() {
       return this.filter
@@ -52,14 +62,24 @@ export const useAppStore = defineStore('app', {
     getOpenMenu() {
       return this.openMenu
     },
+    getAdminSelectedUser() {
+      return this.adminSelectedUser
+    },
 
     //setters
-    setUser(id, email, name, group, token) {
+    setUser(id, email, name, group, course, token) {
       this.user.id = id;
       this.user.email = email;
       this.user.name = name;
       this.user.group = group;
+      this.user.course = course;
       this.user.token = token;
+
+      localStorage.setItem("user", JSON.stringify(this.user));
+    },
+    setUserGroupAndCourse(group, course) {
+      this.user.group = group;
+      this.user.course = course;
 
       localStorage.setItem("user", JSON.stringify(this.user));
     },
@@ -68,6 +88,9 @@ export const useAppStore = defineStore('app', {
     },
     setProposedSongs(proposedSongs) {
       this.proposedSongs = proposedSongs
+    },
+    setUsersAdminView(usersAdminView) {
+      this.usersAdminView = usersAdminView
     },
     setProposedSongsAdminView(proposedSongsAdminView) {
       this.proposedSongsAdminView = proposedSongsAdminView
@@ -86,6 +109,24 @@ export const useAppStore = defineStore('app', {
     },
     setOpenMenu(menuState) {
       this.openMenu = menuState
-    }
+    },
+
+    ///Deletes
+    deleteUser() {
+      this.user = {
+        id: 0,
+        email: "",
+        name: "",
+        group: "",
+        token: null
+      }
+    },
+    deleteGroup(id) {
+      id = parseInt(id);
+      this.classGroups = this.classGroups.filter(group => group.id !== id);
+    },
+    setAdminSelectedUser(adminSelectedUser) {
+      this.adminSelectedUser = adminSelectedUser
+    },
   },
 })

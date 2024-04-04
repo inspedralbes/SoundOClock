@@ -1,6 +1,8 @@
 <script>
 import { socket } from '../socket';
 import { useAppStore } from '@/stores/app';
+import comManager from '../communicationManager';
+
 export default {
     name: 'Song',
     props: {
@@ -8,13 +10,18 @@ export default {
     },
     data() {
         return {
-
+            loading: true,
         }
+    },
+    created() {
+        this.loading = true;
+        comManager.getUserSelectedSongs(this.store.getUser().id);
+        this.loading = false;
     },
     methods: {
         vote(songId) {
             if (!this.isLoadingVote.state) {
-              if (this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
+              if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
                   this.$emit('openModal');
               } else {
                   this.store.setIsLoadingVote({ state: true, selectedSong: songId });
@@ -27,14 +34,14 @@ export default {
             this.$emit('openReportModal', song);
         },
         isSongVotedColor(songId) {
-            if (this.userSelectedSongs.votedSongs.includes(songId)) {
+            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
                 return "#83aee4";
             } else {
                 return "currentColor";
             }
         },
         isSongVotedFill(songId) {
-            if (this.userSelectedSongs.votedSongs.includes(songId)) {
+            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
                 return "#83aee4";
             } else {
                 return "none";
