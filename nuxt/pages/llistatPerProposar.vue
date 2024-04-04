@@ -42,7 +42,6 @@
 
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
-import { setUserFromLocalStorage } from '../utils';
 
 export default {
     data() {
@@ -59,12 +58,7 @@ export default {
             store: useAppStore(),
         }
     },
-    computed: {
-
-    },
     mounted() {
-
-        //setUserFromLocalStorage();
 
         socket.emit('getTopSongs', 'Top Songs Spain');
 
@@ -336,5 +330,6 @@ img {
     background-color: white;
     border-radius: 24px;
     height: 40px;
+    color: #000;
 }
 </style>
