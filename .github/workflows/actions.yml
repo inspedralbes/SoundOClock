@@ -82,10 +82,10 @@ jobs:
     needs: [LARAVEL-TEST, NODE-TEST]
     runs-on: ubuntu-latest
     steps:
-      - name: Obtaining repository code
+      - name: Obtenint el codi del respositori
         uses: actions/checkout@v4
 
-      - name: Deploying
+      - name: Check SSH connection
         run: |
-          echo "Deploying..."
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${{ secrets.SECRET_KEY }} ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "echo Successfully connected to Oracle Cloud"
       - run: echo "🍏 This job's status is ${{ job.status }}."
