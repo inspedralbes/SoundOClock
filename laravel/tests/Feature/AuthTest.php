@@ -18,7 +18,7 @@ class AuthTest extends TestCase {
         ]);
 
         // Check if the response is correct
-        $response->assertStatus(400)
+        $response->assertStatus(201)
             ->assertJsonStructure([
                 'user' => [
                     'id',
