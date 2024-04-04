@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('abbreviation')->nullable();
             $table->boolean('is_public')->default(true);
             $table->integer('max_courses')->default(4);
-            $table->integer('max_lines')->default(26);
             $table->timestamps();
         });
     }
