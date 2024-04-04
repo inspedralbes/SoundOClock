@@ -64,7 +64,7 @@ export default {
     },
     mounted() {
 
-        setUserFromLocalStorage();
+        //setUserFromLocalStorage();
 
         socket.emit('getTopSongs', 'Top Songs Spain');
 

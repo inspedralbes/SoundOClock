@@ -67,7 +67,7 @@ export default {
 <template>
   <div v-if="user == null">
   </div>
-  <div v-else class="contenidor-detalls-usuari rounded-lg text-left p-4">
+  <div v-else class="user-details-container rounded-lg text-left p-4">
     <div class="mb-10">
       <p class="text-5xl font-black">{{ user.name }}</p>
     </div>
@@ -103,7 +103,7 @@ export default {
 </template>
 
 <style scoped>
-.contenidor-detalls-usuari {
+.user-details-container {
   background-color: rgb(56, 56, 56);
   height: 85vh;
 }
