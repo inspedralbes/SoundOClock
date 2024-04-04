@@ -21,15 +21,15 @@ INSERT INTO blacklist (nom, spotify_id) VALUES
 ('Drugstory', 2),
 ('Bitch Mode', 3);
 
-INSERT INTO `groups` (name, abbreviation, is_public, max_courses, max_lines) VALUES
-('Escola Secundaria Obligatoria', 'ESO', 1, 4, 26),
-('Batxillerat', 'BAT', 1, 2, 26),
-('Sistemes Microinformàtics i Xarxes', 'SMX', 1, 2, 26),
-('Desenvolupament d''Aplicacions Web', 'DAW', 1, 2, 26),
-('Desenvolupament d''Aplicacions Multimplataforma', 'DAM', 1, 2, 26),
-('Desenvolupament d''Aplicacions Multimplataforma - Videojocs i Oci Digital', 'DAM-VI', 1, 2, 26),
-('Administració de Sistemes Informàtics en Xarxa', 'ASIX', 1, 2, 26),
-('Animació 3D, Jocs i Entorns Interactius', 'A3D', 1, 2, 26),
-('Curs d''especialització en Desenvolupament de Videojocs', 'CE', 1, 2, 26),
-('Programes de Formació i Inserció', 'PFI', 1, 2, 26),
-('Direcció','DIR',0,1,1);
+INSERT INTO `groups` (name, abbreviation, is_public, max_courses) VALUES
+('Escola Secundaria Obligatoria', 'ESO', 1, 4),
+('Batxillerat', 'BATX', 1, 2),
+('Sistemes Microinformàtics i Xarxes', 'SMX', 1, 2),
+('Desenvolupament d''Aplicacions Web', 'DAW', 1, 2),
+('Desenvolupament d''Aplicacions Multiplataforma', 'DAM', 1, 2),
+('Desenvolupament d''Aplicacions Multiplataforma - Videojocs i Oci Digital', 'DAM-VI', 1, 2),
+('Administració de Sistemes Informàtics en Xarxa', 'ASIX', 1, 2),
+('Animació 3D, Jocs i Entorns Interactius', 'A3D', 1, 2),
+('Curs d''especialització en Desenvolupament de Videojocs', 'CE', 1, 2),
+('Programes de Formació i Inserció', 'PFI', 1, 2),
+('Direcció', 'DIR', 0, 1);

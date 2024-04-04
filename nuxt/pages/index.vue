@@ -41,11 +41,13 @@
 
 <script>
 
+import { useAppStore } from '@/stores/app';
 
 export default {
     data() {
         return {
-            stars: []
+            stars: [],
+            store: useAppStore(),
         }
     },
     mounted() {

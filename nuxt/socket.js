@@ -35,10 +35,9 @@ socket.on("connect", () => {
     console.log("socket userBanned data received: ", data.message);
   });
 
-  socket.on("loginData", (id, mail, name, group, token) => {
-    // console.log("socket loginData data received: ", id, mail, name, group, token);
-    pinia.setUser(id, mail, name, group, token);
-    if (pinia.getUser().group) {
+  socket.on("loginData", (id, mail, name, token, groups) => {
+    pinia.setUser(id, mail, name, token, groups);
+    if (pinia.getUser().groups.length > 0) {
       navigateTo({ path: '/llista_propostes' });
     } else {
       navigateTo({ path: '/escollirGrup' });
