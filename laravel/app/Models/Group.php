@@ -12,7 +12,8 @@ class Group extends Model
     protected $fillable = [
         'name',
         'abbreviation',
-        'is_public'
+        'is_public',
+        'max_courses'
     ];
 
     public function users() {

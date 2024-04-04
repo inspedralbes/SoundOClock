@@ -13,7 +13,6 @@ class GroupsController extends Controller
      */
     public function index() {
         return Group::where('is_public', '<>', 0)->get();
-        // return Group::all();
     }
 
     /**
@@ -39,6 +38,7 @@ class GroupsController extends Controller
             'name' => 'required|string',
             'abbreviation' => 'required|string',
             'is_public' => 'required|int',
+            'max_courses' => 'required|int',
         ]);
 
         return Group::create($request->all());
@@ -68,6 +68,7 @@ class GroupsController extends Controller
             'name' => 'required|string',
             'abbreviation' => 'required|string',
             'is_public' => 'required|int',
+            'max_courses' => 'required|int',
         ]);
 
         $group = Group::findOrfail($id);
@@ -112,26 +113,44 @@ class GroupsController extends Controller
 
     // Add groups to the user
     public function addGroupsToUser(Request $request, string $user_id) {
-        $fields = $request->validate([
-            'groups' => 'required|array',
+        // Validate the request
+        $groups = $request->validate([
+            '*.group_id' => 'required|exists:groups,id', // Validates each group_id exists in groups table
+            '*.course' => 'required|integer', // Validates each course is a number
         ]);
-
-        $user = User::findOrfail($user_id);
-        $user->groups()->attach($fields['groups']);
+    
+        $user = User::findOrFail($user_id);
+    
+        // Loop through each group and attach it with its course
+        foreach ($groups as $group) {
+            $user->groups()->attach($group['group_id'], ['course' => $group['course']]);
+        }
+    
         // Return the user with its groups
-        return $user->groups;
+        return $user->load('groups');
     }
 
-    // Remove all groups from the user and add the new ones
     public function updateGroupsToUser(Request $request, string $user_id) {
-        $fields = $request->validate([
-            'groups' => 'required|array',
+        // Validate the request to ensure each group has a group_id and course
+        $groups = $request->validate([
+            '*.group_id' => 'required|exists:groups,id', // Ensures group_id exists in the groups table
+            '*.course' => 'required|integer', // Ensures course is a number
         ]);
-
-        $user = User::findOrfail($user_id);
-        // This will remove all groups from the user and add the new ones
-        $user->groups()->sync($fields['groups']);
-        return $user->groups;
+    
+        $user = User::findOrFail($user_id);
+    
+        // Prepare the data for syncing
+        $syncData = [];
+        foreach ($groups as $group) {
+            // The key is the group_id, and the value is an array of the additional pivot data
+            $syncData[$group['group_id']] = ['course' => $group['course']];
+        }
+    
+        // This will remove all existing groups and add the new ones with the course data
+        $user->groups()->sync($syncData);
+    
+        // Return the user with its updated groups
+        return $user->load('groups');
     }
 
     // Remove all groups from the user
