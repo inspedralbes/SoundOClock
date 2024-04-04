@@ -77,3 +77,14 @@ jobs:
           npm run dev -- --host=127.0.0.1 > node.log 2>&1 &
           npm run test -- --host=127.0.0.1
       - run: echo "🍏 This job's status is ${{ job.status }}."
+  
+  DEPLOYMENT:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtaining repository code
+        uses: actions/checkout@v4
+
+      - name: Deploying
+        run: |
+          echo "Deploying..."
+      - run: echo "🍏 This job's status is ${{ job.status }}."
