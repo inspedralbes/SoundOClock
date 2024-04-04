@@ -1,11 +1,11 @@
 <template>
     <div v-if="!loading">
-        <h2 class="text-white text-center mb-8">CENSURAR CANÇÓ</h2>
+        <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">CENSURAR CANÇÓ</h2>
         <div class="flex flex-row mt-8">
-            <div class="w-1/3 ml-20">
+            <div class="songs-container w-1/3 ml-20 overflow-y-auto">
                 <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
                     <button v-for="song in songs" @click="selectSong(song)"
-                        class="contenidor-canço flex flex-row justify-between items-center rounded-lg p-3">
+                        class="flex flex-row justify-between items-center rounded-lg p-3" :class="isSelected(song)">
                         <div class="flex flex-row items-center gap-2">
                             <div class="contenidor-img">
                                 <img :src="song.img" alt="Song img" class="rounded-lg">
@@ -24,8 +24,7 @@
                                 <p class="basis-1/3">{{ song.votes }} vots</p>
                             </div>
                         </div>
-                        <!-- <div v-if="song.reports.length > 0"> -->
-                        <div>
+                        <div v-if="song.reports.length > 0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
                                 fill="rgb(239 68 68)"
                                 class="icon icon-tabler icons-tabler-filled icon-tabler-alert-circle">
@@ -38,7 +37,7 @@
                 </div>
             </div>
             <div class="w-2/3 text-white text-center ml-4 mr-4">
-                <SongDetails v-bind:song="song" />
+                <SongDetails v-bind:song="selectedSong" />
             </div>
         </div>
     </div>
@@ -52,13 +51,22 @@ export default {
     data() {
         return {
             loading: true,
-            song: null,
+            selectedSong: null,
         }
     },
     methods: {
         selectSong(selectedSong) {
-            this.song = selectedSong;
-        }
+            this.selectedSong = selectedSong;
+        },
+        isSelected(song) {
+            let style = "song-item--not-selected";
+
+            if (song.id == this.selectedSong.id) {
+                style = "song-item--selected";
+            }
+
+            return style;
+        },
     },
     created() {
         this.loading = true;
@@ -67,6 +75,7 @@ export default {
     },
     computed: {
         songs() {
+            this.selectedSong = this.store.getProposedSongsAdminView()[0];
             return this.store.getProposedSongsAdminView();
         },
     },
@@ -78,6 +87,25 @@ export default {
 </script>
 
 <style scoped>
+
+.songs-container {
+  height: 85vh;
+}
+
+.song-item--not-selected {
+    background-color: rgb(56, 56, 56);
+    color: white;
+}
+
+.song-item--selected {
+    background-color: white;
+    color: rgb(56, 56, 56);
+}
+
+.song-item>*:last-child {
+    justify-self: flex-end;
+}
+
 .contenidor-canço {
     background-color: rgb(56, 56, 56);
     /* border: 1px solid rgb(163, 163, 163); */
