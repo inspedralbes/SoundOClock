@@ -66,7 +66,7 @@ export default {
 
         setUserFromLocalStorage();
 
-        socket.emit('getTopSongs', 'TopGlobal');
+        socket.emit('getTopSongs', 'Top Songs Spain');
 
         socket.on('topSongs', (results) => {
             this.tracks = results;
@@ -123,11 +123,17 @@ export default {
                 }
             } else {
                 if (track.preview_url != null) {
+                    if (this.currentTrack != null) {
+                        this.currentTrack.pause();
+                    }
                     this.currentTrack = new Audio(track.preview_url);
                     this.currentTrackId = track.id;
                     this.currentTrack.play();
                     this.isPlaying = true;
                 } else {
+                    if (this.currentTrack != null) {
+                        this.currentTrack.pause();
+                    }
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
                 }
