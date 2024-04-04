@@ -32,12 +32,13 @@ class GroupsTest extends TestCase {
     }
 
     // Helper function to create a group
-    private function createGroup($user, $name, $abbreviation, $is_public) {
+    private function createGroup($user, $name, $abbreviation, $is_public, $max_courses) {
         return $this->actingAs($user)
             ->post('/api/groups', [
                 'name' => $name,
                 'abbreviation' => $abbreviation,
-                'is_public' => $is_public
+                'is_public' => $is_public,
+                'max_courses' => $max_courses,
             ]);
     }
 
@@ -46,13 +47,14 @@ class GroupsTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($admin, 'group1', 'g1', 1);
+        $response = $this->createGroup($admin, 'group1', 'g1', 1, 2);
 
         $response->assertStatus(201)
             ->assertJson([
                 'name' => 'group1',
                 'abbreviation' => 'g1',
-                'is_public' => 1
+                'is_public' => 1,
+                'max_courses' => 2,
             ]);
     }
 
@@ -61,7 +63,7 @@ class GroupsTest extends TestCase {
         $user = $this->loginAsStudent();
 
         // Create a group
-        $response = $this->createGroup($user, 'group1', 'g1', 1);
+        $response = $this->createGroup($user, 'group1', 'g1', 1, 2);
 
         $response->assertStatus(404)
             ->assertJson([
@@ -75,8 +77,8 @@ class GroupsTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Create 2 groups (both public)
-        $this->createGroup($admin, 'group1', 'g1', 1);
-        $this->createGroup($admin, 'group2', 'g2', 1);
+        $this->createGroup($admin, 'group1', 'g1', 1, 2);
+        $this->createGroup($admin, 'group2', 'g2', 1, 2);
 
         // Get all groups
         $response = $this->actingAs($admin)
@@ -91,8 +93,8 @@ class GroupsTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Create 2 groups (1 public and 1 private)
-        $this->createGroup($admin, 'group1', 'g1', 1);
-        $this->createGroup($admin, 'group2', 'g2', 0);
+        $this->createGroup($admin, 'group1', 'g1', 1, 2);
+        $this->createGroup($admin, 'group2', 'g2', 0, 3);
 
         // Get all groups
         $response = $this->actingAs($admin)
@@ -107,7 +109,7 @@ class GroupsTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($admin, 'group1', 'g1', 1);
+        $response = $this->createGroup($admin, 'group1', 'g1', 1, 3);
         $id = $response->json('id');
 
         // Get the group
@@ -119,8 +121,7 @@ class GroupsTest extends TestCase {
                 'name' => 'group1',
                 'abbreviation' => 'g1',
                 'is_public' => 1,
-                'max_courses' => 4,
-                'max_lines' => 26
+                'max_courses' => 3,
             ]);
     }
 
@@ -129,7 +130,7 @@ class GroupsTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($admin, 'group1', 'g1', 1);
+        $response = $this->createGroup($admin, 'group1', 'g1', 1, 4);
         $id = $response->json('id');
 
         // Update the group
@@ -137,14 +138,16 @@ class GroupsTest extends TestCase {
             ->put("/api/groups/$id", [
                 'name' => 'group2',
                 'abbreviation' => 'g2',
-                'is_public' => 0
+                'is_public' => 0,
+                'max_courses' => 5
             ]);
 
         $response->assertStatus(200)
             ->assertJson([
                 'name' => 'group2',
                 'abbreviation' => 'g2',
-                'is_public' => 0
+                'is_public' => 0,
+                'max_courses' => 5
             ]);
     }
 
@@ -153,7 +156,7 @@ class GroupsTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($admin, 'group1', 'g1', 1);
+        $response = $this->createGroup($admin, 'group1', 'g1', 1, 2);
         $id = $response->json('id');
 
         // Login as a student
@@ -164,7 +167,8 @@ class GroupsTest extends TestCase {
             ->put("/api/groups/$id", [
                 'name' => 'group2',
                 'abbreviation' => 'g2',
-                'is_public' => 0
+                'is_public' => 0,
+                'max_courses' => 3
             ]);
 
         $response->assertStatus(404)
@@ -179,7 +183,7 @@ class GroupsTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($admin, 'group1', 'g1', 1);
+        $response = $this->createGroup($admin, 'group1', 'g1', 1, 2);
         $id = $response->json('id');
 
         // Delete the group
@@ -194,7 +198,7 @@ class GroupsTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($admin, 'group1', 'g1', 1);
+        $response = $this->createGroup($admin, 'group1', 'g1', 1, 3);
         $id = $response->json('id');
 
         // Login as a student
