@@ -139,7 +139,7 @@ class AuthController extends Controller {
     public function update(Request $request, $id) {
 
         // Validar que l'usuari sigui administrador
-        if (auth()->user()->is_admin === 0) {
+        if (auth()->user()->role_id !== 1) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tens permisos d\'administrador.'

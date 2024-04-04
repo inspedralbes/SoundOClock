@@ -4,7 +4,7 @@ import { formatDate } from '../utils';
 export default {
     name: 'Calendar',
     props: {
-        date: Date,
+        date: String,
         isVotingBannedDate: Boolean
     },
     data() {
@@ -17,8 +17,7 @@ export default {
         }
     },
     created() {
-        this.range.start = new Date(),
-        this.range.end = new Date(this.date)
+       this.updateDate();
     },
     methods: {
         formatDate(date) {

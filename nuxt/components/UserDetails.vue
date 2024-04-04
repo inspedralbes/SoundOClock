@@ -42,13 +42,14 @@ export default {
       this.votingBannedUntil = null;
       this.proposingBannedUntil = null;
 
-      if (isVotingBannedDate == "true") {
+      if (isVotingBannedDate == true) {
         this.votingBannedUntil = range.end;
       } else {
         this.proposingBannedUntil = range.end;
       }
     },
     formatDateToLaravel(date) {
+      console.log("DATE", date);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
@@ -77,7 +78,7 @@ export default {
     formatDate(user.vote_banned_until) }}</p>
         <p v-else class="mb-8 text-xl text-center font-black">L'usuari no té limitada la capacitat de votar cançons</p>
         <h2 class="text-2xl mb-4 text-center">LIMITAR VOTAR CANÇONS</h2>
-        <Calendar class="mb-8" v-bind:date="user.vote_banned_until" isVotingBannedDate=true @changeDate="changeDate" />
+        <Calendar class="mb-8" v-bind:date="user.vote_banned_until" :isVotingBannedDate=true @changeDate="changeDate" />
         <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded me-2"
           @click="banUser(true)">LIMITAR VOTACIONS</button>
         <button class="w-fit bg-gray-400 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded"
@@ -90,7 +91,7 @@ export default {
         <p v-else class="mb-8 text-xl text-center font-black">L'usuari no té limitada la capacitat de proposar cançons
         </p>
         <h2 class="text-2xl mb-4 text-center">LIMITAR PROPOSAR CANÇONS</h2>
-        <Calendar class="mb-8" v-bind:date="user.propose_banned_until" isVotingBannedDate=false
+        <Calendar class="mb-8" v-bind:date="user.propose_banned_until" :isVotingBannedDate=false
           @changeDate="changeDate" />
         <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded me-2"
           @click="banUser(false)">LIMITAR PROPOSTES</button>

@@ -2,8 +2,8 @@
     <div v-if="!loading">
         <h1 class="text-4xl text-white text-center font-black mt-4 mb-8">BLOQUEJAR USUARIS</h1>
         <div class="flex flex-row mt-8">
-            <div class="w-1/3 ml-20">
-                <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
+            <div class="contenidor-a w-1/3 ml-20 overflow-y-auto ">
+                <div class="width flex flex-col justify-center ml-auto mr-auto gap-3">
                     <button v-for="user in users" @click="selectUser(user)"
                         class="h-16 flex flex-row justify-between items-center rounded-lg p-3" :class="isSelected(user)">
                         <div class="flex flex-row items-center gap-2">
@@ -77,6 +77,11 @@ export default {
 </script>
 
 <style scoped>
+
+.contenidor-a {
+  height: 85vh;
+}
+
 .contenidor-canço--not-selected {
     background-color: rgb(56, 56, 56);
     color: white;

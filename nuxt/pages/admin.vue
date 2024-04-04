@@ -79,6 +79,7 @@ export default {
                 // 0: resolveComponent('AdminAlarmsCrud'),
                 1: resolveComponent('AdminGroupsCrud'),
                 2: resolveComponent('BanSong'),
+                3: resolveComponent('BanUser'),
                 // 3: resolveComponent('AdminSettingsCrud')
                 4: resolveComponent('AdminBlackListCrud')
 
