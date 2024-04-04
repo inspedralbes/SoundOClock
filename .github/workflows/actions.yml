@@ -60,6 +60,14 @@ jobs:
       - name: Obtaining repository code
         uses: actions/checkout@v4
 
+      - name: Engegar Laravel
+        run: |
+          cd laravel 
+          composer install
+          cp .env.example .env
+          php artisan migrate --env=testing
+          php artisan migrate:fresh --seed
+
       - name: Checking Node
         run: |
           cd node
