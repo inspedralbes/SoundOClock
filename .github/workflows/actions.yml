@@ -6,7 +6,7 @@ on:
       - actions
 
 jobs:
-  LARAVEL TEST:
+  LARAVEL-TEST:
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -25,10 +25,10 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: mongopassword
 
     steps:
-      - name: Obtenint el codi del respositori
+      - name: Obtaining repository code
         uses: actions/checkout@v4
 
-      - name: Comprovant Laravel
+      - name: Checking Laravel
         run: |
           cd laravel 
           composer install
@@ -37,6 +37,7 @@ jobs:
           php artisan migrate:fresh --seed
           php artisan test
       - run: echo "🍏 This job's status is ${{ job.status }}."
+
   NODE-TEST:
     runs-on: ubuntu-latest
     services:
@@ -56,18 +57,10 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: mongopassword
 
     steps:
-      - name: Obtenint el codi del respositori
+      - name: Obtaining repository code
         uses: actions/checkout@v4
 
-      - name: Comprovant Laravel
-        run: |
-          cd laravel 
-          composer install
-          cp .env.example .env
-          php artisan migrate --env=testing
-          php artisan migrate:fresh --seed
-          php artisan serve > /dev/null 2>&1 &
-      - name: Comprovant Node
+      - name: Checking Node
         run: |
           cd node
           npm install
@@ -75,4 +68,3 @@ jobs:
           npm run dev -- --host=127.0.0.1 > node.log 2>&1 &
           npm run test -- --host=127.0.0.1
       - run: echo "🍏 This job's status is ${{ job.status }}."
-  
