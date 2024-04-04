@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="!loading">
         <h2 class="text-white text-center mb-8">CENSURAR CANÇÓ</h2>
         <div class="flex flex-row mt-8">
             <div class="w-1/3 ml-20">
@@ -24,7 +24,8 @@
                                 <p class="basis-1/3">{{ song.votes }} vots</p>
                             </div>
                         </div>
-                        <div v-if="song.reports.length > 0">
+                        <!-- <div v-if="song.reports.length > 0"> -->
+                        <div>
                             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
                                 fill="rgb(239 68 68)"
                                 class="icon icon-tabler icons-tabler-filled icon-tabler-alert-circle">
@@ -60,7 +61,7 @@ export default {
             this.song = selectedSong;
         }
     },
-    mounted() {
+    created() {
         this.loading = true;
         // setUserFromLocalStorage();
         comManager.getAdminSongs();
