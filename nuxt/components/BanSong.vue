@@ -46,7 +46,6 @@
 
 <script>
 import { useAppStore } from '@/stores/app';
-// import { setUserFromLocalStorage } from '../utils';
 import comManager from '../communicationManager';
 
 export default {
@@ -63,7 +62,6 @@ export default {
     },
     created() {
         this.loading = true;
-        // setUserFromLocalStorage();
         comManager.getAdminSongs();
         this.loading = false;
     },
