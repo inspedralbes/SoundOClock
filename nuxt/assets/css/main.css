@@ -12,6 +12,10 @@ body {
     font-variation-settings: 'FILL' 1;
 }
 
+.vc-header {
+    margin-bottom: 1em;
+}
+
 .vc-weekdays {
     margin-bottom: 1em;
 }
