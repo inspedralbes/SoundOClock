@@ -153,7 +153,34 @@ async function searchSongId(id, token) {
 }
 
 async function getGroups(token){
-  const response = await axios.get(`${apiURL}groups`);
+  const response = await axios.get(`${apiURL}groupsAll`);
+  return response.data;
+}
+
+async function updateGroup(token,group){
+  const response = await axios.put(`${apiURL}groups/${group.id}`, group, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  return response.data;
+}
+
+async function deleteGroup(token,id){
+  const response = await axios.delete(`${apiURL}groups/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    }
+  });
+  return response.data;
+}
+
+async function getPublicGroups(token){
+  const response = await axios.get(`${apiURL}groups`, {
+    headers: {
+      "Authorization": "Bearer " + token,
+    }
+  });
   return response.data;
 }
 
@@ -165,6 +192,33 @@ async function fetchSpotifyPage(id) {
     console.error('Error fetching Spotify page:', error);
     return null;
   }
+}
+
+async function getUsers(token) {
+  const response = await fetch(apiURL + 'users', {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
+async function banUser(token, user) {
+  const response = await fetch(apiURL + 'user/' + user.id, {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify(user)
+  });
+  console.log("BAN USER", response);
+  return response;
 }
 
 
@@ -180,7 +234,12 @@ const comManager = {
   searchSong,
   searchSongId,
   getGroups,
+  getPublicGroups,
   fetchSpotifyPage,
+  getUsers,
+  banUser,
+  deleteGroup,
+  updateGroup
 };
 
 export default comManager;

@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 import { useAppStore } from "./stores/app";
 import { useRouter } from 'vue-router';
-import { getUserSelectedSongs, getSongs, getAdminSongs } from './communicationManager';
+import comManager from './communicationManager';
 
 const router = useRouter();
 
@@ -12,13 +12,13 @@ export const socket = io(url);
 socket.on("connect", () => {
   const pinia = useAppStore();
 
-  getUserSelectedSongs(1);
+  comManager.getUserSelectedSongs(1);
   // getSongs();
 
   socket.on("voteCasted", (data) => {
     console.log("socket voteCasted data received: ", data.song);
-    getSongs();
-    getUserSelectedSongs(pinia.getUser().id);
+    comManager.getSongs();
+    comManager.getUserSelectedSongs(pinia.getUser().id);
     pinia.setIsLoadingVote({ state: false, selectedSong: null });
   });
 
@@ -28,14 +28,16 @@ socket.on("connect", () => {
 
   socket.on("songDeleted", (data) => {
     console.log("socket songDeleted data received: ", data.song);
-    getSongs();
-    getAdminSongs();
+    comManager.getSongs();
+    comManager.getAdminSongs();
   });
 
-
+  socket.on("userBanned", (data) => {
+    console.log("socket userBanned data received: ", data.message);
+  });
 
   socket.on("loginData", (id, mail, name, group, token) => {
-    console.log("socket loginData data received: ", id, mail, name, group, token);
+    // console.log("socket loginData data received: ", id, mail, name, group, token);
     pinia.setUser(id, mail, name, group, token);
     if (pinia.getUser().group) {
       navigateTo({ path: '/llista_propostes' });
@@ -48,46 +50,53 @@ socket.on("connect", () => {
     pinia.setClassGroups(data);
   });
 
+  socket.on('groupDeleted', (data) => {
+    pinia.deleteGroup(data.group_id);
+  });
+
+  socket.on('groupUpdated', (data) => {
+  });
+
   socket.on("disconnect", () => {
-  
+
   });
 
   // FUNCTIONS START
-function getUserSelectedSongs(id) {
-  fetch(`${url}/votingRecords/${id}`)
-    .then(response => response.json())
-    .then(data => {
-      // console.log("user: ", data);
-      pinia.setUserSelectedSongs(data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-}
+  function getUserSelectedSongs(id) {
+    fetch(`${url}/votingRecords/${id}`)
+      .then(response => response.json())
+      .then(data => {
+        // console.log("user: ", data);
+        pinia.setUserSelectedSongs(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }
 
-function getSongs() {
-  fetch('${url}/songs')
-    .then(response => response.json())
-    .then(data => {
-      console.log("songs: ", data);
-      pinia.setProposedSongs(data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-}
+  function getSongs() {
+    fetch('${url}/songs')
+      .then(response => response.json())
+      .then(data => {
+        console.log("songs: ", data);
+        pinia.setProposedSongs(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }
 
-function getAdminSongs() {
-  fetch('${url}/adminSongs')
-    .then(response => response.json())
-    .then(data => {
-      console.log("songs: ", data);
-      pinia.setProposedSongsAdminView(data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-}
+  function getAdminSongs() {
+    fetch('${url}/adminSongs')
+      .then(response => response.json())
+      .then(data => {
+        console.log("songs: ", data);
+        pinia.setProposedSongsAdminView(data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }
 });
 
 

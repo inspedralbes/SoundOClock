@@ -4,10 +4,11 @@
 </template>
 
 <style>
-
 body {
   margin: 0;
-  width: 99vw;
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 #__nuxt {
@@ -19,5 +20,4 @@ body {
 .grow {
   flex-grow: 1;
 }
-
 </style>

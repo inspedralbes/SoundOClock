@@ -13,6 +13,14 @@ class GroupsController extends Controller
      */
     public function index() {
         return Group::where('is_public', '<>', 0)->get();
+        // return Group::all();
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function indexAll() {
+        return Group::all();
     }
 
     /**
@@ -88,7 +96,12 @@ class GroupsController extends Controller
             ], 404);
         }
 
-        return Group::destroy($id);
+        Group::destroy($id);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Group successfully deleted.',
+            'group_id' => $id
+        ],200);
     }
 
     // Return all groups from the user

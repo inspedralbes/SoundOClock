@@ -1,8 +1,8 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import { socket } from '../socket';
-import { setUserFromLocalStorage } from '../utils';
-import { getUserSelectedSongs, getSongs } from '../communicationManager';
+// import { setUserFromLocalStorage } from '../utils';
+import comManager from '../communicationManager';
 
 export default {
     data() {
@@ -21,9 +21,9 @@ export default {
     mounted() {
         this.loading = true;
 
-        setUserFromLocalStorage();
-        getUserSelectedSongs(this.store.getUser().id);
-        getSongs();
+        // setUserFromLocalStorage();
+        comManager.getUserSelectedSongs(this.store.getUser().id);
+        comManager.getSongs();
         this.loading = false;
     },
     methods: {
@@ -87,8 +87,11 @@ export default {
             this.showReportModal = false;
         },
         report() {
-            const song = {songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
+            const song = { songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
             socket.emit('reportSong', this.store.getUser().token, song);
+        },
+        goToProposar() {
+            this.$router.push('/llistatPerProposar');
         }
     },
     watch: {
@@ -105,7 +108,9 @@ export default {
             return this.store.getFilter();
         },
         songs() {
-            return this.store.getProposedSongs();
+            let songs = this.store.getProposedSongs();
+            console.log("SONGS", songs);
+            return songs;
         },
     },
     setup() {
@@ -121,14 +126,34 @@ export default {
         <h2>Loading...</h2>
     </div>
     <div v-else class="flex flex-col">
-        <div class="width margen w-4/5 ml-auto mr-auto">
-            <Cercador @search="search" />
+        <div class="width margen w-4/5 h-10 ml-auto mr-auto flex items-center">
+            <div class="grow">
+                <Cercador @search="search" />
+            </div>
+
         </div>
-        <div class="width margenb mb-10 w-4/5 ml-auto mr-auto">
-            <FilterButtons @applyFilter="applyFilter" />
+        <div class="width margenb mb-10 w-4/5 h-fit ml-auto mr-auto flex items-center justify-center gap-1">
+            <FilterButtons @applyFilter="applyFilter" class="grow basis-3/4" />
+            <div class="flex items-center justify-center basis-1/4">
+                <button @click="goToProposar()"
+                    class="bg-gray-600 hover:bg-gray-700 h-full w-full md:w-1/2 md:ml-auto flex items-center justify-center rounded">
+                    <span class="material-symbols-rounded text-white font-bold text-4xl">
+                        add
+                    </span>
+                </button>
+            </div>
         </div>
         <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
-            <Song v-for="song in filteredSongs" @openModal="openModal" @openReportModal="openReportModal" v-bind:song="song" />
+            <Song v-for="song in filteredSongs" @openModal="openModal" @openReportModal="openReportModal"
+                v-bind:song="song" />
+        </div>
+        <div
+            class="h-16 w-1/2 md:w-1/4 bg-gray-600 hover:bg-gray-700 rounded flex items-center justify-center mx-auto mb-10">
+            <button @click="goToProposar()" class="h-full w-full flex items-center justify-center px-10">
+                <span class="material-symbols-rounded text-white font-bold text-4xl">
+                    add
+                </span>
+            </button>
         </div>
         <div @click="showModal = false">
             <transition name="fade">
@@ -141,9 +166,13 @@ export default {
         </div>
         <div v-if="showReportModal" class="modal">
             <div class="report-modal-content">
-                <button type="button" class="float-end bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none" @click="closeReportModal()">
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <button type="button"
+                    class="float-end bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
+                    @click="closeReportModal()">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
                 <div class="clear-both flex flex-col justify-center items-center">
@@ -155,14 +184,17 @@ export default {
                         <path d="M12 8v4" />
                         <path d="M12 16h.01" />
                     </svg>
-                    <p class="mb-8">Per quin motiu vols reportar la cançó {{ reportSongData.reportedSong.title }} de {{ reportSongData.reportedSong.artist}}?</p>
+                    <p class="mb-8">Per quin motiu vols reportar la cançó {{ reportSongData.reportedSong.title }} de {{
+        reportSongData.reportedSong.artist }}?</p>
                     <div class="flex flex-col justify-start items-start mb-4">
                         <label v-for="(option, index) in reportSongData.options" class="mb-2">
-                            <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
+                            <input type="radio" v-model="reportSongData.selectedOption" :value="option"
+                                name="report-option">
                             <span class="ml-2">{{ option }}</span>
                         </label>
                     </div>
-                    <button @click="report()" class="self-end bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">REPORTAR</button>
+                    <button @click="report()"
+                        class="self-end bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">REPORTAR</button>
                 </div>
             </div>
         </div>
@@ -195,8 +227,6 @@ export default {
 .margenb {
     margin-bottom: 1rem;
 }
-
-/* */
 
 .modal {
     position: fixed;
@@ -236,7 +266,7 @@ export default {
     opacity: 0;
 }
 
-@media screen and (min-width: 640px) {
+@media screen and (min-width: 740px) {
     .width {
         width: 55%;
     }

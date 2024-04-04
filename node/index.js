@@ -112,6 +112,24 @@ app.get('/adminSongs', async (req, res) => {
   }
 });
 
+app.get('/users/:userToken', async (req, res) => {
+  try {
+    let users = await comManager.getUsers(req.params.userToken);
+    res.json(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get('/publicGroups', async (req, res) => {
+  try {
+    const groups = await comManager.getPublicGroups();
+    res.json(groups);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {
@@ -359,6 +377,26 @@ io.on('connection', (socket) => {
       });
   })
 
+  socket.on('deleteGroup', (token, groupId) => {
+    comManager.deleteGroup(token, groupId)
+      .then((response) => {
+        socket.emit('groupDeleted', response);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  });
+
+  socket.on('updateGroup', (token, groupName) => {
+    comManager.updateGroup(token, groupName)
+      .then((response) => {
+        socket.emit('groupUpdated', response);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  });
+
 
   socket.on('getTopSongs', (playlist) => {
     console.log('getTopSongsStart');
@@ -402,15 +440,20 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('getGroups', (token) => {
-    comManager.getGroups(token)
-      .then((groups) => {
-        socket.emit('sendGroups', groups);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  })
+  socket.on('banUser', async (userToken, bannedUser) => {
+    // Check that the user is authenticated with Laravel Sanctum and is an admin
+    let user = await comManager.getUserInfo(userToken);
+    if (!user.id || user.role_id !== 1) return;
+    
+    try {
+      // Ban user
+      comManager.banUser(userToken, bannedUser);
+      
+      io.emit('userBanned', { status: 'success', message: `L'usuari' ${bannedUser.name} ha sigut bloquejat` });
+    } catch (err) {
+      socket.emit('reportError', { status: 'error', message: err.message });
+    }
+  });
 
   socket.on('disconnect', () => {
     console.log('user disconnected');

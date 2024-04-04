@@ -25,6 +25,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Public routes
 Route::post('/login', [AuthController::class,'login']);
 Route::get('/groups', [GroupsController::class, 'index']);
+Route::get('/groupsAll', [GroupsController::class, 'indexAll']);
+Route::post('/groups', [GroupsController::class, 'store']);
+Route::delete('/groups/{id}', [GroupsController::class, 'destroy']);
+Route::get('/groups/{id}', [GroupsController::class, 'show']);
+Route::put('/groups/{id}', [GroupsController::class, 'update']);
+Route::get('/classgroups', [ClassGroupsController::class, 'index']);
+Route::get('/users', [AuthController::class, 'index']);
+
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -35,13 +43,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/blacklist/{id}', [BlacklistController::class,'show']);
     Route::post('/blacklist', [BlacklistController::class,'store']);
     Route::delete('/blacklist/{id}', [BlacklistController::class,'destroy']);
+    Route::put('/user/{id}', [AuthController::class, 'update']);
 
     // Groups routes
     Route::post('/groups', [GroupsController::class, 'store']);
+    Route::delete('/groups/{id}', [GroupsController::class, 'destroy']);
     Route::get('/groups/{id}', [GroupsController::class, 'show']);
     Route::put('/groups/{id}', [GroupsController::class, 'update']);
-    Route::delete('/groups/{id}', [GroupsController::class, 'destroy']);
-
+    
     // Groups & Users routes
     Route::get('/getGroupsFromUser/{user_id}', [GroupsController::class, 'getGroupsFromUser']);
     Route::post('/addGroupsToUser/{user_id}', [GroupsController::class, 'addGroupsToUser']);

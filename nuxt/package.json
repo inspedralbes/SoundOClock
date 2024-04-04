@@ -20,6 +20,7 @@
     "@pinia-plugin-persistedstate/nuxt": "^1.2.0"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^6.11.4"
+    "@nuxtjs/tailwindcss": "^6.11.4",
+    "@samk-dev/nuxt-vcalendar": "^1.0.2"
   }
 }
