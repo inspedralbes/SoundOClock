@@ -167,7 +167,18 @@ io.on('connection', (socket) => {
   socket.on('googleLogin', (userToken) => {
     comManager.googleLogin(userToken)
       .then((userData) => {
-        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, userData.token);
+
+        let groups = [];
+        // Populate groups array with group_id and course
+        userData.user.groups.forEach(group => {
+          let groupObject = {
+            group_id: group.pivot.group_id,
+            course: group.pivot.course,
+          }
+          groups.push(groupObject);
+        });
+
+        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.token, groups);
       })
       .catch((err) => {
         console.error(err);
