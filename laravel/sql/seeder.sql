@@ -17,9 +17,9 @@ INSERT INTO users (name, email, created_at, updated_at, role_id, vote_banned_unt
 ('raul', 'raul@gmail.com', NOW(), NOW(), 4, null, null);
 
 INSERT INTO blacklist (nom, spotify_id) VALUES
-('Anaconda', 1),
-('Drugstory', 2),
-('Bitch Mode', 3);
+('Nonstop', '0TlLq3lA83rQOYtrqBqSct'),
+('Red Sun', '5lwWpQ71GKN3sWmk8zZr9g'),
+('Danza Kuduro', '4sCSUQnWQ6HJsOMjfPicdn');
 
 INSERT INTO `groups` (name, abbreviation, is_public, max_courses) VALUES
 ('Escola Secundaria Obligatoria', 'ESO', 1, 4),

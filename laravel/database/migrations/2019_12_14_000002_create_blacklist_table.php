@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('blacklist', function (Blueprint $table) {
             $table->id();
             $table->string('nom');
-            $table->unsignedBigInteger('spotify_id');
+            $table->string('spotify_id');
             $table->timestamps();
         });
     }

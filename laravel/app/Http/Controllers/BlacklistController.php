@@ -218,15 +218,18 @@ class BlacklistController extends Controller
             ], 404);
         }
         
-        // Check that the song exists
-        $song = Blacklist::find($id);
+        // Check that the song exists in the blacklist cheking the idSoptify
+        $song = Blacklist::where('spotify_id', $id)->first();
         if ($song == null) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'The song does not exist.'
             ], 404);
         }
-
-        return Blacklist::destroy($id);
-    }
+        
+        // Delete the song
+        $song->delete();
+        
+        return response()->json($song); 
+        }
 }
