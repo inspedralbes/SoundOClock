@@ -4,8 +4,8 @@
             <span>ID</span>
             <span>Abreviatura</span>
             <span>Grup</span>
-            <span>Núm. Grups</span>
-            <span>Núm. Linies</span>
+            <!-- <span>Núm. Grups</span> -->
+            <!-- <span>Núm. Linies</span> -->
             <span>Public</span>
             <span>Accions</span>
         </div>
@@ -13,8 +13,8 @@
             <span>{{ group.id }}</span>
             <input type="text" v-model="group.abbreviation" :disabled="!group.editing">
             <input type="text" v-model="group.name" :disabled="!group.editing">
-            <input type="number" v-model="group.max_courses" min="1" :disabled="!group.editing">
-            <input type="number" v-model="group.max_lines" min="1" :disabled="!group.editing">
+            <!-- <input type="number" v-model="group.max_courses" min="1" :disabled="!group.editing"> -->
+            <!-- <input type="number" v-model="group.max_lines" min="1" :disabled="!group.editing"> -->
             <ModularSwitch :value="group.is_public" @input="group.is_public = $event" />
             <span v-if="!group.editing">
                 <button class="edit" @click="startEditing(index)">Editar</button>
@@ -96,7 +96,8 @@ export default {
 <style scoped>
 .grid {
     display: grid;
-    grid-template-columns: .1fr .3fr 1fr .3fr .3fr .2fr .5fr;
+    /* grid-template-columns: .1fr .3fr 1fr .3fr .3fr .2fr .5fr; */
+    grid-template-columns: .1fr .3fr 1fr .2fr .5fr;
     gap: 5px;
     padding: 1rem;
 }
