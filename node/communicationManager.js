@@ -221,6 +221,19 @@ async function banUser(token, user) {
   return response;
 }
 
+async function getBells(token) {
+  const response = await fetch(apiURL + 'bells', {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
 
 const comManager = {
   getUserInfo,
@@ -239,7 +252,8 @@ const comManager = {
   getUsers,
   banUser,
   deleteGroup,
-  updateGroup
+  updateGroup,
+  getBells
 };
 
 export default comManager;

@@ -33,3 +33,20 @@ INSERT INTO `groups` (name, abbreviation, is_public, max_courses) VALUES
 ('Curs d''especialització en Desenvolupament de Videojocs', 'CE', 1, 2),
 ('Programes de Formació i Inserció', 'PFI', 1, 2),
 ('Direcció', 'DIR', 0, 1);
+
+INSERT INTO `bells` (hour) VALUES
+('08:00'),
+('09:00'),
+('10:00'),
+('11:00'),
+('11:30'),
+('12:30'),
+('13:30'),
+('14:30'),
+('15:30'),
+('16:30'),
+('17:30'),
+('18:00'),
+('19:00'),
+('20:00'),
+('21:00');
