@@ -55,6 +55,14 @@ socket.on("connect", () => {
   socket.on('groupUpdated', (data) => {
   });
 
+  socket.on('songPosted', (data) => {
+    console.log("socket songPosted data received: ", data)
+  });
+
+  socket.on('postError', (data) => {
+    console.log("socket postError data received: ", data)
+  });
+
   socket.on("disconnect", () => {
 
   });
