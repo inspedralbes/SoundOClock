@@ -75,6 +75,31 @@ async function logout(token) {
   return response;
 }
 
+async function getBlackList(token) {
+  console.log("Get Blacklist: " + apiURL + 'blacklist')
+  const response = await fetch(apiURL + 'blacklist', {
+      method: 'GET',
+      headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer " + token,
+      },
+  });
+  return response;
+}
+
+async function removeSongFromBlacklist(token, songSpotifyId) {
+  const response = await fetch(apiURL + 'blacklist/' + songSpotifyId, {
+      method: 'DELETE',
+      headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer " + token,
+      }
+  });
+  return response;
+}
+
 async function addSongToBlackList(token, song) {
   const response = await fetch(apiURL + 'blacklist', {
     method: 'POST',
@@ -84,8 +109,10 @@ async function addSongToBlackList(token, song) {
       "Authorization": "Bearer " + token,
     },
     body: JSON.stringify({
-      nom: song.title,
       spotify_id: song.id,
+      title: song.title,
+      artist: song.artist,
+      image: song.image,
     })
   });
   return response;
@@ -238,6 +265,8 @@ const comManager = {
   loginUserAndAdmin,
   login,
   logout,
+  getBlackList,
+  removeSongFromBlacklist,
   addSongToBlackList,
   getPlaylists,
   getPlaylistSongs,
