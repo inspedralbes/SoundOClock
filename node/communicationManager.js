@@ -214,8 +214,21 @@ async function banUser(token, user) {
     },
     body: JSON.stringify(user)
   });
-  // console.log("BAN USER", response);
   return response;
+}
+
+async function setUserGroups(userId, token, groups) {
+  const response = await fetch(apiURL + 'addGroupsToUser/' + userId, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify(groups)
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
 }
 
 
@@ -236,7 +249,8 @@ const comManager = {
   getUsers,
   banUser,
   deleteGroup,
-  updateGroup
+  updateGroup,
+  setUserGroups,
 };
 
 export default comManager;
