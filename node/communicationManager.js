@@ -88,8 +88,8 @@ async function getBlackList(token) {
   return response;
 }
 
-async function removeSongFromBlacklist(token, song) {
-  const response = await fetch(apiURL + 'blacklist/' + song.id, {
+async function removeSongFromBlacklist(token, songSpotifyId) {
+  const response = await fetch(apiURL + 'blacklist/' + songSpotifyId, {
       method: 'DELETE',
       headers: {
           "Content-Type": "application/json",
@@ -109,8 +109,10 @@ async function addSongToBlackList(token, song) {
       "Authorization": "Bearer " + token,
     },
     body: JSON.stringify({
-      nom: song.title,
       spotify_id: song.id,
+      title: song.title,
+      artist: song.artist,
+      image: song.image,
     })
   });
   return response;

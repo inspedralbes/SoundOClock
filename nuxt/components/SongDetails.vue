@@ -12,9 +12,9 @@ export default {
     }
   },
   methods: {
-    deleteSong(songId) {
+    deleteSong(song) {
       console.log("user token", this.store.getUser().token);
-      socket.emit('deleteSong', this.store.getUser().token, songId);
+      socket.emit('deleteSong', this.store.getUser().token, song);
     }
   },
   setup() {
@@ -36,7 +36,7 @@ export default {
           <p class="text-3xl">{{ song.artist }}</p>
         </div>
         <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          @click="deleteSong(song.id)">AFEGIR A LA LLISTA NEGRA</button>
+          @click="deleteSong(song)">AFEGIR A LA LLISTA NEGRA</button>
       </div>
     </div>
     <p class="mb-4 text-xl">CANÇÓ PROPOSADA PER: {{ song.submittedBy }}</p>

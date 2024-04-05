@@ -283,17 +283,12 @@ io.on('connection', (socket) => {
   socket.on('getBlacklist', async (userToken) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
-    if (!user.id || user.is_admin === 0){
-      console.log('no es admin');
-      return;
-    }
+    if (!user.id || user.is_admin === 0) return;
 
     try {
       // Get songs from database
-      console.log('es admin, obteniendo blacklist')
       const response = await comManager.getBlackList(userToken);
       const songs = await response.json();
-      console.log('songs', songs);
       socket.emit('sendBlacklist', songs);
     } catch (err) {
       socket.emit('getBlacklistError', { status: 'error', message: err.message });
@@ -302,20 +297,15 @@ io.on('connection', (socket) => {
 
   // remove a song from the blacklist
   socket.on('removeFromBlacklist', async (userToken, songId) => {
-
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
     if (!user.id || user.is_admin === 0) return;
 
     try {
       // Check if the song exists and delete it
-      const song = await Song.findOneAndDelete({ id: songId });
-      if (!song) {
-        socket.emit('deleteError', { status: 'error', message: 'Song not found' });
-        return;
-      }
+      await Song.findOneAndDelete({ id: songId });
 
-      comManager.removeSongFromBlacklist(userToken, song.id);
+      await comManager.removeSongFromBlacklist(userToken, songId);
 
       socket.emit('songRemovedFromBlacklist', songId);
     } catch (err) {

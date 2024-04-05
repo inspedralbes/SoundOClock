@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('blacklist', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');
             $table->string('spotify_id');
+            $table->string('title');
+            $table->string('artist');
+            $table->string('image')->nullable();
+            $table->string('preview_url')->nullable();
             $table->timestamps();
         });
     }

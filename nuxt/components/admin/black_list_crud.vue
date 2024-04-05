@@ -8,10 +8,10 @@
             class="width mb-3 mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
             <div class="contenidor-img">
                 <img :src=track.img :alt="track.title + '_img'" class="rounded-lg">
-                <button @click="playTrack(track.id)" class="rounded-lg"
-                    :class="{ playingC: isPlayingCheck(track.id), noPlaying: !isPlayingCheck(track.id) }">
+                <button @click="playTrack(track.spotify_id)" class="rounded-lg"
+                    :class="{ playingC: isPlayingCheck(track.spotify_id), noPlaying: !isPlayingCheck(track.spotify_id) }">
                     <!-- fer amb computed la classe -->
-                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded">
+                    <span v-if="currentTrackId === track.spotify_id && isPlaying" class="material-symbols-rounded">
                         pause
                     </span>
                     <span v-else class="material-symbols-rounded">
@@ -27,24 +27,24 @@
 
             <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
 
-                <button @click="modalActual = track.id" class="hover:rounded-lg hover:bg-black flex">
+                <button @click="modalActual = track.spotify_id" class="hover:rounded-lg hover:bg-black flex">
                     <span class="material-symbols-outlined options-span">
                         unarchive
                     </span>
                 </button>
-                <ModularModal v-if="modalActual === track.id" @close="modalActual = null"
-                    @confirm="removeFromBlacklist(track.id)">
+                <ModularModal v-if="modalActual === track.spotify_id" @close="modalActual = null"
+                    @confirm="removeFromBlacklist(track.spotify_id)">
                     <template v-slot:title>
                         <h2>Segur que vols treure aquesta cançó de la blacklist?</h2>
                     </template>
                     <template v-slot:content>
                         <div class="mx-auto contenidor-canço flex flex-row items-center rounded-lg gap-2">
                             <div class="contenidor-img">
-                                <img :src=track.img :alt="track.title + '_img'" class="rounded-lg">
-                                <button @click="playTrack(track.id)" class="rounded-lg"
-                                    :class="{ playingC: isPlayingCheck(track.id), noPlaying: !isPlayingCheck(track.id) }">
+                                <img :src="track.image" :alt="track.title + '_img'" class="rounded-lg">
+                                <button @click="playTrack(track.spotify_id)" class="rounded-lg"
+                                    :class="{ playingC: isPlayingCheck(track.spotify_id), noPlaying: !isPlayingCheck(track.spotify_id) }">
                                     <!-- fer amb computed la classe -->
-                                    <span v-if="currentTrackId === track.id && isPlaying"
+                                    <span v-if="currentTrackId === track.spotify_id && isPlaying"
                                         class="material-symbols-rounded">
                                         pause
                                     </span>
@@ -142,9 +142,9 @@ export default {
             }
         });
 
-        socket.on('songRemovedFromBlacklist', (songId) => {
-            this.tracks = this.tracks.filter(track => track.id !== songId);
-            this.filteredTracks = this.filteredTracks.filter(track => track.id !== songId);
+        socket.on('songRemovedFromBlacklist', (spotify_id) => {
+            this.tracks = this.tracks.filter(track => track.spotify_id !== spotify_id);
+            this.filteredTracks = this.filteredTracks.filter(track => track.spotify_id !== spotify_id);
         });
     },
     methods: {
@@ -182,11 +182,11 @@ export default {
                 return false;
             }
         },
-        removeFromBlacklist(songId) {
-            console.log('Removing track with id:', songId);
+        removeFromBlacklist(spotify_id) {
+            console.log('Removing track with id:', spotify_id);
             // Remove track from blacklist
-            let token = useAppStore.getUser().token;
-            socket.emit('removeFromBlacklist', token, songId);
+            let token = this.store.getUser().token;
+            socket.emit('removeFromBlacklist', token, spotify_id);
         },
     },
     setup() {
