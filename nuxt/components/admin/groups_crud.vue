@@ -15,7 +15,7 @@
             <input type="text" v-model="group.name" :disabled="!group.editing">
             <!-- <input type="number" v-model="group.max_courses" min="1" :disabled="!group.editing"> -->
             <!-- <input type="number" v-model="group.max_lines" min="1" :disabled="!group.editing"> -->
-            <ModularSwitch :value="group.is_public" @input="group.is_public = $event" />
+            <ModularSwitch :value="group.is_public" :canSwitch="group.editing" @input="handleSwitch(group,$event)" />
             <span v-if="!group.editing">
                 <button class="edit" @click="startEditing(index)">Editar</button>
                 <button class="delete" @click="openModal('deleteGroup',index,group.id)">Eliminar</button>
@@ -88,6 +88,17 @@ export default {
         saveEdit(index, group) {
             group.editing = false;
             socket.emit('updateGroup', this.store.getUser().token, group);
+        },
+        handleSwitch(group, value) {
+            switch (value) {
+                case true:
+                    value = 1;
+                    break;
+                case false:
+                    value = 0;
+                    break;
+            }
+            group.is_public = value;
         },
     },
 }
