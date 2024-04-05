@@ -123,22 +123,16 @@ export default {
         <h2>Loading...</h2>
     </div>
     <div v-else class="flex flex-col">
-        <div class="width margen w-4/5 h-10 ml-auto mr-auto flex items-center">
+        <div class="title text-white text-center text-4xl font-bold my-5">
+            <h1>VOTAR CANÇONS</h1>
+        </div>
+        <div class="width w-4/5 h-10 ml-auto mr-auto flex items-center">
             <div class="grow">
                 <Cercador @search="search" />
             </div>
-
         </div>
-        <div class="width margenb mb-10 w-4/5 h-fit ml-auto mr-auto flex items-center justify-center gap-1">
+        <div class="width w-4/5 h-fit ml-auto mr-auto flex items-center justify-center gap-1">
             <FilterButtons @applyFilter="applyFilter" class="grow basis-3/4" />
-            <div class="flex items-center justify-center basis-1/4">
-                <button @click="goToProposar()"
-                    class="bg-gray-600 hover:bg-gray-700 h-full w-full md:w-1/2 md:ml-auto flex items-center justify-center rounded">
-                    <span class="material-symbols-rounded text-white font-bold text-4xl">
-                        add
-                    </span>
-                </button>
-            </div>
         </div>
         <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
             <Song v-for="song in filteredSongs" @openModal="openModal" @openReportModal="openReportModal"
