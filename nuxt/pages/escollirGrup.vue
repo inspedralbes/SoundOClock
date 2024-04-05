@@ -23,7 +23,10 @@
             </div>
             <div class="mt-6 w-80">
                 <button @click="storeGroup" class="btn flex justify-center p-3 bg-green-600 rounded w-full" :disabled="checkCorrectOptions()">
-                    Següent
+                    <span v-if="storeGroupsLoading" class="py-1">
+                        <Loader />
+                    </span>
+                    <span v-else>Següent</span>
                 </button>
             </div>
         </div>
@@ -43,10 +46,17 @@ export default {
             groups: [],
             disabled: true,
             selectedGroupId: '',
-            selectedCourse: ''
+            selectedCourse: '',
+            storeGroupsLoading: false
         }
     },
     mounted() {
+        let user = this.store.getUser();
+        if (!user.token) {
+            this.$router.push('/');
+        } else if (user.groups.length > 0) {
+            this.$router.push('/llista_propostes');
+        }
         comManager.getPublicGroups().then((groups) => {
             this.groups = groups;
             this.loading = false;
@@ -63,12 +73,22 @@ export default {
 
     methods: {
         storeGroup() {
+            this.storeGroupsLoading = true;
             let groups = [{
                 group_id: this.selectedGroupId,
                 course: this.selectedCourse
             }];
-            this.store.setUserGroups(groups);
-            this.$router.push('/llista_propostes');
+            let userId = this.store.getUser().id;
+            let userToken = this.store.getUser().token;
+            comManager.setUserGroups(userId, groups, userToken).then((data) => {
+                this.storeGroupsLoading = false;
+                console.log("data", data)
+                // Maybe in a future consider to retrieve the user groups from the DB (data variable)
+                // and store them in the store
+
+                this.store.setUserGroups(groups);
+                this.$router.push('/llista_propostes');
+            });
         },
         checkCorrectOptions() {
             let selectedGroup = this.groups.find(group => group.id === this.selectedGroupId);
