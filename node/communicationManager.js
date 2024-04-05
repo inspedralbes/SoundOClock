@@ -92,9 +92,8 @@ async function addSongToBlackList(token, song) {
 }
 
 async function getPlaylists(playlist, limit, token) {
-  console.log("Playlist start", playlist, limit, token);
+  // console.log("Playlist start", playlist, lsimit, token);
   let url = `https://api.spotify.com/v1/search?q=${playlist}&type=playlist&limit=${limit}`;
-  console.log("url", url);
   let response = await fetch(url, {
     headers: {
       'Accept': 'application/json',
@@ -102,19 +101,17 @@ async function getPlaylists(playlist, limit, token) {
     }
   })
   let jsonResponse = await response.json();
-  console.log("respuesta", jsonResponse.playlists.items);
+  // console.log("respuesta", jsonResponse.playlists.items);
   if (jsonResponse.playlists.items) {
-    console.log("playlistID:", jsonResponse.playlists.items[0].id);
+    // console.log("playlistID:", jsonResponse.playlists.items[0].id);
     let songs = await getPlaylistSongs(jsonResponse.playlists.items[0].id, token);
-    console.log("Playlist Songs:", songs);
+    // console.log("Playlist Songs:", songs);
     return songs;
   }
 }
 
 async function getPlaylistSongs(id, token) {
   let limit = 15;
-  console.log("Playlist Songs start");
-  console.log(id);
   let url = `https://api.spotify.com/v1/playlists/${id}/tracks?offset=0&limit=${limit}`;
   let response = await fetch(url, {
     method: 'GET',
@@ -217,7 +214,7 @@ async function banUser(token, user) {
     },
     body: JSON.stringify(user)
   });
-  console.log("BAN USER", response);
+  // console.log("BAN USER", response);
   return response;
 }
 

@@ -50,8 +50,6 @@ export default {
                 // Acceder al AudioPreviewURL
                 const AudioPreviewURL = jsonData.props.pageProps.state.data.entity.audioPreview.url;
 
-                // Ahora AudioPreviewURL contiene la URL del audio
-                console.log("URL del audio:", AudioPreviewURL);
 
                 // Fetch to AudioPreviewURL to get the audio file .mp3 and play it
                 fetch(AudioPreviewURL)
@@ -62,7 +60,6 @@ export default {
                         this.currentTrackId = songId;
                         this.currentTrackStatus = 'playing';
                         this.currentTrack.play();
-                        console.log("Playing song:", this.currentTrackId);
                     })
                     .catch(error => {
                         console.error('Error getting the audio file:', error);
@@ -74,7 +71,6 @@ export default {
     },
     methods: {
         getHtmlSpotify(id) {
-            console.log("getHtmlSpotify", id)
             socket.emit('getHtmlSpotify', id);
         },
         onFileChange(e) {
@@ -90,7 +86,6 @@ export default {
                 let minutes = Math.floor(audio.duration / 60); // get minutes
                 let seconds = Math.floor(audio.duration % 60); // get seconds
                 // let hours = Math.floor(audio.duration / 3600); // get hours
-                console.log('Audio duration:', minutes + ':' + seconds); // log the duration
             };
         },
         getSongs(query) {
@@ -111,11 +106,9 @@ export default {
 
             if (this.currentTrackId == id) {
                 if (this.currentTrackStatus == 'playing') {
-                    console.log('Pausing song:', this.currentTrackId);
                     this.currentTrack.pause();
                     this.currentTrackStatus = 'paused';
                 } else {
-                    console.log('Playing song:', this.currentTrackId);
                     this.currentTrack.play();
                     this.currentTrackStatus = 'playing';
                 }
@@ -125,7 +118,6 @@ export default {
                 let token = "BQDHYS3B6e1y9imeOZGd8YEXjF1yscw5Ag48s-bB95FyfjIC8b2sGpDP0Ejzq0XAjLEtxTbkQkn5Vn1R5z-ZypWmLBrz3KNE5THyNsu_6M6Amqm8Lso"
                 let url = `https://api.spotify.com/v1/tracks/${id}`;
 
-                console.log('Fectch', url);
                 // fetch to /songs/:id to get the song file .mp3 and play it
                 fetch(url, {
                     headers: {
@@ -135,7 +127,6 @@ export default {
                 })
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Data:', data);
                         const previewURL = data.preview_url;
                         return previewURL;
                     })
@@ -153,7 +144,6 @@ export default {
                                     this.currentTrackId = id;
                                     this.currentTrackStatus = 'playing';
                                     this.currentTrack.play();
-                                    console.log("Playing song:", this.currentTrackId);
                                 })
                                 .catch(error => {
                                     console.error('Error getting the audio file:', error);

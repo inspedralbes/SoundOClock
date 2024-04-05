@@ -108,7 +108,6 @@ export default {
         fetch('http://localhost:8080/songs')
             .then(response => response.json())
             .then(data => {
-                console.log("songs: ", data);
                 data = songs;
                 this.tracks = data;
                 this.filteredTracks = data;
@@ -138,9 +137,6 @@ export default {
                 // Acceder al AudioPreviewURL
                 const AudioPreviewURL = jsonData.props.pageProps.state.data.entity.audioPreview.url;
 
-                // Ahora AudioPreviewURL contiene la URL del audio
-                console.log("URL del audio:", AudioPreviewURL);
-
                 // Fetch to AudioPreviewURL to get the audio file .mp3 and play it
                 fetch(AudioPreviewURL)
                     .then(response => response.blob())
@@ -150,7 +146,6 @@ export default {
                         this.currentTrackId = songId;
                         this.currentTrack.play();
                         this.isPlaying = true;
-                        console.log("Playing song:", this.currentTrackId);
                     })
                     .catch(error => {
                         console.error('Error getting the audio file:', error);
@@ -173,11 +168,9 @@ export default {
 
             if (this.currentTrackId == id) {
                 if (this.isPlaying == true) {
-                    console.log('Pausing song:', this.currentTrackId);
                     this.currentTrack.pause();
                     this.isPlaying = false;
                 } else {
-                    console.log('Playing song:', this.currentTrackId);
                     this.currentTrack.play();
                     this.isPlaying = true;
                 }
@@ -196,7 +189,6 @@ export default {
             }
         },
         removeFromBlacklist(trackId) {
-            console.log('Removing track with id:', trackId);
             // Remove track from blacklist
             this.tracks = this.tracks.filter(track => track.id !== trackId);
             this.filteredTracks = this.filteredTracks.filter(track => track.id !== trackId);

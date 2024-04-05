@@ -7,7 +7,6 @@ function getUserSelectedSongs(id) {
     fetch(`${url}/votingRecords/${id}`)
         .then(response => response.json())
         .then(data => {
-            console.log("user selected songs: ", data);
             store.setUserSelectedSongs(data);
         })
         .catch(error => {
@@ -20,7 +19,6 @@ function getSongs() {
     fetch(`${url}/songs`)
         .then(response => response.json())
         .then(data => {
-            console.log("songs: ", data);
             store.setProposedSongs(data);
         })
         .catch(error => {
@@ -33,7 +31,6 @@ function getAdminSongs() {
     fetch(`${url}/adminSongs`)
         .then(response => response.json())
         .then(data => {
-            console.log("songs: ", data);
             store.setProposedSongsAdminView(data);
         })
         .catch(error => {
@@ -46,7 +43,6 @@ export function getUsers() {
     fetch(`${url}/users/${store.getUser().token}`)
         .then(response => response.json())
         .then(data => {
-            console.log("users: ", data);
             store.setUsersAdminView(data);
             store.setAdminSelectedUser(data[0]);
         })

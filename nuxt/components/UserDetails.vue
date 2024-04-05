@@ -20,20 +20,20 @@ export default {
     banUser(isVotingBeingBanned) {
       if (isVotingBeingBanned) {
         this.user.vote_banned_until = this.formatDateToLaravel(this.votingBannedUntil);
-        console.log(`L'usuari ${this.user.name} no pot votar cançons fins ${this.user.vote_banned_until}.`);
+        // console.log(`L'usuari ${this.user.name} no pot votar cançons fins ${this.user.vote_banned_until}.`);
       } else {
         this.user.propose_banned_until = this.formatDateToLaravel(this.proposingBannedUntil);
-        console.log(`L'usuari ${this.user.name} no pot proposar cançons fins ${this.user.propose_banned_until}.`);
+        // console.log(`L'usuari ${this.user.name} no pot proposar cançons fins ${this.user.propose_banned_until}.`);
       }
       socket.emit('banUser', this.store.getUser().token, this.user);
     },
     enableUser(isVotingBeingEnabled) {
       if (isVotingBeingEnabled) {
         this.user.vote_banned_until = null;
-        console.log(`L'usuari ${this.user.name} pot tornar a votar cançons.`);
+        // console.log(`L'usuari ${this.user.name} pot tornar a votar cançons.`);
       } else {
         this.user.propose_banned_until = null;
-        console.log(`L'usuari ${this.user.name} pot tornar a proposar cançons.`);
+        // console.log(`L'usuari ${this.user.name} pot tornar a proposar cançons.`);
       }
       socket.emit('banUser', this.store.getUser().token, this.user);
     },
@@ -49,7 +49,6 @@ export default {
       }
     },
     formatDateToLaravel(date) {
-      console.log("DATE", date);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');

@@ -107,7 +107,6 @@ export default {
         },
         songs() {
             let songs = this.store.getProposedSongs();
-            console.log("SONGS", songs);
             return songs;
         },
     },

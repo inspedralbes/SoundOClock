@@ -48,7 +48,6 @@ export default {
     },
     mounted() {
         comManager.getPublicGroups().then((groups) => {
-            console.log("Groups: ", groups);
             this.groups = groups;
             this.loading = false;
         });
@@ -66,7 +65,6 @@ export default {
         storeGroup() {
             let selectedGroup = this.groups.find(group => group.id === this.selectedGroupId);
             this.store.setUserGroupAndCourse(selectedGroup.abbreviation, this.selectedCourse);
-            console.log("User", this.store.getUser());
             this.$router.push('/llista_propostes');
         },
         checkCorrectOptions() {

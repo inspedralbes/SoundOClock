@@ -146,7 +146,7 @@ async function obtenerActualizarTokenSpotify() {
     }, { headers });
     if (response.data.access_token) {
       spotifyToken = response.data.access_token;
-      console.log('Token de Spotify actualizado:', spotifyToken);
+      console.log('Token de Spotify actualizado');
     } else {
       console.error('No se pudo obtener el token de Spotify.');
     }
@@ -188,7 +188,6 @@ io.on('connection', (socket) => {
 
   // Post song checking for duplicates first
   socket.on('postSong', async (userToken, songData) => {
-    console.log('postSong', userToken, songData);
     // Check that the user is authenticated with Laravel Sanctum
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
@@ -196,7 +195,6 @@ io.on('connection', (socket) => {
     try {
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
-      console.log('existingSong', existingSong);
       if (existingSong) {
         socket.emit('postError', { status: 'error', message: 'Song already exists' });
         return;
@@ -204,7 +202,6 @@ io.on('connection', (socket) => {
 
       // Check if the user already submitted a song
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
-      console.log('votingRecord', votingRecord);
       if (votingRecord && votingRecord.submitted) {
         socket.emit('postError', { status: 'error', message: 'User already submitted a song' });
         return;
@@ -213,7 +210,6 @@ io.on('connection', (socket) => {
       // Save the song and update the voting record
       const newSong = new Song(songData);
       await newSong.save();
-      console.log('newSong saved', newSong);
 
       if (!votingRecord) {
         await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], group: user.class_group_id }).save();
@@ -225,7 +221,7 @@ io.on('connection', (socket) => {
       io.emit('songPosted', { status: 'success', song: songData });
     } catch (err) {
       socket.emit('postError', { status: 'error', message: err.message });
-      console.log('postError', err.message);
+      console.error('postError', err.message);
     }
   });
 
@@ -328,7 +324,6 @@ io.on('connection', (socket) => {
   socket.on('getHtmlSpotify', (songId) => {
     comManager.fetchSpotifyPage(songId).then(html => {
       if (html) {
-        console.log(html);
         socket.emit('sendHtmlSpotify', html, songId);
       }
     });
@@ -336,15 +331,11 @@ io.on('connection', (socket) => {
 
 
   socket.on('getTopSongs', (playlist) => {
-    console.log('getTopSongsStart');
     let limit = 1;
     let songsToEmit = [];
     comManager.getPlaylists(playlist, limit, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
-          console.log("emit topSongs", data);
-          console.log("track", data.items[0].track);
           data.items.forEach(song => {
             songsToEmit.push(song.track);
           });
@@ -355,11 +346,9 @@ io.on('connection', (socket) => {
 
   socket.on('searchSong', (search) => {
     let limit = 15;
-    console.log('searchSongStart');
     comManager.searchSong(search, limit, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
           socket.emit('searchResult', data.tracks.items);
         }
       });
@@ -367,11 +356,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('searchId', (id) => {
-    console.log('searchIdStart');
     comManager.searchSongId(id, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
           socket.emit('searchResultId', data);
         }
       });
@@ -409,15 +396,11 @@ io.on('connection', (socket) => {
 
 
   socket.on('getTopSongs', (playlist) => {
-    console.log('getTopSongsStart');
     let limit = 1;
     let songsToEmit = [];
     comManager.getPlaylists(playlist, limit, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
-          console.log("emit topSongs", data);
-          console.log("track", data.items[0].track);
           data.items.forEach(song => {
             songsToEmit.push(song.track);
           });
@@ -428,11 +411,9 @@ io.on('connection', (socket) => {
 
   socket.on('searchSong', (search) => {
     let limit = 15;
-    console.log('searchSongStart');
     comManager.searchSong(search, limit, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
           socket.emit('searchResult', data.tracks.items);
         }
       });
@@ -440,11 +421,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('searchId', (id) => {
-    console.log('searchIdStart');
     comManager.searchSongId(id, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
           socket.emit('searchResultId', data);
         }
       });

@@ -16,7 +16,6 @@ export default {
     created() {
         this.loading = true;
         comManager.getUserSelectedSongs(this.store.getUser().id);
-        console.log(this.store.getUser());
         this.loading = false;
     },
     methods: {
@@ -26,7 +25,6 @@ export default {
                   this.$emit('openModal');
               } else {
                   this.store.setIsLoadingVote({ state: true, selectedSong: songId });
-                  console.log(songId);
                   socket.emit('castVote', this.store.getUser().token, songId);
               }
           }

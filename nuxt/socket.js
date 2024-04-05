@@ -15,24 +15,24 @@ socket.on("connect", () => {
   // getSongs();
 
   socket.on("voteCasted", (data) => {
-    console.log("socket voteCasted data received: ", data.song);
+    // console.log("socket voteCasted data received: ", data.song);
     comManager.getSongs();
     comManager.getUserSelectedSongs(pinia.getUser().id);
     pinia.setIsLoadingVote({ state: false, selectedSong: null });
   });
 
   socket.on("songReported", (data) => {
-    console.log("socket songReported data received: ", data.message);
+    // console.log("socket songReported data received: ", data.message);
   });
 
   socket.on("songDeleted", (data) => {
-    console.log("socket songDeleted data received: ", data.song);
+    // console.log("socket songDeleted data received: ", data.song);
     comManager.getSongs();
     comManager.getAdminSongs();
   });
 
   socket.on("userBanned", (data) => {
-    console.log("socket userBanned data received: ", data.message);
+    // console.log("socket userBanned data received: ", data.message);
   });
 
   socket.on("loginData", (id, mail, name, token, groups) => {
@@ -76,7 +76,6 @@ socket.on("connect", () => {
     fetch('${url}/songs')
       .then(response => response.json())
       .then(data => {
-        console.log("songs: ", data);
         pinia.setProposedSongs(data);
       })
       .catch(error => {
@@ -88,7 +87,6 @@ socket.on("connect", () => {
     fetch('${url}/adminSongs')
       .then(response => response.json())
       .then(data => {
-        console.log("songs: ", data);
         pinia.setProposedSongsAdminView(data);
       })
       .catch(error => {
