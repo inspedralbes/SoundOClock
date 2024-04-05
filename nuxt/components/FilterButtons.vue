@@ -21,7 +21,7 @@ export default {
 </script>
 
 <template>
-  <div class="flex flex-row horizontal-scroll-container">
+  <div class="flex flex-row horizontal-scroll-container justify-between">
     <div class="radio-card" :class="{ selected: filter === '1' }">
       <input type="radio" id="option1" name="options" value="1" v-model="filter" @change="applyFilter()" />
       <label for="option1">Més votat</label>
@@ -34,12 +34,12 @@ export default {
 
     <div class="radio-card" :class="{ selected: filter === '3' }">
       <input type="radio" id="option3" name="options" value="3" v-model="filter" @change="applyFilter()" />
-      <label for="option3">Titol Alfabeticament</label>
+      <label for="option3">Titol A-Z</label>
     </div>
 
     <div class="radio-card" :class="{ selected: filter === '4' }">
       <input type="radio" id="option4" name="options" value="4" v-model="filter" @change="applyFilter()" />
-      <label for="option4">Autor Alfabeticament</label>
+      <label for="option4">Autor A-Z</label>
     </div>
   </div>
 </template>
@@ -49,12 +49,13 @@ export default {
   background-color: #D9D9D9;
   font-size: 0.75em;
   display: inline-block;
-  margin: 10px 5px;
+  margin: 10px 0;
   padding: 10px;
   border: none;
   border-radius: 20px;
   cursor: pointer;
   transition: background-color 0.5s;
+  color: #000;
 }
 
 .radio-card:hover {

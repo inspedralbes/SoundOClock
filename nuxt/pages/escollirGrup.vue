@@ -1,6 +1,8 @@
 <template>
-    <div class="w-80 mx-auto">
-        <h1 class="text-2xl text-center my-6">Escull el teu grup:</h1>
+    <div class="w-80 mx-auto mt-6">
+        <div class="title text-white text-center text-4xl font-bold my-5">
+            <h1>Escull el teu Grup:</h1>
+        </div>
         <div v-if="loading" class="loading">
             <Loader />
         </div>
