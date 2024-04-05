@@ -51,6 +51,15 @@ export default {
         }
     },
     mounted() {
+        let user = this.store.getUser();
+        console.log(user);
+        if(user.token) {
+            if (this.store.getUser().groups.length > 0) {
+                navigateTo({ path: '/llista_propostes' });
+            } else {
+                navigateTo({ path: '/escollirGrup' });
+            }
+        }
         for (let i = 0; i < 50; i++) {
             this.stars.push({
                 top: Math.random() * window.innerHeight,

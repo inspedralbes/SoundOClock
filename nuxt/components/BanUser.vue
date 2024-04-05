@@ -1,8 +1,8 @@
 <template>
     <div v-if="!loading">
-        <h1 class="text-4xl text-white text-center font-black mt-4 mb-8">BLOQUEJAR USUARIS</h1>
+        <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">BLOQUEJAR USUARIS</h2>
         <div class="flex flex-row mt-8">
-            <div class="contenidor-a w-1/3 ml-20 overflow-y-auto ">
+            <div class="users-container w-1/3 ml-20 overflow-y-auto">
                 <div class="width flex flex-col justify-center ml-auto mr-auto gap-3">
                     <button v-for="user in users" @click="selectUser(user)"
                         class="h-16 flex flex-row justify-between items-center rounded-lg p-3" :class="isSelected(user)">
@@ -32,7 +32,6 @@
 
 <script>
 import { useAppStore } from '@/stores/app';
-import { setUserFromLocalStorage } from '../utils';
 import { getUsers } from '../communicationManager';
 
 export default {
@@ -46,10 +45,10 @@ export default {
             this.store.setAdminSelectedUser(selectedUser);
         },
         isSelected(user) {
-            let style = "contenidor-canço--not-selected";
+            let style = "user-item--not-selected";
 
             if (user.id == this.selectedUser.id) {
-                style = "contenidor-canço--selected";
+                style = "user-item--selected";
             }
 
             return style;
@@ -57,7 +56,6 @@ export default {
     },
     mounted() {
         this.loading = true;
-        setUserFromLocalStorage();
         this.users = getUsers();
         this.loading = false;
     },
@@ -78,21 +76,21 @@ export default {
 
 <style scoped>
 
-.contenidor-a {
+.users-container {
   height: 85vh;
 }
 
-.contenidor-canço--not-selected {
+.user-item--not-selected {
     background-color: rgb(56, 56, 56);
     color: white;
 }
 
-.contenidor-canço--selected {
+.user-item--selected {
     background-color: white;
     color: rgb(56, 56, 56);
 }
 
-.contenidor-canço>*:last-child {
+.user-item>*:last-child {
     justify-self: flex-end;
 }
 

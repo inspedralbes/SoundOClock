@@ -1,7 +1,6 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import { socket } from '../socket';
-// import { setUserFromLocalStorage } from '../utils';
 import comManager from '../communicationManager';
 
 export default {
@@ -20,7 +19,6 @@ export default {
     },
     created() {
         this.loading = true;
-        // setUserFromLocalStorage();
         // comManager.getUserSelectedSongs(this.store.getUser().id);
         comManager.getSongs();
         this.loading = false;
@@ -85,6 +83,8 @@ export default {
             this.showReportModal = false;
         },
         report() {
+            console.log("ENTRO")
+            console.log(this.store.getUser());
             const song = { songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
             socket.emit('reportSong', this.store.getUser().token, song);
         },

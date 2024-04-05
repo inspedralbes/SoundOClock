@@ -63,8 +63,11 @@ export default {
 
     methods: {
         storeGroup() {
-            let selectedGroup = this.groups.find(group => group.id === this.selectedGroupId);
-            this.store.setUserGroupAndCourse(selectedGroup.abbreviation, this.selectedCourse);
+            let groups = [{
+                group_id: this.selectedGroupId,
+                course: this.selectedCourse
+            }];
+            this.store.setUserGroups(groups);
             this.$router.push('/llista_propostes');
         },
         checkCorrectOptions() {
