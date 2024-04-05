@@ -61,12 +61,26 @@ async function getPublicGroups() {
     return data;
 }
 
+async function getBells() {
+    const store = useAppStore();
+    fetch(`${url}/bells/${store.getUser().token}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("bells: ", data);
+            store.setBells(data);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+}
+
 const comManager={
     getUserSelectedSongs,
     getSongs,
     getAdminSongs,
     getUsers,
-    getPublicGroups
+    getPublicGroups,
+    getBells
 };
 
 export default comManager;

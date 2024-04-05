@@ -12,8 +12,9 @@
             </div>
             <div class="groups-bells-container rounded-lg w-2/3 text-white text-center ml-4 mr-4">
                 <div v-for="relation in relations">
-                    <p>{{ relation.bell }}</p>
+                    <p>{{ relation.bell.hour }}</p>
                     <select aria-label="" v-model="relation.groups[0]" @change="changeOption()">
+                        <option :value=null>No té grup assignat</option>
                         <option v-for="group in classGroups" :value="group">{{ group.abbreviation }}</option>
                     </select>
                 </div>
@@ -25,18 +26,27 @@
 <script>
 import { computed } from 'vue';
 import { useAppStore } from '@/stores/app';
+import comManager from '../../communicationManager';
 
 export default {
     data() {
         const store = useAppStore();
         return {
             classGroups: computed(() => store.getClassGroups()),
-            bells: ["08:00", "09:00", "10:00", "11:00", "11:30", "12:30", "13:30"],
+            // bells: ["08:00", "09:00", "10:00", "11:00", "11:30", "12:30", "13:30"],
             relations: []
         }
     },
     created() {
+        this.loading = true;
+        comManager.getBells();
         this.createRelationsStructure();
+        this.loading = false;
+    },
+    watch: {
+        bells: { // Each time the range change execute changeDate() method
+            handler: 'createRelationsStructure',
+        },
     },
     methods: {
         createRelationsStructure() {
@@ -47,7 +57,7 @@ export default {
             for (let i = 0; i < this.bells.length; i++) {
                 relation = {};
                 relation.bell = this.bells[i];
-                relation.groups = [this.classGroups[2]];
+                relation.groups = [null];
 
                 relations.push(relation);
             }
@@ -58,6 +68,12 @@ export default {
         changeOption() {
             console.log(this.relations);
         }
+    },
+    computed: {
+        bells() {
+            console.log("ENTERING COMPUTED")
+            return this.store.getBells();
+        },
     },
     setup() {
         const store = useAppStore();

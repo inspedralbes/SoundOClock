@@ -11,7 +11,12 @@ class BellController extends Controller
      * Display a listing of the resource.
      */
     public function index() {
-        return Bell::all();
+        
+        $bells = Bell::all();
+
+        // foreach ($bells as $bell) {
+        //     $bell->groups()->attach($group['group_id'], ['course' => $group['course']]);
+        // }
     }
 
 }
