@@ -58,12 +58,29 @@ async function getPublicGroups() {
     return data;
 }
 
+async function setUserGroups(userId, groups, token) {
+    const response = await fetch(`${url}/addGroupsToUser`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            userId,
+            groups,
+            token,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
 const comManager={
     getUserSelectedSongs,
     getSongs,
     getAdminSongs,
     getUsers,
-    getPublicGroups
+    getPublicGroups,
+    setUserGroups
 };
 
 export default comManager;

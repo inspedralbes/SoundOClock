@@ -9,6 +9,7 @@ import axios from 'axios';
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -124,6 +125,15 @@ app.get('/publicGroups', async (req, res) => {
   try {
     const groups = await comManager.getPublicGroups();
     res.json(groups);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
+app.post('/addGroupsToUser', async (req, res) => {
+  try {
+    const response = await comManager.setUserGroups(req.body.userId, req.body.token, req.body.groups);
+    res.json(response);
   } catch (err) {
     res.status(500).send(err);
   }
