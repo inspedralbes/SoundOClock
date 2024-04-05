@@ -7,7 +7,7 @@
         <div v-for="track in filteredTracks"
             class="width mb-3 mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
             <div class="contenidor-img">
-                <img :src=track.img :alt="track.title + '_img'" class="rounded-lg">
+                <img :src="track.image" :alt="track.title + '_img'" class="rounded-lg">
                 <button @click="playTrack(track.spotify_id)" class="rounded-lg"
                     :class="{ playingC: isPlayingCheck(track.spotify_id), noPlaying: !isPlayingCheck(track.spotify_id) }">
                     <!-- fer amb computed la classe -->
