@@ -83,8 +83,6 @@ export default {
             this.showReportModal = false;
         },
         report() {
-            console.log("ENTRO")
-            console.log(this.store.getUser());
             const song = { songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
             socket.emit('reportSong', this.store.getUser().token, song);
         },

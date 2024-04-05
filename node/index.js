@@ -156,7 +156,6 @@ async function obtenerActualizarTokenSpotify() {
     }, { headers });
     if (response.data.access_token) {
       spotifyToken = response.data.access_token;
-      console.log('Token de Spotify actualizado');
     } else {
       console.error('No se pudo obtener el token de Spotify.');
     }

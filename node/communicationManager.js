@@ -76,7 +76,6 @@ async function logout(token) {
 }
 
 async function getBlackList(token) {
-  console.log("Get Blacklist: " + apiURL + 'blacklist')
   const response = await fetch(apiURL + 'blacklist', {
       method: 'GET',
       headers: {
@@ -119,7 +118,6 @@ async function addSongToBlackList(token, song) {
 }
 
 async function getPlaylists(playlist, limit, token) {
-  // console.log("Playlist start", playlist, lsimit, token);
   let url = `https://api.spotify.com/v1/search?q=${playlist}&type=playlist&limit=${limit}`;
   let response = await fetch(url, {
     headers: {
@@ -128,11 +126,8 @@ async function getPlaylists(playlist, limit, token) {
     }
   })
   let jsonResponse = await response.json();
-  // console.log("respuesta", jsonResponse.playlists.items);
   if (jsonResponse.playlists.items) {
-    // console.log("playlistID:", jsonResponse.playlists.items[0].id);
     let songs = await getPlaylistSongs(jsonResponse.playlists.items[0].id, token);
-    // console.log("Playlist Songs:", songs);
     return songs;
   }
 }

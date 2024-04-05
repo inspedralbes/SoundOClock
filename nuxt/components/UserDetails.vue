@@ -20,20 +20,16 @@ export default {
     banUser(isVotingBeingBanned) {
       if (isVotingBeingBanned) {
         this.user.vote_banned_until = this.formatDateToLaravel(this.votingBannedUntil);
-        // console.log(`L'usuari ${this.user.name} no pot votar cançons fins ${this.user.vote_banned_until}.`);
       } else {
         this.user.propose_banned_until = this.formatDateToLaravel(this.proposingBannedUntil);
-        // console.log(`L'usuari ${this.user.name} no pot proposar cançons fins ${this.user.propose_banned_until}.`);
       }
       socket.emit('banUser', this.store.getUser().token, this.user);
     },
     enableUser(isVotingBeingEnabled) {
       if (isVotingBeingEnabled) {
         this.user.vote_banned_until = null;
-        // console.log(`L'usuari ${this.user.name} pot tornar a votar cançons.`);
       } else {
         this.user.propose_banned_until = null;
-        // console.log(`L'usuari ${this.user.name} pot tornar a proposar cançons.`);
       }
       socket.emit('banUser', this.store.getUser().token, this.user);
     },

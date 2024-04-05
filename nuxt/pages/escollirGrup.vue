@@ -84,7 +84,6 @@ export default {
             let userToken = this.store.getUser().token;
             comManager.setUserGroups(userId, groups, userToken).then((data) => {
                 this.storeGroupsLoading = false;
-                console.log("data", data)
                 // Maybe in a future consider to retrieve the user groups from the DB (data variable)
                 // and store them in the store
 

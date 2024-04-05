@@ -90,7 +90,6 @@ export default {
 
     },
     mounted() {
-        console.log('Getting blacklist');
         this.loading = true;
         socket.emit('getBlacklist', this.store.getUser().token);
 
@@ -98,7 +97,6 @@ export default {
             this.tracks = blacklist;
             this.filteredTracks = blacklist;
             this.loading = false;
-            console.log('Blacklist received:', this.tracks);
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -177,7 +175,6 @@ export default {
             }
         },
         removeFromBlacklist(spotify_id) {
-            console.log('Removing track with id:', spotify_id);
             // Remove track from blacklist
             let token = this.store.getUser().token;
             socket.emit('removeFromBlacklist', token, spotify_id);
