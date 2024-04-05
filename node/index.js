@@ -320,14 +320,14 @@ io.on('connection', (socket) => {
   });
 
   // Delete a song
-  socket.on('deleteSong', async (userToken, songId) => {
+  socket.on('deleteSong', async (userToken, songInfo) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
     if (!user.id || user.is_admin === 0) return;
 
     try {
       // Check if the song exists and delete it
-      const song = await Song.findOneAndDelete({ id: songId });
+      const song = await Song.findOneAndDelete({ id: songInfo.id });
       if (!song) {
         socket.emit('deleteError', { status: 'error', message: 'Song not found' });
         return;

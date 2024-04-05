@@ -112,7 +112,7 @@ async function addSongToBlackList(token, song) {
       spotify_id: song.id,
       title: song.title,
       artist: song.artist,
-      image: song.image,
+      image: song.img,
     })
   });
   return response;
