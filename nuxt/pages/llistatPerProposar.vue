@@ -1,4 +1,7 @@
 <template>
+    <!-- Reproductor -->
+    <ModularPlayer @pause="playTrack($event)" @propose="proposeSong($event)" />
+
     <!-- TITULO -->
     <h1 class="w-full text-center text-5xl font-bold m-2">Proposa la teva cançó</h1>
 
@@ -130,26 +133,32 @@ export default {
             socket.emit('searchSong', this.query);
         },
         playTrack(track) {
+            const store = useAppStore();
             if (this.currentTrackId == track.id) {
                 if (this.isPlaying) {
                     this.currentTrack.pause();
                     this.isPlaying = false;
+                    store.deleteCurrentTrackPlaying();
                 } else {
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    store.setCurrentTrackPlaying(track);
                 }
             } else {
                 if (track.preview_url != null) {
                     if (this.currentTrack != null) {
                         this.currentTrack.pause();
+                        store.deleteCurrentTrackPlaying();
                     }
                     this.currentTrack = new Audio(track.preview_url);
                     this.currentTrackId = track.id;
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    store.setCurrentTrackPlaying(track);
                 } else {
                     if (this.currentTrack != null) {
                         this.currentTrack.pause();
+                        store.deleteCurrentTrackPlaying();
                     }
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
