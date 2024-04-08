@@ -484,6 +484,12 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('configureBellsGroupsRelations', async (userToken, data) => {
+    console.log('data received', data);
+    console.log('user received', userToken)
+    let dat = await comManager.setBellsGroupsConfiguration(userToken, data);
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
