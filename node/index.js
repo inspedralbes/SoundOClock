@@ -61,8 +61,6 @@ async function insertDefaultsMongo() {
 }
 
 //FETCH TO GET HTML FROM SPOTIFY
-
-
 insertDefaultsMongo();
 
 // API routes
