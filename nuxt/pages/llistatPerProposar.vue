@@ -63,7 +63,6 @@
             <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
                 task_alt
             </span>
-
         </div>
     </div>
 </template>
