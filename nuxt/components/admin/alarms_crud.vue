@@ -37,19 +37,44 @@
             </div>
         </div>
     </div>
+    <Transition name="fade">
+        <ModularModal v-if="modals.submitRelations" type="warning" msg="Desar" title="Desar configuració timbres" @confirm="submitData()" @close="modals.submitRelations=false">
+            <template #title>
+                <h2>Desar configuració timbres</h2>
+            </template>
+            <template #content>
+                <p>Estàs segur que vols desar la configuració dels timbres?</p>
+            </template>
+        </ModularModal>
+    </Transition>
+
+    <Transition name="fade">
+        <ModularModal v-if="modals.bellsWithoutGroups" type="error" title="Hi ha timbres sense grup assignat" @close="modals.bellsWithoutGroups=false">
+            <template #title>
+                <h2>Hi han franges horàries sense grup assignat</h2>
+            </template>
+            <template #content>
+                <p>Totes les franges horàries han de tenir com a mínim un grup assignat.</p>
+            </template>
+        </ModularModal>
+    </Transition>
 </template>
 
 <script>
 import { computed } from 'vue';
 import { useAppStore } from '@/stores/app';
 import comManager from '../../communicationManager';
+import { socket } from '@/socket';
 
 export default {
     data() {
         const store = useAppStore();
         return {
             classGroups: computed(() => store.getClassGroups()),
-            // relations: []
+            modals: {
+                submitRelations: false,
+                bellsWithoutGroups: false,
+            },
         }
     },
     created() {
@@ -93,12 +118,15 @@ export default {
                     break;
                 }
             }
-            
             if (isSubmittable) {
-                console.log("TOTS ELS CURSOS ASSIGNATS")
+                this.modals.submitRelations = true;
             } else {
-                console.log("ENCARA FALTEN TIMBRES PER ASSIGNAR")
+                this.modals.bellsWithoutGroups = true;
             }
+        },
+        submitData() {
+            console.log("INFORMACIÓ ENVIADA", this.bells);
+            socket.emit('configureBellsGroupsRelations', this.bells);
         }
     },
     computed: {
