@@ -95,7 +95,7 @@ class BlacklistTest extends TestCase {
         $response = $this->insertSong($admin, 'song1', '1', 'artist');
         $id = $response->json('spotify_id');
 
-        // Get the song from the blacklist
+        // Get the song from the blacklista
         $response = $this->actingAs($admin)
             ->get("/api/blacklist/$id");
 
