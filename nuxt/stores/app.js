@@ -22,12 +22,13 @@ export const useAppStore = defineStore('app', {
     classGroups: [],
     openMenu: false,
     adminSelectedUser: null,
-    bells: []
+    bells: [],
+    currentTrackPlaying: null,
 
   }),
-  persist:{
+  persist: {
     storage: persistedState.localStorage,
-    paths:['user']
+    paths: ['user']
   },
   actions: {
 
@@ -64,6 +65,9 @@ export const useAppStore = defineStore('app', {
     },
     getAdminSelectedUser() {
       return this.adminSelectedUser
+    },
+    getCurrentTrackPlaying() {
+      return this.currentTrackPlaying
     },
     getBells() {
       return this.bells
@@ -111,6 +115,9 @@ export const useAppStore = defineStore('app', {
     setOpenMenu(menuState) {
       this.openMenu = menuState
     },
+    setCurrentTrackPlaying(currentTrackPlaying) {
+      this.currentTrackPlaying = currentTrackPlaying
+    },
     setBells(bells) {
       this.bells = bells
     },
@@ -128,6 +135,9 @@ export const useAppStore = defineStore('app', {
     deleteGroup(id) {
       id = parseInt(id);
       this.classGroups = this.classGroups.filter(group => group.id !== id);
+    },
+    deleteCurrentTrackPlaying() {
+      this.currentTrackPlaying = null
     },
     setAdminSelectedUser(adminSelectedUser) {
       this.adminSelectedUser = adminSelectedUser

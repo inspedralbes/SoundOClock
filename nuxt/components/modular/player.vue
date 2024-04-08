@@ -1,0 +1,149 @@
+<template>
+    <Transition name="player-slide">
+        <div v-if="track != null"
+            class="fixed bottom-8 right-8 bg-white rounded-lg shadow-lg p-4 w-[200px] overflow-hidden">
+            <div class="flex flex-col items-center">
+                <div>
+                    <img class="rounded-lg object-cover" :src="track.album.images[0].url" alt="Album Image">
+                </div>
+                <div class="mt-4 text-center overflow-hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 whitespace-nowrap overflow-hidden"
+                        :class="{ 'text-marquee': isOverflowing(1) }">{{
+            track.name }}
+                    </h3>
+                    <p class="text-gray-700 whitespace-nowrap overflow-hidden"
+                        :class="{ 'text-marquee': isOverflowing(2) }">
+                        <span v-for="(artist, index) in track.artists" :key="index">
+                            <span v-if="index !== 0">, </span>
+                            {{ artist.name }}
+                        </span>
+                    </p>
+                </div>
+                <div class="flex flex-row items-center">
+                    <button class="m-2" @click="pause">
+                        <span class="material-symbols-rounded text-4xl text-gray-700">
+                            pause
+                        </span>
+                    </button>
+                    <button v-if="type === 'propose' && (!track.loading && !track.proposed)" class="m-2"
+                        @click="propose">
+                        <span class="material-symbols-rounded text-4xl text-gray-700">
+                            add_circle
+                        </span>
+                    </button>
+                    <div v-if="track.loading" class="loader-track"></div>
+                    <div v-if="type === 'propose' && (track.proposed)" class="m-2">
+                        <span class="material-symbols-rounded text-4xl text-gray-700">
+                            task_alt
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Transition>
+</template>
+
+<script>
+import { useAppStore } from '@/stores/app';
+import { computed } from 'vue';
+
+export default {
+    data() {
+        const appStore = useAppStore();
+        return {
+            track: computed(() => appStore.currentTrackPlaying),
+        }
+    },
+    props: {
+        type: {
+            type: String,
+            default: 'propose'
+        }
+    },
+    created() {
+    },
+    methods: {
+        pause() {
+            this.$emit('pause', this.track);
+        },
+        propose() {
+            this.$emit('propose', this.track);
+        },
+        isOverflowing(text) {
+            let nameLength = 0;
+            if (text === 1) {
+                nameLength = this.track.name.length;
+                return nameLength > 20;
+            } else {
+                for (const artist of this.track.artists) {
+                    nameLength += artist.name.length;
+                }
+                return nameLength > 20;
+            }
+        }
+    },
+    computed: {
+
+    }
+}
+</script>
+
+<style scoped>
+.player-slide-enter-active,
+.player-slide-leave-active {
+    transition: transform 0.3s;
+}
+
+.player-slide-enter-from,
+.player-slide-leave-to {
+    transform: translateX(150%);
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.text-marquee {
+    white-space: nowrap;
+    animation: marquee 10s linear infinite;
+}
+
+.loader-track {
+    width: 35px;
+    height: 35px;
+    padding: 8px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #020202;
+    --_m:
+        conic-gradient(#0000 10%, #000),
+        linear-gradient(#000 0 0) content-box;
+    -webkit-mask: var(--_m);
+    mask: var(--_m);
+    -webkit-mask-composite: source-out;
+    mask-composite: subtract;
+    animation: l3 1s infinite linear;
+}
+
+@keyframes l3 {
+    to {
+        transform: rotate(1turn)
+    }
+}
+
+.playingFade-enter-active,
+.playingFade-leave-active {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.playingFade-enter-from,
+.playingFade-leave-to {
+    opacity: 0;
+}
+</style>

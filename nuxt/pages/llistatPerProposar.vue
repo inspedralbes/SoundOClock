@@ -1,4 +1,7 @@
 <template>
+    <!-- Reproductor -->
+    <ModularPlayer @pause="playTrack($event)" @propose="proposeSong($event)" />
+
     <!-- TITULO -->
     <h1 class="w-full text-center text-5xl font-bold m-2">Proposa la teva cançó</h1>
 
@@ -34,7 +37,14 @@
         <div class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
             <div class="flex flex-col w-[70%]">
                 <p class="font-bold text-base uppercase">{{ track.name }}</p>
-                <p class="text-sm">{{ track.artists[0].name }}</p>
+                <div class="flex flex-row text-sm">
+                    <p class="whitespace-nowrap overflow-hidden">
+                        <span v-for="(artist, index) in track.artists" :key="index">
+                            <span v-if="index !== 0">, </span>
+                            {{ artist.name }}
+                        </span>
+                    </p>
+                </div>
             </div>
             <button @click="playTrack(track)">
                 <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
@@ -49,9 +59,7 @@
                     add_circle
                 </span>
             </button>
-            <div v-if="track.loading" class="loader-track">
-
-            </div>
+            <div v-if="track.loading" class="loader-track"></div>
             <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
                 task_alt
             </span>
@@ -130,26 +138,32 @@ export default {
             socket.emit('searchSong', this.query);
         },
         playTrack(track) {
+            const store = useAppStore();
             if (this.currentTrackId == track.id) {
                 if (this.isPlaying) {
                     this.currentTrack.pause();
                     this.isPlaying = false;
+                    store.deleteCurrentTrackPlaying();
                 } else {
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    store.setCurrentTrackPlaying(track);
                 }
             } else {
                 if (track.preview_url != null) {
                     if (this.currentTrack != null) {
                         this.currentTrack.pause();
+                        store.deleteCurrentTrackPlaying();
                     }
                     this.currentTrack = new Audio(track.preview_url);
                     this.currentTrackId = track.id;
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    store.setCurrentTrackPlaying(track);
                 } else {
                     if (this.currentTrack != null) {
                         this.currentTrack.pause();
+                        store.deleteCurrentTrackPlaying();
                     }
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
