@@ -7,31 +7,39 @@
                     <img class="rounded-lg object-cover" :src="track.album.images[0].url" alt="Album Image">
                 </div>
                 <div class="mt-4 text-center overflow-hidden">
-                    <h3 class="text-lg font-semibold text-gray-800 whitespace-nowrap overflow-hidden text-marquee">{{
-                        track.name }}
+                    <h3 class="text-lg font-semibold text-gray-800 whitespace-nowrap overflow-hidden"
+                        :class="{ 'text-marquee': isOverflowing(1) }">{{
+            track.name }}
                     </h3>
-                    <p class="text-gray-700 whitespace-nowrap overflow-hidden">
+                    <p class="text-gray-700 whitespace-nowrap overflow-hidden"
+                        :class="{ 'text-marquee': isOverflowing(2) }">
                         <span v-for="(artist, index) in track.artists" :key="index">
+                            <span v-if="index !== 0">, </span>
                             {{ artist.name }}
-                            <span v-if="index < track.artists.length - 1">, </span>
                         </span>
                     </p>
                 </div>
-                <div class="flex flex-row">
+                <div class="flex flex-row items-center">
                     <button class="m-2" @click="pause">
                         <span class="material-symbols-rounded text-4xl text-gray-700">
                             pause
                         </span>
                     </button>
-                    <button v-if="type === 'propose'" class="m-2" @click="propose">
+                    <button v-if="type === 'propose' && (!track.loading && !track.proposed)" class="m-2"
+                        @click="propose">
                         <span class="material-symbols-rounded text-4xl text-gray-700">
                             add_circle
                         </span>
                     </button>
+                    <div v-if="track.loading" class="loader-track"></div>
+                    <div v-if="type === 'propose' && (track.proposed)" class="m-2">
+                        <span class="material-symbols-rounded text-4xl text-gray-700">
+                            task_alt
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
-
     </Transition>
 </template>
 
@@ -60,6 +68,18 @@ export default {
         },
         propose() {
             this.$emit('propose', this.track);
+        },
+        isOverflowing(text) {
+            let nameLength = 0;
+            if (text === 1) {
+                nameLength = this.track.name.length;
+                return nameLength > 20;
+            } else {
+                for (const artist of this.track.artists) {
+                    nameLength += artist.name.length;
+                }
+                return nameLength > 20;
+            }
         }
     },
     computed: {
@@ -76,7 +96,7 @@ export default {
 
 .player-slide-enter-from,
 .player-slide-leave-to {
-    transform: translateX(100%);
+    transform: translateX(150%);
 }
 
 @keyframes marquee {
@@ -92,5 +112,38 @@ export default {
 .text-marquee {
     white-space: nowrap;
     animation: marquee 10s linear infinite;
+}
+
+.loader-track {
+    width: 35px;
+    height: 35px;
+    padding: 8px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #020202;
+    --_m:
+        conic-gradient(#0000 10%, #000),
+        linear-gradient(#000 0 0) content-box;
+    -webkit-mask: var(--_m);
+    mask: var(--_m);
+    -webkit-mask-composite: source-out;
+    mask-composite: subtract;
+    animation: l3 1s infinite linear;
+}
+
+@keyframes l3 {
+    to {
+        transform: rotate(1turn)
+    }
+}
+
+.playingFade-enter-active,
+.playingFade-leave-active {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.playingFade-enter-from,
+.playingFade-leave-to {
+    opacity: 0;
 }
 </style>
