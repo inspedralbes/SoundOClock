@@ -33,11 +33,13 @@ class BlacklistTest extends TestCase {
     }
 
     // Helper function to insert a song into the blacklist
-    private function insertSong($user, $nom, $spotify_id) {
+    private function insertSong($user, $nom, $spotify_id, $artist) {
         return $this->actingAs($user)
             ->post('/api/blacklist', [
                 'nom' => $nom,
-                'spotify_id' => $spotify_id
+                'spotify_id' => $spotify_id,
+                'title' => $nom,
+                'artist' => $artist
             ]);
     }
 
@@ -46,7 +48,7 @@ class BlacklistTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Insert a song into the blacklist
-        $response = $this->insertSong($admin, 'song1', 1);
+        $response = $this->insertSong($admin, 'song1', '1', 'artist');
 
         $response->assertStatus(201)
             ->assertJson([
