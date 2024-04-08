@@ -206,7 +206,7 @@ describe('Listen the Server sockets', function () {
       done();
     });
 
-    clientSocket.emit('deleteSong', adminToken, testSong.id);
+    clientSocket.emit('deleteSong', adminToken, testSong);
   })
 
   it("should not delete a song if it doesn't exist", (done) => {

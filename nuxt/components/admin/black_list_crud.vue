@@ -2,7 +2,7 @@
     <div>
         <div class="width mx-auto my-5 flex flex-row justify-center">
             <input class="cercador w-full ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..."
-                v-model="query" @keyup.enter="getSongs()"></input>
+                v-model="query" @keyup.enter="getSongs()" />
         </div>
         <div v-for="track in filteredTracks"
             class="width mb-3 mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
@@ -64,6 +64,9 @@
 
             </div>
         </div>
+        <div class="m-8" v-if="loading">
+            <Loader />
+        </div>
     </div>
 </template>
 
@@ -75,7 +78,7 @@ import { useAppStore } from '../../stores/app';
 export default {
     data() {
         return {
-            token: '',
+            loading: true,
             songFile: null,
             query: '',
             tracks: [],
@@ -181,9 +184,9 @@ export default {
         },
     },
     setup() {
-    const store = useAppStore();
-    return { store };
-  },
+        const store = useAppStore();
+        return { store };
+    },
 }
 </script>
 
