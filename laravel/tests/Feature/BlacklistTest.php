@@ -36,7 +36,6 @@ class BlacklistTest extends TestCase {
     private function insertSong($user, $nom, $spotify_id, $artist) {
         return $this->actingAs($user)
             ->post('/api/blacklist', [
-                'nom' => $nom,
                 'spotify_id' => $spotify_id,
                 'title' => $nom,
                 'artist' => $artist
@@ -52,8 +51,9 @@ class BlacklistTest extends TestCase {
 
         $response->assertStatus(201)
             ->assertJson([
-                'nom' => 'song1',
-                'spotify_id' => 1
+                'spotify_id' => 1,
+                'title' => 'song1',
+                'artist' => 'artist'
             ]);
     }
 
@@ -62,7 +62,7 @@ class BlacklistTest extends TestCase {
         $user = $this->loginAsStudent();
 
         // Insert a song into the blacklist
-        $response = $this->insertSong($user, 'song1', 1);
+        $response = $this->insertSong($user, 'song1', '1', 'artist');
 
         $response->assertStatus(404)
             ->assertJson([
@@ -76,8 +76,8 @@ class BlacklistTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Insert a 2 songs into the blacklist
-        $this->insertSong($admin, 'song1', 1);
-        $this->insertSong($admin, 'song2', 2);
+        $this->insertSong($admin, 'song1', '1', 'artist');
+        $this->insertSong($admin, 'song2', '2', 'artist');
 
         // Get the songs from the blacklist
         $response = $this->actingAs($admin)
@@ -92,7 +92,7 @@ class BlacklistTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Insert a song into the blacklist
-        $response = $this->insertSong($admin, 'song1', 1);
+        $response = $this->insertSong($admin, 'song1', '1', 'artist');
         $id = $response->json('id');
 
         // Get the song from the blacklist
@@ -101,8 +101,8 @@ class BlacklistTest extends TestCase {
 
         $response->assertStatus(200)
             ->assertJson([
-                'nom' => 'song1',
-                'spotify_id' => 1
+                'title' => 'song1',
+                'spotify_id' => '1',
             ]);
     }
 
