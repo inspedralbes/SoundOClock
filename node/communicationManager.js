@@ -253,6 +253,18 @@ async function setUserGroups(userId, token, groups) {
   return jsonResponse;
 }
 
+async function getBells(token) {
+  const response = await fetch(apiURL + 'bells', {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
 
 const comManager = {
   getUserInfo,
@@ -275,6 +287,7 @@ const comManager = {
   deleteGroup,
   updateGroup,
   setUserGroups,
+  getBells
 };
 
 export default comManager;

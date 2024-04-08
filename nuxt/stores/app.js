@@ -21,7 +21,8 @@ export const useAppStore = defineStore('app', {
     isLoadingVote: false,
     classGroups: [],
     openMenu: false,
-    adminSelectedUser: null
+    adminSelectedUser: null,
+    bells: []
 
   }),
   persist:{
@@ -63,6 +64,9 @@ export const useAppStore = defineStore('app', {
     },
     getAdminSelectedUser() {
       return this.adminSelectedUser
+    },
+    getBells() {
+      return this.bells
     },
 
     //setters
@@ -106,6 +110,9 @@ export const useAppStore = defineStore('app', {
     },
     setOpenMenu(menuState) {
       this.openMenu = menuState
+    },
+    setBells(bells) {
+      this.bells = bells
     },
 
     ///Deletes

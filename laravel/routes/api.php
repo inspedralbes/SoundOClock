@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlacklistController;
 use App\Http\Controllers\GroupsController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\BellController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,4 +58,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/roles/{id}', [RolesController::class, 'show']);
     Route::put('/roles/{id}', [RolesController::class, 'update']);
     Route::delete('/roles/{id}', [RolesController::class, 'destroy']);
+
+    // Bells routes
+    Route::get('/bells', [BellController::class, 'index']);
 });

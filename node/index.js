@@ -138,6 +138,14 @@ app.post('/addGroupsToUser', async (req, res) => {
     res.status(500).send(err);
   }
 })
+app.get('/bells/:userToken', async (req, res) => {
+  try {
+    let bells = await comManager.getBells(req.params.userToken);
+    res.json(bells);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
 
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
