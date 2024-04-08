@@ -387,17 +387,6 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('searchSong', (search) => {
-    let limit = 15;
-    comManager.searchSong(search, limit, spotifyToken)
-      .then(data => {
-        if (data) {
-          socket.emit('searchResult', data.tracks.items);
-        }
-      });
-
-  });
-
   socket.on('searchId', (id) => {
     comManager.searchSongId(id, spotifyToken)
       .then(data => {
