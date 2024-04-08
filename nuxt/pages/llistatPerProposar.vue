@@ -1,45 +1,66 @@
 <template>
-    <div>
-        <div class="width mx-auto my-5 flex flex-row justify-center">
-            <input class="cercador w-full ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..."
-                v-model="query" @keyup.enter="getSongs()"></input>
+    <!-- TITULO -->
+    <h1 class="w-full text-center text-5xl font-bold m-2">Proposa la teva cançó</h1>
+
+    <!-- BARRA DE BUSQUEDA -->
+    <div class="w-full flex justify-center items-center">
+        <div class="relative w-[70%] m-2 text-center">
+            <input type="text" placeholder="Buscar..."
+                class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                v-model="query" @keyup.enter="getSongs()">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded">
+                search
+            </span>
+            <button @click="deleteSearch">
+                <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded">
+                    Close
+                </span>
+            </button>
         </div>
-        <div v-for="track in tracks"
-            class="width mb-3 mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
-            <div class="contenidor-img">
-                <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="rounded-lg">
-                <button @click="playTrack(track)" class="rounded-lg"
-                    :class="{ playingC: isPlayingCheck(track.id), noPlaying: !isPlayingCheck(track.id) }">
-                    <!-- fer amb computed la classe -->
-                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded">
-                        pause
-                    </span>
-                    <span v-else class="material-symbols-rounded">
-                        play_arrow
-                    </span>
-                </button>
+    </div>
+
+
+    <!-- Listado de canciones -->
+    <div v-for="track, index in tracks" :key="index" class="flex flex-row justify-center m-2">
+        <div class="relative">
+            <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full">
+            <Transition name="playingFade">
+                <div v-if="currentTrackId === track.id && isPlaying"
+                    class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
+                    <div class="loader"></div>
+                </div>
+            </Transition>
+        </div>
+        <div class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
+            <div class="flex flex-col w-[70%]">
+                <p class="font-bold text-base uppercase">{{ track.name }}</p>
+                <p class="text-sm">{{ track.artists[0].name }}</p>
             </div>
+            <button @click="playTrack(track)">
+                <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
+                    pause
+                </span>
+                <span v-else class="material-symbols-rounded text-4xl">
+                    play_arrow
+                </span>
+            </button>
+            <button @click="proposeSong(track)" v-if="!track.loading && !track.proposed">
+                <span class="material-symbols-rounded text-4xl">
+                    add_circle
+                </span>
+            </button>
+            <div v-if="track.loading" class="loader-track">
 
-            <div class="song-data">
-                <p class="font-black basis-1/2">{{ track.name }}</p>
-                <p class="basis-1/2">{{ track.artists[0].name }}</p>
             </div>
+            <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
+                task_alt
+            </span>
 
-            <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
-
-                <button @click="proposeSong(track)" class="hover:rounded-lg hover:bg-black w-fit flex">
-                    <span class="material-symbols-rounded text-4xl">
-                        add
-                    </span>
-                </button>
-
-            </div>
         </div>
     </div>
 </template>
 
 <script>
-
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
 
@@ -102,6 +123,10 @@ export default {
     },
     methods: {
         getSongs() {
+            if (this.query == '') {
+                socket.emit('getTopSongs', 'Top Songs Spain');
+                return;
+            }
             socket.emit('searchSong', this.query);
         },
         playTrack(track) {
@@ -137,6 +162,7 @@ export default {
             }
         },
         proposeSong(track) {
+            track.loading = true;
             if (track.preview_url == null) {
                 socket.emit('getHtmlSpotify', track.id);
                 this.isWaitingToPropose = true;
@@ -153,6 +179,10 @@ export default {
                 }
                 socket.emit('postSong', this.store.getUser().token, song);
             }
+            setTimeout(() => {
+                track.proposed = true;
+                track.loading = false;
+            }, 2000);
         },
         getMp3(AudioPreviewURL, songId) {
             fetch(AudioPreviewURL)
@@ -192,6 +222,11 @@ export default {
                     console.error('Error getting the audio file:', error);
                 });
         },
+        deleteSearch() {
+            this.query = '';
+            this.tracks = [];
+            socket.emit('getTopSongs', 'Top Songs Spain');
+        }
     },
     beforeDestroy() {
         socket.off('topSongs');
@@ -202,132 +237,71 @@ export default {
 </script>
 
 <style scoped>
-.width {
-    width: 85%;
+/* HTML: <div class="loader"></div> */
+.loader {
+    width: 45px;
+    aspect-ratio: 1;
+    --c: no-repeat linear-gradient(#ffffff 0 0);
+    background:
+        var(--c) 0% 50%,
+        var(--c) 50% 50%,
+        var(--c) 100% 50%;
+    background-size: 20% 100%;
+    animation: l1 1s infinite linear;
 }
 
-.contenidor-canço {
-    background-color: rgb(56, 56, 56);
-    color: white;
-}
-
-.contenidor-canço>*:last-child {
-    justify-self: flex-end;
-}
-
-.contenidor-img {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 20%;
-    min-width: fit-content;
-    height: 100%;
-    width: fit-content;
-}
-
-.contenidor-img>button>span {
-    font-size: 3rem;
-    color: white;
-}
-
-.contenidor-img>button>span {
-    width: 80%;
-    height: auto;
-}
-
-.contenidor-img:hover>button {
-    display: flex;
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    right: 0;
-    top: 0;
-    background-color: rgb(0, 0, 0, 0.3);
-    cursor: pointer;
-    z-index: 100;
-}
-
-.playingC {
-    display: flex;
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    right: 0;
-    top: 0;
-    background-color: rgb(0, 0, 0, 0.3);
-    cursor: pointer;
-    z-index: 100;
-}
-
-.song-data {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    justify-content: space-evenly;
-    flex-grow: 1;
-    align-items: center;
-    height: 100%;
-    max-width: 100%;
-    min-width: 5%;
-    text-align: center;
-}
-
-.song-data>p {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.contenidor-butons {
-    max-width: 20%;
-    height: 100%;
-    flex-grow: 1;
-    min-width: fit-content;
-    align-self: center;
-}
-
-img {
-    width: 60px;
-    height: 60px;
-}
-
-.noPlaying {
-    display: none;
-}
-
-@media screen and (min-width: 768px) {
-
-    .song-data {
-        display: flex;
-        flex-direction: row;
-        flex-grow: 1;
-
-        max-width: 100%;
+@keyframes l1 {
+    0% {
+        background-size: 20% 100%, 20% 100%, 20% 100%
     }
 
-    .contenidor-butons {
-        max-width: 20%;
-        height: 100%;
-        flex-grow: 1;
-        min-width: fit-content;
-        align-self: center;
+    33% {
+        background-size: 20% 10%, 20% 100%, 20% 100%
     }
 
-    .width {
-        width: 55%;
+    50% {
+        background-size: 20% 100%, 20% 10%, 20% 100%
     }
 
+    66% {
+        background-size: 20% 100%, 20% 100%, 20% 10%
+    }
+
+    100% {
+        background-size: 20% 100%, 20% 100%, 20% 100%
+    }
 }
 
-.cercador {
-    background-color: white;
-    border-radius: 24px;
-    height: 40px;
-    color: #000;
+/* HTML: <div class="loader"></div> */
+.loader-track {
+    width: 35px;
+    padding: 8px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #ffffff;
+    --_m:
+        conic-gradient(#0000 10%, #000),
+        linear-gradient(#000 0 0) content-box;
+    -webkit-mask: var(--_m);
+    mask: var(--_m);
+    -webkit-mask-composite: source-out;
+    mask-composite: subtract;
+    animation: l3 1s infinite linear;
+}
+
+@keyframes l3 {
+    to {
+        transform: rotate(1turn)
+    }
+}
+
+.playingFade-enter-active,
+.playingFade-leave-active {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.playingFade-enter-from,
+.playingFade-leave-to {
+    opacity: 0;
 }
 </style>
