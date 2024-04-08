@@ -5,18 +5,34 @@
             <div class="users-container w-1/3 ml-20 overflow-y-auto">
                 <div class="width flex flex-col justify-center ml-auto mr-auto gap-3">
                     <div v-for="group in classGroups"
-                        class="group-item h-20 flex flex-row justify-center items-center rounded-lg p-3">
+                        class="group-item h-20 flex flex-row justify-center items-center rounded-lg p-4" draggable="true"
+                        @dragstart="startDrag($event, group)">
                         {{ group.abbreviation }}
                     </div>
                 </div>
             </div>
-            <div class="groups-bells-container rounded-lg w-2/3 text-white text-center ml-4 mr-4">
-                <div v-for="relation in relations">
-                    <p>{{ relation.bell.hour }}</p>
-                    <select aria-label="" v-model="relation.groups[0]" @change="changeOption()">
-                        <option :value=null>No té grup assignat</option>
-                        <option v-for="group in classGroups" :value="group">{{ group.abbreviation }}</option>
-                    </select>
+            <div class="groups-bells-container rounded-lg w-2/3 text-white text-center ml-4 mr-4 flex flex-col gap-4 p-4">
+                <button class="save-button hover:bg-sky-300 w-fit text-white font-bold py-2 px-4 rounded"
+          @click="saveBellsGroupsRelation()">DESAR TIMBRES</button>
+                <div v-for="bell in bells" class="bg-gray-400 rounded-lg p-4 flex flex-row gap-4"
+                    @drop="onDrop($event, bell)" @dragenter.prevent @dragover.prevent>
+                    <div class="text-lg w-1/6 p-6 rounded-lg hour-item">{{ bell.hour.substring(0, 5) }}</div>
+                    <div v-if="bell.groups.length > 0" v-for="group in bell.groups"
+                        class="group-item--added rounded-lg p-6 relative">
+                        <span>{{ group.abbreviation }}</span>
+                        <button
+                            class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold rounded-full p-1 absolute top-2 right-2"
+                            @click="deleteGroup(bell, group)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-x">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M18 6l-12 12" />
+                                <path d="M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div v-else class="p-6 text-xl grow">NO HI HA CAP GRUP ASSIGNAT A AQUESTA FRANJA HORÀRIA</div>
                 </div>
             </div>
         </div>
@@ -33,46 +49,67 @@ export default {
         const store = useAppStore();
         return {
             classGroups: computed(() => store.getClassGroups()),
-            // bells: ["08:00", "09:00", "10:00", "11:00", "11:30", "12:30", "13:30"],
-            relations: []
+            // relations: []
         }
     },
     created() {
         this.loading = true;
         comManager.getBells();
-        this.createRelationsStructure();
         this.loading = false;
     },
     watch: {
-        bells: { // Each time the range change execute changeDate() method
+        bells: { // Each time bells change execute createRelationsStructure() method
             handler: 'createRelationsStructure',
         },
     },
     methods: {
-        createRelationsStructure() {
-
-            let relations = [];
-            let relation = {};
-
-            for (let i = 0; i < this.bells.length; i++) {
-                relation = {};
-                relation.bell = this.bells[i];
-                relation.groups = [null];
-
-                relations.push(relation);
-            }
-
-            this.relations = relations;
-            console.log(this.relations);
+        startDrag(event, group) {
+            event.dataTransfer.dropEffect = 'move';
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('groupId', group.id);
         },
-        changeOption() {
-            console.log(this.relations);
+        onDrop(event, bell) {
+            const groupId = event.dataTransfer.getData('groupId');
+            const group = this.classGroups.find((group) => group.id == groupId);
+            if (!bell.groups.find((group) => group.id == groupId)) {
+                bell.groups.push(group);
+            }
+        },
+        deleteGroup(bell, group) {
+            // Busca el grup a la llista de grups associada al timbre
+            const index = bell.groups.indexOf(group); 
+
+            // Si es troba el grup, eliminar-lo
+            if (index > -1) { 
+                bell.groups.splice(index, 1);
+            }
+        },
+        saveBellsGroupsRelation() {
+            console.log(this.bells);
+            let isSubmittable = true;
+            for (let i = 0; i < this.bells.length; i++) {
+                if (this.bells[i].groups <= 0) {
+                    isSubmittable =  false;
+                    break;
+                }
+            }
+            
+            if (isSubmittable) {
+                console.log("TOTS ELS CURSOS ASSIGNATS")
+            } else {
+                console.log("ENCARA FALTEN TIMBRES PER ASSIGNAR")
+            }
         }
     },
     computed: {
         bells() {
-            console.log("ENTERING COMPUTED")
-            return this.store.getBells();
+            let bells = this.store.getBells();
+            for (let i = 0; i < bells.length; i++) {
+                for (let j = 0; j < bells[i].groups.length; j++) {
+                    delete bells[i].groups[j].pivot;
+                }
+            }
+            return bells;
         },
     },
     setup() {
@@ -88,13 +125,29 @@ export default {
     color: white;
 }
 
-.group-item:hover,
+.group-item--added {
+    background-color: rgb(56, 56, 56);
+    color: white;
+    width: 150px;
+}
+
+.hour-item {
+    background-color: var(--pedralbes-blue);
+    color: white;
+}
+
+/* .group-item:hover,
 .group-item:active {
     background-color: white;
     color: rgb(56, 56, 56);
-}
+} */
 
 .groups-bells-container {
     background-color: rgb(56, 56, 56);
 }
+
+.save-button {
+    background-color: var(--pedralbes-blue);
+}
+
 </style>

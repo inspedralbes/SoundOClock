@@ -50,3 +50,6 @@ INSERT INTO `bells` (hour) VALUES
 ('19:00'),
 ('20:00'),
 ('21:00');
+
+INSERT INTO `bell_group` (bell_id, group_id) VALUES
+(1, 1), (2, 1), (2, 2),(2, 3), (3, 2), (3, 4), (4, 5), (5, 6);

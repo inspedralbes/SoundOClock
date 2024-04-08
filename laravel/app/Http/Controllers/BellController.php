@@ -14,9 +14,10 @@ class BellController extends Controller
         
         $bells = Bell::all();
 
-        // foreach ($bells as $bell) {
-        //     $bell->groups()->attach($group['group_id'], ['course' => $group['course']]);
-        // }
+        // Return the bells with its groups
+        return $bells->load('groups');
+        
+
     }
 
 }
