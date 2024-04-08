@@ -7,7 +7,7 @@
 
     <!-- Barra de busqueda -->
     <div class="w-full flex justify-center items-center">
-        <div class="relative w-[70%] m-2 text-center">
+        <div class="relative w-[60%] m-2 text-center">
             <input type="text" placeholder="Buscar..."
                 class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
                 v-model.lazy="filter">
@@ -20,6 +20,16 @@
                 </span>
             </button>
         </div>
+        <select v-model.lazy="orderBy"
+            class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center">
+            <option value="votes-desc">Més vots</option>
+            <option value="votes-asc">Menys vots</option>
+            <option value="title-desc">Títol (A-Z)</option>
+            <option value="title-asc">Títol (Z-A)</option>
+            <option value="artist-desc">Artista (A-Z)</option>
+            <option value="artist-asc">Artista (Z-A)</option>
+        </select>
+
     </div>
 
     <!-- Listado canciones -->
@@ -85,7 +95,7 @@
         <template #title>Reportar cançó</template>
         <template #content>
             <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-        reportSongData.reportedSong.artist }}?</p>
+                reportSongData.reportedSong.artist }}?</p>
             <div class="flex flex-col">
                 <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                     <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
@@ -94,6 +104,15 @@
             </div>
         </template>
     </ModularModal>
+
+    <!-- Boton que redirige a la propuesta de canciones -->
+    <footer class="fixed bottom-2 w-full flex justify-center align-center">
+        <button @click="goToProposar"
+            class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700">Proposar
+            cançó
+        </button>
+    </footer>
+
 </template>
 
 <script>
@@ -116,7 +135,8 @@ export default {
                 reportedSong: null,
                 options: ["La cançó té contingut inadequat", "La cançó no s'adequa a la temàtica"],
                 selectedOption: "La cançó té contingut inadequat"
-            }
+            },
+            orderBy: 'votes-desc',
         }
     },
     created() {
@@ -128,18 +148,6 @@ export default {
     methods: {
         deleteSearch() {
             this.filter = '';
-        },
-        sortByVotesDescending() {
-            this.filteredSongs.sort((a, b) => b.votes - a.votes);
-        },
-        sortByVotesAscending() {
-            this.filteredSongs.sort((a, b) => a.votes - b.votes);
-        },
-        sortByTitleAlphabetically() {
-            this.filteredSongs.sort((a, b) => a.title.localeCompare(b.title));
-        },
-        sortByArtistAlphabetically() {
-            this.filteredSongs.sort((a, b) => a.artist.localeCompare(b.artist));
         },
         report(track) {
             this.modals.reportModal = true;
@@ -175,7 +183,35 @@ export default {
             return songs;
         },
         filteredSongs() {
-            return this.songs.filter(song => song.title.toLowerCase().includes(this.filter.toLowerCase()) || song.artist.toLowerCase().includes(this.filter.toLowerCase()));
+            let filtered = this.songs.filter(song =>
+                song.title.toLowerCase().includes(this.filter.toLowerCase()) ||
+                song.artist.toLowerCase().includes(this.filter.toLowerCase())
+            );
+
+            switch (this.orderBy) {
+                case 'votes-desc':
+                    filtered.sort((a, b) => b.votes - a.votes);
+                    break;
+                case 'votes-asc':
+                    filtered.sort((a, b) => a.votes - b.votes);
+                    break;
+                case 'title-desc':
+                    filtered.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+                case 'title-asc':
+                    filtered.sort((a, b) => b.title.localeCompare(a.title));
+                    break;
+                case 'artist-desc':
+                    filtered.sort((a, b) => a.artist.localeCompare(b.artist));
+                    break;
+                case 'artist-asc':
+                    filtered.sort((a, b) => b.artist.localeCompare(a.artist));
+                    break;
+                default:
+                    break;
+            }
+
+            return filtered;
         },
         isSongVoted() {
             if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
