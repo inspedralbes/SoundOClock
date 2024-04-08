@@ -2,7 +2,8 @@
 
 
     <!-- Reproductor -->
-    <ModularPlayer @pause="playTrack($event)" @propose="proposeSong($event)" />
+    <ModularPlayer v-if="$device.isDesktop" @pause="playTrack($event)" @propose="proposeSong($event)" />
+    <MobilePlayer v-else @pause="playTrack($event)" @propose="proposeSong($event)" />
 
     <!-- TITULO -->
     <h1 class="w-full text-center text-5xl font-bold m-2">Proposa la teva cançó</h1>
@@ -28,7 +29,7 @@
     <!-- Listado de canciones -->
     <div v-for="track, index in tracks" :key="index" class="flex flex-row justify-center m-2">
         <div class="relative">
-            <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full">
+            <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full z-0">
             <Transition name="playingFade">
                 <div v-if="currentTrackId === track.id && isPlaying"
                     class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
@@ -91,7 +92,7 @@ export default {
         }
     },
     created() {
-        // console.log(this.$device.isDesktop);s
+        console.log(this.$device.isMobile)
     },
     mounted() {
         socket.emit('getTopSongs', 'Top Songs Spain');
