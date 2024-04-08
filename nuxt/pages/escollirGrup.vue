@@ -1,6 +1,8 @@
 <template>
-    <div class="w-80 mx-auto">
-        <h1 class="text-2xl text-center my-6">Escull el teu grup:</h1>
+    <div class="w-80 mx-auto mt-6">
+        <div class="title text-white text-center text-4xl font-bold my-5">
+            <h1>Escull el teu Grup:</h1>
+        </div>
         <div v-if="loading" class="loading">
             <Loader />
         </div>
@@ -23,7 +25,10 @@
             </div>
             <div class="mt-6 w-80">
                 <button @click="storeGroup" class="btn flex justify-center p-3 bg-green-600 rounded w-full" :disabled="checkCorrectOptions()">
-                    Següent
+                    <span v-if="storeGroupsLoading" class="py-1">
+                        <Loader />
+                    </span>
+                    <span v-else>Següent</span>
                 </button>
             </div>
         </div>
@@ -43,12 +48,18 @@ export default {
             groups: [],
             disabled: true,
             selectedGroupId: '',
-            selectedCourse: ''
+            selectedCourse: '',
+            storeGroupsLoading: false
         }
     },
     mounted() {
+        let user = this.store.getUser();
+        if (!user.token) {
+            this.$router.push('/');
+        } else if (user.groups.length > 0) {
+            this.$router.push('/llista_propostes');
+        }
         comManager.getPublicGroups().then((groups) => {
-            console.log("Groups: ", groups);
             this.groups = groups;
             this.loading = false;
         });
@@ -64,10 +75,21 @@ export default {
 
     methods: {
         storeGroup() {
-            let selectedGroup = this.groups.find(group => group.id === this.selectedGroupId);
-            this.store.setUserGroupAndCourse(selectedGroup.abbreviation, this.selectedCourse);
-            console.log("User", this.store.getUser());
-            this.$router.push('/llista_propostes');
+            this.storeGroupsLoading = true;
+            let groups = [{
+                group_id: this.selectedGroupId,
+                course: this.selectedCourse
+            }];
+            let userId = this.store.getUser().id;
+            let userToken = this.store.getUser().token;
+            comManager.setUserGroups(userId, groups, userToken).then((data) => {
+                this.storeGroupsLoading = false;
+                // Maybe in a future consider to retrieve the user groups from the DB (data variable)
+                // and store them in the store
+
+                this.store.setUserGroups(groups);
+                this.$router.push('/llista_propostes');
+            });
         },
         checkCorrectOptions() {
             let selectedGroup = this.groups.find(group => group.id === this.selectedGroupId);

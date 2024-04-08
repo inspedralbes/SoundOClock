@@ -13,6 +13,7 @@ const host = argv.host || 'mongodb';
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -29,18 +30,19 @@ mongoose.connect('mongodb://mongoadmin:mongopassword@' + host +':27017/soundoclo
   .catch(err => console.error('MongoDB connection error:', err));
 
 async function insertDefaultsMongo() {
-  // const songs = [
-  //   { id: 1, title: 'Blinding Lights', artist: 'The Weeknd', year: 2020, img: 'blinding-lights.jpg', previewUrl: 'https://example.com/blinding-lights-preview', votes: 150, submitDate: new Date('2020-11-29'), submittedBy: 'User1' },
-  //   { id: 2, title: 'Shot in the Dark', artist: 'AC/DC', year: 2020, img: 'shot-in-the-dark.jpg', previewUrl: 'https://example.com/shot-in-the-dark-preview', votes: 75, submitDate: new Date('2020-10-07'), submittedBy: 'User2' },
-  //   { id: 3, title: 'Don\'t Start Now', artist: 'Dua Lipa', year: 2019, img: 'dont-start-now.jpg', previewUrl: 'https://example.com/dont-start-now-preview', votes: 200, submitDate: new Date('2019-11-01'), submittedBy: 'User3' },
-  //   { id: 4, title: 'Fear Inoculum', artist: 'Tool', year: 2019, img: 'fear-inoculum.jpg', previewUrl: 'https://example.com/fear-inoculum-preview', votes: 90, submitDate: new Date('2019-08-30'), submittedBy: 'User4' },
-  //   { id: 5, title: 'God\'s Plan', artist: 'Drake', year: 2018, img: 'gods-plan.jpg', previewUrl: 'https://example.com/gods-plan-preview', votes: 250, submitDate: new Date('2018-01-19'), submittedBy: 'User5' },
-  //   { id: 6, title: 'HARDWIRE', artist: 'Metallica', year: 2016, img: 'hardwire.jpg', previewUrl: 'https://example.com/hardwire-preview', votes: 65, submitDate: new Date('2016-08-18'), submittedBy: 'User6' },
-  //   { id: 7, title: 'Hello', artist: 'Adele', year: 2015, img: 'hello.jpg', previewUrl: 'https://example.com/hello-preview', votes: 300, submitDate: new Date('2015-10-23'), submittedBy: 'User7' },
-  //   { id: 8, title: 'Doom and Gloom', artist: 'The Rolling Stones', year: 2012, img: 'doom-and-gloom.jpg', previewUrl: 'https://example.com/doom-and-gloom-preview', votes: 80, submitDate: new Date('2012-10-11'), submittedBy: 'User8' },
-  //   { id: 9, title: 'Royals', artist: 'Lorde', year: 2013, img: 'royals.jpg', previewUrl: 'https://example.com/royals-preview', votes: 220, submitDate: new Date('2013-03-08'), submittedBy: 'User9' },
-  //   { id: 10, title: 'R U Mine?', artist: 'Arctic Monkeys', year: 2013, img: 'r-u-mine.jpg', previewUrl: 'https://example.com/r-u-mine-preview', votes: 110, submitDate: new Date('2013-02-27'), submittedBy: 'User10' }
-  // ];
+  const songs = [
+    { id: '0VjIjW4GlUZAMYd2vXMi3b', title: 'Blinding Lights', artist: 'The Weeknd', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36', previewUrl: 'https://example.com/blinding-lights-preview', votes: 150, submitDate: new Date('2020-11-29'), submittedBy: 1 },
+    { id: '62PaSfnXSMyLshYJrlTuL3', title: 'Hello', artist: 'Adele', year: 2015, img: 'https://i.scdn.co/image/ab67616d00001e0247ce408fb4926d69da6713c2', previewUrl: 'https://example.com/hello-preview', votes: 300, submitDate: new Date('2015-10-23'), submittedBy: 7 },
+    { id: '0sfdiwck2xr4PteGOdyOfz', title: 'Shot in the Dark', artist: 'AC/DC', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e0204db0e3bcd166c1d6cfd81f9', previewUrl: 'https://example.com/shot-in-the-dark-preview', votes: 75, submitDate: new Date('2020-10-07'), submittedBy: 2 },
+    //     { id: 3, title: 'Don\'t Start Now', artist: 'Dua Lipa', year: 2019, img: 'dont-start-now.jpg', previewUrl: 'https://example.com/dont-start-now-preview', votes: 200, submitDate: new Date('2019-11-01'), submittedBy: 3 },
+    //     { id: 4, title: 'Fear Inoculum', artist: 'Tool', year: 2019, img: 'fear-inoculum.jpg', previewUrl: 'https://example.com/fear-inoculum-preview', votes: 90, submitDate: new Date('2019-08-30'), submittedBy: 4 },
+    //     { id: 5, title: 'God\'s Plan', artist: 'Drake', year: 2018, img: 'gods-plan.jpg', previewUrl: 'https://example.com/gods-plan-preview', votes: 250, submitDate: new Date('2018-01-19'), submittedBy: 5 },
+    //     { id: 6, title: 'HARDWIRE', artist: 'Metallica', year: 2016, img: 'hardwire.jpg', previewUrl: 'https://example.com/hardwire-preview', votes: 65, submitDate: new Date('2016-08-18'), submittedBy: 6 },
+    //     { id: 8, title: 'Doom and Gloom', artist: 'The Rolling Stones', year: 2012, img: 'doom-and-gloom.jpg', previewUrl: 'https://example.com/doom-and-gloom-preview', votes: 80, submitDate: new Date('2012-10-11'), submittedBy: 8 },
+    //     { id: 9, title: 'Royals', artist: 'Lorde', year: 2013, img: 'royals.jpg', previewUrl: 'https://example.com/royals-preview', votes: 220, submitDate: new Date('2013-03-08'), submittedBy: 9 },
+    //     { id: 10, title: 'R U Mine?', artist: 'Arctic Monkeys', year: 2013, img: 'r-u-mine.jpg', previewUrl: 'https://example.com/r-u-mine-preview', votes: 110, submitDate: new Date('2013-02-27'), submittedBy: 10 }
+  ];
+
   const votingRecords = [
     { userId: 1, submitted: true, votedSongs: [1, 4], group: 1 },
     { userId: 2, submitted: false, votedSongs: [], group: 2 },
@@ -48,9 +50,9 @@ async function insertDefaultsMongo() {
   ];
 
   // Upsert songs
-  // for (const song of songs) {
-  //   await Song.updateOne({ id: song.id }, { $setOnInsert: song }, { upsert: true });
-  // }
+  for (const song of songs) {
+    await Song.updateOne({ id: song.id }, { $setOnInsert: song }, { upsert: true });
+  }
 
   // Upsert voting records
   for (const record of votingRecords) {
@@ -130,6 +132,15 @@ app.get('/publicGroups', async (req, res) => {
   }
 })
 
+app.post('/addGroupsToUser', async (req, res) => {
+  try {
+    const response = await comManager.setUserGroups(req.body.userId, req.body.token, req.body.groups);
+    res.json(response);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {
@@ -147,7 +158,6 @@ async function obtenerActualizarTokenSpotify() {
     }, { headers });
     if (response.data.access_token) {
       spotifyToken = response.data.access_token;
-      console.log('Token de Spotify actualizado:', spotifyToken);
     } else {
       console.error('No se pudo obtener el token de Spotify.');
     }
@@ -169,7 +179,18 @@ io.on('connection', (socket) => {
   socket.on('googleLogin', (userToken) => {
     comManager.googleLogin(userToken)
       .then((userData) => {
-        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.user.class_group_id, userData.token);
+
+        let groups = [];
+        // Populate groups array with group_id and course
+        userData.user.groups.forEach(group => {
+          let groupObject = {
+            group_id: group.pivot.group_id,
+            course: group.pivot.course,
+          }
+          groups.push(groupObject);
+        });
+
+        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.token, groups);
       })
       .catch((err) => {
         console.error(err);
@@ -178,7 +199,6 @@ io.on('connection', (socket) => {
 
   // Post song checking for duplicates first
   socket.on('postSong', async (userToken, songData) => {
-    console.log('postSong', userToken, songData);
     // Check that the user is authenticated with Laravel Sanctum
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
@@ -186,7 +206,6 @@ io.on('connection', (socket) => {
     try {
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
-      console.log('existingSong', existingSong);
       if (existingSong) {
         socket.emit('postError', { status: 'error', message: 'Song already exists' });
         return;
@@ -194,7 +213,6 @@ io.on('connection', (socket) => {
 
       // Check if the user already submitted a song
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
-      console.log('votingRecord', votingRecord);
       if (votingRecord && votingRecord.submitted) {
         socket.emit('postError', { status: 'error', message: 'User already submitted a song' });
         return;
@@ -203,7 +221,6 @@ io.on('connection', (socket) => {
       // Save the song and update the voting record
       const newSong = new Song(songData);
       await newSong.save();
-      console.log('newSong saved', newSong);
 
       if (!votingRecord) {
         await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], group: user.class_group_id }).save();
@@ -215,7 +232,7 @@ io.on('connection', (socket) => {
       io.emit('songPosted', { status: 'success', song: songData });
     } catch (err) {
       socket.emit('postError', { status: 'error', message: err.message });
-      console.log('postError', err.message);
+      console.error('postError', err.message);
     }
   });
 
@@ -269,15 +286,49 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Delete a song
-  socket.on('deleteSong', async (userToken, songId) => {
+  // Get all songs from the blacklist
+  socket.on('getBlacklist', async (userToken) => {
+    // Check that the user is authenticated with Laravel Sanctum and is an admin
+    let user = await comManager.getUserInfo(userToken);
+    if (!user.id || user.is_admin === 0) return;
+
+    try {
+      // Get songs from database
+      const response = await comManager.getBlackList(userToken);
+      const songs = await response.json();
+      socket.emit('sendBlacklist', songs);
+    } catch (err) {
+      socket.emit('getBlacklistError', { status: 'error', message: err.message });
+    }
+  });
+
+  // remove a song from the blacklist
+  socket.on('removeFromBlacklist', async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
     if (!user.id || user.is_admin === 0) return;
 
     try {
       // Check if the song exists and delete it
-      const song = await Song.findOneAndDelete({ id: songId });
+      await Song.findOneAndDelete({ id: songId });
+
+      await comManager.removeSongFromBlacklist(userToken, songId);
+
+      socket.emit('songRemovedFromBlacklist', songId);
+    } catch (err) {
+      socket.emit('deleteError', { status: 'error', message: err.message });
+    }
+  });
+
+  // Delete a song
+  socket.on('deleteSong', async (userToken, songInfo) => {
+    // Check that the user is authenticated with Laravel Sanctum and is an admin
+    let user = await comManager.getUserInfo(userToken);
+    if (!user.id || user.is_admin === 0) return;
+
+    try {
+      // Check if the song exists and delete it
+      const song = await Song.findOneAndDelete({ id: songInfo.id });
       if (!song) {
         socket.emit('deleteError', { status: 'error', message: 'Song not found' });
         return;
@@ -318,7 +369,6 @@ io.on('connection', (socket) => {
   socket.on('getHtmlSpotify', (songId) => {
     comManager.fetchSpotifyPage(songId).then(html => {
       if (html) {
-        console.log(html);
         socket.emit('sendHtmlSpotify', html, songId);
       }
     });
@@ -326,15 +376,11 @@ io.on('connection', (socket) => {
 
 
   socket.on('getTopSongs', (playlist) => {
-    console.log('getTopSongsStart');
     let limit = 1;
     let songsToEmit = [];
     comManager.getPlaylists(playlist, limit, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
-          console.log("emit topSongs", data);
-          console.log("track", data.items[0].track);
           data.items.forEach(song => {
             songsToEmit.push(song.track);
           });
@@ -345,11 +391,9 @@ io.on('connection', (socket) => {
 
   socket.on('searchSong', (search) => {
     let limit = 15;
-    console.log('searchSongStart');
     comManager.searchSong(search, limit, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
           socket.emit('searchResult', data.tracks.items);
         }
       });
@@ -357,11 +401,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('searchId', (id) => {
-    console.log('searchIdStart');
     comManager.searchSongId(id, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
           socket.emit('searchResultId', data);
         }
       });
@@ -399,15 +441,11 @@ io.on('connection', (socket) => {
 
 
   socket.on('getTopSongs', (playlist) => {
-    console.log('getTopSongsStart');
     let limit = 1;
     let songsToEmit = [];
     comManager.getPlaylists(playlist, limit, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
-          console.log("emit topSongs", data);
-          console.log("track", data.items[0].track);
           data.items.forEach(song => {
             songsToEmit.push(song.track);
           });
@@ -418,11 +456,9 @@ io.on('connection', (socket) => {
 
   socket.on('searchSong', (search) => {
     let limit = 15;
-    console.log('searchSongStart');
     comManager.searchSong(search, limit, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
           socket.emit('searchResult', data.tracks.items);
         }
       });
@@ -430,11 +466,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('searchId', (id) => {
-    console.log('searchIdStart');
     comManager.searchSongId(id, spotifyToken)
       .then(data => {
         if (data) {
-          console.log(data);
           socket.emit('searchResultId', data);
         }
       });
@@ -444,11 +478,11 @@ io.on('connection', (socket) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
     if (!user.id || user.role_id !== 1) return;
-    
+
     try {
       // Ban user
       comManager.banUser(userToken, bannedUser);
-      
+
       io.emit('userBanned', { status: 'success', message: `L'usuari' ${bannedUser.name} ha sigut bloquejat` });
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });

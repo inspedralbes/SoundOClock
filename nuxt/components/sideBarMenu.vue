@@ -1,6 +1,6 @@
 <template>
     <aside
-        :class="{ 'fixed flex flex-col left-0 bg-black text-white overflow-hidden h-screen px-4 py-0 shadow-md z-50': true, 'w-16': !isOpen, 'w-[12rem]': isOpen }">
+        :class="{ 'fixed flex flex-col left-0 bg-black text-white overflow-hidden h-screen px-4 py-0 shadow-md z-[3000]': true, 'w-16': !isOpen, 'w-[12rem]': isOpen }">
         <div class="mx-[-1rem] px-[1rem] bg-white">
             <div class="my-4 flex justify-start transition duration-300 ease-in-out">
                 <img :class="{ 'w-8': true, 'w-[3rem]': isOpen }" src=" /img/inspedralbes_logo.svg"

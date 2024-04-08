@@ -12,34 +12,28 @@ export const socket = io(url);
 socket.on("connect", () => {
   const pinia = useAppStore();
 
-  comManager.getUserSelectedSongs(1);
   // getSongs();
 
   socket.on("voteCasted", (data) => {
-    console.log("socket voteCasted data received: ", data.song);
     comManager.getSongs();
     comManager.getUserSelectedSongs(pinia.getUser().id);
     pinia.setIsLoadingVote({ state: false, selectedSong: null });
   });
 
   socket.on("songReported", (data) => {
-    console.log("socket songReported data received: ", data.message);
   });
 
   socket.on("songDeleted", (data) => {
-    console.log("socket songDeleted data received: ", data.song);
     comManager.getSongs();
     comManager.getAdminSongs();
   });
 
   socket.on("userBanned", (data) => {
-    console.log("socket userBanned data received: ", data.message);
   });
 
-  socket.on("loginData", (id, mail, name, group, token) => {
-    // console.log("socket loginData data received: ", id, mail, name, group, token);
-    pinia.setUser(id, mail, name, group, token);
-    if (pinia.getUser().group) {
+  socket.on("loginData", (id, mail, name, token, groups) => {
+    pinia.setUser(id, mail, name, token, groups);
+    if (pinia.getUser().groups.length > 0) {
       navigateTo({ path: '/llista_propostes' });
     } else {
       navigateTo({ path: '/escollirGrup' });
@@ -57,6 +51,12 @@ socket.on("connect", () => {
   socket.on('groupUpdated', (data) => {
   });
 
+  socket.on('songPosted', (data) => {
+  });
+
+  socket.on('postError', (data) => {
+  });
+
   socket.on("disconnect", () => {
 
   });
@@ -66,7 +66,6 @@ socket.on("connect", () => {
     fetch(`${url}/votingRecords/${id}`)
       .then(response => response.json())
       .then(data => {
-        // console.log("user: ", data);
         pinia.setUserSelectedSongs(data);
       })
       .catch(error => {
@@ -78,7 +77,6 @@ socket.on("connect", () => {
     fetch('${url}/songs')
       .then(response => response.json())
       .then(data => {
-        console.log("songs: ", data);
         pinia.setProposedSongs(data);
       })
       .catch(error => {
@@ -90,7 +88,6 @@ socket.on("connect", () => {
     fetch('${url}/adminSongs')
       .then(response => response.json())
       .then(data => {
-        console.log("songs: ", data);
         pinia.setProposedSongsAdminView(data);
       })
       .catch(error => {

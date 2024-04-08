@@ -75,6 +75,30 @@ async function logout(token) {
   return response;
 }
 
+async function getBlackList(token) {
+  const response = await fetch(apiURL + 'blacklist', {
+      method: 'GET',
+      headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer " + token,
+      },
+  });
+  return response;
+}
+
+async function removeSongFromBlacklist(token, songSpotifyId) {
+  const response = await fetch(apiURL + 'blacklist/' + songSpotifyId, {
+      method: 'DELETE',
+      headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer " + token,
+      }
+  });
+  return response;
+}
+
 async function addSongToBlackList(token, song) {
   const response = await fetch(apiURL + 'blacklist', {
     method: 'POST',
@@ -84,17 +108,17 @@ async function addSongToBlackList(token, song) {
       "Authorization": "Bearer " + token,
     },
     body: JSON.stringify({
-      nom: song.title,
       spotify_id: song.id,
+      title: song.title,
+      artist: song.artist,
+      image: song.img,
     })
   });
   return response;
 }
 
 async function getPlaylists(playlist, limit, token) {
-  console.log("Playlist start", playlist, limit, token);
   let url = `https://api.spotify.com/v1/search?q=${playlist}&type=playlist&limit=${limit}`;
-  console.log("url", url);
   let response = await fetch(url, {
     headers: {
       'Accept': 'application/json',
@@ -102,19 +126,14 @@ async function getPlaylists(playlist, limit, token) {
     }
   })
   let jsonResponse = await response.json();
-  console.log("respuesta", jsonResponse.playlists.items);
   if (jsonResponse.playlists.items) {
-    console.log("playlistID:", jsonResponse.playlists.items[0].id);
     let songs = await getPlaylistSongs(jsonResponse.playlists.items[0].id, token);
-    console.log("Playlist Songs:", songs);
     return songs;
   }
 }
 
 async function getPlaylistSongs(id, token) {
   let limit = 15;
-  console.log("Playlist Songs start");
-  console.log(id);
   let url = `https://api.spotify.com/v1/playlists/${id}/tracks?offset=0&limit=${limit}`;
   let response = await fetch(url, {
     method: 'GET',
@@ -217,8 +236,21 @@ async function banUser(token, user) {
     },
     body: JSON.stringify(user)
   });
-  console.log("BAN USER", response);
   return response;
+}
+
+async function setUserGroups(userId, token, groups) {
+  const response = await fetch(apiURL + 'addGroupsToUser/' + userId, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify(groups)
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
 }
 
 
@@ -228,6 +260,8 @@ const comManager = {
   loginUserAndAdmin,
   login,
   logout,
+  getBlackList,
+  removeSongFromBlacklist,
   addSongToBlackList,
   getPlaylists,
   getPlaylistSongs,
@@ -239,7 +273,8 @@ const comManager = {
   getUsers,
   banUser,
   deleteGroup,
-  updateGroup
+  updateGroup,
+  setUserGroups,
 };
 
 export default comManager;

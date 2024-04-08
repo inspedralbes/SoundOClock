@@ -1,14 +1,18 @@
 <template>
     <div class="container">
-        <label class="switch-label" @click="toggle" @keydown.space.prevent="toggle">{{ labelText }}</label>
-        <span class="toggle-wrapper" role="checkbox" :aria-checked="value.toString()" tabindex="0" @click="toggle"
-            @keydown.space.prevent="toggle">
+        <label v-if="labelText" class="switch-label" @click="toggle" @keydown.space.prevent="toggle" v-bind:class="{ 'clickable': canSwitch }">{{ labelText }}</label>
+        <span class="toggle-wrapper"
+              role="checkbox"
+              :aria-checked="value.toString()"
+              tabindex="0"
+              @click="canSwitch ? toggle() : null"
+              @keydown.space.prevent="canSwitch ? toggle() : null"
+              :class="canSwitch ? 'clickable' : 'not-clickable'">
             <span class="toggle-background" :style="backgroundStyles" />
             <span class="toggle-indicator" :style="indicatorStyles" />
         </span>
     </div>
 </template>
-  
 
 <script>
 export default {
@@ -18,8 +22,10 @@ export default {
             required: true
         },
         labelText: {
-            type: String,
-            default: '' // Valor por defecto para el label
+            type: String
+        },
+        canSwitch: {
+            type: Boolean
         }
     },
     computed: {
@@ -37,16 +43,13 @@ export default {
         indicatorStyles() {
             return { transform: this.value ? 'translateX(14px)' : 'translateX(0)' };
         }
-
     },
-
     methods: {
         toggle() {
             this.$emit('input', !this.value);
         }
     }
 };
-
 </script>
 
 <style scoped>
@@ -93,5 +96,15 @@ export default {
 
 .switch-label {
     margin: .2rem;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.not-clickable{
+    transition: all .2s ease-in-out;
+    cursor: not-allowed;
+    filter:grayscale(100%)
 }
 </style>

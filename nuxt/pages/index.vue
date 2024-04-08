@@ -3,7 +3,7 @@
         <div class="fixed top-0 left-0 w-full h-full overflow-hidden z-[-1] starfield">
             <Star v-for="(star, index) in stars" :key="index" :top="star.top" :left="star.left" :delay="star.delay" />
         </div>
-        <div class="h-10"></div>
+        <div class="h-40"></div>
 
         <div class="title text-white text-center text-4xl font-bold my-4">
             <h1>VOTA LA CANÇÓ</h1>
@@ -33,22 +33,32 @@
             </svg>
         </button>
 
-        <div class="w-300 h-66 absolute bg-black rounded-full bottom-[10rem] z-50 circle"></div>
-        <div class="w-52 h-50 absolute bg-red rounded-full bottom-[4rem] z-40 circle min"></div>
+        <div class="circle"></div>
+        <div class="circle min"></div>
 
     </div>
 </template>
 
 <script>
 
+import { useAppStore } from '@/stores/app';
 
 export default {
     data() {
         return {
-            stars: []
+            stars: [],
+            store: useAppStore(),
         }
     },
     mounted() {
+        let user = this.store.getUser();
+        if(user.token) {
+            if (this.store.getUser().groups.length > 0) {
+                navigateTo({ path: '/llista_propostes' });
+            } else {
+                navigateTo({ path: '/escollirGrup' });
+            }
+        }
         for (let i = 0; i < 50; i++) {
             this.stars.push({
                 top: Math.random() * window.innerHeight,
@@ -89,7 +99,7 @@ export default {
 <style lang="scss" scoped>
 .circle {
     width: 300%;
-    height: 66%;
+    height: 50%;
     position: absolute;
     background: rgb(0, 0, 0);
     border-radius: 50%;
@@ -100,7 +110,7 @@ export default {
 .circle.min {
     box-shadow: 0px 0px 152px 60px rgba(255, 255, 255, 0.44);
     width: 52%;
-    height: 50%;
+    height: 40%;
     bottom: -4rem;
     z-index: 98;
     background-color: red;

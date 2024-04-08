@@ -12,9 +12,8 @@ export default {
     }
   },
   methods: {
-    deleteSong(songId) {
-      console.log("user token", this.store.getUser().token);
-      socket.emit('deleteSong', this.store.getUser().token, songId);
+    deleteSong(song) {
+      socket.emit('deleteSong', this.store.getUser().token, song);
     }
   },
   setup() {
@@ -27,16 +26,16 @@ export default {
 <template>
   <div v-if="song == null">
   </div>
-  <div v-else class="contenidor-canço rounded-lg h-screen text-left p-4">
+  <div v-else class="user-details-container rounded-lg h-screen text-left p-4">
     <div class="flex flex-row mb-10">
-      <img src="/img/mora-primer-dia-de-clases.jpg" alt="" class="w-1/3 rounded-lg">
+      <img :src="song.img" alt="" class="w-1/3 rounded-lg">
       <div class="w-2/3 ml-4 flex flex-col justify-between">
         <div>
           <p class="text-5xl font-black">{{ song.title }}</p>
           <p class="text-3xl">{{ song.artist }}</p>
         </div>
         <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          @click="deleteSong(song.id)">AFEGIR A LA LLISTA NEGRA</button>
+          @click="deleteSong(song)">AFEGIR A LA LLISTA NEGRA</button>
       </div>
     </div>
     <p class="mb-4 text-xl">CANÇÓ PROPOSADA PER: {{ song.submittedBy }}</p>
@@ -50,7 +49,7 @@ export default {
         </svg>
         <p class="text-xl">NÚMERO DE REPORTS: {{ song.reports.length }}</p>
       </div>
-      <div v-for="report in song.reports" class="contenidor-report p-4 flex flex-row justify-between rounded-lg">
+      <div v-for="report in song.reports" class="report-container p-4 flex flex-row justify-between rounded-lg">
         <p>{{ report.reason }}</p>
         <p>{{ report.userName }}</p>
       </div>
@@ -59,8 +58,12 @@ export default {
 </template>
 
 <style scoped>
-.contenidor-canço,
-.contenidor-report {
+.user-details-container,
+.report-container {
   background-color: rgb(56, 56, 56);
+}
+
+.user-details-container {
+  height: 85vh;
 }
 </style>

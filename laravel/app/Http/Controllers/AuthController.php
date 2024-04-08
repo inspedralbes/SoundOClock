@@ -56,6 +56,8 @@ class AuthController extends Controller {
             'name' => $fields['name'],
         ]);
 
+        $user->load('groups');
+
         $token = $user->createToken('soundoclock')->plainTextToken;
 
         $response = [
@@ -124,6 +126,7 @@ class AuthController extends Controller {
         $user = auth()->user();
     
         if ($user) {
+            $user->load('groups');
             return response($user, 200);
         } else {
             return response()->json([
