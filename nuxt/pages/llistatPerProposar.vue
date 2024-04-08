@@ -1,4 +1,6 @@
 <template>
+
+
     <!-- Reproductor -->
     <ModularPlayer @pause="playTrack($event)" @propose="proposeSong($event)" />
 
@@ -72,6 +74,7 @@
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
 
+
 export default {
     data() {
         return {
@@ -86,6 +89,9 @@ export default {
             isWaitingToPropose: false,
             store: useAppStore(),
         }
+    },
+    created() {
+        // console.log(this.$device.isDesktop);s
     },
     mounted() {
         socket.emit('getTopSongs', 'Top Songs Spain');
