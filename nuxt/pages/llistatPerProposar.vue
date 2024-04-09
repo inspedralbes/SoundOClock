@@ -26,47 +26,56 @@
 
 
     <!-- Listado de canciones -->
-    <div v-for="track, index in tracks" :key="index" class="flex flex-row justify-center m-2">
-        <div class="relative">
-            <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full z-0">
-            <Transition name="playingFade">
-                <div v-if="currentTrackId === track.id && isPlaying"
-                    class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
-                    <div class="loader"></div>
-                </div>
-            </Transition>
-        </div>
-        <div class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
-            <div class="flex flex-col w-[70%]">
-                <p class="font-bold text-base uppercase">{{ track.name }}</p>
-                <div class="flex flex-row text-sm">
-                    <p class="whitespace-nowrap overflow-hidden">
-                        <span v-for="(artist, index) in track.artists" :key="index">
-                            <span v-if="index !== 0">, </span>
-                            {{ artist.name }}
-                        </span>
-                    </p>
-                </div>
+    <div class="mb-20">
+        <div v-for="track, index in tracks" :key="index" class="flex flex-row justify-center m-2">
+            <div class="relative">
+                <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full z-0">
+                <Transition name="playingFade">
+                    <div v-if="currentTrackId === track.id && isPlaying"
+                        class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
+                        <div class="loader"></div>
+                    </div>
+                </Transition>
             </div>
-            <button @click="playTrack(track)">
-                <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
-                    pause
+            <div
+                class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
+                <div class="flex flex-col w-[70%]">
+                    <p class="font-bold text-base uppercase">{{ track.name }}</p>
+                    <div class="flex flex-row text-sm">
+                        <p class="whitespace-nowrap overflow-hidden">
+                            <span v-for="(artist, index) in track.artists" :key="index">
+                                <span v-if="index !== 0">, </span>
+                                {{ artist.name }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <button @click="playTrack(track)">
+                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
+                        pause
+                    </span>
+                    <span v-else class="material-symbols-rounded text-4xl">
+                        play_arrow
+                    </span>
+                </button>
+                <button @click="proposeSong(track)" v-if="!track.loading && !track.proposed">
+                    <span class="material-symbols-rounded text-4xl">
+                        add_circle
+                    </span>
+                </button>
+                <div v-if="track.loading" class="loader-track"></div>
+                <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
+                    task_alt
                 </span>
-                <span v-else class="material-symbols-rounded text-4xl">
-                    play_arrow
-                </span>
-            </button>
-            <button @click="proposeSong(track)" v-if="!track.loading && !track.proposed">
-                <span class="material-symbols-rounded text-4xl">
-                    add_circle
-                </span>
-            </button>
-            <div v-if="track.loading" class="loader-track"></div>
-            <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
-                task_alt
-            </span>
+            </div>
         </div>
     </div>
+    <!-- Boton que redirige a la propuesta de canciones -->
+    <footer class="fixed bottom-2 w-full flex justify-center align-center">
+        <button @click="$router.push('/llista_propostes2')"
+            class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700">Tornar a les votacions
+        </button>
+    </footer>
 </template>
 
 <script>

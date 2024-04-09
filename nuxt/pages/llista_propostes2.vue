@@ -33,48 +33,51 @@
     </div>
 
     <!-- Listado canciones -->
-    <div v-for="track, index in filteredSongs" :key="index" class="flex flex-row justify-center m-2">
-        <div class="relative">
-            <img :src="track.img" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full">
-            <Transition name="playingFade">
-                <div v-if="currentTrackId === track.id && isPlaying"
-                    class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
-                    <div class="loader"></div>
-                </div>
-            </Transition>
-        </div>
-        <div class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
-            <div class="flex flex-col w-[70%]">
-                <p class="font-bold text-base uppercase">{{ track.title }}</p>
-                <div class="flex flex-row text-sm">
-                    <p class="whitespace-nowrap overflow-hidden">
-                        {{ track.artist }}
-                    </p>
-                </div>
-                <p>Vots: {{ track.votes }}</p>
+    <div class="mb-20">
+
+        <div v-for="track, index in filteredSongs" :key="index" class="flex flex-row justify-center m-2">
+            <div class="relative">
+                <img :src="track.img" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full">
+                <Transition name="playingFade">
+                    <div v-if="currentTrackId === track.id && isPlaying"
+                        class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
+                        <div class="loader"></div>
+                    </div>
+                </Transition>
             </div>
-            <button @click="playTrack(track)">
-                <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
-                    pause
-                </span>
-                <span v-else class="material-symbols-rounded text-4xl">
-                    play_arrow
-                </span>
-            </button>
-            <button @click="report(track)">
-                <span class="material-symbols-rounded text-4xl">
-                    report
-                </span>
-            </button>
-            <div v-if="isLoadingVote.state && isLoadingVote.selectedSong == track.id" class="loader-track"></div>
-            <button v-else @click="vote(track.id)">
-                <span class="material-symbols-rounded text-4xl" :class="{ 'text-blue-500': isSongVoted }">
-                    thumb_up
-                </span>
-            </button>
+            <div
+                class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
+                <div class="flex flex-col w-[70%]">
+                    <p class="font-bold text-base uppercase">{{ track.title }}</p>
+                    <div class="flex flex-row text-sm">
+                        <p class="whitespace-nowrap overflow-hidden">
+                            {{ track.artist }}
+                        </p>
+                    </div>
+                    <p>Vots: {{ track.votes }}</p>
+                </div>
+                <button @click="playTrack(track)">
+                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
+                        pause
+                    </span>
+                    <span v-else class="material-symbols-rounded text-4xl">
+                        play_arrow
+                    </span>
+                </button>
+                <button @click="report(track)">
+                    <span class="material-symbols-rounded text-4xl">
+                        report
+                    </span>
+                </button>
+                <div v-if="isLoadingVote.state && isLoadingVote.selectedSong == track.id" class="loader-track"></div>
+                <button v-else @click="vote(track.id)">
+                    <span class="material-symbols-rounded text-4xl" :class="{ 'text-blue-500': isSongVoted }">
+                        thumb_up
+                    </span>
+                </button>
+            </div>
         </div>
     </div>
-
     <!-- Modales -->
     <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
     <ModularModal v-if="modals.alreadyVotedModal" @close="modals.alreadyVotedModal = false">
