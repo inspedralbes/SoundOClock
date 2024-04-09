@@ -104,6 +104,10 @@ jobs:
           chmod 600 ~/prod_key.pem
           cd ${{ github.workspace }}
           cd nuxt
+          mv .env.example .env
           npm install
-          npm run build
-          ls
+          sed -i 's/GOOGLE_CLIENT_ID=/GOOGLE_CLIENT_ID=a/g' .env
+          sed -i 's/GOOGLE_CLIENT_SECRET=/GOOGLE_CLIENT_SECRET=b/g' .env
+          sed -i 's/GOOGLE_REDIRECT_URI=/GOOGLE_REDIRECT_URI=c/g' .env
+          cat .env
+          
