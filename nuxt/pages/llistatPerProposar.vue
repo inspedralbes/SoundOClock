@@ -70,6 +70,16 @@
             </div>
         </div>
     </div>
+
+    <!-- Modals -->
+    <ModularModal v-if="modals.proposeSongError" @close="modals.proposeSongError = false">
+        <template #title>Ja has proposat una cançó</template>
+        <template #content>
+            <p class="text-center">Ja has proposat una cançó, espera a que la següent votació per proposar una altra.
+            </p>
+        </template>
+    </ModularModal>
+
     <!-- Boton que redirige a la propuesta de canciones -->
     <footer class="fixed bottom-2 w-full flex justify-center align-center">
         <button @click="$router.push('/llista_propostes')"
@@ -81,10 +91,12 @@
 <script>
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
+import { computed } from 'vue';
 
 
 export default {
     data() {
+        const store = useAppStore();
         return {
             token: '',
             songFile: null,
@@ -96,6 +108,11 @@ export default {
             isWaitingToPlay: false,
             isWaitingToPropose: false,
             store: useAppStore(),
+            modals: {
+                proposeSongError: false,
+            },
+            postedSongStatus: computed(() => store.postedSongStatus),
+            postedSongId: "",
         }
     },
     created() {
@@ -142,6 +159,7 @@ export default {
                 console.error('No se encontró el script con el id "__NEXT_DATA__" en el HTML recibido');
             }
         });
+
     },
     methods: {
         getSongs() {
@@ -193,6 +211,7 @@ export default {
         },
         proposeSong(track) {
             track.loading = true;
+            this.postedSongId = track.id;
             if (track.preview_url == null) {
                 socket.emit('getHtmlSpotify', track.id);
                 this.isWaitingToPropose = true;
@@ -209,10 +228,6 @@ export default {
                 }
                 socket.emit('postSong', this.store.getUser().token, song);
             }
-            setTimeout(() => {
-                track.proposed = true;
-                track.loading = false;
-            }, 2000);
         },
         getMp3(AudioPreviewURL, songId) {
             fetch(AudioPreviewURL)
@@ -256,6 +271,9 @@ export default {
             this.query = '';
             this.tracks = [];
             socket.emit('getTopSongs', 'Top Songs Spain');
+        },
+        searchBySongId(id) {
+            return this.tracks.find(item => item.id == id);
         }
     },
     beforeDestroy() {
@@ -269,6 +287,17 @@ export default {
                 this.currentTrack.onended = () => {
                     this.isPlaying = false;
                     this.store.deleteCurrentTrackPlaying();
+                }
+            }
+        },
+        postedSongStatus: {
+            handler: function () {
+                if (this.postedSongStatus.status == 'error') {
+                    this.modals.proposeSongError = true;
+                    this.searchBySongId(this.postedSongId).loading = false;
+                } else {
+                    this.searchBySongId(this.postedSongId).loading = false;
+                    this.searchBySongId(this.postedSongId).proposed = true;
                 }
             }
         }

@@ -24,6 +24,7 @@ export const useAppStore = defineStore('app', {
     adminSelectedUser: null,
     bells: [],
     currentTrackPlaying: null,
+    postedSongStatus: null,
 
   }),
   persist: {
@@ -71,6 +72,9 @@ export const useAppStore = defineStore('app', {
     },
     getBells() {
       return this.bells
+    },
+    getPostedSongStatus() {
+      return this.postedSongStatus
     },
 
     //setters
@@ -121,6 +125,9 @@ export const useAppStore = defineStore('app', {
     setBells(bells) {
       this.bells = bells
     },
+    setPostedSongStatus(postedSongStatus) {
+      this.postedSongStatus = postedSongStatus
+    },
 
     ///Deletes
     deleteUser() {
@@ -138,6 +145,9 @@ export const useAppStore = defineStore('app', {
     },
     deleteCurrentTrackPlaying() {
       this.currentTrackPlaying = null
+    },
+    deletePostedSongStatus() {
+      this.postedSongStatus = null
     },
     setAdminSelectedUser(adminSelectedUser) {
       this.adminSelectedUser = adminSelectedUser
