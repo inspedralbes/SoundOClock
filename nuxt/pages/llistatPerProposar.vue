@@ -82,7 +82,7 @@
 
     <!-- Boton que redirige a la propuesta de canciones -->
     <footer class="fixed bottom-2 w-full flex justify-center align-center">
-        <button @click="$router.push('/llista_propostes')"
+        <button @click="goToVote"
             class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700">Tornar a les votacions
         </button>
     </footer>
@@ -117,7 +117,7 @@ export default {
     },
     mounted() {
 
-        if(!this.store.getUser().token) {
+        if (!this.store.getUser().token) {
             console.log('No token');
             navigateTo({ path: '/' });
         }
@@ -277,6 +277,11 @@ export default {
         },
         searchBySongId(id) {
             return this.tracks.find(item => item.id == id);
+        },
+        goToVote() {
+            this.$router.push('/llista_propostes');
+            this.store.setProposeSongStatus(null);
+            this.currentTrack.pause();
         }
     },
     beforeDestroy() {
