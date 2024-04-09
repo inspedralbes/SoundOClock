@@ -5,25 +5,31 @@
     <MobilePlayer v-else type="vote" @pause="playTrack($event)" @vote="vote($event.id)" @report="report($event)" />
 
     <!-- Titulo -->
-    <h1 class="w-full text-center text-5xl font-bold m-2">Vota la teva cançó preferida</h1>
+    <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">Vota
+        la teva
+        cançó
+        preferida</h1>
 
     <!-- Barra de busqueda -->
-    <div class="w-full flex justify-center items-center">
-        <div class="relative w-[60%] m-2 text-center">
+    <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
+        <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
             <input type="text" placeholder="Buscar..."
                 class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                v-model.lazy="filter">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded">
+                :class="{ '!py-1 !text-sm': $device.isMobile }" v-model.lazy="filter">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
+                :class="{ 'text-base': $device.isMobile }">
                 search
             </span>
             <button @click="deleteSearch">
-                <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded">
+                <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                    :class="{ 'text-base': $device.isMobile }">
                     Close
                 </span>
             </button>
         </div>
         <select v-model.lazy="orderBy"
-            class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center">
+            class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center"
+            :class="{ 'text-sm !p-1': $device.isMobile }">
             <option value="votes-desc">Més vots</option>
             <option value="votes-asc">Menys vots</option>
             <option value="title-desc">Títol (A-Z)</option>
@@ -36,7 +42,6 @@
 
     <!-- Listado canciones -->
     <div class="mb-20">
-
         <div v-for="track, index in filteredSongs" :key="index" class="flex flex-row justify-center m-2">
             <div class="relative">
                 <img :src="track.img" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full">
@@ -114,7 +119,8 @@
     <!-- Boton que redirige a la propuesta de canciones -->
     <footer class="fixed bottom-2 w-full flex justify-center align-center">
         <button @click="goToProposar"
-            class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700">Proposar
+            class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700"
+            :class="{ 'text-sm w-[90%] mb-4': $device.isMobile }">Proposar
             cançó
         </button>
     </footer>
