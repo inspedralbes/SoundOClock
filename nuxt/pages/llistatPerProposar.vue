@@ -167,9 +167,11 @@ export default {
                     store.setCurrentTrackPlaying(track);
                 } else {
                     if (this.currentTrack != null) {
+
                         this.currentTrack.pause();
                         store.deleteCurrentTrackPlaying();
                     }
+                    store.setCurrentTrackPlaying(track);
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
                 }
@@ -252,6 +254,16 @@ export default {
         socket.off('searchResult');
         socket.off('sendHtmlSpotify');
     },
+    watch: {
+        'currentTrack': {
+            handler: function () {
+                this.currentTrack.onended = () => {
+                    this.isPlaying = false;
+                    this.store.deleteCurrentTrackPlaying();
+                }
+            }
+        }
+    }
 }
 </script>
 
