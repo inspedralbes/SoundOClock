@@ -18,6 +18,7 @@
 
 <script>
 import { socket } from '@/socket';
+import { useAppStore } from '@/stores/app';
 
 export default {
     data() {
@@ -27,10 +28,16 @@ export default {
             tracks: [],
             currentTrack: null,
             currentTrackId: null,
-            currentTrackStatus: 'stopped'
+            currentTrackStatus: 'stopped',
+            store: useAppStore(),
         }
     },
     mounted() {
+
+        if(!this.store.getUser().token) {
+            navigateTo({ path: '/' });
+        }
+
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
 
             // Crear un elemento HTML temporal
@@ -156,9 +163,6 @@ export default {
 
         },
     },
-    computed: {
-
-    }
 }
 </script>
 

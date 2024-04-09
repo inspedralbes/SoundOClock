@@ -98,10 +98,13 @@ export default {
             store: useAppStore(),
         }
     },
-    created() {
-
-    },
     mounted() {
+
+        if(!this.store.getUser().token) {
+            console.log('No token');
+            navigateTo({ path: '/' });
+        }
+
         socket.emit('getTopSongs', 'Top Songs Spain');
 
         socket.on('topSongs', (results) => {
