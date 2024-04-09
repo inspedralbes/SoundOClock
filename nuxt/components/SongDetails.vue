@@ -8,12 +8,15 @@ export default {
   },
   data() {
     return {
-
+      modals: {
+        addSongToBlacklist: false,
+      },
     }
   },
   methods: {
     deleteSong(song) {
-      socket.emit('deleteSong', this.store.getUser().token, song);
+      this.modals.addSongToBlacklist = true;
+      //socket.emit('deleteSong', this.store.getUser().token, song);
     }
   },
   setup() {
@@ -55,6 +58,18 @@ export default {
       </div>
     </div>
   </div>
+
+  <Transition name="fade">
+    <ModularModal v-if="modals.addSongToBlacklist" type="error" msg="Afegir" title="Afegir cançó a la llista negra"
+      @confirm="submitData()" @close="modals.addSongToBlacklist = false">
+      <template #title>
+        <h2>Afegir cançó a la llista negra</h2>
+      </template>
+      <template #content>
+        <p>Estàs segur que vols afegir cançó a la llista negra?</p>
+      </template>
+    </ModularModal>
+  </Transition>
 </template>
 
 <style scoped>
