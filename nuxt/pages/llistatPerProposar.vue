@@ -51,7 +51,7 @@
                     </div>
                 </div>
                 <button @click="playTrack(track)">
-                    <span v-if="currentTrack.id === track.id && isPlaying" class="material-symbols-rounded text-4xl">
+                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
                         pause
                     </span>
                     <span v-else class="material-symbols-rounded text-4xl">
@@ -180,6 +180,7 @@ export default {
                     this.isPlaying = false;
                     store.deleteCurrentTrackPlaying();
                 } else {
+                    this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
@@ -192,6 +193,7 @@ export default {
                     }
                     this.currentTrack = new Audio(track.preview_url);
                     this.currentTrackId = track.id;
+                    this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
@@ -245,6 +247,7 @@ export default {
                     if (this.isWaitingToPlay) {
                         this.currentTrack = new Audio(audioURL);
                         this.currentTrackId = songId;
+                        this.currentTrack.load();
                         this.currentTrack.play();
                         this.isPlaying = true;
                         this.isWaitingToPlay = false;
@@ -280,7 +283,7 @@ export default {
         },
         goToVote() {
             this.$router.push('/llista_propostes');
-            this.store.setProposeSongStatus(null);
+            this.store.deleteCurrentTrackPlaying(null);
             this.currentTrack.pause();
         }
     },

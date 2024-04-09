@@ -100,7 +100,7 @@
         <template #title>Reportar cançó</template>
         <template #content>
             <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-                reportSongData.reportedSong.artist }}?</p>
+        reportSongData.reportedSong.artist }}?</p>
             <div class="flex flex-col">
                 <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                     <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
@@ -146,6 +146,7 @@ export default {
             store: useAppStore(),
             currentTrack: null,
             currentTrackId: null,
+            isPlaying: false,
         }
     },
     created() {
@@ -198,6 +199,7 @@ export default {
                     this.isPlaying = false;
                     store.deleteCurrentTrackPlaying();
                 } else {
+                    this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
@@ -211,6 +213,7 @@ export default {
                     }
                     this.currentTrack = new Audio(track.previewUrl);
                     this.currentTrackId = track.id;
+                    this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
@@ -225,8 +228,6 @@ export default {
                     this.isWaitingToPlay = true;
                 }
             }
-            console.log(this.currentTrackId == track.id);
-            console.log(this.isPlaying);
         },
     },
     watch: {
