@@ -52,9 +52,11 @@ socket.on("connect", () => {
   });
 
   socket.on('songPosted', (data) => {
+    pinia.setPostedSongStatus(data);
   });
 
   socket.on('postError', (data) => {
+    pinia.setPostedSongStatus(data);
   });
 
   socket.on('bellsGroupsRelationsUpdated', (data) => {

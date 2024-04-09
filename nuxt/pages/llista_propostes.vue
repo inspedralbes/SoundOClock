@@ -71,7 +71,8 @@
                 </button>
                 <div v-if="isLoadingVote.state && isLoadingVote.selectedSong == track.id" class="loader-track"></div>
                 <button v-else @click="vote(track.id)">
-                    <span class="material-symbols-rounded text-4xl" :class="{ 'text-blue-500': isSongVoted }">
+                    <span
+                        :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id) }">
                         thumb_up
                     </span>
                 </button>
@@ -81,7 +82,7 @@
     <!-- Modales -->
     <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
     <ModularModal v-if="modals.alreadyVotedModal" @close="modals.alreadyVotedModal = false">
-        <template #title>Màxims vots aconseguits</template>
+        <template #title>Has arribat al màxim de vots</template>
         <template #content>
             <p>
                 Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura
@@ -140,6 +141,7 @@ export default {
                 selectedOption: "La cançó té contingut inadequat"
             },
             orderBy: 'votes-desc',
+            userSelectedSongs: computed(() => store.userSelectedSongs),
             store: useAppStore()
         }
     },
@@ -149,7 +151,7 @@ export default {
         this.loading = false;
     },
     mounted() {
-        if(!this.store.getUser().token) {
+        if (!this.store.getUser().token) {
             navigateTo({ path: '/' });
         }
     },
@@ -171,13 +173,20 @@ export default {
         vote(songId) {
             if (!this.isLoadingVote.state) {
                 if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
-                    // this.$emit('openModal');
+                    this.modals.alreadyVotedModal = true;
                 } else {
                     this.store.setIsLoadingVote({ state: true, selectedSong: songId });
                     socket.emit('castVote', this.store.getUser().token, songId);
                 }
             }
         },
+        isSongVoted(songId) {
+            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     },
     watch: {
         songs: { // Each time songs change execute search() method
@@ -221,14 +230,6 @@ export default {
 
             return filtered;
         },
-        isSongVoted() {
-            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
     },
 }
 
