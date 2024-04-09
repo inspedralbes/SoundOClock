@@ -61,4 +61,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Bells routes
     Route::get('/bells', [BellController::class, 'index']);
+    Route::put('/updateBells', [BellController::class, 'update']);
 });

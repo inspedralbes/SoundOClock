@@ -57,6 +57,14 @@ socket.on("connect", () => {
   socket.on('postError', (data) => {
   });
 
+  socket.on('bellsGroupsRelationsUpdated', (data) => {
+    console.log('socket bellsGroupsRelationsUpdated data received', data);
+  });
+
+  socket.on('updateBellsGroupsRelationsError', (data) => {
+    console.log('socket updateBellsGroupsRelationsError data received', data);
+  });
+
   socket.on("disconnect", () => {
 
   });

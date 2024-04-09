@@ -484,6 +484,16 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('updateBellsGroupsRelations', async (userToken, bells) => {
+
+    try {
+      let response = await comManager.setBellsGroupsConfiguration(userToken, bells);
+      io.emit('bellsGroupsRelationsUpdated', { status: 'success', message: response });
+    } catch (err) {
+      socket.emit('updateBellsGroupsRelationsError', { status: 'error', message: err.message });
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });

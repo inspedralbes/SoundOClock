@@ -51,7 +51,7 @@
     <Transition name="fade">
         <ModularModal v-if="modals.bellsWithoutGroups" type="error" title="Hi ha timbres sense grup assignat" @close="modals.bellsWithoutGroups=false">
             <template #title>
-                <h2>Hi han franges horàries sense grup assignat</h2>
+                <h2>Hi ha timbres sense grup assignat</h2>
             </template>
             <template #content>
                 <p>Totes les franges horàries han de tenir com a mínim un grup assignat.</p>
@@ -110,7 +110,6 @@ export default {
             }
         },
         saveBellsGroupsRelation() {
-            console.log(this.bells);
             let isSubmittable = true;
             for (let i = 0; i < this.bells.length; i++) {
                 if (this.bells[i].groups <= 0) {
@@ -125,8 +124,8 @@ export default {
             }
         },
         submitData() {
-            console.log("INFORMACIÓ ENVIADA", this.bells);
-            socket.emit('configureBellsGroupsRelations', this.bells);
+            const bells = {bells: this.bells};
+            socket.emit('updateBellsGroupsRelations', this.store.getUser().token, bells);
         }
     },
     computed: {

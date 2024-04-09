@@ -273,6 +273,19 @@ async function getBells(token) {
   return jsonResponse;
 }
 
+async function setBellsGroupsConfiguration(token, bells) {
+  const response = await fetch(apiURL + 'updateBells', {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify(bells)
+  });
+  return response;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -294,7 +307,8 @@ const comManager = {
   deleteGroup,
   updateGroup,
   setUserGroups,
-  getBells
+  getBells,
+  setBellsGroupsConfiguration
 };
 
 export default comManager;
