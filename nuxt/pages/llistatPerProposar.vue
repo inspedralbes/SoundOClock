@@ -1,6 +1,5 @@
 <template>
 
-
     <!-- Reproductor -->
     <ModularPlayer v-if="$device.isDesktop" @pause="playTrack($event)" @propose="proposeSong($event)" />
     <MobilePlayer v-else @pause="playTrack($event)" @propose="proposeSong($event)" />
