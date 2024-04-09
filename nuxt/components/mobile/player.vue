@@ -1,9 +1,10 @@
 <template>
     <Transition name="player-slide">
-        <div v-if="track != null"
-            class="fixed bottom-0 right-0 bg-white rounded-lg shadow-lg p-4 w-full overflow-hidden z-50">
+        <div v-if="track != null" class="fixed bottom-0 right-0 bg-white shadow-lg p-4 w-full overflow-hidden z-50">
+            <img class="fixed bottom-5 object-cover w-28 rounded-full border-8 border-solid border-white spin"
+                :src="track.album.images[0].url" alt="Album Image">
             <div class="flex flex-col items-center">
-                <div class="flex flex-row items-center">
+                <div class="flex flex-row items-center ml-20">
                     <button class="m-2" @click="pause">
                         <span class="material-symbols-rounded text-4xl text-gray-700">
                             pause
@@ -83,21 +84,6 @@ export default {
     transform: translateY(150%);
 }
 
-@keyframes marquee {
-    0% {
-        transform: translateX(100%);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-.text-marquee {
-    white-space: nowrap;
-    animation: marquee 10s linear infinite;
-}
-
 .loader-track {
     width: 35px;
     height: 35px;
@@ -129,5 +115,19 @@ export default {
 .playingFade-enter-from,
 .playingFade-leave-to {
     opacity: 0;
+}
+
+.spin {
+    animation: spin 5s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 </style>

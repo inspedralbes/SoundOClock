@@ -90,7 +90,7 @@ export default {
         }
     },
     created() {
-        console.log(this.$device.isMobile)
+
     },
     mounted() {
         socket.emit('getTopSongs', 'Top Songs Spain');
