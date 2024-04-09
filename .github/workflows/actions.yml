@@ -111,7 +111,7 @@ jobs:
           sed -i 's/GOOGLE_CLIENT_SECRET=/GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}/g' .env
           sed -i 's#GOOGLE_REDIRECT_URI=#GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }} #g' .env
           npm run build  -- --host=http://129.151.244.179:8080
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d projecte/nuxt2] && sudo rm -r projecte/nuxt2"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d projecte/nuxt2 ] && sudo rm -r projecte/nuxt2"
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "cd projecte && mkdir nuxt2"
 
 
