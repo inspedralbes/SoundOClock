@@ -156,6 +156,15 @@ app.post('/logout', async (req, res) => {
   }
 })
 
+app.post('/userInfo', async (req, res) => {
+  try {
+    let response = await comManager.getUserInfo(req.body.token);
+    res.json(response);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {

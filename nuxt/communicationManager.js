@@ -102,7 +102,22 @@ async function logout(token) {
     return data;
 }
 
-const comManager= {
+async function getUserInfo(token) {
+    const response = await fetch(`${url}/userInfo`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            token,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
+const comManager = {
     getUserSelectedSongs,
     getSongs,
     getAdminSongs,
@@ -110,7 +125,8 @@ const comManager= {
     getPublicGroups,
     setUserGroups,
     getBells,
-    logout
+    logout,
+    getUserInfo,
 };
 
 export default comManager;
