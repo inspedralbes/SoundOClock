@@ -110,5 +110,6 @@ jobs:
           sed -i 's/GOOGLE_CLIENT_ID=/GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}/g' .env
           sed -i 's/GOOGLE_CLIENT_SECRET=/GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}/g' .env
           sed -i 's#GOOGLE_REDIRECT_URI=#GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }} #g' .env
-          npm run build  -- --host=http://129.151.244.179:8080
+          npm run generate  -- --host=http://129.151.244.179:8080
+          
           
