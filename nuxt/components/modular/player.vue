@@ -1,15 +1,15 @@
 <template>
     <Transition name="player-slide">
         <div v-if="track != null"
-            class="fixed bottom-8 right-8 bg-white rounded-lg shadow-lg p-4 w-[200px] overflow-hidden">
+            class="fixed bottom-8 right-8 bg-white rounded-lg shadow-sm p-4 w-[200px] overflow-hidden shadow-white">
             <div class="flex flex-col items-center">
                 <div>
-                    <img class="rounded-lg object-cover" :src="track.album.images[0].url" alt="Album Image">
+                    <img class="rounded-full object-cover spin" :src="track.album.images[0].url" alt="Album Image">
                 </div>
                 <div class="mt-4 text-center overflow-hidden">
                     <h3 class="text-lg font-semibold text-gray-800 whitespace-nowrap overflow-hidden"
                         :class="{ 'text-marquee': isOverflowing(1) }">{{
-            track.name }}
+                            track.name }}
                     </h3>
                     <p class="text-gray-700 whitespace-nowrap overflow-hidden"
                         :class="{ 'text-marquee': isOverflowing(2) }">
@@ -145,5 +145,19 @@ export default {
 .playingFade-enter-from,
 .playingFade-leave-to {
     opacity: 0;
+}
+
+.spin {
+    animation: spin 5s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 </style>
