@@ -140,13 +140,18 @@ export default {
                 selectedOption: "La cançó té contingut inadequat"
             },
             orderBy: 'votes-desc',
+            store: useAppStore()
         }
     },
     created() {
         this.loading = true;
-        // comManager.getUserSelectedSongs(this.store.getUser().id);
         comManager.getSongs();
         this.loading = false;
+    },
+    mounted() {
+        if(!this.store.getUser().token) {
+            navigateTo({ path: '/' });
+        }
     },
     methods: {
         deleteSearch() {
@@ -224,10 +229,6 @@ export default {
             }
         }
 
-    },
-    setup() {
-        const store = useAppStore();
-        return { store };
     },
 }
 
