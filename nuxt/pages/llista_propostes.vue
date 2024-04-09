@@ -1,3 +1,123 @@
+<template>
+    <!-- Reproductor -->
+    <ModularPlayer type="vote" @pause="playTrack($event)" />
+
+    <!-- Titulo -->
+    <h1 class="w-full text-center text-5xl font-bold m-2">Vota la teva cançó preferida</h1>
+
+    <!-- Barra de busqueda -->
+    <div class="w-full flex justify-center items-center">
+        <div class="relative w-[60%] m-2 text-center">
+            <input type="text" placeholder="Buscar..."
+                class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                v-model.lazy="filter">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded">
+                search
+            </span>
+            <button @click="deleteSearch">
+                <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded">
+                    Close
+                </span>
+            </button>
+        </div>
+        <select v-model.lazy="orderBy"
+            class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center">
+            <option value="votes-desc">Més vots</option>
+            <option value="votes-asc">Menys vots</option>
+            <option value="title-desc">Títol (A-Z)</option>
+            <option value="title-asc">Títol (Z-A)</option>
+            <option value="artist-desc">Artista (A-Z)</option>
+            <option value="artist-asc">Artista (Z-A)</option>
+        </select>
+
+    </div>
+
+    <!-- Listado canciones -->
+    <div class="mb-20">
+
+        <div v-for="track, index in filteredSongs" :key="index" class="flex flex-row justify-center m-2">
+            <div class="relative">
+                <img :src="track.img" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full">
+                <Transition name="playingFade">
+                    <div v-if="currentTrackId === track.id && isPlaying"
+                        class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
+                        <div class="loader"></div>
+                    </div>
+                </Transition>
+            </div>
+            <div
+                class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
+                <div class="flex flex-col w-[70%]">
+                    <p class="font-bold text-base uppercase">{{ track.title }}</p>
+                    <div class="flex flex-row text-sm">
+                        <p class="whitespace-nowrap overflow-hidden">
+                            {{ track.artist }}
+                        </p>
+                    </div>
+                    <p>Vots: {{ track.votes }}</p>
+                </div>
+                <button @click="playTrack(track)">
+                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
+                        pause
+                    </span>
+                    <span v-else class="material-symbols-rounded text-4xl">
+                        play_arrow
+                    </span>
+                </button>
+                <button @click="report(track)">
+                    <span class="material-symbols-rounded text-4xl">
+                        report
+                    </span>
+                </button>
+                <div v-if="isLoadingVote.state && isLoadingVote.selectedSong == track.id" class="loader-track"></div>
+                <button v-else @click="vote(track.id)">
+                    <span class="material-symbols-rounded text-4xl" :class="{ 'text-blue-500': isSongVoted }">
+                        thumb_up
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Modales -->
+    <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
+    <ModularModal v-if="modals.alreadyVotedModal" @close="modals.alreadyVotedModal = false">
+        <template #title>Màxims vots aconseguits</template>
+        <template #content>
+            <p>
+                Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura
+                s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions,
+                promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies
+                per
+                la teva participació!
+            </p>
+        </template>
+    </ModularModal>
+
+    <!-- Modal de los reportes -->
+    <ModularModal msg="Reportar" v-if="modals.reportModal" @close="modals.reportModal = false" @confirm="reportTrack">
+        <template #title>Reportar cançó</template>
+        <template #content>
+            <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
+                reportSongData.reportedSong.artist }}?</p>
+            <div class="flex flex-col">
+                <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
+                    <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
+                    <span class="ml-2">{{ option }}</span>
+                </label>
+            </div>
+        </template>
+    </ModularModal>
+
+    <!-- Boton que redirige a la propuesta de canciones -->
+    <footer class="fixed bottom-2 w-full flex justify-center align-center">
+        <button @click="goToProposar"
+            class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700">Proposar
+            cançó
+        </button>
+    </footer>
+
+</template>
+
 <script>
 import { useAppStore } from '@/stores/app';
 import { socket } from '../socket';
@@ -5,16 +125,21 @@ import comManager from '../communicationManager';
 
 export default {
     data() {
+        const store = useAppStore();
         return {
-            filteredSongs: [],
-            showModal: false,
-            showReportModal: false,
+            filter: '',
+            modals: {
+                alreadyVotedModal: false,
+                reportModal: false
+            },
             loading: false,
+            isLoadingVote: computed(() => store.isLoadingVote),
             reportSongData: {
                 reportedSong: null,
                 options: ["La cançó té contingut inadequat", "La cançó no s'adequa a la temàtica"],
                 selectedOption: "La cançó té contingut inadequat"
-            }
+            },
+            orderBy: 'votes-desc',
         }
     },
     created() {
@@ -24,71 +149,30 @@ export default {
         this.loading = false;
     },
     methods: {
-        applyFilter() {
-            switch (parseInt(this.filter)) {
-                case 1:
-                    this.sortByVotesDescending();
-                    break;
-                case 2:
-                    this.sortByVotesAscending();
-                    break;
-                case 3:
-                    this.sortByTitleAlphabetically();
-                    break;
-                case 4:
-                    this.sortByArtistAlphabetically();
-                    break;
-                default:
-                    break;
-            }
+        deleteSearch() {
+            this.filter = '';
         },
-        sortByVotesDescending() {
-            this.filteredSongs.sort((a, b) => b.votes - a.votes);
+        report(track) {
+            this.modals.reportModal = true;
+            this.reportSongData.reportedSong = track;
         },
-        sortByVotesAscending() {
-            this.filteredSongs.sort((a, b) => a.votes - b.votes);
-        },
-        sortByTitleAlphabetically() {
-            this.filteredSongs.sort((a, b) => a.title.localeCompare(b.title));
-        },
-        sortByArtistAlphabetically() {
-            this.filteredSongs.sort((a, b) => a.artist.localeCompare(b.artist));
-        },
-        search() {
-            this.filteredSongs = [];
-
-            for (let i = 0; i < this.songs.length; i++) {
-                if (this.songs[i].artist.match(this.searchEngineFilter) || this.songs[i].title.match(this.searchEngineFilter)) {
-                    this.filteredSongs.push(this.songs[i]);
-                }
-            }
-
-            this.applyFilter();
-        },
-        openModal() {
-            this.showModal = true;
-            setTimeout(() => {
-                this.closeModal();
-            }, 1500);
-        },
-        closeModal() {
-            this.showModal = false;
-        },
-        openReportModal(data) {
-            this.reportSongData.reportedSong = data;
-            this.showReportModal = true;
-        },
-        closeReportModal() {
-            this.reportSongData.reportedSong = null;
-            this.showReportModal = false;
-        },
-        report() {
+        reportTrack() {
             const song = { songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
             socket.emit('reportSong', this.store.getUser().token, song);
         },
         goToProposar() {
             this.$router.push('/llistatPerProposar');
-        }
+        },
+        vote(songId) {
+            if (!this.isLoadingVote.state) {
+                if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
+                    // this.$emit('openModal');
+                } else {
+                    this.store.setIsLoadingVote({ state: true, selectedSong: songId });
+                    socket.emit('castVote', this.store.getUser().token, songId);
+                }
+            }
+        },
     },
     watch: {
         songs: { // Each time songs change execute search() method
@@ -97,16 +181,49 @@ export default {
         }
     },
     computed: {
-        searchEngineFilter() {
-            return this.store.getSearchEngineFilter();
-        },
-        filter() {
-            return this.store.getFilter();
-        },
         songs() {
             let songs = this.store.getProposedSongs();
             return songs;
         },
+        filteredSongs() {
+            let filtered = this.songs.filter(song =>
+                song.title.toLowerCase().includes(this.filter.toLowerCase()) ||
+                song.artist.toLowerCase().includes(this.filter.toLowerCase())
+            );
+
+            switch (this.orderBy) {
+                case 'votes-desc':
+                    filtered.sort((a, b) => b.votes - a.votes);
+                    break;
+                case 'votes-asc':
+                    filtered.sort((a, b) => a.votes - b.votes);
+                    break;
+                case 'title-desc':
+                    filtered.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+                case 'title-asc':
+                    filtered.sort((a, b) => b.title.localeCompare(a.title));
+                    break;
+                case 'artist-desc':
+                    filtered.sort((a, b) => a.artist.localeCompare(b.artist));
+                    break;
+                case 'artist-asc':
+                    filtered.sort((a, b) => b.artist.localeCompare(a.artist));
+                    break;
+                default:
+                    break;
+            }
+
+            return filtered;
+        },
+        isSongVoted() {
+            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
     },
     setup() {
         const store = useAppStore();
@@ -116,156 +233,26 @@ export default {
 
 </script>
 
-<template>
-    <div v-if="loading" class="loading">
-        <h2>Loading...</h2>
-    </div>
-    <div v-else class="flex flex-col">
-        <div class="title text-white text-center text-4xl font-bold my-5">
-            <h1>VOTAR CANÇONS</h1>
-        </div>
-        <div class="width w-4/5 h-10 ml-auto mr-auto flex items-center">
-            <div class="grow">
-                <Cercador @search="search" />
-            </div>
-        </div>
-        <div class="width w-4/5 h-fit ml-auto mr-auto flex items-center justify-center gap-1">
-            <FilterButtons @applyFilter="applyFilter" class="grow basis-3/4" />
-        </div>
-        <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-5">
-            <Song v-for="song in filteredSongs" @openModal="openModal" @openReportModal="openReportModal"
-                v-bind:song="song" />
-        </div>
-        <div
-            class="h-16 w-1/2 md:w-1/4 bg-gray-600 hover:bg-gray-700 rounded flex items-center justify-center mx-auto mb-10">
-            <button @click="goToProposar()" class="h-full w-full flex items-center justify-center px-10">
-                <span class="material-symbols-rounded text-white font-bold text-4xl">
-                    add
-                </span>
-            </button>
-        </div>
-        <div @click="showModal = false">
-            <transition name="fade">
-                <div v-if="showModal" class="modal">
-                    <div class="modal-content">
-                        <p>JA HAS UTILITZAT ELS TEUS DOS VOTS</p>
-                    </div>
-                </div>
-            </transition>
-        </div>
-        <div v-if="showReportModal" class="modal">
-            <div class="report-modal-content">
-                <button type="button"
-                    class="float-end bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
-                    @click="closeReportModal()">
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-                <div class="clear-both flex flex-col justify-center items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                        stroke="#960019" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-tabler icons-tabler-outline icon-tabler-alert-circle mb-4">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
-                        <path d="M12 8v4" />
-                        <path d="M12 16h.01" />
-                    </svg>
-                    <p class="mb-8">Per quin motiu vols reportar la cançó {{ reportSongData.reportedSong.title }} de {{
-        reportSongData.reportedSong.artist }}?</p>
-                    <div class="flex flex-col justify-start items-start mb-4">
-                        <label v-for="(option, index) in reportSongData.options" class="mb-2">
-                            <input type="radio" v-model="reportSongData.selectedOption" :value="option"
-                                name="report-option">
-                            <span class="ml-2">{{ option }}</span>
-                        </label>
-                    </div>
-                    <button @click="report()"
-                        class="self-end bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">REPORTAR</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-
 <style scoped>
-.loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+.loader-track {
+    width: 35px;
+    padding: 8px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #ffffff;
+    --_m:
+        conic-gradient(#0000 10%, #000),
+        linear-gradient(#000 0 0) content-box;
+    -webkit-mask: var(--_m);
+    mask: var(--_m);
+    -webkit-mask-composite: source-out;
+    mask-composite: subtract;
+    animation: l3 1s infinite linear;
 }
 
-.width {
-    width: 85%;
-}
-
-.margen {
-    margin-top: 1rem;
-}
-
-.margenb {
-    margin-bottom: 1rem;
-}
-
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 101;
-}
-
-.modal-content {
-    width: 60%;
-    text-align: center;
-    background-color: white;
-    padding: 30px;
-    border-radius: 5px;
-}
-
-.report-modal-content {
-    width: 90%;
-    text-align: center;
-    background-color: white;
-    padding: 20px;
-    border-radius: 5px;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 1s;
-}
-
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
-}
-
-@media screen and (min-width: 740px) {
-    .width {
-        width: 55%;
-    }
-
-    .margen {
-        margin-top: 2.5rem;
-    }
-
-    .margenb {
-        margin-bottom: 2.5rem;
+@keyframes l3 {
+    to {
+        transform: rotate(1turn)
     }
 }
 </style>

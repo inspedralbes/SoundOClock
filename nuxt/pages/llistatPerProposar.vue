@@ -72,7 +72,7 @@
     </div>
     <!-- Boton que redirige a la propuesta de canciones -->
     <footer class="fixed bottom-2 w-full flex justify-center align-center">
-        <button @click="$router.push('/llista_propostes2')"
+        <button @click="$router.push('/llista_propostes')"
             class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700">Tornar a les votacions
         </button>
     </footer>
