@@ -110,7 +110,6 @@ export default {
             }
         },
         saveBellsGroupsRelation() {
-            console.log(this.bells);
             let isSubmittable = true;
             for (let i = 0; i < this.bells.length; i++) {
                 if (this.bells[i].groups <= 0) {
@@ -126,8 +125,7 @@ export default {
         },
         submitData() {
             const bells = {bells: this.bells};
-            console.log("INFORMACIÓ ENVIADA", bells);
-            socket.emit('configureBellsGroupsRelations', this.store.getUser().token, bells);
+            socket.emit('updateBellsGroupsRelations', this.store.getUser().token, bells);
         }
     },
     computed: {

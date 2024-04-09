@@ -266,17 +266,16 @@ async function getBells(token) {
   return jsonResponse;
 }
 
-async function setBellsGroupsConfiguration(token, data) {
-  const response = await fetch(apiURL + 'updateBells/', {
+async function setBellsGroupsConfiguration(token, bells) {
+  const response = await fetch(apiURL + 'updateBells', {
     method: 'PUT',
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
       "Authorization": "Bearer " + token,
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(bells)
   });
-  console.log("RESPONSE UPDATE CONFIG", response);
   return response;
 }
 
