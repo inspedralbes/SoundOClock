@@ -54,7 +54,7 @@
                             {{ track.artist }}
                         </p>
                     </div>
-                    <p>Vots: {{ track.votes }}</p>
+                    <p class="text-sm">Vots: {{ track.votes }}</p>
                 </div>
                 <button @click="playTrack(track)">
                     <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
