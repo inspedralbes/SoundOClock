@@ -108,7 +108,7 @@ jobs:
           npm install
           sed -i 's/GOOGLE_CLIENT_ID=/GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}/g' .env
           sed -i 's/GOOGLE_CLIENT_SECRET=/GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}/g' .env
-          sed -i 's/GOOGLE_REDIRECT_URI=/GOOGLE_REDIRECT_URI=http://soundoclock.daw.inspedralbes.cat/auth/callback/google /g' .env
+          sed -i 's#GOOGLE_REDIRECT_URI=#GOOGLE_REDIRECT_URI=http://soundoclock.daw.inspedralbes.cat/auth/callback/google #g' .env
 
           cat .env
           
