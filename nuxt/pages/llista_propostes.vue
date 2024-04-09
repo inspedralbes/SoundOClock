@@ -42,20 +42,24 @@
 
     <!-- Listado canciones -->
     <div class="mb-20">
-        <div v-for="track, index in filteredSongs" :key="index" class="flex flex-row justify-center m-2">
+        <div v-for="track, index in filteredSongs" :key="index" class="flex flex-row m-2"
+            :class="{ 'justify-center': $device.isDesktop }">
             <div class="relative">
-                <img :src="track.img" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full">
+                <img :src="track.img" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full"
+                    :class="{ '!w-[4rem] !h-[4rem]': $device.isMobile }">
                 <Transition name="playingFade">
                     <div v-if="currentTrackId === track.id && isPlaying"
-                        class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
+                        class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full"
+                        :class="{ '!w-20 !h-20': $device.isMobile }">
                         <div class="loader"></div>
                     </div>
                 </Transition>
             </div>
-            <div
-                class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
+            <div class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center"
+                :class="{ '!w-full ml-4': $device.isMobile }">
                 <div class="flex flex-col w-[70%]">
-                    <p class="font-bold text-base uppercase">{{ track.title }}</p>
+                    <p class="font-bold text-base uppercase" :class="{ '!text-sm overflow-hidden': $device.isMobile }">
+                        {{ track.title }}</p>
                     <div class="flex flex-row text-sm">
                         <p class="whitespace-nowrap overflow-hidden">
                             {{ track.artist }}
@@ -63,26 +67,31 @@
                     </div>
                     <p class="text-sm">Vots: {{ track.votes }}</p>
                 </div>
-                <button @click="playTrack(track)">
-                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
-                        pause
-                    </span>
-                    <span v-else class="material-symbols-rounded text-4xl">
-                        play_arrow
-                    </span>
-                </button>
-                <button @click="report(track)">
-                    <span class="material-symbols-rounded text-4xl">
-                        report
-                    </span>
-                </button>
-                <div v-if="isLoadingVote.state && isLoadingVote.selectedSong == track.id" class="loader-track"></div>
-                <button v-else @click="vote(track.id)">
-                    <span
-                        :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id) }">
-                        thumb_up
-                    </span>
-                </button>
+                <div :class="{ '!w-[80%] flex flex-row justify-between': $device.isMobile }">
+                    <button @click="playTrack(track)">
+                        <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl"
+                            :class="{ '!text-2xl': $device.isMobile }">
+                            pause
+                        </span>
+                        <span v-else class="material-symbols-rounded text-4xl"
+                            :class="{ '!text-2xl': $device.isMobile }">
+                            play_arrow
+                        </span>
+                    </button>
+                    <button @click="report(track)">
+                        <span class="material-symbols-rounded text-4xl" :class="{ '!text-2xl': $device.isMobile }">
+                            report
+                        </span>
+                    </button>
+                    <div v-if="isLoadingVote.state && isLoadingVote.selectedSong == track.id" class="loader-track">
+                    </div>
+                    <button v-else @click="vote(track.id)">
+                        <span
+                            :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id), '!text-2xl': $device.isMobile }">
+                            thumb_up
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -238,6 +247,11 @@ export default {
                 }
             }
         },
+        isOverflowing(index) {
+            let nameLength = 0;
+            nameLength = this.filteredSongs[index].name ? this.filteredSongs[index].name.length : this.filteredSongs[index].title.length;
+            return nameLength > 20;
+        }
     },
     watch: {
         songs: { // Each time songs change execute search() method
@@ -359,5 +373,20 @@ export default {
 .playingFade-enter-from,
 .playingFade-leave-to {
     opacity: 0;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.text-marquee {
+    white-space: nowrap;
+    animation: marquee 10s linear infinite;
 }
 </style>
