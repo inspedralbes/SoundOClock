@@ -52,7 +52,7 @@ export default {
     },
     mounted() {
         let user = this.store.getUser();
-        if(user.token) {
+        if (user.token) {
             if (this.store.getUser().groups.length > 0) {
                 navigateTo({ path: '/llista_propostes' });
             } else {
@@ -113,6 +113,6 @@ export default {
     height: 40%;
     bottom: -4rem;
     z-index: 98;
-    background-color: red;
+    background-color: transparent;
 }
 </style>
