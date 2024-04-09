@@ -51,7 +51,7 @@
                     </div>
                 </div>
                 <button @click="playTrack(track)">
-                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
+                    <span v-if="currentTrack.id === track.id && isPlaying" class="material-symbols-rounded text-4xl">
                         pause
                     </span>
                     <span v-else class="material-symbols-rounded text-4xl">

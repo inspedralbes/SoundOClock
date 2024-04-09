@@ -4,19 +4,20 @@
             class="fixed bottom-8 right-8 bg-white rounded-lg shadow-sm p-4 w-[200px] overflow-hidden shadow-white">
             <div class="flex flex-col items-center">
                 <div>
-                    <img class="rounded-full object-cover spin" :src="track.album.images[0].url" alt="Album Image">
+                    <img class="rounded-full object-cover spin"
+                        :src="track.album ? track.album.images[0].url : track.img" alt="Album Image">
                 </div>
                 <div class="mt-4 text-center overflow-hidden">
                     <h3 class="text-lg font-semibold text-gray-800 whitespace-nowrap overflow-hidden"
-                        :class="{ 'text-marquee': isOverflowing(1) }">{{
-                            track.name }}
+                        :class="{ 'text-marquee': isOverflowing(1) }">{{ track.name ? track.name : track.title }}
                     </h3>
                     <p class="text-gray-700 whitespace-nowrap overflow-hidden"
                         :class="{ 'text-marquee': isOverflowing(2) }">
-                        <span v-for="(artist, index) in track.artists" :key="index">
+                        <span v-if="track.artists" v-for="(artist, index) in track.artists" :key="index">
                             <span v-if="index !== 0">, </span>
                             {{ artist.name }}
                         </span>
+                        <span v-else>{{ track.artist }}</span>
                     </p>
                 </div>
                 <div class="flex flex-row items-center">
@@ -72,13 +73,18 @@ export default {
         isOverflowing(text) {
             let nameLength = 0;
             if (text === 1) {
-                nameLength = this.track.name.length;
+                nameLength = this.track.name ? this.track.name.length : this.track.title.length;
                 return nameLength > 20;
             } else {
-                for (const artist of this.track.artists) {
-                    nameLength += artist.name.length;
+                if (this.track.artists) {
+                    for (const artist of this.track.artists) {
+
+                        nameLength += artist.name.length;
+                    }
+                    return nameLength > 20;
+                } else {
+                    return this.track.artist.length > 20;
                 }
-                return nameLength > 20;
             }
         }
     },

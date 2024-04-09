@@ -2,7 +2,7 @@
     <Transition name="player-slide">
         <div v-if="track != null" class="fixed bottom-0 right-0 bg-white shadow-lg p-4 w-full overflow-hidden z-50">
             <img class="fixed bottom-5 object-cover w-28 rounded-full border-8 border-solid border-white spin"
-                :src="track.album.images[0].url" alt="Album Image">
+                :src="track.album ? track.album.images[0].url : track.img" alt="Album Image">
             <div class="flex flex-col items-center">
                 <div class="flex flex-row items-center ml-20">
                     <button class="m-2" @click="pause">

@@ -1,6 +1,7 @@
 <template>
     <!-- Reproductor -->
-    <ModularPlayer type="vote" @pause="playTrack($event)" />
+    <ModularPlayer v-if="$device.isDesktop" type="vote" @pause="playTrack($event)" />
+    <MobilePlayer v-else type="vote" @pause="playTrack($event)" />
 
     <!-- Titulo -->
     <h1 class="w-full text-center text-5xl font-bold m-2">Vota la teva cançó preferida</h1>
@@ -142,7 +143,9 @@ export default {
             },
             orderBy: 'votes-desc',
             userSelectedSongs: computed(() => store.userSelectedSongs),
-            store: useAppStore()
+            store: useAppStore(),
+            currentTrack: null,
+            currentTrackId: null,
         }
     },
     created() {
@@ -186,7 +189,45 @@ export default {
             } else {
                 return false;
             }
-        }
+        },
+        playTrack(track) {
+            const store = useAppStore();
+            if (this.currentTrackId == track.id) {
+                if (this.isPlaying) {
+                    this.currentTrack.pause();
+                    this.isPlaying = false;
+                    store.deleteCurrentTrackPlaying();
+                } else {
+                    this.currentTrack.play();
+                    this.isPlaying = true;
+                    store.setCurrentTrackPlaying(track);
+                }
+            } else {
+                if (track.previewUrl != null) {
+                    if (this.currentTrack != null) {
+                        this.currentTrack.pause();
+                        this.isPlaying = false;
+                        store.deleteCurrentTrackPlaying();
+                    }
+                    this.currentTrack = new Audio(track.previewUrl);
+                    this.currentTrackId = track.id;
+                    this.currentTrack.play();
+                    this.isPlaying = true;
+                    store.setCurrentTrackPlaying(track);
+                } else {
+                    if (this.currentTrack != null) {
+                        this.isPlaying = false;
+                        this.currentTrack.pause();
+                        store.deleteCurrentTrackPlaying();
+                    }
+                    store.setCurrentTrackPlaying(track);
+                    socket.emit('getHtmlSpotify', track.id);
+                    this.isWaitingToPlay = true;
+                }
+            }
+            console.log(this.currentTrackId == track.id);
+            console.log(this.isPlaying);
+        },
     },
     watch: {
         songs: { // Each time songs change execute search() method
@@ -236,6 +277,40 @@ export default {
 </script>
 
 <style scoped>
+.loader {
+    width: 45px;
+    aspect-ratio: 1;
+    --c: no-repeat linear-gradient(#ffffff 0 0);
+    background:
+        var(--c) 0% 50%,
+        var(--c) 50% 50%,
+        var(--c) 100% 50%;
+    background-size: 20% 100%;
+    animation: l1 1s infinite linear;
+}
+
+@keyframes l1 {
+    0% {
+        background-size: 20% 100%, 20% 100%, 20% 100%
+    }
+
+    33% {
+        background-size: 20% 10%, 20% 100%, 20% 100%
+    }
+
+    50% {
+        background-size: 20% 100%, 20% 10%, 20% 100%
+    }
+
+    66% {
+        background-size: 20% 100%, 20% 100%, 20% 10%
+    }
+
+    100% {
+        background-size: 20% 100%, 20% 100%, 20% 100%
+    }
+}
+
 .loader-track {
     width: 35px;
     padding: 8px;
@@ -256,5 +331,15 @@ export default {
     to {
         transform: rotate(1turn)
     }
+}
+
+.playingFade-enter-active,
+.playingFade-leave-active {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.playingFade-enter-from,
+.playingFade-leave-to {
+    opacity: 0;
 }
 </style>
