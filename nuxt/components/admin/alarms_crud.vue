@@ -1,24 +1,27 @@
 <template>
     <div v-if="!loading">
         <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">RELACIONAR GRUPS AMB TIMBRES</h2>
-        <div class="flex flex-row mt-8">
-            <div class="users-container w-1/3 ml-20 overflow-y-auto">
-                <div class="width flex flex-col justify-center ml-auto mr-auto gap-3">
+        <div class="flex flex-col gap-3 mt-8 ml-20 mr-8">
+            <div class="bg-gray-400 rounded-lg users-container p-4">
+            <span class="text-lg font-bold">GRUPS DISPONIBLES</span>
+                <div class="flex flex-row gap-3 py-4 overflow-x-auto">
                     <div v-for="group in classGroups"
-                        class="group-item h-20 flex flex-row justify-center items-center rounded-lg p-4" draggable="true"
+                        class="group-item min-w-40 h-20 flex flex-row justify-center items-center rounded-lg p-4" draggable="true"
                         @dragstart="startDrag($event, group)">
                         {{ group.abbreviation }}
                     </div>
                 </div>
             </div>
-            <div class="groups-bells-container rounded-lg w-2/3 text-white text-center ml-4 mr-4 flex flex-col gap-4 p-4">
-                <button class="save-button hover:bg-sky-300 w-fit text-white font-bold py-2 px-4 rounded"
+            <div class="groups-bells-container rounded-lg">
+                <button class="save-button hover:bg-sky-300 w-fit text-white font-bold mt-4 ml-4 py-2 px-4 rounded"
           @click="saveBellsGroupsRelation()">DESAR TIMBRES</button>
-                <div v-for="bell in bells" class="bg-gray-400 rounded-lg p-4 flex flex-row gap-4"
+            
+            <div class="text-white text-center flex flex-row gap-4 p-4 overflow-x-auto">
+                <div v-for="bell in bells" class="bg-gray-400 rounded-lg p-4 flex flex-col gap-4 min-h-96"
                     @drop="onDrop($event, bell)" @dragenter.prevent @dragover.prevent>
-                    <div class="text-lg w-1/6 p-6 rounded-lg hour-item">{{ bell.hour.substring(0, 5) }}</div>
+                    <div class="text-lg min-w-40 h-20 p-6 rounded-lg hour-item">{{ bell.hour.substring(0, 5) }}</div>
                     <div v-if="bell.groups.length > 0" v-for="group in bell.groups"
-                        class="group-item--added rounded-lg p-6 relative">
+                        class="group-item min-w-40 h-20 flex flex-row justify-center items-center rounded-lg p-4 relative">
                         <span>{{ group.abbreviation }}</span>
                         <button
                             class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold rounded-full p-1 absolute top-2 right-2"
@@ -32,8 +35,11 @@
                             </svg>
                         </button>
                     </div>
-                    <div v-else class="p-6 text-xl grow">NO HI HA CAP GRUP ASSIGNAT A AQUESTA FRANJA HORÀRIA</div>
+                    <div v-else class="px-6 pb-10 text-xl grow width-150 flex items-center">
+                        <span>SENSE GRUPS</span>
+                    </div>
                 </div>
+            </div>
             </div>
         </div>
     </div>
@@ -147,20 +153,23 @@ export default {
 </script>
 
 <style scoped>
+
+.groups-container {
+    background-color: rgb(56, 56, 56);
+}
+
 .group-item {
     background-color: rgb(56, 56, 56);
     color: white;
 }
 
-.group-item--added {
-    background-color: rgb(56, 56, 56);
-    color: white;
-    width: 150px;
-}
-
 .hour-item {
     background-color: var(--pedralbes-blue);
     color: white;
+}
+
+.width-150 {
+    width: 150px;
 }
 
 /* .group-item:hover,

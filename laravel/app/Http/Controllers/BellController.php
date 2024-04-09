@@ -17,7 +17,27 @@ class BellController extends Controller
 
         // Return the bells with its groups
         return $bells->load('groups');
-        
+
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        // Validate that user is admin
+        if (auth()->user()->role_id !== 1) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You do not have admin permissions.'
+            ], 404);
+        }
+
+        $fields = $request->validate([
+            'hour' => 'required|date_format:H:i:s',
+        ]);
+
+        return Bell::create($request->all());
     }
 
     public function update(Request $request) {

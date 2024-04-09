@@ -1,5 +1,8 @@
 <template>
-    <SideBarMenu @toggle-menu="isOpen = $event">
+    <div class="w-screen h-screen" v-if="loading">
+        <Loader />
+    </div>
+    <SideBarMenu @toggle-menu="isOpen = $event" v-if="!loading">
         <!-- 
             - Cada 'button' de dentro del sidebar-menu es un boton que cambia la pantalla. 
             - La pantalla que se muestra depende de la variable 'selected_screen'.
@@ -62,13 +65,13 @@
         </template>
     </SideBarMenu>
 
-    <component :is="active_screen" />
+    <component :is="active_screen" v-if="!loading"/>
 </template>
 
 <script>
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
-import {computed} from 'vue';
+import comManager from '@/communicationManager';
 
 export default {
     data() {
@@ -82,19 +85,32 @@ export default {
                 3: resolveComponent('BanUser'),
                 // 3: resolveComponent('AdminSettingsCrud')
                 4: resolveComponent('AdminBlackListCrud')
-
-            }
-        }
+            },
+            loading: true
+        } 
     },
     setup() {
             const store = useAppStore();
             return { store };
         },
     created() {
-            socket.emit('getGroups', this.store.getUser().token);
+        socket.emit('getGroups', this.store.getUser().token);
     },
-    methods: {
+    mounted() {
+        const userToken = this.store.getUser().token;
 
+        // Check if the user is authenticated
+        if (!userToken) {
+            navigateTo({ path: '/' });
+        }
+
+        // Check if the user is an admin
+        comManager.getUserInfo(userToken).then((response) => {
+            if (response.role_id !== 1) {
+                navigateTo({ path: '/' });
+            }
+            this.loading = false;
+        });
     },
     computed: {
         active_screen() {
