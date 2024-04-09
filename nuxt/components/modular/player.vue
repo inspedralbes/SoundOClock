@@ -21,9 +21,19 @@
                     </p>
                 </div>
                 <div class="flex flex-row items-center">
+                    <button v-if="type === 'vote'" class="m-2" @click="report">
+                        <span class="material-symbols-rounded text-4xl text-gray-700">
+                            report
+                        </span>
+                    </button>
                     <button class="m-2" @click="pause">
                         <span class="material-symbols-rounded text-4xl text-gray-700">
                             pause
+                        </span>
+                    </button>
+                    <button v-if="type === 'vote' && !isLoadingVote.state" class="m-2" @click="vote">
+                        <span class="material-symbols-rounded text-4xl text-gray-700">
+                            thumb_up
                         </span>
                     </button>
                     <button v-if="type === 'propose' && (!track.loading && !track.proposed)" class="m-2"
@@ -32,7 +42,7 @@
                             add_circle
                         </span>
                     </button>
-                    <div v-if="track.loading" class="loader-track"></div>
+                    <div v-if="track.loading || isLoadingVote.state" class="loader-track"></div>
                     <div v-if="type === 'propose' && (track.proposed)" class="m-2">
                         <span class="material-symbols-rounded text-4xl text-gray-700">
                             task_alt
@@ -53,6 +63,7 @@ export default {
         const appStore = useAppStore();
         return {
             track: computed(() => appStore.currentTrackPlaying),
+            isLoadingVote: computed(() => appStore.isLoadingVote),
         }
     },
     props: {
@@ -69,6 +80,12 @@ export default {
         },
         propose() {
             this.$emit('propose', this.track);
+        },
+        report() {
+            this.$emit('report', this.track);
+        },
+        vote() {
+            this.$emit('vote', this.track);
         },
         isOverflowing(text) {
             let nameLength = 0;

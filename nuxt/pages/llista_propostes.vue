@@ -1,7 +1,8 @@
 <template>
     <!-- Reproductor -->
-    <ModularPlayer v-if="$device.isDesktop" type="vote" @pause="playTrack($event)" />
-    <MobilePlayer v-else type="vote" @pause="playTrack($event)" />
+    <ModularPlayer v-if="$device.isDesktop" type="vote" @pause="playTrack($event)" @vote="vote($event.id)"
+        @report="report($event)" />
+    <MobilePlayer v-else type="vote" @pause="playTrack($event)" @vote="vote($event.id)" @report="report($event)" />
 
     <!-- Titulo -->
     <h1 class="w-full text-center text-5xl font-bold m-2">Vota la teva cançó preferida</h1>
@@ -173,6 +174,8 @@ export default {
         },
         goToProposar() {
             this.$router.push('/llistatPerProposar');
+            this.currentTrack.pause();
+            this.store.deleteCurrentTrackPlaying();
         },
         vote(songId) {
             if (!this.isLoadingVote.state) {
@@ -234,6 +237,14 @@ export default {
         songs: { // Each time songs change execute search() method
             handler: 'search',
             immediate: false,
+        },
+        'currentTrack': {
+            handler: function () {
+                this.currentTrack.onended = () => {
+                    this.isPlaying = false;
+                    this.store.deleteCurrentTrackPlaying();
+                }
+            }
         }
     },
     computed: {
