@@ -114,5 +114,6 @@ export default {
     bottom: -4rem;
     z-index: 98;
     background-color: transparent;
+    background: none;
 }
 </style>

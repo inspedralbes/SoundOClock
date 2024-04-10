@@ -32,13 +32,13 @@ async function insertDefaultsMongo() {
     { id: '0VjIjW4GlUZAMYd2vXMi3b', title: 'Blinding Lights', artist: 'The Weeknd', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36', previewUrl: 'https://example.com/blinding-lights-preview', votes: 150, submitDate: new Date('2020-11-29'), submittedBy: 1 },
     { id: '62PaSfnXSMyLshYJrlTuL3', title: 'Hello', artist: 'Adele', year: 2015, img: 'https://i.scdn.co/image/ab67616d00001e0247ce408fb4926d69da6713c2', previewUrl: 'https://example.com/hello-preview', votes: 300, submitDate: new Date('2015-10-23'), submittedBy: 7 },
     { id: '0sfdiwck2xr4PteGOdyOfz', title: 'Shot in the Dark', artist: 'AC/DC', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e0204db0e3bcd166c1d6cfd81f9', previewUrl: 'https://example.com/shot-in-the-dark-preview', votes: 75, submitDate: new Date('2020-10-07'), submittedBy: 2 },
-    //     { id: 3, title: 'Don\'t Start Now', artist: 'Dua Lipa', year: 2019, img: 'dont-start-now.jpg', previewUrl: 'https://example.com/dont-start-now-preview', votes: 200, submitDate: new Date('2019-11-01'), submittedBy: 3 },
-    //     { id: 4, title: 'Fear Inoculum', artist: 'Tool', year: 2019, img: 'fear-inoculum.jpg', previewUrl: 'https://example.com/fear-inoculum-preview', votes: 90, submitDate: new Date('2019-08-30'), submittedBy: 4 },
-    //     { id: 5, title: 'God\'s Plan', artist: 'Drake', year: 2018, img: 'gods-plan.jpg', previewUrl: 'https://example.com/gods-plan-preview', votes: 250, submitDate: new Date('2018-01-19'), submittedBy: 5 },
-    //     { id: 6, title: 'HARDWIRE', artist: 'Metallica', year: 2016, img: 'hardwire.jpg', previewUrl: 'https://example.com/hardwire-preview', votes: 65, submitDate: new Date('2016-08-18'), submittedBy: 6 },
-    //     { id: 8, title: 'Doom and Gloom', artist: 'The Rolling Stones', year: 2012, img: 'doom-and-gloom.jpg', previewUrl: 'https://example.com/doom-and-gloom-preview', votes: 80, submitDate: new Date('2012-10-11'), submittedBy: 8 },
-    //     { id: 9, title: 'Royals', artist: 'Lorde', year: 2013, img: 'royals.jpg', previewUrl: 'https://example.com/royals-preview', votes: 220, submitDate: new Date('2013-03-08'), submittedBy: 9 },
-    //     { id: 10, title: 'R U Mine?', artist: 'Arctic Monkeys', year: 2013, img: 'r-u-mine.jpg', previewUrl: 'https://example.com/r-u-mine-preview', votes: 110, submitDate: new Date('2013-02-27'), submittedBy: 10 }
+    { id: 3, title: 'Don\'t Start Now', artist: 'Dua Lipa', year: 2019, img: 'dont-start-now.jpg', previewUrl: 'https://example.com/dont-start-now-preview', votes: 200, submitDate: new Date('2019-11-01'), submittedBy: 3 },
+    { id: 4, title: 'Fear Inoculum', artist: 'Tool', year: 2019, img: 'fear-inoculum.jpg', previewUrl: 'https://example.com/fear-inoculum-preview', votes: 90, submitDate: new Date('2019-08-30'), submittedBy: 4 },
+    { id: 5, title: 'God\'s Plan', artist: 'Drake', year: 2018, img: 'gods-plan.jpg', previewUrl: 'https://example.com/gods-plan-preview', votes: 250, submitDate: new Date('2018-01-19'), submittedBy: 5 },
+    { id: 6, title: 'HARDWIRE', artist: 'Metallica', year: 2016, img: 'hardwire.jpg', previewUrl: 'https://example.com/hardwire-preview', votes: 65, submitDate: new Date('2016-08-18'), submittedBy: 6 },
+    { id: 8, title: 'Doom and Gloom', artist: 'The Rolling Stones', year: 2012, img: 'doom-and-gloom.jpg', previewUrl: 'https://example.com/doom-and-gloom-preview', votes: 80, submitDate: new Date('2012-10-11'), submittedBy: 8 },
+    { id: 9, title: 'Royals', artist: 'Lorde', year: 2013, img: 'royals.jpg', previewUrl: 'https://example.com/royals-preview', votes: 220, submitDate: new Date('2013-03-08'), submittedBy: 9 },
+    { id: 10, title: 'R U Mine?', artist: 'Arctic Monkeys', year: 2013, img: 'r-u-mine.jpg', previewUrl: 'https://example.com/r-u-mine-preview', votes: 110, submitDate: new Date('2013-02-27'), submittedBy: 10 }
   ];
 
   const votingRecords = [
@@ -61,7 +61,7 @@ async function insertDefaultsMongo() {
 //FETCH TO GET HTML FROM SPOTIFY
 
 
-insertDefaultsMongo();
+// insertDefaultsMongo();
 
 // API routes
 app.get('/songs', async (req, res) => {
