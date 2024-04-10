@@ -101,10 +101,14 @@ export default {
     width: 300%;
     height: 50%;
     position: absolute;
-    background: rgb(0, 0, 0);
     border-radius: 50%;
     bottom: -10rem;
     z-index: 99;
+}
+
+.circle:not(.min) {
+    background: rgb(0, 0, 0);
+
 }
 
 .circle.min {
