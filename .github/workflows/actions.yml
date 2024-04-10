@@ -126,7 +126,7 @@ jobs:
           sed -i 's/NODE_ENV=/NODE_ENV=production /g' .env
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d projecte/node ] && sudo rm -r projecte/node"
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "mkdir projecte/node"
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./!(node_modules) ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:./projecte/node
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r --exclude 'node_modules' ./* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:./projecte/node
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "cd projecte && docker compose up -d"
 
 
