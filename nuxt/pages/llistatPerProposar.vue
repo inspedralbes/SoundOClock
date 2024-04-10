@@ -1,91 +1,97 @@
 <template>
+    <div :class="{ 'overflow-hidden max-h-dvh': modals.proposeSongError }">
 
-    <!-- Reproductor -->
-    <ModularPlayer v-if="$device.isDesktop" @pause="playTrack($event)" @propose="proposeSong($event)" />
-    <MobilePlayer v-else @pause="playTrack($event)" @propose="proposeSong($event)" />
 
-    <!-- TITULO -->
-    <h1 class="w-full text-center text-5xl font-bold m-2">Proposa la teva cançó</h1>
+        <!-- Reproductor -->
+        <ModularPlayer v-if="$device.isDesktop" @pause="playTrack($event)" @propose="proposeSong($event)" />
+        <MobilePlayer v-else @pause="playTrack($event)" @propose="proposeSong($event)" />
 
-    <!-- BARRA DE BUSQUEDA -->
-    <div class="w-full flex justify-center items-center">
-        <div class="relative w-[70%] m-2 text-center">
-            <input type="text" placeholder="Buscar..."
-                class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                v-model="query" @keyup.enter="getSongs()">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded">
-                search
-            </span>
-            <button @click="deleteSearch">
-                <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded">
-                    Close
+        <!-- TITULO -->
+        <h1 class="w-full text-center text-5xl font-bold m-2">Proposa la teva cançó</h1>
+
+        <!-- BARRA DE BUSQUEDA -->
+        <div class="w-full flex justify-center items-center">
+            <div class="relative w-[70%] m-2 text-center">
+                <input type="text" placeholder="Buscar..."
+                    class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                    v-model="query" @keyup.enter="getSongs()">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded">
+                    search
                 </span>
-            </button>
-        </div>
-    </div>
-
-
-    <!-- Listado de canciones -->
-    <div class="mb-20">
-        <div v-for="track, index in tracks" :key="index" class="flex flex-row justify-center m-2">
-            <div class="relative">
-                <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full z-0">
-                <Transition name="playingFade">
-                    <div v-if="currentTrackId === track.id && isPlaying"
-                        class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
-                        <div class="loader"></div>
-                    </div>
-                </Transition>
+                <button @click="deleteSearch">
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded">
+                        Close
+                    </span>
+                </button>
             </div>
-            <div
-                class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
-                <div class="flex flex-col w-[70%]">
-                    <p class="font-bold text-base uppercase">{{ track.name }}</p>
-                    <div class="flex flex-row text-sm">
-                        <p class="whitespace-nowrap overflow-hidden">
-                            <span v-for="(artist, index) in track.artists" :key="index">
-                                <span v-if="index !== 0">, </span>
-                                {{ artist.name }}
-                            </span>
-                        </p>
-                    </div>
+        </div>
+
+
+        <!-- Listado de canciones -->
+        <div class="mb-20">
+            <div v-for="track, index in tracks" :key="index" class="flex flex-row justify-center m-2">
+                <div class="relative">
+                    <img :src="track.album.images[1].url" :alt="track.name + '_img'"
+                        class="w-20 h-20 m-2 rounded-full z-0">
+                    <Transition name="playingFade">
+                        <div v-if="currentTrackId === track.id && isPlaying"
+                            class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
+                            <div class="loader"></div>
+                        </div>
+                    </Transition>
                 </div>
-                <button @click="playTrack(track)">
-                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
-                        pause
+                <div
+                    class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
+                    <div class="flex flex-col w-[70%]">
+                        <p class="font-bold text-base uppercase">{{ track.name }}</p>
+                        <div class="flex flex-row text-sm">
+                            <p class="whitespace-nowrap overflow-hidden">
+                                <span v-for="(artist, index) in track.artists" :key="index">
+                                    <span v-if="index !== 0">, </span>
+                                    {{ artist.name }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <button @click="playTrack(track)">
+                        <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
+                            pause
+                        </span>
+                        <span v-else class="material-symbols-rounded text-4xl">
+                            play_arrow
+                        </span>
+                    </button>
+                    <button @click="proposeSong(track)" v-if="!track.loading && !track.proposed">
+                        <span class="material-symbols-rounded text-4xl">
+                            add_circle
+                        </span>
+                    </button>
+                    <div v-if="track.loading" class="loader-track"></div>
+                    <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
+                        task_alt
                     </span>
-                    <span v-else class="material-symbols-rounded text-4xl">
-                        play_arrow
-                    </span>
-                </button>
-                <button @click="proposeSong(track)" v-if="!track.loading && !track.proposed">
-                    <span class="material-symbols-rounded text-4xl">
-                        add_circle
-                    </span>
-                </button>
-                <div v-if="track.loading" class="loader-track"></div>
-                <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
-                    task_alt
-                </span>
+                </div>
             </div>
         </div>
+
+        <!-- Modals -->
+        <component :is="activeModal" v-if="modals.proposeSongError" @close="modals.proposeSongError = false">
+            <template #title>Ja has proposat una cançó</template>
+            <template #content>
+                <p class="text-center">Ja has proposat una cançó, espera a que la següent votació per proposar una
+                    altra.
+                </p>
+            </template>
+        </component>
+
+        <!-- Boton que redirige a la propuesta de canciones -->
+        <footer class="fixed bottom-2 w-full flex justify-center align-center">
+            <button @click="goToVote"
+                class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700">Tornar a les
+                votacions
+            </button>
+        </footer>
     </div>
-
-    <!-- Modals -->
-    <ModularModal v-if="modals.proposeSongError" @close="modals.proposeSongError = false">
-        <template #title>Ja has proposat una cançó</template>
-        <template #content>
-            <p class="text-center">Ja has proposat una cançó, espera a que la següent votació per proposar una altra.
-            </p>
-        </template>
-    </ModularModal>
-
-    <!-- Boton que redirige a la propuesta de canciones -->
-    <footer class="fixed bottom-2 w-full flex justify-center align-center">
-        <button @click="goToVote"
-            class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700">Tornar a les votacions
-        </button>
-    </footer>
 </template>
 
 <script>
@@ -113,6 +119,11 @@ export default {
             },
             postedSongStatus: computed(() => store.postedSongStatus),
             postedSongId: "",
+            modalSelector: this.$device.isMobile ? 1 : 0,
+            modalComponent: {
+                0: resolveComponent('ModularModal'),
+                1: resolveComponent('MobileModal'),
+            }
         }
     },
     mounted() {
@@ -291,6 +302,11 @@ export default {
         socket.off('topSongs');
         socket.off('searchResult');
         socket.off('sendHtmlSpotify');
+    },
+    computed: {
+        activeModal() {
+            return this.modalComponent[this.modalSelector];
+        },
     },
     watch: {
         'currentTrack': {

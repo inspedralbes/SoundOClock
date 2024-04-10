@@ -37,7 +37,6 @@
             <option value="artist-desc">Artista (A-Z)</option>
             <option value="artist-asc">Artista (Z-A)</option>
         </select>
-
     </div>
 
     <!-- Listado canciones -->
@@ -97,7 +96,7 @@
     </div>
     <!-- Modales -->
     <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
-    <ModularModal v-if="modals.alreadyVotedModal" @close="modals.alreadyVotedModal = false">
+    <component :is="activeModal" v-if="modals.alreadyVotedModal" @close="modals.alreadyVotedModal = false">
         <template #title>Has arribat al màxim de vots</template>
         <template #content>
             <p>
@@ -108,14 +107,15 @@
                 la teva participació!
             </p>
         </template>
-    </ModularModal>
+    </component>
 
     <!-- Modal de los reportes -->
-    <ModularModal msg="Reportar" v-if="modals.reportModal" @close="modals.reportModal = false" @confirm="reportTrack">
+    <component :is="activeModal" msg="Reportar" v-if="modals.reportModal" @close="modals.reportModal = false"
+        @confirm="reportTrack">
         <template #title>Reportar cançó</template>
         <template #content>
             <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-        reportSongData.reportedSong.artist }}?</p>
+                reportSongData.reportedSong.artist }}?</p>
             <div class="flex flex-col">
                 <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                     <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
@@ -123,7 +123,7 @@
                 </label>
             </div>
         </template>
-    </ModularModal>
+    </component>
 
     <!-- Boton que redirige a la propuesta de canciones -->
     <footer class="fixed bottom-2 w-full flex justify-center align-center">
@@ -163,6 +163,11 @@ export default {
             currentTrack: null,
             currentTrackId: null,
             isPlaying: false,
+            modalSelector: this.$device.isMobile ? 1 : 0,
+            modalComponent: {
+                0: resolveComponent('ModularModal'),
+                1: resolveComponent('MobileModal'),
+            }
         }
     },
     created() {
@@ -302,6 +307,9 @@ export default {
             }
 
             return filtered;
+        },
+        activeModal() {
+            return this.modalComponent[this.modalSelector];
         },
     },
 }
