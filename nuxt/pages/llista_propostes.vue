@@ -45,12 +45,12 @@
         <div class="mb-20">
             <div v-for="track, index in filteredSongs" :key="index" class="flex flex-row m-2"
                 :class="{ 'justify-center': $device.isDesktop }">
-                <div class="relative">
+                <div class="relative flex items-center">
                     <img :src="track.img" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full"
                         :class="{ '!w-[4rem] !h-[4rem]': $device.isMobile }">
                     <Transition name="playingFade">
                         <div v-if="currentTrackId === track.id && isPlaying"
-                            class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full"
+                            class="absolute left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full"
                             :class="{ '!w-20 !h-20': $device.isMobile }">
                             <div class="loader"></div>
                         </div>
@@ -120,7 +120,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-                    reportSongData.reportedSong.artist }}?</p>
+        reportSongData.reportedSong.artist }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
