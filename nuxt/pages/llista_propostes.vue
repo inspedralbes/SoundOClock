@@ -43,60 +43,10 @@
 
         <!-- Listado canciones -->
         <div class="mb-20">
-            <div v-for="track, index in filteredSongs" :key="index" class="flex flex-row m-2"
-                :class="{ 'justify-center': $device.isDesktop }">
-                <div class="relative flex items-center">
-                    <img :src="track.img" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full"
-                        :class="{ '!w-[4rem] !h-[4rem]': $device.isMobile }">
-                    <Transition name="playingFade">
-                        <div v-if="currentTrackId === track.id && isPlaying"
-                            class="absolute left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full"
-                            :class="{ '!w-20 !h-20': $device.isMobile }">
-                            <div class="loader"></div>
-                        </div>
-                    </Transition>
-                </div>
-                <div class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center"
-                    :class="{ '!w-full ml-4': $device.isMobile }">
-                    <div class="flex flex-col w-[70%]">
-                        <p class="font-bold text-base uppercase"
-                            :class="{ '!text-sm overflow-hidden': $device.isMobile }">
-                            {{ track.title }}</p>
-                        <div class="flex flex-row text-sm">
-                            <p class="whitespace-nowrap overflow-hidden">
-                                {{ track.artist }}
-                            </p>
-                        </div>
-                        <p class="text-sm">Vots: {{ track.votes }}</p>
-                    </div>
-                    <div :class="{ '!w-[80%] flex flex-row justify-between': $device.isMobile }">
-                        <button @click="playTrack(track)">
-                            <span v-if="currentTrackId === track.id && isPlaying"
-                                class="material-symbols-rounded text-4xl" :class="{ '!text-2xl': $device.isMobile }">
-                                pause
-                            </span>
-                            <span v-else class="material-symbols-rounded text-4xl"
-                                :class="{ '!text-2xl': $device.isMobile }">
-                                play_arrow
-                            </span>
-                        </button>
-                        <button @click="report(track)">
-                            <span class="material-symbols-rounded text-4xl" :class="{ '!text-2xl': $device.isMobile }">
-                                report
-                            </span>
-                        </button>
-                        <div v-if="isLoadingVote.state && isLoadingVote.selectedSong == track.id" class="loader-track">
-                        </div>
-                        <button v-else @click="vote(track.id)">
-                            <span
-                                :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id), '!text-2xl': $device.isMobile }">
-                                thumb_up
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <Song v-for="track in filteredSongs" :key="track.id" :track="track" :currentTrackId="currentTrackId"
+                :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)" @report="report($event)" type="vote" />
         </div>
+
         <!-- Modales -->
         <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
         <component :is="activeModal" :open="modals.alreadyVotedModal" @close="modals.alreadyVotedModal = false">
@@ -213,13 +163,7 @@ export default {
                 }
             }
         },
-        isSongVoted(songId) {
-            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
-                return true;
-            } else {
-                return false;
-            }
-        },
+
         playTrack(track) {
             const store = useAppStore();
             if (this.currentTrackId == track.id) {

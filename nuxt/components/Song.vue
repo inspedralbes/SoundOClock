@@ -1,204 +1,189 @@
-<script>
-import { socket } from '../socket';
-import { useAppStore } from '@/stores/app';
-import comManager from '../communicationManager';
-
-export default {
-    name: 'Song',
-    props: {
-        song: Object
-    },
-    data() {
-        return {
-            loading: true,
-        }
-    },
-    created() {
-        this.loading = true;
-        comManager.getUserSelectedSongs(this.store.getUser().id);
-        this.loading = false;
-    },
-    methods: {
-        vote(songId) {
-            if (!this.isLoadingVote.state) {
-              if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
-                  this.$emit('openModal');
-              } else {
-                  this.store.setIsLoadingVote({ state: true, selectedSong: songId });
-                  socket.emit('castVote', this.store.getUser().token, songId);
-              }
-          }
-        },
-        report() {
-            const song = {id: this.song.id, title: this.song.title, artist: this.song.artist}
-            this.$emit('openReportModal', song);
-        },
-        isSongVotedColor(songId) {
-            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
-                return "#83aee4";
-            } else {
-                return "currentColor";
-            }
-        },
-        isSongVotedFill(songId) {
-            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
-                return "#83aee4";
-            } else {
-                return "none";
-            }
-        },
-    },
-    computed: {
-        userSelectedSongs() {
-            return this.store.getUserSelectedSongs();
-        },
-        isLoadingVote() {
-            return this.store.getIsLoadingVote();
-        }
-    },
-    setup() {
-        const store = useAppStore();
-        return { store };
-    },
-}
-
-</script>
-
 <template>
-    <div class="contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
-        <div class="contenidor-img">
-            <img :src="song.img" alt="" class="rounded-lg">
-            <button class="rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                    class="icon icon-tabler icons-tabler-filled icon-tabler-player-play">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" />
-                </svg>
-            </button>
+    <div class="flex flex-row justify-center m-2">
+        <div class="relative flex items-align">
+            <img :src="track.album ? track.album.images[0].url : track.img"
+                :alt="track.name ? track.name : track.title + '_img'" class="w-20 h-20 m-2 rounded-full z-0">
+            <Transition name="playingFade">
+                <div v-if="currentTrackId === track.id && isPlaying"
+                    class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
+                    <div class="loader"></div>
+                </div>
+            </Transition>
         </div>
-
-        <div class="song-data">
-            <p class="font-black basis-1/3">{{ song.title }}</p>
-            <p class="basis-1/3">{{ song.artist }}</p>
-            <p class="basis-1/3">{{ song.votes }} vots</p>
-        </div>
-
-        <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
-            <button @click="report()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-alert-circle">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
-                    <path d="M12 8v4" />
-                    <path d="M12 16h.01" />
-                </svg>
+        <div class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
+            <div class="flex flex-col w-[70%]">
+                <p class="font-bold text-base uppercase">{{ track.name ? track.name : track.title }}</p>
+                <div class="flex flex-row text-sm">
+                    <p class="whitespace-nowrap overflow-hidden">
+                        <span v-if="track.artists" v-for="(artist, index) in track.artists" :key="index">
+                            <span v-if="index !== 0">, </span>
+                            {{ artist.name }}
+                        </span>
+                        <span v-else>{{ track.artist }}</span>
+                    </p>
+                </div>
+                <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.votes }}</p>
+            </div>
+            <button @click="playTrack(track)">
+                <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
+                    pause
+                </span>
+                <span v-else class="material-symbols-rounded text-4xl">
+                    play_arrow
+                </span>
             </button>
-            <svg v-if="isLoadingVote.state == true && isLoadingVote.selectedSong == song.id" width="36" height="36" fill="#83aee4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" class="spinner-loader"/></svg>
-            <button v-else @click="vote(song.id)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" :fill="isSongVotedFill(song.id)"
-                    :stroke="isSongVotedColor(song.id)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-thumb-up">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path
-                        d="M7 11v8a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1h3a4 4 0 0 0 4 -4v-1a2 2 0 0 1 4 0v5h3a2 2 0 0 1 2 2l-1 5a2 3 0 0 1 -2 2h-7a3 3 0 0 1 -3 -3" />
-                </svg>
+            <button v-if="type === 'vote'" @click="report(track)">
+                <span class="material-symbols-rounded text-4xl">
+                    report
+                </span>
             </button>
-            <!--<svg  xmlns="http://www.w3.org/2000/svg"  width="36"  height="36"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-pause"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 4h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2z" /><path d="M17 4h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2z" /></svg>-->
+            <button @click="proposeSong(track)" v-if="type === 'propose' && (!track.loading && !track.proposed)">
+                <span class="material-symbols-rounded text-4xl">
+                    add_circle
+                </span>
+            </button>
+            <div v-if="track.loading || (isLoadingVote.state && isLoadingVote.selectedSong == track.id)"
+                class="loader-track"></div>
+            <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
+                task_alt
+            </span>
+            <button v-if="type === 'vote' && !(isLoadingVote.state && isLoadingVote.selectedSong == track.id)"
+                @click="vote(track.id)">
+                <span :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id) }">
+                    thumb_up
+                </span>
+            </button>
         </div>
     </div>
 </template>
 
+<script>
+import { socket } from '@/socket';
+import { useAppStore } from '@/stores/app';
+import { computed } from 'vue';
+
+export default {
+    props: {
+        track: {
+            type: Object,
+            required: true
+        },
+        currentTrackId: {
+            type: String,
+        },
+        isPlaying: {
+            type: Boolean,
+        },
+        type: {
+            type: String,
+            default: 'propose'
+        }
+    },
+    data() {
+        return {
+            store: useAppStore(),
+            isLoadingVote: computed(() => this.store.isLoadingVote),
+            userSelectedSongs: computed(() => this.store.userSelectedSongs)
+        }
+    },
+    created() {
+
+    },
+    mounted() {
+
+    },
+    methods: {
+        playTrack(track) {
+            this.$emit('play', track);
+        },
+        proposeSong(track) {
+            this.$emit('propose', track);
+        },
+        vote(songId) {
+            this.$emit('vote', songId);
+        },
+        report(track) {
+            this.$emit('report', track);
+        },
+        isSongVoted(songId) {
+            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+    },
+    watch: {
+
+    },
+}
+</script>
+
 <style scoped>
-
-.spinner-loader {
-    transform-origin:center;
-    animation: rotate .75s infinite linear;
-    color: white;
+.loader {
+    width: 45px;
+    aspect-ratio: 1;
+    --c: no-repeat linear-gradient(#ffffff 0 0);
+    background:
+        var(--c) 0% 50%,
+        var(--c) 50% 50%,
+        var(--c) 100% 50%;
+    background-size: 20% 100%;
+    animation: l1 1s infinite linear;
 }
 
-@keyframes rotate {
-    from {
-        transform: rotate(0deg); /* Initial rotation angle */
+@keyframes l1 {
+    0% {
+        background-size: 20% 100%, 20% 100%, 20% 100%
     }
+
+    33% {
+        background-size: 20% 10%, 20% 100%, 20% 100%
+    }
+
+    50% {
+        background-size: 20% 100%, 20% 10%, 20% 100%
+    }
+
+    66% {
+        background-size: 20% 100%, 20% 100%, 20% 10%
+    }
+
+    100% {
+        background-size: 20% 100%, 20% 100%, 20% 100%
+    }
+}
+
+/* HTML: <div class="loader"></div> */
+.loader-track {
+    width: 35px;
+    padding: 8px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #ffffff;
+    --_m:
+        conic-gradient(#0000 10%, #000),
+        linear-gradient(#000 0 0) content-box;
+    -webkit-mask: var(--_m);
+    mask: var(--_m);
+    -webkit-mask-composite: source-out;
+    mask-composite: subtract;
+    animation: l3 1s infinite linear;
+}
+
+@keyframes l3 {
     to {
-        transform: rotate(360deg); /* Final rotation angle */
+        transform: rotate(1turn)
     }
 }
 
-
-.contenidor-canço {
-    background-color: rgb(56, 56, 56);
-    /* border: 1px solid rgb(163, 163, 163); */
-    color: white;
+.playingFade-enter-active,
+.playingFade-leave-active {
+    transition: opacity 0.2s ease-in-out;
 }
 
-.contenidor-canço>*:last-child {
-    justify-self: flex-end;
-}
-
-.contenidor-img {
-    position: relative;
-    max-width: 20%;
-    min-width: fit-content;
-    height: 100%;
-    width: fit-content;
-}
-
-.contenidor-img>button {
-    display: none;
-}
-
-.contenidor-img:hover>button>svg {
-    width: 80%;
-    height: auto;
-}
-
-.contenidor-img:hover>button {
-    display: flex;
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    right: 0;
-    top: 0;
-    background-color: rgb(0, 0, 0, 0.3);
-    cursor: pointer;
-    z-index: 100;
-}
-
-.song-data {
-    max-width: 100%;
-    min-width: 5%;
-}
-
-.song-data>p {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.contenidor-butons {
-    max-width: 20%;
-    min-width: fit-content;
-    align-self: center;
-    margin-left: auto;
-}
-
-img {
-    width: 60px;
-    height: 60px;
-}
-
-@media screen and (min-width: 768px) {
-
-    .song-data {
-        display: flex;
-        flex-direction: row;
-        flex-grow: 1;
-        max-width: 100%;
-    }
-
+.playingFade-enter-from,
+.playingFade-leave-to {
+    opacity: 0;
 }
 </style>
