@@ -29,7 +29,7 @@ function getSongs() {
 
 function getAdminSongs() {
     const store = useAppStore();
-    fetch(`${url}/adminSongs`)
+    fetch(`${url}/adminSongs/${store.getUser().token}`)
         .then(response => response.json())
         .then(data => {
             store.setProposedSongsAdminView(data);

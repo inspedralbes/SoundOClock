@@ -85,16 +85,27 @@ app.get('/reportSongs/:songId', async (req, res) => {
   }
 });
 
-app.get('/adminSongs', async (req, res) => {
+app.get('/adminSongs/:userToken', async (req, res) => {
   try {
-    // Query all songs
+    // Query all proposed songs
     const songs = await Song.find();
 
-    // Iterate through each song and find its reported versions
+    // Iterate through each song
     const songsWithReports = await Promise.all(songs.map(async (song) => {
+
+      // Find the reports associted to the song
       const reports = await ReportSong.find({ songId: song.id });
+
+      // Find the user that proposed the song
+      const user = await comManager.showUser(req.params.userToken, song.submittedBy);
+
+      // Transform the mongoose.Document into an object
       song = song.toObject();
+
+      // Add reports and user associated to the song
       song.reports = reports;
+      song.user = user;
+
       return song;
     }));
 
@@ -377,7 +388,7 @@ io.on('connection', (socket) => {
       }
 
       // Add a register in ReportSong table
-      await new ReportSong({ userId: user.id, userName: user.name, songId: song.id, reason: reportedSong.option }).save();
+      await new ReportSong({ userId: user.id, userName: user.name, songId: song.id, reason: reportedSong.option, isRead: false }).save();
 
       io.emit('songReported', { status: 'success', message: `La cançó ${song.title} ha sigut reportada` });
     } catch (err) {

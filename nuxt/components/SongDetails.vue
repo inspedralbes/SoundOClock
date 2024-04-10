@@ -19,7 +19,18 @@ export default {
     },
     submitData() {
       socket.emit('deleteSong', this.store.getUser().token, this.song);
-    }
+    },
+    handleSwitch(report, value) {
+            switch (value) {
+                case true:
+                    value = 1;
+                    break;
+                case false:
+                    value = 0;
+                    break;
+            }
+            this.song.reports[0].isRead = value;
+        },
   },
   setup() {
     const store = useAppStore();
@@ -43,7 +54,7 @@ export default {
           @click="deleteSong(song)">AFEGIR A LA LLISTA NEGRA</button>
       </div>
     </div>
-    <p class="mb-4 text-xl">CANÇÓ PROPOSADA PER: {{ song.submittedBy }}</p>
+    <p class="mb-4 text-xl">CANÇÓ PROPOSADA PER: {{ song.user.name }}</p>
     <div class="w-100 p-4 flex flex-col gap-2 bg-gray-400 rounded-lg">
       <div class=" mb-2 flex flex-row items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="rgb(239 68 68)"
@@ -57,6 +68,8 @@ export default {
       <div v-for="report in song.reports" class="report-container p-4 flex flex-row justify-between rounded-lg">
         <p>{{ report.reason }}</p>
         <p>{{ report.userName }}</p>
+        <p>{{ report.isRead }}</p>
+        <ModularSwitch :value="report.isRead" :canSwitch=true @input="handleSwitch(report,$event)" />
       </div>
     </div>
   </div>

@@ -139,6 +139,29 @@ class AuthController extends Controller {
         return User::all();
     }
 
+    public function show($id) {
+
+        // Validar que l'usuari sigui administrador
+        if (auth()->user()->role_id !== 1) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No tens permisos d\'administrador.'
+            ], 404);
+        }
+
+        // Find user
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'L\'usuari no existeix.'
+            ], 404);
+        }
+
+        return response()->json($user);
+    }
+
     public function update(Request $request, $id) {
 
         // Validar que l'usuari sigui administrador

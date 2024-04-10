@@ -243,7 +243,8 @@ async function banUser(token, user) {
     },
     body: JSON.stringify(user)
   });
-  return response;
+  const jsonResponse = await response.json();
+  return jsonResponse;
 }
 
 async function setUserGroups(userId, token, groups) {
@@ -283,7 +284,21 @@ async function setBellsGroupsConfiguration(token, bells) {
     },
     body: JSON.stringify(bells)
   });
-  return response;
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
+async function showUser(token, userId) {
+  const response = await fetch(apiURL + `user/${userId}`, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
 }
 
 const comManager = {
@@ -308,7 +323,8 @@ const comManager = {
   updateGroup,
   setUserGroups,
   getBells,
-  setBellsGroupsConfiguration
+  setBellsGroupsConfiguration,
+  showUser
 };
 
 export default comManager;
