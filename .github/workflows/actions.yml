@@ -126,7 +126,7 @@ jobs:
           sed -i 's/SPOTIFY_CLIENT_SECRET=/SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}/g' .env
           sed -i 's/NODE_ENV=/NODE_ENV=production /g' .env
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d projecte/node ] && sudo rm -r projecte/node"
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r .node/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:./projecte/node
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:./projecte/node
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "cd projecte && docker compose up -d"
 
 
