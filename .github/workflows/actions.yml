@@ -112,6 +112,7 @@ jobs:
           sed -i 's#GOOGLE_REDIRECT_URI=#GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }} #g' .env
           npm run build  -- --host=http://129.151.244.179:8080
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d projecte/nuxt2 ] && mkdir -p projecte/nuxt2 "
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./nuxt/.output ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:./projecte/nuxt2
 
 
           
