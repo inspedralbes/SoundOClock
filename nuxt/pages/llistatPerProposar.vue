@@ -1,13 +1,12 @@
 <template>
     <div :class="{ 'overflow-hidden max-h-dvh': modals.proposeSongError }">
-
-
         <!-- Reproductor -->
         <ModularPlayer v-if="$device.isDesktop" @pause="playTrack($event)" @propose="proposeSong($event)" />
         <MobilePlayer v-else @pause="playTrack($event)" @propose="proposeSong($event)" />
 
         <!-- TITULO -->
-        <h1 class="w-full text-center text-5xl font-bold m-2">Proposa la teva cançó</h1>
+        <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
+            Proposa la teva cançó</h1>
 
         <!-- BARRA DE BUSQUEDA -->
         <div class="w-full flex justify-center items-center">
@@ -29,9 +28,9 @@
 
         <!-- Listado de canciones -->
         <div class="mb-20">
-            <Song v-for="track, index in tracks" :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying"
-                type="propose" @play="playTrack($event)" @propose="proposeSong($event)">
-            </Song>
+            <component :is="activeSong" v-for="track, index in tracks" :track="track" :currentTrackId="currentTrackId"
+                :isPlaying="isPlaying" type="propose" @play="playTrack($event)" @propose="proposeSong($event)">
+            </component>
         </div>
 
         <!-- Modals -->
@@ -47,7 +46,8 @@
         <!-- Boton que redirige a la propuesta de canciones -->
         <footer class="fixed bottom-2 w-full flex justify-center align-center">
             <button @click="goToVote"
-                class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700">Tornar a les
+                class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700"
+                :class="{ 'text-sm w-[90%] mb-4': $device.isMobile }">Tornar a les
                 votacions
             </button>
         </footer>
@@ -80,10 +80,15 @@ export default {
             postedSongStatus: computed(() => store.postedSongStatus),
             postedSongId: "",
             modalSelector: this.$device.isMobile ? 1 : 0,
+            songComponentSelector: this.$device.isMobile ? 1 : 0,
             modalComponent: {
                 0: resolveComponent('ModularModal'),
                 1: resolveComponent('MobileModal'),
-            }
+            },
+            songComponent: {
+                0: resolveComponent('Song'),
+                1: resolveComponent('MobileSong'),
+            },
         }
     },
     created() {
@@ -270,6 +275,9 @@ export default {
         activeModal() {
             return this.modalComponent[this.modalSelector];
         },
+        activeSong() {
+            return this.songComponent[this.songComponentSelector];
+        }
     },
     watch: {
         'currentTrack': {

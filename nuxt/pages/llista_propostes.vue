@@ -43,8 +43,9 @@
 
         <!-- Listado canciones -->
         <div class="mb-20">
-            <Song v-for="track in filteredSongs" :key="track.id" :track="track" :currentTrackId="currentTrackId"
-                :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)" @report="report($event)" type="vote" />
+            <component :is="activeSong" v-for="track in filteredSongs" :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
+                @report="report($event)" type="vote" />
         </div>
 
         <!-- Modales -->
@@ -120,10 +121,15 @@ export default {
             currentTrackId: null,
             isPlaying: false,
             modalSelector: this.$device.isMobile ? 1 : 0,
+            songComponentSelector: this.$device.isMobile ? 1 : 0,
             modalComponent: {
                 0: resolveComponent('ModularModal'),
                 1: resolveComponent('MobileModal'),
-            }
+            },
+            songComponent: {
+                0: resolveComponent('Song'),
+                1: resolveComponent('MobileSong'),
+            },
         }
     },
     created() {
@@ -261,6 +267,9 @@ export default {
         activeModal() {
             return this.modalComponent[this.modalSelector];
         },
+        activeSong() {
+            return this.songComponent[this.songComponentSelector];
+        }
     },
 }
 
