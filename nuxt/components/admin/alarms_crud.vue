@@ -35,8 +35,8 @@
                                 </svg>
                             </button>
                         </div>
-                        <div v-else class="px-6 pb-10 text-xl grow width-150 flex items-center">
-                            <span>SENSE GRUPS</span>
+                        <div v-else class="px-6 pb-10 text-xl grow width-150 flex justify-center items-center">
+                            <span class="text-center">SENSE GRUPS</span>
                         </div>
                     </div>
                 </div>

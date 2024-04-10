@@ -14,9 +14,11 @@ export default {
     }
   },
   methods: {
-    deleteSong(song) {
+    deleteSong() {
       this.modals.addSongToBlacklist = true;
-      //socket.emit('deleteSong', this.store.getUser().token, song);
+    },
+    submitData() {
+      socket.emit('deleteSong', this.store.getUser().token, this.song);
     }
   },
   setup() {
@@ -66,7 +68,7 @@ export default {
         <h2>Afegir cançó a la llista negra</h2>
       </template>
       <template #content>
-        <p>Estàs segur que vols afegir cançó a la llista negra?</p>
+        <p>Segur que vols afegir <span class="font-bold">{{ song.title }}</span> de <span class="font-bold">{{ song.artist }}</span> a la llista negra?</p>
       </template>
     </ModularModal>
   </Transition>

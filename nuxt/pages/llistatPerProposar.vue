@@ -227,7 +227,7 @@ export default {
                     img: track.album.images[1].url,
                     previewUrl: track.preview_url,
                     submitDate: new Date().toISOString(),
-                    submitedBy: this.store.getUser().id,
+                    submittedBy: this.store.getUser().id,
                 }
                 socket.emit('postSong', this.store.getUser().token, song);
             }
