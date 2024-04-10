@@ -75,7 +75,7 @@
         </div>
 
         <!-- Modals -->
-        <component :is="activeModal" v-if="modals.proposeSongError" @close="modals.proposeSongError = false">
+        <component :is="activeModal" :open="modals.proposeSongError" @close="modals.proposeSongError = false">
             <template #title>Ja has proposat una cançó</template>
             <template #content>
                 <p class="text-center">Ja has proposat una cançó, espera a que la següent votació per proposar una
