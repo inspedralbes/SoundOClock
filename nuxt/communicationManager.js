@@ -1,10 +1,6 @@
 import { useAppStore } from './stores/app.js';
 
-// const url = "http://129.151.244.179:8080"; // production environment
-import minimist from 'minimist';
-
-const argv = minimist(process.argv.slice(2));
-const url = argv.host || "http://localhost:8080";
+const url = "http://129.151.244.179:8080";
 
 function getUserSelectedSongs(id) {
     const store = useAppStore();

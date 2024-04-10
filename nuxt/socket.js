@@ -2,12 +2,10 @@ import { io } from "socket.io-client";
 import { useAppStore } from "./stores/app";
 import { useRouter } from 'vue-router';
 import comManager from './communicationManager';
-import minimist from 'minimist';
 
 const router = useRouter();
 
-const argv = minimist(process.argv.slice(2));
-const url = argv.host || "http://localhost:8080";
+const url = "http://129.151.244.179:8080";
 
 export const socket = io(url);
 
