@@ -85,16 +85,27 @@ app.get('/reportSongs/:songId', async (req, res) => {
   }
 });
 
-app.get('/adminSongs', async (req, res) => {
+app.get('/adminSongs/:userToken', async (req, res) => {
   try {
-    // Query all songs
+    // Query all proposed songs
     const songs = await Song.find();
 
-    // Iterate through each song and find its reported versions
+    // Iterate through each song
     const songsWithReports = await Promise.all(songs.map(async (song) => {
+
+      // Find the reports associted to the song
       const reports = await ReportSong.find({ songId: song.id });
+
+      // Find the user that proposed the song
+      const user = await comManager.showUser(req.params.userToken, song.submittedBy);
+
+      // Transform the mongoose.Document into an object
       song = song.toObject();
+
+      // Add reports and user associated to the song
       song.reports = reports;
+      song.user = user;
+
       return song;
     }));
 
@@ -379,7 +390,7 @@ io.on('connection', (socket) => {
       }
 
       // Add a register in ReportSong table
-      await new ReportSong({ userId: user.id, userName: user.name, songId: song.id, reason: reportedSong.option }).save();
+      await new ReportSong({ userId: user.id, userName: user.name, songId: song.id, reason: reportedSong.option, isRead: false }).save();
 
       io.emit('songReported', { status: 'success', message: `La cançó ${song.title} ha sigut reportada` });
     } catch (err) {
@@ -528,6 +539,18 @@ io.on('connection', (socket) => {
       socket.emit('dirPCStatus', false);
     }
   });
+  
+  socket.on('changeIsReadReportStatus', async (userToken, report) => {
+    // Check that the user is authenticated with Laravel Sanctum
+    let user = await comManager.getUserInfo(userToken);
+    if (!user.id) return;
+
+    // Find the report
+    const reportSong = await ReportSong.findOne({ _id: report._id });
+    reportSong.isRead = report.isRead;
+    await reportSong.save();
+    io.emit('isReadReportStatusChanged', { status: 'success', message: `El report amb id ${reportSong._id} ha canviat.` });
+  })
 
   socket.on('disconnect', () => {
     console.log('user disconnected');

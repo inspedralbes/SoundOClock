@@ -23,7 +23,8 @@ const reportSongSchema = new mongoose.Schema({
   userId: Number,
   userName: String,
   songId: String,
-  reason: String
+  reason: String,
+  isRead: Boolean,
 });
 
 const VotingRecord = mongoose.model('VotingRecord', votingRecordSchema);

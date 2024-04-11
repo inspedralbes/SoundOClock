@@ -38,6 +38,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/blacklist/{id}', [BlacklistController::class,'show']);
     Route::post('/blacklist', [BlacklistController::class,'store']);
     Route::delete('/blacklist/{id}', [BlacklistController::class,'destroy']);
+    Route::get('/user/{id}', [AuthController::class, 'show']);
     Route::put('/user/{id}', [AuthController::class, 'update']);
 
     // Groups routes

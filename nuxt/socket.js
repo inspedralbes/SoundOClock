@@ -67,6 +67,10 @@ socket.on("connect", () => {
     console.log('socket updateBellsGroupsRelationsError data received', data);
   });
 
+  socket.on('isReadReportStatusChanged', (data) => {
+    console.log('socket isReadReportStatusChanged data received', data);
+  });
+
   socket.on("disconnect", () => {
 
   });
