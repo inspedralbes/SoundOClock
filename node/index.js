@@ -389,6 +389,7 @@ io.on('connection', (socket) => {
 
   socket.on('getHtmlSpotify', (songId) => {
     comManager.fetchSpotifyPage(songId).then(html => {
+      console.log(html);
       if (html) {
         socket.emit('sendHtmlSpotify', html, songId);
       }
