@@ -189,6 +189,8 @@ setInterval(obtenerActualizarTokenSpotify, 59 * 60 * 1000);
 // Obtener y actualizar el token de Spotify al iniciar el servidor
 obtenerActualizarTokenSpotify();
 
+let dirPC = null;
+
 // Sockets
 io.on('connection', (socket) => {
   console.log('a user connected');
@@ -507,8 +509,31 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('dirPC', () => {
+    dirPC = socket.id;
+    socket.emit('dirPCStatus', true);
+  });
+
+  socket.on('sendBells', () => {
+    if (dirPC) {
+      io.to(dirPC).emit('executeSendBells',);
+    }
+  });
+
+  socket.on('getPcStatus', () => {
+    if (dirPC) {
+      socket.emit('dirPCStatus', true);
+    } else {
+      socket.emit('dirPCStatus', false);
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
+    if (socket.id === dirPC) {
+      dirPC = null;
+      socket.emit('dirPCStatus', false);
+    }
   });
 
   socket.on('testing', (data) => {
