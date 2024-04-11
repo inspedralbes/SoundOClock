@@ -21,12 +21,14 @@
                     :class="{ 'text-base': $device.isMobile }">
                     search
                 </span>
-                <button @click="deleteSearch">
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
-                        :class="{ 'text-base': $device.isMobile }">
-                        Close
-                    </span>
-                </button>
+                <Transition name="delete-fade">
+                    <button v-if="filter" @click="deleteSearch">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                            :class="{ 'text-base': $device.isMobile }">
+                            Close
+                        </span>
+                    </button>
+                </Transition>
             </div>
             <select v-model.lazy="orderBy"
                 class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center"
@@ -287,84 +289,13 @@ export default {
 </script>
 
 <style scoped>
-.loader {
-    width: 45px;
-    aspect-ratio: 1;
-    --c: no-repeat linear-gradient(#ffffff 0 0);
-    background:
-        var(--c) 0% 50%,
-        var(--c) 50% 50%,
-        var(--c) 100% 50%;
-    background-size: 20% 100%;
-    animation: l1 1s infinite linear;
+.delete-fade-enter-active,
+.delete-fade-leave-active {
+    transition: opacity 0.5s;
 }
 
-@keyframes l1 {
-    0% {
-        background-size: 20% 100%, 20% 100%, 20% 100%
-    }
-
-    33% {
-        background-size: 20% 10%, 20% 100%, 20% 100%
-    }
-
-    50% {
-        background-size: 20% 100%, 20% 10%, 20% 100%
-    }
-
-    66% {
-        background-size: 20% 100%, 20% 100%, 20% 10%
-    }
-
-    100% {
-        background-size: 20% 100%, 20% 100%, 20% 100%
-    }
-}
-
-.loader-track {
-    width: 35px;
-    padding: 8px;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: #ffffff;
-    --_m:
-        conic-gradient(#0000 10%, #000),
-        linear-gradient(#000 0 0) content-box;
-    -webkit-mask: var(--_m);
-    mask: var(--_m);
-    -webkit-mask-composite: source-out;
-    mask-composite: subtract;
-    animation: l3 1s infinite linear;
-}
-
-@keyframes l3 {
-    to {
-        transform: rotate(1turn)
-    }
-}
-
-.playingFade-enter-active,
-.playingFade-leave-active {
-    transition: opacity 0.2s ease-in-out;
-}
-
-.playingFade-enter-from,
-.playingFade-leave-to {
+.delete-fade-enter-from,
+.delete-fade-leave-to {
     opacity: 0;
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(100%);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-.text-marquee {
-    white-space: nowrap;
-    animation: marquee 10s linear infinite;
 }
 </style>

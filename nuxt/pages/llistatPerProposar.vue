@@ -17,12 +17,14 @@
                     :class="{ 'text-base': $device.isMobile }">
                     search
                 </span>
-                <button @click="deleteSearch">
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
-                        :class="{ 'text-base': $device.isMobile }">
-                        Close
-                    </span>
-                </button>
+                <Transition name="delete-fade">
+                    <button v-if="query" @click="deleteSearch">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                            :class="{ 'text-base': $device.isMobile }">
+                            Close
+                        </span>
+                    </button>
+                </Transition>
             </div>
         </div>
 
@@ -289,5 +291,13 @@ export default {
 </script>
 
 <style scoped>
-/* HTML: <div class="loader"></div> */
+.delete-fade-enter-active,
+.delete-fade-leave-active {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.delete-fade-enter-from,
+.delete-fade-leave-to {
+    opacity: 0;
+}
 </style>
