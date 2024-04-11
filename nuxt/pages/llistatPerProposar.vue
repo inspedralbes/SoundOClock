@@ -249,7 +249,9 @@ export default {
             this.currentTrack.pause();
         }
     },
-    beforeDestroy() {
+    beforeUnmount() {
+        this.store.deleteCurrentTrackPlaying(null);
+        this.currentTrack.pause();
         socket.off('topSongs');
         socket.off('searchResult');
         socket.off('sendHtmlSpotify');
