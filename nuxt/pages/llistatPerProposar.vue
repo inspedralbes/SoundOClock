@@ -92,7 +92,7 @@ export default {
                 1: resolveComponent('MobileSong'),
             },
             playerComponent: {
-                0: resolveComponent('Player'),
+                0: resolveComponent('ModularPlayer'),
                 1: resolveComponent('MobilePlayer'),
             }
         }
