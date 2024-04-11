@@ -518,6 +518,18 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('changeIsReadReportStatus', async (userToken, report) => {
+    // Check that the user is authenticated with Laravel Sanctum
+    let user = await comManager.getUserInfo(userToken);
+    if (!user.id) return;
+
+    // Find the report
+    const reportSong = await ReportSong.findOne({ _id: report._id });
+    reportSong.isRead = report.isRead;
+    await reportSong.save();
+    io.emit('isReadReportStatusChanged', { status: 'success', message: `El report amb id ${reportSong._id} ha canviat.` });
+  })
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
