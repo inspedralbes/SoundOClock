@@ -1,25 +1,25 @@
 <template>
     <div :class="{ 'overflow-hidden max-h-dvh': modals.proposeSongError }">
-
-
         <!-- Reproductor -->
-        <ModularPlayer v-if="$device.isDesktop" @pause="playTrack($event)" @propose="proposeSong($event)" />
-        <MobilePlayer v-else @pause="playTrack($event)" @propose="proposeSong($event)" />
+        <component :is="activePlayer" @pause="playTrack($event)" @propose="proposeSong($event)" />
 
         <!-- TITULO -->
-        <h1 class="w-full text-center text-5xl font-bold m-2">Proposa la teva cançó</h1>
+        <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
+            Proposa la teva cançó</h1>
 
         <!-- BARRA DE BUSQUEDA -->
         <div class="w-full flex justify-center items-center">
-            <div class="relative w-[70%] m-2 text-center">
+            <div class="relative w-[70%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text" placeholder="Buscar..."
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                    v-model="query" @keyup.enter="getSongs()">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded">
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="query" @keyup.enter="getSongs()">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
+                    :class="{ 'text-base': $device.isMobile }">
                     search
                 </span>
                 <button @click="deleteSearch">
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded">
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                        :class="{ 'text-base': $device.isMobile }">
                         Close
                     </span>
                 </button>
@@ -29,49 +29,9 @@
 
         <!-- Listado de canciones -->
         <div class="mb-20">
-            <div v-for="track, index in tracks" :key="index" class="flex flex-row justify-center m-2">
-                <div class="relative">
-                    <img :src="track.album.images[1].url" :alt="track.name + '_img'"
-                        class="w-20 h-20 m-2 rounded-full z-0">
-                    <Transition name="playingFade">
-                        <div v-if="currentTrackId === track.id && isPlaying"
-                            class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
-                            <div class="loader"></div>
-                        </div>
-                    </Transition>
-                </div>
-                <div
-                    class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
-                    <div class="flex flex-col w-[70%]">
-                        <p class="font-bold text-base uppercase">{{ track.name }}</p>
-                        <div class="flex flex-row text-sm">
-                            <p class="whitespace-nowrap overflow-hidden">
-                                <span v-for="(artist, index) in track.artists" :key="index">
-                                    <span v-if="index !== 0">, </span>
-                                    {{ artist.name }}
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                    <button @click="playTrack(track)">
-                        <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
-                            pause
-                        </span>
-                        <span v-else class="material-symbols-rounded text-4xl">
-                            play_arrow
-                        </span>
-                    </button>
-                    <button @click="proposeSong(track)" v-if="!track.loading && !track.proposed">
-                        <span class="material-symbols-rounded text-4xl">
-                            add_circle
-                        </span>
-                    </button>
-                    <div v-if="track.loading" class="loader-track"></div>
-                    <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
-                        task_alt
-                    </span>
-                </div>
-            </div>
+            <component :is="activeSong" v-for="track, index in tracks" :track="track" :currentTrackId="currentTrackId"
+                :isPlaying="isPlaying" type="propose" @play="playTrack($event)" @propose="proposeSong($event)">
+            </component>
         </div>
 
         <!-- Modals -->
@@ -87,7 +47,8 @@
         <!-- Boton que redirige a la propuesta de canciones -->
         <footer class="fixed bottom-2 w-full flex justify-center align-center">
             <button @click="goToVote"
-                class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700">Tornar a les
+                class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700"
+                :class="{ 'text-sm w-[90%] mb-4': $device.isMobile }">Tornar a les
                 votacions
             </button>
         </footer>
@@ -120,18 +81,25 @@ export default {
             postedSongStatus: computed(() => store.postedSongStatus),
             postedSongId: "",
             modalSelector: this.$device.isMobile ? 1 : 0,
+            songComponentSelector: this.$device.isMobile ? 1 : 0,
+            playerComponentSelector: this.$device.isMobile ? 1 : 0,
             modalComponent: {
                 0: resolveComponent('ModularModal'),
                 1: resolveComponent('MobileModal'),
+            },
+            songComponent: {
+                0: resolveComponent('Song'),
+                1: resolveComponent('MobileSong'),
+            },
+            playerComponent: {
+                0: resolveComponent('Player'),
+                1: resolveComponent('MobilePlayer'),
             }
         }
     },
-    mounted() {
+    created() {
 
-        if (!this.store.getUser().token) {
-            console.log('No token');
-            navigateTo({ path: '/' });
-        }
+
 
         socket.emit('getTopSongs', 'Top Songs Spain');
 
@@ -174,6 +142,12 @@ export default {
             }
         });
 
+    },
+    mounted() {
+        if (!this.store.getUser().token) {
+            console.log('No token');
+            navigateTo({ path: '/' });
+        }
     },
     methods: {
         getSongs() {
@@ -307,6 +281,12 @@ export default {
         activeModal() {
             return this.modalComponent[this.modalSelector];
         },
+        activeSong() {
+            return this.songComponent[this.songComponentSelector];
+        },
+        activePlayer() {
+            return this.playerComponent[this.playerComponentSelector];
+        }
     },
     watch: {
         'currentTrack': {
@@ -334,70 +314,4 @@ export default {
 
 <style scoped>
 /* HTML: <div class="loader"></div> */
-.loader {
-    width: 45px;
-    aspect-ratio: 1;
-    --c: no-repeat linear-gradient(#ffffff 0 0);
-    background:
-        var(--c) 0% 50%,
-        var(--c) 50% 50%,
-        var(--c) 100% 50%;
-    background-size: 20% 100%;
-    animation: l1 1s infinite linear;
-}
-
-@keyframes l1 {
-    0% {
-        background-size: 20% 100%, 20% 100%, 20% 100%
-    }
-
-    33% {
-        background-size: 20% 10%, 20% 100%, 20% 100%
-    }
-
-    50% {
-        background-size: 20% 100%, 20% 10%, 20% 100%
-    }
-
-    66% {
-        background-size: 20% 100%, 20% 100%, 20% 10%
-    }
-
-    100% {
-        background-size: 20% 100%, 20% 100%, 20% 100%
-    }
-}
-
-/* HTML: <div class="loader"></div> */
-.loader-track {
-    width: 35px;
-    padding: 8px;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: #ffffff;
-    --_m:
-        conic-gradient(#0000 10%, #000),
-        linear-gradient(#000 0 0) content-box;
-    -webkit-mask: var(--_m);
-    mask: var(--_m);
-    -webkit-mask-composite: source-out;
-    mask-composite: subtract;
-    animation: l3 1s infinite linear;
-}
-
-@keyframes l3 {
-    to {
-        transform: rotate(1turn)
-    }
-}
-
-.playingFade-enter-active,
-.playingFade-leave-active {
-    transition: opacity 0.2s ease-in-out;
-}
-
-.playingFade-enter-from,
-.playingFade-leave-to {
-    opacity: 0;
-}
 </style>

@@ -1,9 +1,8 @@
 <template>
     <div :class="{ 'overflow-hidden max-h-dvh': (modals.alreadyVotedModal || modals.reportModal) }">
         <!-- Reproductor -->
-        <ModularPlayer v-if="$device.isDesktop" type="vote" @pause="playTrack($event)" @vote="vote($event.id)"
+        <component :is="activePlayer" type="vote" @pause="playTrack($event)" @vote="vote($event.id)"
             @report="report($event)" />
-        <MobilePlayer v-else type="vote" @pause="playTrack($event)" @vote="vote($event.id)" @report="report($event)" />
 
         <!-- Titulo -->
         <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
@@ -17,7 +16,7 @@
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text" placeholder="Buscar..."
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                    :class="{ '!py-1 !text-sm': $device.isMobile }" v-model.lazy="filter">
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model.lazy="filter">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
                     :class="{ 'text-base': $device.isMobile }">
                     search
@@ -31,7 +30,7 @@
             </div>
             <select v-model.lazy="orderBy"
                 class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center"
-                :class="{ 'text-sm !p-1': $device.isMobile }">
+                :class="{ 'text-sm !p-2': $device.isMobile }">
                 <option value="votes-desc">Més vots</option>
                 <option value="votes-asc">Menys vots</option>
                 <option value="title-desc">Títol (A-Z)</option>
@@ -43,60 +42,11 @@
 
         <!-- Listado canciones -->
         <div class="mb-20">
-            <div v-for="track, index in filteredSongs" :key="index" class="flex flex-row m-2"
-                :class="{ 'justify-center': $device.isDesktop }">
-                <div class="relative flex items-center">
-                    <img :src="track.img" :alt="track.name + '_img'" class="w-20 h-20 m-2 rounded-full"
-                        :class="{ '!w-[4rem] !h-[4rem]': $device.isMobile }">
-                    <Transition name="playingFade">
-                        <div v-if="currentTrackId === track.id && isPlaying"
-                            class="absolute left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full"
-                            :class="{ '!w-20 !h-20': $device.isMobile }">
-                            <div class="loader"></div>
-                        </div>
-                    </Transition>
-                </div>
-                <div class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center"
-                    :class="{ '!w-full ml-4': $device.isMobile }">
-                    <div class="flex flex-col w-[70%]">
-                        <p class="font-bold text-base uppercase"
-                            :class="{ '!text-sm overflow-hidden': $device.isMobile }">
-                            {{ track.title }}</p>
-                        <div class="flex flex-row text-sm">
-                            <p class="whitespace-nowrap overflow-hidden">
-                                {{ track.artist }}
-                            </p>
-                        </div>
-                        <p class="text-sm">Vots: {{ track.votes }}</p>
-                    </div>
-                    <div :class="{ '!w-[80%] flex flex-row justify-between': $device.isMobile }">
-                        <button @click="playTrack(track)">
-                            <span v-if="currentTrackId === track.id && isPlaying"
-                                class="material-symbols-rounded text-4xl" :class="{ '!text-2xl': $device.isMobile }">
-                                pause
-                            </span>
-                            <span v-else class="material-symbols-rounded text-4xl"
-                                :class="{ '!text-2xl': $device.isMobile }">
-                                play_arrow
-                            </span>
-                        </button>
-                        <button @click="report(track)">
-                            <span class="material-symbols-rounded text-4xl" :class="{ '!text-2xl': $device.isMobile }">
-                                report
-                            </span>
-                        </button>
-                        <div v-if="isLoadingVote.state && isLoadingVote.selectedSong == track.id" class="loader-track">
-                        </div>
-                        <button v-else @click="vote(track.id)">
-                            <span
-                                :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id), '!text-2xl': $device.isMobile }">
-                                thumb_up
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <component :is="activeSong" v-for="track in filteredSongs" :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
+                @report="report($event)" type="vote" />
         </div>
+
         <!-- Modales -->
         <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
         <component :is="activeModal" :open="modals.alreadyVotedModal" @close="modals.alreadyVotedModal = false">
@@ -120,7 +70,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-        reportSongData.reportedSong.artist }}?</p>
+                    reportSongData.reportedSong.artist }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -170,9 +120,19 @@ export default {
             currentTrackId: null,
             isPlaying: false,
             modalSelector: this.$device.isMobile ? 1 : 0,
+            songComponentSelector: this.$device.isMobile ? 1 : 0,
+            playerSelector: this.$device.isMobile ? 1 : 0,
             modalComponent: {
                 0: resolveComponent('ModularModal'),
                 1: resolveComponent('MobileModal'),
+            },
+            songComponent: {
+                0: resolveComponent('Song'),
+                1: resolveComponent('MobileSong'),
+            },
+            activePlayer: {
+                0: resolveComponent('ModularPlayer'),
+                1: resolveComponent('MobilePlayer'),
             }
         }
     },
@@ -213,13 +173,7 @@ export default {
                 }
             }
         },
-        isSongVoted(songId) {
-            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
-                return true;
-            } else {
-                return false;
-            }
-        },
+
         playTrack(track) {
             const store = useAppStore();
             if (this.currentTrackId == track.id) {
@@ -317,6 +271,12 @@ export default {
         activeModal() {
             return this.modalComponent[this.modalSelector];
         },
+        activeSong() {
+            return this.songComponent[this.songComponentSelector];
+        },
+        activePlayer() {
+            return this.activePlayer[this.playerSelector];
+        }
     },
 }
 
