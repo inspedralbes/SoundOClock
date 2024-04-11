@@ -1,9 +1,8 @@
 <template>
     <div :class="{ 'overflow-hidden max-h-dvh': (modals.alreadyVotedModal || modals.reportModal) }">
         <!-- Reproductor -->
-        <ModularPlayer v-if="$device.isDesktop" type="vote" @pause="playTrack($event)" @vote="vote($event.id)"
+        <component :is="activePlayer" type="vote" @pause="playTrack($event)" @vote="vote($event.id)"
             @report="report($event)" />
-        <MobilePlayer v-else type="vote" @pause="playTrack($event)" @vote="vote($event.id)" @report="report($event)" />
 
         <!-- Titulo -->
         <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
@@ -17,7 +16,7 @@
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text" placeholder="Buscar..."
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                    :class="{ '!py-1 !text-sm': $device.isMobile }" v-model.lazy="filter">
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model.lazy="filter">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
                     :class="{ 'text-base': $device.isMobile }">
                     search
@@ -31,7 +30,7 @@
             </div>
             <select v-model.lazy="orderBy"
                 class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center"
-                :class="{ 'text-sm !p-1': $device.isMobile }">
+                :class="{ 'text-sm !p-2': $device.isMobile }">
                 <option value="votes-desc">Més vots</option>
                 <option value="votes-asc">Menys vots</option>
                 <option value="title-desc">Títol (A-Z)</option>
@@ -71,7 +70,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-        reportSongData.reportedSong.artist }}?</p>
+                    reportSongData.reportedSong.artist }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -122,6 +121,7 @@ export default {
             isPlaying: false,
             modalSelector: this.$device.isMobile ? 1 : 0,
             songComponentSelector: this.$device.isMobile ? 1 : 0,
+            playerSelector: this.$device.isMobile ? 1 : 0,
             modalComponent: {
                 0: resolveComponent('ModularModal'),
                 1: resolveComponent('MobileModal'),
@@ -130,6 +130,10 @@ export default {
                 0: resolveComponent('Song'),
                 1: resolveComponent('MobileSong'),
             },
+            activePlayer: {
+                0: resolveComponent('ModularPlayer'),
+                1: resolveComponent('MobilePlayer'),
+            }
         }
     },
     created() {
@@ -269,6 +273,9 @@ export default {
         },
         activeSong() {
             return this.songComponent[this.songComponentSelector];
+        },
+        activePlayer() {
+            return this.activePlayer[this.playerSelector];
         }
     },
 }

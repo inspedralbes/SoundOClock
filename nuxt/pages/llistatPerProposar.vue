@@ -1,8 +1,7 @@
 <template>
     <div :class="{ 'overflow-hidden max-h-dvh': modals.proposeSongError }">
         <!-- Reproductor -->
-        <ModularPlayer v-if="$device.isDesktop" @pause="playTrack($event)" @propose="proposeSong($event)" />
-        <MobilePlayer v-else @pause="playTrack($event)" @propose="proposeSong($event)" />
+        <component :is="activePlayer" @pause="playTrack($event)" @propose="proposeSong($event)" />
 
         <!-- TITULO -->
         <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
@@ -10,15 +9,17 @@
 
         <!-- BARRA DE BUSQUEDA -->
         <div class="w-full flex justify-center items-center">
-            <div class="relative w-[70%] m-2 text-center">
+            <div class="relative w-[70%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text" placeholder="Buscar..."
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                    v-model="query" @keyup.enter="getSongs()">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded">
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="query" @keyup.enter="getSongs()">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
+                    :class="{ 'text-base': $device.isMobile }">
                     search
                 </span>
                 <button @click="deleteSearch">
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded">
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                        :class="{ 'text-base': $device.isMobile }">
                         Close
                     </span>
                 </button>
@@ -81,6 +82,7 @@ export default {
             postedSongId: "",
             modalSelector: this.$device.isMobile ? 1 : 0,
             songComponentSelector: this.$device.isMobile ? 1 : 0,
+            playerComponentSelector: this.$device.isMobile ? 1 : 0,
             modalComponent: {
                 0: resolveComponent('ModularModal'),
                 1: resolveComponent('MobileModal'),
@@ -89,6 +91,10 @@ export default {
                 0: resolveComponent('Song'),
                 1: resolveComponent('MobileSong'),
             },
+            playerComponent: {
+                0: resolveComponent('Player'),
+                1: resolveComponent('MobilePlayer'),
+            }
         }
     },
     created() {
@@ -277,6 +283,9 @@ export default {
         },
         activeSong() {
             return this.songComponent[this.songComponentSelector];
+        },
+        activePlayer() {
+            return this.playerComponent[this.playerComponentSelector];
         }
     },
     watch: {
