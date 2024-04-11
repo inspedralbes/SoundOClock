@@ -1,50 +1,69 @@
 <template>
-    <div>
-        <div class="width mx-auto my-5 flex flex-row justify-center">
-            <input class="cercador w-full ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..."
-                v-model="query" @keyup.enter="getSongs()"></input>
-        </div>
-        <div v-for="track in tracks"
-            class="width mb-3 mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
-            <div class="contenidor-img">
-                <img :src="track.album.images[1].url" :alt="track.name + '_img'" class="rounded-lg">
-                <button @click="playTrack(track)" class="rounded-lg"
-                    :class="{ playingC: isPlayingCheck(track.id), noPlaying: !isPlayingCheck(track.id) }">
-                    <!-- fer amb computed la classe -->
-                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded">
-                        pause
-                    </span>
-                    <span v-else class="material-symbols-rounded">
-                        play_arrow
-                    </span>
-                </button>
-            </div>
+    <div :class="{ 'overflow-hidden max-h-dvh': modals.proposeSongError }">
+        <!-- Reproductor -->
+        <component :is="activePlayer" @pause="playTrack($event)" @propose="proposeSong($event)" />
 
-            <div class="song-data">
-                <p class="font-black basis-1/2">{{ track.name }}</p>
-                <p class="basis-1/2">{{ track.artists[0].name }}</p>
-            </div>
+        <!-- TITULO -->
+        <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
+            Proposa la teva cançó</h1>
 
-            <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
-
-                <button @click="proposeSong(track)" class="hover:rounded-lg hover:bg-black w-fit flex">
-                    <span class="material-symbols-rounded text-4xl">
-                        add
+        <!-- BARRA DE BUSQUEDA -->
+        <div class="w-full flex justify-center items-center">
+            <div class="relative w-[70%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
+                <input type="text" placeholder="Buscar..."
+                    class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="query" @keyup.enter="getSongs()">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
+                    :class="{ 'text-base': $device.isMobile }">
+                    search
+                </span>
+                <button @click="deleteSearch">
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                        :class="{ 'text-base': $device.isMobile }">
+                        Close
                     </span>
                 </button>
-
             </div>
         </div>
+
+
+        <!-- Listado de canciones -->
+        <div class="mb-20">
+            <component :is="activeSong" v-for="track, index in tracks" :track="track" :currentTrackId="currentTrackId"
+                :isPlaying="isPlaying" type="propose" @play="playTrack($event)" @propose="proposeSong($event)">
+            </component>
+        </div>
+
+        <!-- Modals -->
+        <component :is="activeModal" :open="modals.proposeSongError" @close="modals.proposeSongError = false">
+            <template #title>Ja has proposat una cançó</template>
+            <template #content>
+                <p class="text-center">Ja has proposat una cançó, espera a que la següent votació per proposar una
+                    altra.
+                </p>
+            </template>
+        </component>
+
+        <!-- Boton que redirige a la propuesta de canciones -->
+        <footer class="fixed bottom-2 w-full flex justify-center align-center">
+            <button @click="goToVote"
+                class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700"
+                :class="{ 'text-sm w-[90%] mb-4': $device.isMobile }">Tornar a les
+                votacions
+            </button>
+        </footer>
     </div>
 </template>
 
 <script>
-
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
+import { computed } from 'vue';
+
 
 export default {
     data() {
+        const store = useAppStore();
         return {
             token: '',
             songFile: null,
@@ -56,9 +75,31 @@ export default {
             isWaitingToPlay: false,
             isWaitingToPropose: false,
             store: useAppStore(),
+            modals: {
+                proposeSongError: false,
+            },
+            postedSongStatus: computed(() => store.postedSongStatus),
+            postedSongId: "",
+            modalSelector: this.$device.isMobile ? 1 : 0,
+            songComponentSelector: this.$device.isMobile ? 1 : 0,
+            playerComponentSelector: this.$device.isMobile ? 1 : 0,
+            modalComponent: {
+                0: resolveComponent('ModularModal'),
+                1: resolveComponent('MobileModal'),
+            },
+            songComponent: {
+                0: resolveComponent('Song'),
+                1: resolveComponent('MobileSong'),
+            },
+            playerComponent: {
+                0: resolveComponent('Player'),
+                1: resolveComponent('MobilePlayer'),
+            }
         }
     },
-    mounted() {
+    created() {
+
+
 
         socket.emit('getTopSongs', 'Top Songs Spain');
 
@@ -70,7 +111,6 @@ export default {
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
-
             // Crear un elemento HTML temporal
             const tempElement = document.createElement('div');
 
@@ -101,33 +141,54 @@ export default {
                 console.error('No se encontró el script con el id "__NEXT_DATA__" en el HTML recibido');
             }
         });
+
+    },
+    mounted() {
+        if (!this.store.getUser().token) {
+            console.log('No token');
+            navigateTo({ path: '/' });
+        }
     },
     methods: {
         getSongs() {
+            if (this.query == '') {
+                socket.emit('getTopSongs', 'Top Songs Spain');
+                return;
+            }
             socket.emit('searchSong', this.query);
         },
         playTrack(track) {
+            const store = useAppStore();
             if (this.currentTrackId == track.id) {
                 if (this.isPlaying) {
                     this.currentTrack.pause();
                     this.isPlaying = false;
+                    store.deleteCurrentTrackPlaying();
                 } else {
+                    this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    store.setCurrentTrackPlaying(track);
                 }
             } else {
                 if (track.preview_url != null) {
                     if (this.currentTrack != null) {
                         this.currentTrack.pause();
+                        store.deleteCurrentTrackPlaying();
                     }
                     this.currentTrack = new Audio(track.preview_url);
                     this.currentTrackId = track.id;
+                    this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    store.setCurrentTrackPlaying(track);
                 } else {
                     if (this.currentTrack != null) {
+
                         this.currentTrack.pause();
+                        store.deleteCurrentTrackPlaying();
                     }
+                    store.setCurrentTrackPlaying(track);
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
                 }
@@ -139,6 +200,8 @@ export default {
             }
         },
         proposeSong(track) {
+            track.loading = true;
+            this.postedSongId = track.id;
             if (track.preview_url == null) {
                 socket.emit('getHtmlSpotify', track.id);
                 this.isWaitingToPropose = true;
@@ -151,7 +214,7 @@ export default {
                     img: track.album.images[1].url,
                     previewUrl: track.preview_url,
                     submitDate: new Date().toISOString(),
-                    submitedBy: this.store.getUser().id,
+                    submittedBy: this.store.getUser().id,
                 }
                 socket.emit('postSong', this.store.getUser().token, song);
             }
@@ -169,6 +232,7 @@ export default {
                     if (this.isWaitingToPlay) {
                         this.currentTrack = new Audio(audioURL);
                         this.currentTrackId = songId;
+                        this.currentTrack.load();
                         this.currentTrack.play();
                         this.isPlaying = true;
                         this.isWaitingToPlay = false;
@@ -194,142 +258,60 @@ export default {
                     console.error('Error getting the audio file:', error);
                 });
         },
+        deleteSearch() {
+            this.query = '';
+            this.tracks = [];
+            socket.emit('getTopSongs', 'Top Songs Spain');
+        },
+        searchBySongId(id) {
+            return this.tracks.find(item => item.id == id);
+        },
+        goToVote() {
+            this.$router.push('/llista_propostes');
+            this.store.deleteCurrentTrackPlaying(null);
+            this.currentTrack.pause();
+        }
     },
     beforeDestroy() {
         socket.off('topSongs');
         socket.off('searchResult');
         socket.off('sendHtmlSpotify');
     },
+    computed: {
+        activeModal() {
+            return this.modalComponent[this.modalSelector];
+        },
+        activeSong() {
+            return this.songComponent[this.songComponentSelector];
+        },
+        activePlayer() {
+            return this.playerComponent[this.playerComponentSelector];
+        }
+    },
+    watch: {
+        'currentTrack': {
+            handler: function () {
+                this.currentTrack.onended = () => {
+                    this.isPlaying = false;
+                    this.store.deleteCurrentTrackPlaying();
+                }
+            }
+        },
+        postedSongStatus: {
+            handler: function () {
+                if (this.postedSongStatus.status == 'error') {
+                    this.modals.proposeSongError = true;
+                    this.searchBySongId(this.postedSongId).loading = false;
+                } else {
+                    this.searchBySongId(this.postedSongId).loading = false;
+                    this.searchBySongId(this.postedSongId).proposed = true;
+                }
+            }
+        }
+    }
 }
 </script>
 
 <style scoped>
-.width {
-    width: 85%;
-}
-
-.contenidor-canço {
-    background-color: rgb(56, 56, 56);
-    color: white;
-}
-
-.contenidor-canço>*:last-child {
-    justify-self: flex-end;
-}
-
-.contenidor-img {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 20%;
-    min-width: fit-content;
-    height: 100%;
-    width: fit-content;
-}
-
-.contenidor-img>button>span {
-    font-size: 3rem;
-    color: white;
-}
-
-.contenidor-img>button>span {
-    width: 80%;
-    height: auto;
-}
-
-.contenidor-img:hover>button {
-    display: flex;
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    right: 0;
-    top: 0;
-    background-color: rgb(0, 0, 0, 0.3);
-    cursor: pointer;
-    z-index: 100;
-}
-
-.playingC {
-    display: flex;
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    right: 0;
-    top: 0;
-    background-color: rgb(0, 0, 0, 0.3);
-    cursor: pointer;
-    z-index: 100;
-}
-
-.song-data {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    justify-content: space-evenly;
-    flex-grow: 1;
-    align-items: center;
-    height: 100%;
-    max-width: 100%;
-    min-width: 5%;
-    text-align: center;
-}
-
-.song-data>p {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.contenidor-butons {
-    max-width: 20%;
-    height: 100%;
-    flex-grow: 1;
-    min-width: fit-content;
-    align-self: center;
-}
-
-img {
-    width: 60px;
-    height: 60px;
-}
-
-.noPlaying {
-    display: none;
-}
-
-@media screen and (min-width: 768px) {
-
-    .song-data {
-        display: flex;
-        flex-direction: row;
-        flex-grow: 1;
-
-        max-width: 100%;
-    }
-
-    .contenidor-butons {
-        max-width: 20%;
-        height: 100%;
-        flex-grow: 1;
-        min-width: fit-content;
-        align-self: center;
-    }
-
-    .width {
-        width: 55%;
-    }
-
-}
-
-.cercador {
-    background-color: white;
-    border-radius: 24px;
-    height: 40px;
-    color: #000;
-}
+/* HTML: <div class="loader"></div> */
 </style>

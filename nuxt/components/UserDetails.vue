@@ -9,8 +9,16 @@ export default {
   },
   data() {
     return {
+      isVotingBeingChanged: false,
       votingBannedUntil: null,
-      proposingBannedUntil: null
+      proposingBannedUntil: null,
+      modals: {
+        noDateSelected: false,
+        banUserVotingCapacity: false,
+        unbanUserVotingCapacity: false,
+        banUserProposingCapacity: false,
+        unbanUserProposingCapacity:false
+      }
     }
   },
   methods: {
@@ -18,18 +26,40 @@ export default {
       return formatDate(date);
     },
     banUser(isVotingBeingBanned) {
-      if (isVotingBeingBanned) {
-        this.user.vote_banned_until = this.formatDateToLaravel(this.votingBannedUntil);
+      this.isVotingBeingChanged = isVotingBeingBanned;
+      if ((isVotingBeingBanned && !this.votingBannedUntil) || (!isVotingBeingBanned && !this.proposingBannedUntil)) {
+        this.modals.noDateSelected = true;
       } else {
-        this.user.propose_banned_until = this.formatDateToLaravel(this.proposingBannedUntil);
+        if (isVotingBeingBanned) {
+          //this.user.vote_banned_until = this.formatDateToLaravel(this.votingBannedUntil);
+          this.votingBannedUntil = this.formatDateToLaravel(this.votingBannedUntil);
+          this.modals.banUserVotingCapacity = true;
+        } else {
+          this.proposingBannedUntil = this.formatDateToLaravel(this.proposingBannedUntil);
+          // this.user.propose_banned_until = this.formatDateToLaravel(this.proposingBannedUntil);
+          this.modals.banUserProposingCapacity = true;
+        }
+        //socket.emit('banUser', this.store.getUser().token, this.user);
       }
-      socket.emit('banUser', this.store.getUser().token, this.user);
+
     },
     enableUser(isVotingBeingEnabled) {
+      this.isVotingBeingChanged = isVotingBeingEnabled;
       if (isVotingBeingEnabled) {
-        this.user.vote_banned_until = null;
+        this.votingBannedUntil = null;
+        this.modals.unbanUserVotingCapacity = true;
       } else {
-        this.user.propose_banned_until = null;
+        this.proposingBannedUntil = null;
+        this.modals.unbanUserProposingCapacity = true;
+      }
+      // socket.emit('banUser', this.store.getUser().token, this.user);
+    },
+    submitData() {
+
+      if (this.isVotingBeingChanged) {
+        this.user.vote_banned_until = this.votingBannedUntil;
+      } else {
+        this.user.propose_banned_until = this.proposingBannedUntil;
       }
       socket.emit('banUser', this.store.getUser().token, this.user);
     },
@@ -70,7 +100,7 @@ export default {
       <div class="w-1/2">
         <p v-if="user.vote_banned_until" class="mb-8 text-xl text-center font-black">L'usuari no pot votar cançons fins
           el {{
-    formatDate(user.vote_banned_until) }}</p>
+            formatDate(user.vote_banned_until) }}</p>
         <p v-else class="mb-8 text-xl text-center font-black">L'usuari no té limitada la capacitat de votar cançons</p>
         <h2 class="text-2xl mb-4 text-center">LIMITAR VOTAR CANÇONS</h2>
         <Calendar class="mb-8" v-bind:date="user.vote_banned_until" :isVotingBannedDate=true @changeDate="changeDate" />
@@ -82,7 +112,7 @@ export default {
       <div class="w-1/2">
         <p v-if="user.propose_banned_until" class="mb-8 text-xl text-center font-black">L'usuari no pot proposar cançons
           fins el {{
-    formatDate(user.propose_banned_until) }}</p>
+            formatDate(user.propose_banned_until) }}</p>
         <p v-else class="mb-8 text-xl text-center font-black">L'usuari no té limitada la capacitat de proposar cançons
         </p>
         <h2 class="text-2xl mb-4 text-center">LIMITAR PROPOSAR CANÇONS</h2>
@@ -95,6 +125,70 @@ export default {
       </div>
     </div>
   </div>
+
+  <Transition name="fade">
+    <ModularModal v-if="modals.noDateSelected" type="error" title="No hi ha cap data seleccionada"
+      @close="modals.noDateSelected = false">
+      <template #title>
+        <h2>No hi ha cap data seleccionada</h2>
+      </template>
+      <template #content>
+        <p>Selecciona una franja de dates per poder bloquejar a l'usuari <span class="font-bold">{{ user.name }}</span>.
+        </p>
+      </template>
+    </ModularModal>
+  </Transition>
+
+  <Transition name="fade">
+    <ModularModal v-if="modals.banUserVotingCapacity" type="error" msg="Limitar" title="Limitar votacions usuari"
+      @confirm="submitData()" @close="modals.banUserVotingCapacity = false">
+      <template #title>
+        <h2>Limitar capacitat de votar</h2>
+      </template>
+      <template #content>
+        <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> no pugui votar cançons fins el
+          <span class="font-bold">{{ formatDate(this.votingBannedUntil) }}?</span>
+        </p>
+      </template>
+    </ModularModal>
+  </Transition>
+
+  <Transition name="fade">
+    <ModularModal v-if="modals.unbanUserVotingCapacity" type="error" msg="Habilitar" title="Habilitar votacions usuari"
+      @confirm="submitData()" @close="modals.unbanUserVotingCapacity = false">
+      <template #title>
+        <h2>Habilitar capacitat de votar</h2>
+      </template>
+      <template #content>
+        <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> pugui tornar a votar cançons?</p>
+      </template>
+    </ModularModal>
+  </Transition>
+
+  <Transition name="fade">
+    <ModularModal v-if="modals.banUserProposingCapacity" type="error" msg="Limitar" title="Limitar propostes usuari"
+      @confirm="submitData()" @close="modals.banUserProposingCapacity = false">
+      <template #title>
+        <h2>Limitar capacitat de proposar</h2>
+      </template>
+      <template #content>
+        <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> no pugui proposar cançons fins
+          el <span class="font-bold">{{ formatDate(this.proposingBannedUntil) }}?</span></p>
+      </template>
+    </ModularModal>
+  </Transition>
+
+  <Transition name="fade">
+    <ModularModal v-if="modals.unbanUserProposingCapacity" type="error" msg="Habilitar" title="Habilitar propostes usuari"
+      @confirm="submitData()" @close="modals.unbanUserProposingCapacity = false">
+      <template #title>
+        <h2>Habilitar capacitat de proposar</h2>
+      </template>
+      <template #content>
+        <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> tornar a proposar cançons?</p>
+      </template>
+    </ModularModal>
+  </Transition>
 </template>
 
 <style scoped>

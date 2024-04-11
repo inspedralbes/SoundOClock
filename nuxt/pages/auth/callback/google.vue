@@ -75,9 +75,7 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
 
 <!-- LOADER CSS QUE ESTA TO WAPO -->
 <!-- https://uiverse.io/csozidev/curly-crab-48 -->

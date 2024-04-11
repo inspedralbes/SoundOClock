@@ -77,24 +77,24 @@ async function logout(token) {
 
 async function getBlackList(token) {
   const response = await fetch(apiURL + 'blacklist', {
-      method: 'GET',
-      headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": "Bearer " + token,
-      },
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
   });
   return response;
 }
 
 async function removeSongFromBlacklist(token, songSpotifyId) {
   const response = await fetch(apiURL + 'blacklist/' + songSpotifyId, {
-      method: 'DELETE',
-      headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": "Bearer " + token,
-      }
+    method: 'DELETE',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    }
   });
   return response;
 }
@@ -118,17 +118,24 @@ async function addSongToBlackList(token, song) {
 }
 
 async function getPlaylists(playlist, limit, token) {
-  let url = `https://api.spotify.com/v1/search?q=${playlist}&type=playlist&limit=${limit}`;
-  let response = await fetch(url, {
-    headers: {
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + token
+
+  try {
+    let url = `https://api.spotify.com/v1/search?q=${playlist}&type=playlist&limit=${limit}`;
+    let response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token
+      }
+    })
+    let jsonResponse = await response.json();
+
+
+    if (jsonResponse.playlists.items) {
+      let songs = await getPlaylistSongs(jsonResponse.playlists.items[0].id, token);
+      return songs;
     }
-  })
-  let jsonResponse = await response.json();
-  if (jsonResponse.playlists.items) {
-    let songs = await getPlaylistSongs(jsonResponse.playlists.items[0].id, token);
-    return songs;
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -171,12 +178,12 @@ async function searchSongId(id, token) {
   return jsonResponse;
 }
 
-async function getGroups(token){
+async function getGroups(token) {
   const response = await axios.get(`${apiURL}groupsAll`);
   return response.data;
 }
 
-async function updateGroup(token,group){
+async function updateGroup(token, group) {
   const response = await axios.put(`${apiURL}groups/${group.id}`, group, {
     headers: {
       'Authorization': `Bearer ${token}`
@@ -185,7 +192,7 @@ async function updateGroup(token,group){
   return response.data;
 }
 
-async function deleteGroup(token,id){
+async function deleteGroup(token, id) {
   const response = await axios.delete(`${apiURL}groups/${id}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -194,7 +201,7 @@ async function deleteGroup(token,id){
   return response.data;
 }
 
-async function getPublicGroups(token){
+async function getPublicGroups(token) {
   const response = await axios.get(`${apiURL}groups`, {
     headers: {
       "Authorization": "Bearer " + token,
@@ -253,6 +260,31 @@ async function setUserGroups(userId, token, groups) {
   return jsonResponse;
 }
 
+async function getBells(token) {
+  const response = await fetch(apiURL + 'bells', {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
+async function setBellsGroupsConfiguration(token, bells) {
+  const response = await fetch(apiURL + 'updateBells', {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify(bells)
+  });
+  return response;
+}
 
 const comManager = {
   getUserInfo,
@@ -275,6 +307,8 @@ const comManager = {
   deleteGroup,
   updateGroup,
   setUserGroups,
+  getBells,
+  setBellsGroupsConfiguration
 };
 
 export default comManager;

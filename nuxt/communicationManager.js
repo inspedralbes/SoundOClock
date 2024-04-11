@@ -73,13 +73,59 @@ async function setUserGroups(userId, groups, token) {
     return data;
 }
 
-const comManager={
+async function getBells() {
+    const store = useAppStore();
+    fetch(`${url}/bells/${store.getUser().token}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("bells: ", data);
+            store.setBells(data);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+}
+
+async function logout(token) {
+    const response = await fetch(`${url}/logout`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            token,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
+async function getUserInfo(token) {
+    const response = await fetch(`${url}/userInfo`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            token,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
+const comManager = {
     getUserSelectedSongs,
     getSongs,
     getAdminSongs,
     getUsers,
     getPublicGroups,
-    setUserGroups
+    setUserGroups,
+    getBells,
+    logout,
+    getUserInfo,
 };
 
 export default comManager;

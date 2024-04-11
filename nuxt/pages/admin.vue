@@ -1,5 +1,8 @@
 <template>
-    <SideBarMenu @toggle-menu="isOpen = $event">
+    <div class="w-screen h-screen" v-if="loading">
+        <Loader />
+    </div>
+    <SideBarMenu @toggle-menu="isOpen = $event" v-if="!loading">
         <!-- 
             - Cada 'button' de dentro del sidebar-menu es un boton que cambia la pantalla. 
             - La pantalla que se muestra depende de la variable 'selected_screen'.
@@ -48,6 +51,13 @@
             <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Llista negra</span>
         </button>
         <!-- --------- -->
+        <button @click="selected_screen=5" :class="{'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4':true,'isActive':selected_screen===5}">
+            <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
+                music_off
+            </span>
+            <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Set songs</span>
+        </button>
+        <!-- --------- -->
         <!-- 
             El contenido que vaya dentro del template v-slot:footer se mostrará al final del sidebar-menu.
          -->
@@ -62,13 +72,13 @@
         </template>
     </SideBarMenu>
 
-    <component :is="active_screen" />
+    <component :is="active_screen" v-if="!loading"/>
 </template>
 
 <script>
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
-import {computed} from 'vue';
+import comManager from '@/communicationManager';
 
 export default {
     data() {
@@ -76,25 +86,39 @@ export default {
             isOpen: false,
             selected_screen: 1,
             screens:{
-                // 0: resolveComponent('AdminAlarmsCrud'),
+                0: resolveComponent('AdminAlarmsCrud'),
                 1: resolveComponent('AdminGroupsCrud'),
                 2: resolveComponent('BanSong'),
                 3: resolveComponent('BanUser'),
                 // 3: resolveComponent('AdminSettingsCrud')
-                4: resolveComponent('AdminBlackListCrud')
-
-            }
-        }
+                4: resolveComponent('AdminBlackListCrud'),
+                5: resolveComponent('AdminSetSongs')
+            },
+            loading: true
+        } 
     },
     setup() {
             const store = useAppStore();
             return { store };
         },
     created() {
-            socket.emit('getGroups', this.store.getUser().token);
+        socket.emit('getGroups', this.store.getUser().token);
     },
-    methods: {
+    mounted() {
+        const userToken = this.store.getUser().token;
 
+        // Check if the user is authenticated
+        if (!userToken) {
+            navigateTo({ path: '/' });
+        }
+
+        // Check if the user is an admin
+        comManager.getUserInfo(userToken).then((response) => {
+            if (response.role_id !== 1) {
+                navigateTo({ path: '/' });
+            }
+            this.loading = false;
+        });
     },
     computed: {
         active_screen() {

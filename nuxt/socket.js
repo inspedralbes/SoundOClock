@@ -52,9 +52,19 @@ socket.on("connect", () => {
   });
 
   socket.on('songPosted', (data) => {
+    pinia.setPostedSongStatus(data);
   });
 
   socket.on('postError', (data) => {
+    pinia.setPostedSongStatus(data);
+  });
+
+  socket.on('bellsGroupsRelationsUpdated', (data) => {
+    console.log('socket bellsGroupsRelationsUpdated data received', data);
+  });
+
+  socket.on('updateBellsGroupsRelationsError', (data) => {
+    console.log('socket updateBellsGroupsRelationsError data received', data);
   });
 
   socket.on("disconnect", () => {
