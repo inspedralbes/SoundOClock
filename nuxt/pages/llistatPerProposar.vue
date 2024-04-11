@@ -118,7 +118,6 @@ export default {
             // Obtener el script por su id
             const scriptElement = tempElement.querySelector('#__NEXT_DATA__');
 
-            console.log(scriptElement);
 
             // Verificar si se encontró el elemento
             if (scriptElement) {
@@ -128,7 +127,6 @@ export default {
                 // Acceder al AudioPreviewURL
                 const AudioPreviewURL = jsonData.props.pageProps.state.data.entity.audioPreview.url;
 
-                console.log(AudioPreviewURL);
 
                 // add AudioPreviewURL to the track object with the songId
                 this.tracks.forEach(item => {
@@ -162,7 +160,6 @@ export default {
         playTrack(track) {
             const store = useAppStore();
 
-            console.log(track.previewUrl);
             if (this.currentTrackId == track.id) {
                 if (this.isPlaying) {
                     this.currentTrack.pause();
