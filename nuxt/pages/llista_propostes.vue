@@ -72,7 +72,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-                    reportSongData.reportedSong.artist }}?</p>
+        reportSongData.reportedSong.artist }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -149,8 +149,10 @@ export default {
         }
     },
     beforeUnmount() {
-        this.store.deleteCurrentTrackPlaying(null);
-        this.currentTrack.pause();
+        if (this.currentTrack != null) {
+            this.currentTrack.pause();
+        }
+        this.store.deleteCurrentTrackPlaying();
     },
     methods: {
         deleteSearch() {
@@ -165,9 +167,11 @@ export default {
             socket.emit('reportSong', this.store.getUser().token, song);
         },
         goToProposar() {
-            this.$router.push('/llistatPerProposar');
-            this.currentTrack.pause();
+            if (this.currentTrack != null) {
+                this.currentTrack.pause();
+            }
             this.store.deleteCurrentTrackPlaying();
+            this.$router.push('/llistatPerProposar');
         },
         vote(songId) {
             if (!this.isLoadingVote.state) {
