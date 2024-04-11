@@ -1,7 +1,6 @@
 import { useAppStore } from './stores/app.js';
 
-const url = "http://localhost:8080"; // development environment
-// const url = "http://129.151.244.179:8080"; // production environment
+const url = "http://129.151.244.179:8080";
 
 function getUserSelectedSongs(id) {
     const store = useAppStore();

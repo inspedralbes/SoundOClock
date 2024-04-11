@@ -5,7 +5,7 @@ import comManager from './communicationManager';
 
 const router = useRouter();
 
-let url = "http://localhost:8080";
+const url = "http://129.151.244.179:8080";
 
 export const socket = io(url);
 

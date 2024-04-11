@@ -6,10 +6,6 @@ import mongoose from 'mongoose';
 import comManager from './communicationManager.js';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
-import minimist from 'minimist';
-
-const argv = minimist(process.argv.slice(2));
-const host = argv.host || 'mongodb';
 
 const app = express();
 app.use(cors());
@@ -25,21 +21,30 @@ const io = new Server(server, {
 const port = process.env.PORT || 8080;
 
 // Mongoose setup
-mongoose.connect('mongodb://mongoadmin:mongopassword@' + host +':27017/soundoclock', { authSource: "admin" })
-.then(() => console.log('MongoDB connected'))
+mongoose.connect('mongodb://mongoadmin:mongopassword@mongodb:27017/soundoclock', {
+  authSource: "admin" // This is needed if you're using credentials to connect to MongoDB
+})
+  .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
 async function insertDefaultsMongo() {
   const songs = [
     { id: '0VjIjW4GlUZAMYd2vXMi3b', title: 'Blinding Lights', artist: 'The Weeknd', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36', previewUrl: 'https://example.com/blinding-lights-preview', votes: 150, submitDate: new Date('2020-11-29'), submittedBy: 1 },
     { id: '62PaSfnXSMyLshYJrlTuL3', title: 'Hello', artist: 'Adele', year: 2015, img: 'https://i.scdn.co/image/ab67616d00001e0247ce408fb4926d69da6713c2', previewUrl: 'https://example.com/hello-preview', votes: 300, submitDate: new Date('2015-10-23'), submittedBy: 7 },
-    { id: '0sfdiwck2xr4PteGOdyOfz', title: 'Shot in the Dark', artist: 'AC/DC', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e0204db0e3bcd166c1d6cfd81f9', previewUrl: 'https://example.com/shot-in-the-dark-preview', votes: 75, submitDate: new Date('2020-10-07'), submittedBy: 2 }
+    { id: '0sfdiwck2xr4PteGOdyOfz', title: 'Shot in the Dark', artist: 'AC/DC', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e0204db0e3bcd166c1d6cfd81f9', previewUrl: 'https://example.com/shot-in-the-dark-preview', votes: 75, submitDate: new Date('2020-10-07'), submittedBy: 2 },
+    //     { id: 3, title: 'Don\'t Start Now', artist: 'Dua Lipa', year: 2019, img: 'dont-start-now.jpg', previewUrl: 'https://example.com/dont-start-now-preview', votes: 200, submitDate: new Date('2019-11-01'), submittedBy: 3 },
+    //     { id: 4, title: 'Fear Inoculum', artist: 'Tool', year: 2019, img: 'fear-inoculum.jpg', previewUrl: 'https://example.com/fear-inoculum-preview', votes: 90, submitDate: new Date('2019-08-30'), submittedBy: 4 },
+    //     { id: 5, title: 'God\'s Plan', artist: 'Drake', year: 2018, img: 'gods-plan.jpg', previewUrl: 'https://example.com/gods-plan-preview', votes: 250, submitDate: new Date('2018-01-19'), submittedBy: 5 },
+    //     { id: 6, title: 'HARDWIRE', artist: 'Metallica', year: 2016, img: 'hardwire.jpg', previewUrl: 'https://example.com/hardwire-preview', votes: 65, submitDate: new Date('2016-08-18'), submittedBy: 6 },
+    //     { id: 8, title: 'Doom and Gloom', artist: 'The Rolling Stones', year: 2012, img: 'doom-and-gloom.jpg', previewUrl: 'https://example.com/doom-and-gloom-preview', votes: 80, submitDate: new Date('2012-10-11'), submittedBy: 8 },
+    //     { id: 9, title: 'Royals', artist: 'Lorde', year: 2013, img: 'royals.jpg', previewUrl: 'https://example.com/royals-preview', votes: 220, submitDate: new Date('2013-03-08'), submittedBy: 9 },
+    //     { id: 10, title: 'R U Mine?', artist: 'Arctic Monkeys', year: 2013, img: 'r-u-mine.jpg', previewUrl: 'https://example.com/r-u-mine-preview', votes: 110, submitDate: new Date('2013-02-27'), submittedBy: 10 }
   ];
 
   const votingRecords = [
-    { userId: 1, submitted: true, votedSongs: [1, 4], groups: [1] },
-    { userId: 2, submitted: false, votedSongs: [], groups: [2] },
-    { userId: 3, submitted: false, votedSongs: [2], groups: [1] },
+    { userId: 1, submitted: true, votedSongs: [1, 4], group: 1 },
+    { userId: 2, submitted: false, votedSongs: [], group: 2 },
+    { userId: 3, submitted: false, votedSongs: [2], group: 1 },
   ];
 
   // Upsert songs
@@ -54,6 +59,8 @@ async function insertDefaultsMongo() {
 }
 
 //FETCH TO GET HTML FROM SPOTIFY
+
+
 insertDefaultsMongo();
 
 // API routes
@@ -85,27 +92,16 @@ app.get('/reportSongs/:songId', async (req, res) => {
   }
 });
 
-app.get('/adminSongs/:userToken', async (req, res) => {
+app.get('/adminSongs', async (req, res) => {
   try {
-    // Query all proposed songs
+    // Query all songs
     const songs = await Song.find();
 
-    // Iterate through each song
+    // Iterate through each song and find its reported versions
     const songsWithReports = await Promise.all(songs.map(async (song) => {
-
-      // Find the reports associted to the song
       const reports = await ReportSong.find({ songId: song.id });
-
-      // Find the user that proposed the song
-      const user = await comManager.showUser(req.params.userToken, song.submittedBy);
-
-      // Transform the mongoose.Document into an object
       song = song.toObject();
-
-      // Add reports and user associated to the song
       song.reports = reports;
-      song.user = user;
-
       return song;
     }));
 
@@ -137,32 +133,6 @@ app.get('/publicGroups', async (req, res) => {
 app.post('/addGroupsToUser', async (req, res) => {
   try {
     const response = await comManager.setUserGroups(req.body.userId, req.body.token, req.body.groups);
-    res.json(response);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-})
-app.get('/bells/:userToken', async (req, res) => {
-  try {
-    let bells = await comManager.getBells(req.params.userToken);
-    res.json(bells);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
-
-app.post('/logout', async (req, res) => {
-  try {
-    let response = await comManager.logout(req.body.token);
-    res.json(response);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-})
-
-app.post('/userInfo', async (req, res) => {
-  try {
-    let response = await comManager.getUserInfo(req.body.token);
     res.json(response);
   } catch (err) {
     res.status(500).send(err);
@@ -200,8 +170,6 @@ setInterval(obtenerActualizarTokenSpotify, 59 * 60 * 1000);
 // Obtener y actualizar el token de Spotify al iniciar el servidor
 obtenerActualizarTokenSpotify();
 
-let dirPC = null;
-
 // Sockets
 io.on('connection', (socket) => {
   console.log('a user connected');
@@ -209,7 +177,7 @@ io.on('connection', (socket) => {
   socket.on('googleLogin', (userToken) => {
     comManager.googleLogin(userToken)
       .then((userData) => {
-
+	console.log(userData)
         let groups = [];
         // Populate groups array with group_id and course
         userData.user.groups.forEach(group => {
@@ -230,6 +198,7 @@ io.on('connection', (socket) => {
   // Post song checking for duplicates first
   socket.on('postSong', async (userToken, songData) => {
     // Check that the user is authenticated with Laravel Sanctum
+    console.log("token", userToken, songData);
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
 
@@ -237,6 +206,7 @@ io.on('connection', (socket) => {
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
       if (existingSong) {
+        console.log("ya existe cancion");
         socket.emit('postError', { status: 'error', message: 'Song already exists' });
         return;
       }
@@ -244,6 +214,7 @@ io.on('connection', (socket) => {
       // Check if the user already submitted a song
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
       if (votingRecord && votingRecord.submitted) {
+        console.log("already submited");
         socket.emit('postError', { status: 'error', message: 'User already submitted a song' });
         return;
       }
@@ -253,15 +224,16 @@ io.on('connection', (socket) => {
       await newSong.save();
 
       if (!votingRecord) {
-        let userGroups = user.groups.map(group => group.id);
-        await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], groups: userGroups }).save();
+        await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], group: user.class_group_id }).save();
       } else {
         votingRecord.submitted = true;
         await votingRecord.save();
+        console.log("song saved");
       }
 
       io.emit('songPosted', { status: 'success', song: songData });
     } catch (err) {
+      console.log("error:", err);
       socket.emit('postError', { status: 'error', message: err.message });
       console.error('postError', err.message);
     }
@@ -305,8 +277,7 @@ io.on('connection', (socket) => {
       await song.save();
 
       if (!votingRecord) {
-        let userGroups = user.groups.map(group => group.id);
-        await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [songId], groups: userGroups }).save();
+        await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [songId], group: user.class_group_id }).save();
       } else {
         votingRecord.votedSongs.push(songId);
         await votingRecord.save();
@@ -390,7 +361,7 @@ io.on('connection', (socket) => {
       }
 
       // Add a register in ReportSong table
-      await new ReportSong({ userId: user.id, userName: user.name, songId: song.id, reason: reportedSong.option, isRead: false }).save();
+      await new ReportSong({ userId: user.id, userName: user.name, songId: song.id, reason: reportedSong.option }).save();
 
       io.emit('songReported', { status: 'success', message: `La cançó ${song.title} ha sigut reportada` });
     } catch (err) {
@@ -400,7 +371,6 @@ io.on('connection', (socket) => {
 
   socket.on('getHtmlSpotify', (songId) => {
     comManager.fetchSpotifyPage(songId).then(html => {
-      console.log(html);
       if (html) {
         socket.emit('sendHtmlSpotify', html, songId);
       }
@@ -420,6 +390,17 @@ io.on('connection', (socket) => {
           socket.emit('topSongs', songsToEmit);
         }
       });
+  });
+
+  socket.on('searchSong', (search) => {
+    let limit = 15;
+    comManager.searchSong(search, limit, spotifyToken)
+      .then(data => {
+        if (data) {
+          socket.emit('searchResult', data.tracks.items);
+        }
+      });
+
   });
 
   socket.on('searchId', (id) => {
@@ -511,53 +492,8 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('updateBellsGroupsRelations', async (userToken, bells) => {
-
-    try {
-      let response = await comManager.setBellsGroupsConfiguration(userToken, bells);
-      io.emit('bellsGroupsRelationsUpdated', { status: 'success', message: response });
-    } catch (err) {
-      socket.emit('updateBellsGroupsRelationsError', { status: 'error', message: err.message });
-    }
-  });
-
-  socket.on('dirPC', () => {
-    dirPC = socket.id;
-    socket.emit('dirPCStatus', true);
-  });
-
-  socket.on('sendBells', () => {
-    if (dirPC) {
-      io.to(dirPC).emit('executeSendBells',);
-    }
-  });
-
-  socket.on('getPcStatus', () => {
-    if (dirPC) {
-      socket.emit('dirPCStatus', true);
-    } else {
-      socket.emit('dirPCStatus', false);
-    }
-  });
-  
-  socket.on('changeIsReadReportStatus', async (userToken, report) => {
-    // Check that the user is authenticated with Laravel Sanctum
-    let user = await comManager.getUserInfo(userToken);
-    if (!user.id) return;
-
-    // Find the report
-    const reportSong = await ReportSong.findOne({ _id: report._id });
-    reportSong.isRead = report.isRead;
-    await reportSong.save();
-    io.emit('isReadReportStatusChanged', { status: 'success', message: `El report amb id ${reportSong._id} ha canviat.` });
-  })
-
   socket.on('disconnect', () => {
     console.log('user disconnected');
-    if (socket.id === dirPC) {
-      dirPC = null;
-      socket.emit('dirPCStatus', false);
-    }
   });
 
   socket.on('testing', (data) => {

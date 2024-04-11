@@ -33,11 +33,12 @@ class BlacklistTest extends TestCase {
     }
 
     // Helper function to insert a song into the blacklist
-    private function insertSong($user, $nom, $spotify_id) {
+    private function insertSong($user, $nom, $spotify_id, $artist) {
         return $this->actingAs($user)
             ->post('/api/blacklist', [
-                'nom' => $nom,
-                'spotify_id' => $spotify_id
+                'spotify_id' => $spotify_id,
+                'title' => $nom,
+                'artist' => $artist
             ]);
     }
 
@@ -46,12 +47,13 @@ class BlacklistTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Insert a song into the blacklist
-        $response = $this->insertSong($admin, 'song1', 1);
+        $response = $this->insertSong($admin, 'song1', '1', 'artist');
 
         $response->assertStatus(201)
             ->assertJson([
-                'nom' => 'song1',
-                'spotify_id' => 1
+                'spotify_id' => 1,
+                'title' => 'song1',
+                'artist' => 'artist'
             ]);
     }
 
@@ -60,7 +62,7 @@ class BlacklistTest extends TestCase {
         $user = $this->loginAsStudent();
 
         // Insert a song into the blacklist
-        $response = $this->insertSong($user, 'song1', 1);
+        $response = $this->insertSong($user, 'song1', '1', 'artist');
 
         $response->assertStatus(404)
             ->assertJson([
@@ -74,8 +76,8 @@ class BlacklistTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Insert a 2 songs into the blacklist
-        $this->insertSong($admin, 'song1', 1);
-        $this->insertSong($admin, 'song2', 2);
+        $this->insertSong($admin, 'song1', '1', 'artist');
+        $this->insertSong($admin, 'song2', '2', 'artist');
 
         // Get the songs from the blacklist
         $response = $this->actingAs($admin)
@@ -90,17 +92,18 @@ class BlacklistTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Insert a song into the blacklist
-        $response = $this->insertSong($admin, 'song1', 1);
-        $id = $response->json('id');
+        $response = $this->insertSong($admin, 'song1', '1', 'artist');
+        $id = $response->json('spotify_id');
 
-        // Get the song from the blacklist
+        // Get the song from the blacklista
         $response = $this->actingAs($admin)
             ->get("/api/blacklist/$id");
 
         $response->assertStatus(200)
             ->assertJson([
-                'nom' => 'song1',
-                'spotify_id' => 1
+                'title' => 'song1',
+                'spotify_id' => '1',
+                'artist' => 'artist'
             ]);
     }
 
@@ -109,8 +112,8 @@ class BlacklistTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Insert a song into the blacklist
-        $response = $this->insertSong($admin, 'song1', 1);
-        $id = $response->json('id');
+        $response = $this->insertSong($admin, 'song1', '1', 'artist');
+        $id = $response->json('spotify_id');
 
         // Delete the song from the blacklist
         $response = $this->actingAs($admin)
@@ -124,8 +127,8 @@ class BlacklistTest extends TestCase {
         $admin = $this->loginAsAdmin();
 
         // Insert a song into the blacklist
-        $response = $this->insertSong($admin, 'song1', 1);
-        $id = $response->json('id');
+        $response = $this->insertSong($admin, 'song1', '1', 'artist');
+        $id = $response->json('spotify_id');
 
         // Login as a student
         $user = $this->loginAsStudent();
