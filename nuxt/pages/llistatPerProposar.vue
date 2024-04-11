@@ -99,8 +99,6 @@ export default {
     },
     created() {
 
-
-
         socket.emit('getTopSongs', 'Top Songs Spain');
 
         socket.on('topSongs', (results) => {
@@ -120,6 +118,8 @@ export default {
             // Obtener el script por su id
             const scriptElement = tempElement.querySelector('#__NEXT_DATA__');
 
+            console.log(scriptElement);
+
             // Verificar si se encontró el elemento
             if (scriptElement) {
                 // Acceder al contenido JSON dentro del script y convertirlo a objeto JavaScript
@@ -127,6 +127,8 @@ export default {
 
                 // Acceder al AudioPreviewURL
                 const AudioPreviewURL = jsonData.props.pageProps.state.data.entity.audioPreview.url;
+
+                console.log(AudioPreviewURL);
 
                 // add AudioPreviewURL to the track object with the songId
                 this.tracks.forEach(item => {
@@ -159,6 +161,8 @@ export default {
         },
         playTrack(track) {
             const store = useAppStore();
+
+            console.log(track.previewUrl);
             if (this.currentTrackId == track.id) {
                 if (this.isPlaying) {
                     this.currentTrack.pause();
@@ -220,43 +224,16 @@ export default {
             }
         },
         getMp3(AudioPreviewURL, songId) {
-            fetch(AudioPreviewURL)
-                .then(response => response.blob())
-                .then(blob => { // blob is the file track.mp3
-                    const audioURL = URL.createObjectURL(blob);
-                    this.tracks.forEach(item => {
-                        if (item.id == songId) {
-                            item.preview_url = audioURL;
-                        }
-                    });
-                    if (this.isWaitingToPlay) {
-                        this.currentTrack = new Audio(audioURL);
-                        this.currentTrackId = songId;
-                        this.currentTrack.load();
-                        this.currentTrack.play();
-                        this.isPlaying = true;
-                        this.isWaitingToPlay = false;
-                    } else if (this.isWaitingToPropose) {
-                        let track = this.tracks.find(item => item.id == songId);
+            let track = this.tracks.find(item => item.id == songId);
+            track.preview_url = AudioPreviewURL;
+            if (this.isWaitingToPlay) {
+                this.playTrack(track);
+                this.isWaitingToPlay = false;
+            } else if (this.isWaitingToPropose) {
+                this.proposeSong(track);
+                this.isWaitingToPropose = false;
 
-                        let song = {
-                            id: track.id,
-                            title: track.name,
-                            artist: track.artists[0].name,
-                            date: track.album.release_date,
-                            img: track.album.images[1].url,
-                            previewUrl: track.preview_url,
-                            submitDate: new Date().toISOString(),
-                            submitedBy: this.store.getUser().id,
-                        }
-                        socket.emit('postSong', this.store.getUser().token, song);
-                        this.isWaitingToPropose = false;
-
-                    }
-                })
-                .catch(error => {
-                    console.error('Error getting the audio file:', error);
-                });
+            }
         },
         deleteSearch() {
             this.query = '';
@@ -272,7 +249,9 @@ export default {
             this.currentTrack.pause();
         }
     },
-    beforeDestroy() {
+    beforeUnmount() {
+        this.store.deleteCurrentTrackPlaying(null);
+        this.currentTrack.pause();
         socket.off('topSongs');
         socket.off('searchResult');
         socket.off('sendHtmlSpotify');

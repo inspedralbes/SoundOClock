@@ -146,6 +146,10 @@ export default {
             navigateTo({ path: '/' });
         }
     },
+    beforeUnmount() {
+        this.store.deleteCurrentTrackPlaying(null);
+        this.currentTrack.pause();
+    },
     methods: {
         deleteSearch() {
             this.filter = '';
