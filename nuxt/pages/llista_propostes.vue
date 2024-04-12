@@ -16,7 +16,8 @@
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text" placeholder="Buscar..."
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model.lazy="filter">
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter"
+                    @keyup.enter="filter = $event.target.value">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
                     :class="{ 'text-base': $device.isMobile }">
                     search
@@ -31,8 +32,9 @@
                 </Transition>
             </div>
             <select v-model.lazy="orderBy"
-                class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center"
-                :class="{ 'text-sm !p-2': $device.isMobile }">
+                class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                :class="{ 'text-sm !p-2': $device.isMobile }" :disabled="songs.length == 0">
+                <option value="" disabled selected>Filtre</option>
                 <option value="votes-desc">Més vots</option>
                 <option value="votes-asc">Menys vots</option>
                 <option value="title-desc">Títol (A-Z)</option>
@@ -40,13 +42,21 @@
                 <option value="artist-desc">Artista (A-Z)</option>
                 <option value="artist-asc">Artista (Z-A)</option>
             </select>
+
         </div>
 
         <!-- Listado canciones -->
-        <div class="mb-20">
+        <div v-if="songs.length != 0" class="mb-20">
             <component :is="activeSong" v-for="track in filteredSongs" :key="track.id" :track="track"
                 :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
                 @report="report($event)" type="vote" />
+        </div>
+        <div v-else class="mt-8">
+            <p class="text-center text-xl font-bold">Encara no s'ha proposat cap cançó.</p>
+            <p class="text-center mt-2">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile"> <a
+                    :href="$router.resolve({ path: '/llistatPerProposar' }).href"
+                    class="text-blue-500 hover:underline">clic
+                    aquí</a>.</p>
         </div>
 
         <!-- Modales -->
@@ -72,7 +82,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-                    reportSongData.reportedSong.artist }}?</p>
+        reportSongData.reportedSong.artist }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -101,22 +111,22 @@ import comManager from '../communicationManager';
 
 export default {
     data() {
-        const store = useAppStore();
         return {
             filter: '',
             modals: {
                 alreadyVotedModal: false,
                 reportModal: false
             },
+            songs: computed(() => this.store.proposedSongs),
             loading: false,
-            isLoadingVote: computed(() => store.isLoadingVote),
+            isLoadingVote: computed(() => this.store.isLoadingVote),
             reportSongData: {
                 reportedSong: null,
                 options: ["La cançó té contingut inadequat", "La cançó no s'adequa a la temàtica"],
                 selectedOption: "La cançó té contingut inadequat"
             },
-            orderBy: 'votes-desc',
-            userSelectedSongs: computed(() => store.userSelectedSongs),
+            orderBy: '',
+            userSelectedSongs: computed(() => this.store.userSelectedSongs),
             store: useAppStore(),
             currentTrack: null,
             currentTrackId: null,
@@ -139,18 +149,18 @@ export default {
         }
     },
     created() {
-        this.loading = true;
-        comManager.getSongs();
-        this.loading = false;
     },
     mounted() {
         if (!this.store.getUser().token) {
             navigateTo({ path: '/' });
         }
+        comManager.getSongs();
     },
     beforeUnmount() {
-        this.store.deleteCurrentTrackPlaying(null);
-        this.currentTrack.pause();
+        if (this.currentTrack != null) {
+            this.currentTrack.pause();
+        }
+        this.store.deleteCurrentTrackPlaying();
     },
     methods: {
         deleteSearch() {
@@ -165,9 +175,11 @@ export default {
             socket.emit('reportSong', this.store.getUser().token, song);
         },
         goToProposar() {
-            this.$router.push('/llistatPerProposar');
-            this.currentTrack.pause();
+            if (this.currentTrack != null) {
+                this.currentTrack.pause();
+            }
             this.store.deleteCurrentTrackPlaying();
+            this.$router.push('/llistatPerProposar');
         },
         vote(songId) {
             if (!this.isLoadingVote.state) {
@@ -236,13 +248,9 @@ export default {
                     this.store.deleteCurrentTrackPlaying();
                 }
             }
-        }
+        },
     },
     computed: {
-        songs() {
-            let songs = this.store.getProposedSongs();
-            return songs;
-        },
         filteredSongs() {
             let filtered = this.songs.filter(song =>
                 song.title.toLowerCase().includes(this.filter.toLowerCase()) ||

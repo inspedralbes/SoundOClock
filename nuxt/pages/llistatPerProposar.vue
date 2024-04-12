@@ -243,14 +243,18 @@ export default {
             return this.tracks.find(item => item.id == id);
         },
         goToVote() {
+            if (this.currentTrack != null) {
+                this.currentTrack.pause();
+            }
+            this.store.deleteCurrentTrackPlaying();
             this.$router.push('/llista_propostes');
-            this.store.deleteCurrentTrackPlaying(null);
-            this.currentTrack.pause();
         }
     },
     beforeUnmount() {
-        this.store.deleteCurrentTrackPlaying(null);
-        this.currentTrack.pause();
+        if (this.currentTrack != null) {
+            this.currentTrack.pause();
+        }
+        this.store.deleteCurrentTrackPlaying();
         socket.off('topSongs');
         socket.off('searchResult');
         socket.off('sendHtmlSpotify');
