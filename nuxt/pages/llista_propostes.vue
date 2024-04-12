@@ -82,7 +82,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-                    reportSongData.reportedSong.artist }}?</p>
+        reportSongData.reportedSong.artist }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -155,13 +155,19 @@ export default {
             navigateTo({ path: '/' });
         }
         comManager.getSongs();
-        comManager.getUserSelectedSongs();
+        comManager.getUserSelectedSongs(this.store.getUser().id);
+
+        socket.on("voteError", (data) => {
+            this.modals.alreadyVotedModal = true;
+            this.isLoadingVote.state = false;
+        })
     },
     beforeUnmount() {
         if (this.currentTrack != null) {
             this.currentTrack.pause();
         }
         this.store.deleteCurrentTrackPlaying();
+        socket.off("voteError");
     },
     methods: {
         deleteSearch() {
@@ -184,7 +190,7 @@ export default {
         },
         vote(songId) {
             if (!this.isLoadingVote.state) {
-                if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
+                if (this.userSelectedSongsvotedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
                     this.modals.alreadyVotedModal = true;
                 } else {
                     this.store.setIsLoadingVote({ state: true, selectedSong: songId });

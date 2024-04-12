@@ -112,7 +112,7 @@ export default {
             this.$emit('report', track);
         },
         isSongVoted(songId) {
-            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
+            if (this.userSelectedSongs && this.userSelectedSongs.votedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
                 return true;
             } else {
                 return false;
