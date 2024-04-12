@@ -12,7 +12,7 @@ export const useAppStore = defineStore('app', {
         token: null
       },
 
-    userSelectedSongs: null,
+    userSelectedSongs: [],
     proposedSongs: [],
     sortedVotedSongs: [],
     proposedSongsAdminView: [],

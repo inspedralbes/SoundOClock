@@ -155,12 +155,19 @@ export default {
             navigateTo({ path: '/' });
         }
         comManager.getSongs();
+        comManager.getUserSelectedSongs(this.store.getUser().id);
+
+        socket.on("voteError", (data) => {
+            this.modals.alreadyVotedModal = true;
+            this.isLoadingVote.state = false;
+        })
     },
     beforeUnmount() {
         if (this.currentTrack != null) {
             this.currentTrack.pause();
         }
         this.store.deleteCurrentTrackPlaying();
+        socket.off("voteError");
     },
     methods: {
         deleteSearch() {
@@ -183,7 +190,7 @@ export default {
         },
         vote(songId) {
             if (!this.isLoadingVote.state) {
-                if (this.userSelectedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
+                if (this.userSelectedSongsvotedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
                     this.modals.alreadyVotedModal = true;
                 } else {
                     this.store.setIsLoadingVote({ state: true, selectedSong: songId });
@@ -259,10 +266,10 @@ export default {
 
             switch (this.orderBy) {
                 case 'votes-desc':
-                    filtered.sort((a, b) => b.votes - a.votes);
+                    filtered.sort((a, b) => b.totalVotes - a.totalVotes);
                     break;
                 case 'votes-asc':
-                    filtered.sort((a, b) => a.votes - b.votes);
+                    filtered.sort((a, b) => a.totalVotes - b.totalVotes);
                     break;
                 case 'title-desc':
                     filtered.sort((a, b) => a.title.localeCompare(b.title));
