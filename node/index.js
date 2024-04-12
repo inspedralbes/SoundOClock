@@ -25,8 +25,8 @@ const io = new Server(server, {
 const port = process.env.PORT || 8080;
 
 // Mongoose setup
-mongoose.connect('mongodb://mongoadmin:mongopassword@' + host +':27017/soundoclock', { authSource: "admin" })
-.then(() => console.log('MongoDB connected'))
+mongoose.connect('mongodb://mongoadmin:mongopassword@' + host + ':27017/soundoclock', { authSource: "admin" })
+  .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
 async function insertDefaultsMongo() {
@@ -54,7 +54,7 @@ async function insertDefaultsMongo() {
 }
 
 //FETCH TO GET HTML FROM SPOTIFY
-insertDefaultsMongo();
+// insertDefaultsMongo();
 
 // API routes
 app.get('/songs', async (req, res) => {
@@ -539,7 +539,7 @@ io.on('connection', (socket) => {
       socket.emit('dirPCStatus', false);
     }
   });
-  
+
   socket.on('changeIsReadReportStatus', async (userToken, report) => {
     // Check that the user is authenticated with Laravel Sanctum
     let user = await comManager.getUserInfo(userToken);

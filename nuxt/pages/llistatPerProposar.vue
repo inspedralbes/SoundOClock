@@ -17,12 +17,14 @@
                     :class="{ 'text-base': $device.isMobile }">
                     search
                 </span>
-                <button @click="deleteSearch">
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
-                        :class="{ 'text-base': $device.isMobile }">
-                        Close
-                    </span>
-                </button>
+                <Transition name="delete-fade">
+                    <button v-if="query" @click="deleteSearch">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                            :class="{ 'text-base': $device.isMobile }">
+                            Close
+                        </span>
+                    </button>
+                </Transition>
             </div>
         </div>
 
@@ -92,7 +94,7 @@ export default {
                 1: resolveComponent('MobileSong'),
             },
             playerComponent: {
-                0: resolveComponent('Player'),
+                0: resolveComponent('ModularPlayer'),
                 1: resolveComponent('MobilePlayer'),
             }
         }
@@ -118,7 +120,6 @@ export default {
             // Obtener el script por su id
             const scriptElement = tempElement.querySelector('#__NEXT_DATA__');
 
-            console.log(scriptElement);
 
             // Verificar si se encontró el elemento
             if (scriptElement) {
@@ -128,7 +129,6 @@ export default {
                 // Acceder al AudioPreviewURL
                 const AudioPreviewURL = jsonData.props.pageProps.state.data.entity.audioPreview.url;
 
-                console.log(AudioPreviewURL);
 
                 // add AudioPreviewURL to the track object with the songId
                 this.tracks.forEach(item => {
@@ -162,7 +162,6 @@ export default {
         playTrack(track) {
             const store = useAppStore();
 
-            console.log(track.previewUrl);
             if (this.currentTrackId == track.id) {
                 if (this.isPlaying) {
                     this.currentTrack.pause();
@@ -244,14 +243,18 @@ export default {
             return this.tracks.find(item => item.id == id);
         },
         goToVote() {
+            if (this.currentTrack != null) {
+                this.currentTrack.pause();
+            }
+            this.store.deleteCurrentTrackPlaying();
             this.$router.push('/llista_propostes');
-            this.store.deleteCurrentTrackPlaying(null);
-            this.currentTrack.pause();
         }
     },
     beforeUnmount() {
-        this.store.deleteCurrentTrackPlaying(null);
-        this.currentTrack.pause();
+        if (this.currentTrack != null) {
+            this.currentTrack.pause();
+        }
+        this.store.deleteCurrentTrackPlaying();
         socket.off('topSongs');
         socket.off('searchResult');
         socket.off('sendHtmlSpotify');
@@ -292,5 +295,13 @@ export default {
 </script>
 
 <style scoped>
-/* HTML: <div class="loader"></div> */
+.delete-fade-enter-active,
+.delete-fade-leave-active {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.delete-fade-enter-from,
+.delete-fade-leave-to {
+    opacity: 0;
+}
 </style>
