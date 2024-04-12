@@ -16,9 +16,13 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->boolean('is_admin')->default(false);
+            $table->date('vote_banned_until')->nullable()->default(null);
+            $table->date('propose_banned_until')->nullable()->default(null);
+            // $table->bigInteger('class_group_id')->unsigned()->nullable();
+            // $table->foreign('class_group_id')->references('id')->on('class_groups');
         });
     }
 

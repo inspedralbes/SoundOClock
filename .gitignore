@@ -1,3 +1,7 @@
 mysql_data/*
 mysql_data/
 mysql_data
+mongodb_data/
+PrivKey.ppk
+*.key
+*.key.*
