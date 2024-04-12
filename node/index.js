@@ -31,9 +31,9 @@ mongoose.connect('mongodb://mongoadmin:mongopassword@' + host + ':27017/soundocl
 
 async function insertDefaultsMongo() {
   const songs = [
-    { id: '0VjIjW4GlUZAMYd2vXMi3b', title: 'Blinding Lights', artist: 'The Weeknd', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36', previewUrl: 'https://example.com/blinding-lights-preview', votes: 150, submitDate: new Date('2020-11-29'), submittedBy: 1 },
-    { id: '62PaSfnXSMyLshYJrlTuL3', title: 'Hello', artist: 'Adele', year: 2015, img: 'https://i.scdn.co/image/ab67616d00001e0247ce408fb4926d69da6713c2', previewUrl: 'https://example.com/hello-preview', votes: 300, submitDate: new Date('2015-10-23'), submittedBy: 7 },
-    { id: '0sfdiwck2xr4PteGOdyOfz', title: 'Shot in the Dark', artist: 'AC/DC', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e0204db0e3bcd166c1d6cfd81f9', previewUrl: 'https://example.com/shot-in-the-dark-preview', votes: 75, submitDate: new Date('2020-10-07'), submittedBy: 2 }
+    { id: '0VjIjW4GlUZAMYd2vXMi3b', title: 'Blinding Lights', artist: 'The Weeknd', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36', previewUrl: 'https://example.com/blinding-lights-preview', submitDate: new Date('2020-11-29'), submittedBy: 1 },
+    { id: '62PaSfnXSMyLshYJrlTuL3', title: 'Hello', artist: 'Adele', year: 2015, img: 'https://i.scdn.co/image/ab67616d00001e0247ce408fb4926d69da6713c2', previewUrl: 'https://example.com/hello-preview', totalVotes: 300, votesPerGroup: { 1: 2, 2: 8 }, submitDate: new Date('2015-10-23'), submittedBy: 7 },
+    { id: '0sfdiwck2xr4PteGOdyOfz', title: 'Shot in the Dark', artist: 'AC/DC', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e0204db0e3bcd166c1d6cfd81f9', previewUrl: 'https://example.com/shot-in-the-dark-preview', totalVotes: 75, votesPerGroup: { 1: 1, 4: 10 }, submitDate: new Date('2020-10-07'), submittedBy: 2 }
   ];
 
   const votingRecords = [
@@ -75,6 +75,56 @@ app.get('/votingRecords/:userId', async (req, res) => {
     res.status(500).send(err);
   }
 });
+
+app.get('/sortedVotedSongs', async (req, res) => {
+  try {
+    const songs = await Song.aggregate([
+      {
+        // Convert the votesPerGroup map to an array of key-value pairs
+        $addFields: {
+          votesPerGroupArray: { $objectToArray: "$votesPerGroup" }
+        }
+      },
+      { $unwind: "$votesPerGroupArray" },
+      {
+        // Sort by group ID first (if needed to ensure group order) and then by votes descending
+        $sort: {
+          "votesPerGroupArray.k": 1,
+          "votesPerGroupArray.v": -1
+        }
+      },
+      {
+        // Group by group ID and push the songs into an array
+        $group: {
+          _id: "$votesPerGroupArray.k",
+          songs: {
+            $push: {
+              id: "$id",
+              title: "$title",
+              artist: "$artist",
+              img: "$img",
+              previewUrl: "$previewUrl",
+              votes: "$votesPerGroupArray.v"
+            }
+          }
+        }
+      },
+      // Sort by group ID
+      { $sort: { "_id": 1 } },
+      {
+        // Project the final result
+        $project: {
+          _id: 0,
+          group: "$_id",
+          songs: { $slice: ["$songs", 10] }
+        }
+      }
+    ]);
+    res.json(songs);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
 
 app.get('/reportSongs/:songId', async (req, res) => {
   try {
@@ -233,6 +283,8 @@ io.on('connection', (socket) => {
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
 
+    // TODO: songData does not include the year of the song, it should
+
     try {
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
@@ -284,7 +336,14 @@ io.on('connection', (socket) => {
       // Check if the user wants to undo the vote
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
       if (votingRecord && votingRecord.votedSongs.includes(songId)) {
-        song.votes -= 1;
+        song.totalVotes -= 1;
+        // Update the song with the new vote count per group
+        user.groups.forEach(group => {
+          let votes = song.votesPerGroup.get(group.id.toString());
+          if (votes > 0) {
+            song.votesPerGroup.set(group.id.toString(), votes - 1);
+          }
+        })
         await song.save();
 
         votingRecord.votedSongs = votingRecord.votedSongs.filter(id => id !== songId);
@@ -301,7 +360,16 @@ io.on('connection', (socket) => {
       }
 
       // Save the vote and update the voting record
-      song.votes += 1;
+      song.totalVotes += 1;
+      // Update the song with the new vote count per group
+      user.groups.forEach(group => {
+        let votes = song.votesPerGroup.get(group.id.toString());
+        if (votes > 0) {
+          song.votesPerGroup.set(group.id.toString(), votes + 1);
+        } else {
+          song.votesPerGroup.set(group.id.toString(), 1);
+        }
+      })
       await song.save();
 
       if (!votingRecord) {
