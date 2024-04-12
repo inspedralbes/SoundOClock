@@ -51,6 +51,12 @@
             <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Llista negra</span>
         </button>
         <!-- --------- -->
+        <button @click="selected_screen=5" :class="{'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4':true,'isActive':selected_screen===5}">
+            <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
+                pending_actions
+            </span>
+            <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Planificar Cançons</span>
+        </button>
         <!-- 
             El contenido que vaya dentro del template v-slot:footer se mostrará al final del sidebar-menu.
          -->
@@ -83,8 +89,8 @@ export default {
                 1: resolveComponent('AdminGroupsCrud'),
                 2: resolveComponent('BanSong'),
                 3: resolveComponent('BanUser'),
-                // 3: resolveComponent('AdminSettingsCrud')
-                4: resolveComponent('AdminBlackListCrud')
+                4: resolveComponent('AdminBlackListCrud'),
+                5: resolveComponent('AdminSetSongs')
             },
             loading: true
         } 
