@@ -32,7 +32,7 @@
                         unarchive
                     </span>
                 </button>
-                <ModularModal v-if="modalActual === track.spotify_id" @close="modalActual = null"
+                <ModularModal :open="modalActual === track.spotify_id" @close="modalActual = null"
                     @confirm="removeFromBlacklist(track.spotify_id)">
                     <template v-slot:title>
                         <h2>Segur que vols treure aquesta cançó de la blacklist?</h2>

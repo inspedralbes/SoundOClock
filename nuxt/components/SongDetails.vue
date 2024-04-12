@@ -121,18 +121,16 @@ export default {
     </div>
   </div>
 
-  <Transition name="fade">
-    <ModularModal v-if="modals.addSongToBlacklist" type="error" msg="Afegir" title="Afegir cançó a la llista negra"
-      @confirm="submitData()" @close="modals.addSongToBlacklist = false">
-      <template #title>
-        <h2>Afegir cançó a la llista negra</h2>
-      </template>
-      <template #content>
-        <p>Segur que vols afegir <span class="font-bold">{{ song.title }}</span> de <span class="font-bold">{{ song.artist
-        }}</span> a la llista negra?</p>
-      </template>
-    </ModularModal>
-  </Transition>
+  <ModularModal :open="modals.addSongToBlacklist" type="error" msg="Afegir" title="Afegir cançó a la llista negra"
+    @confirm="submitData()" @close="modals.addSongToBlacklist = false">
+    <template #title>
+      <h2>Afegir cançó a la llista negra</h2>
+    </template>
+    <template #content>
+      <p>Segur que vols afegir <span class="font-bold">{{ song.title }}</span> de <span class="font-bold">{{ song.artist
+      }}</span> a la llista negra?</p>
+    </template>
+  </ModularModal>
 </template>
 
 <style scoped>
@@ -148,6 +146,7 @@ export default {
 .pedralbes-button {
   background-color: var(--pedralbes-blue);
 }
+
 .cont {
   height: 200px;
 }

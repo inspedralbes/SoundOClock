@@ -49,29 +49,25 @@
             </div>
         </div>
     </div>
-    <Transition name="fade">
-        <ModularModal v-if="modals.submitRelations" type="warning" msg="Desar" title="Desar configuració timbres"
-            @confirm="submitData()" @close="modals.submitRelations = false">
-            <template #title>
-                <h2>Desar configuració timbres</h2>
-            </template>
-            <template #content>
-                <p>Estàs segur que vols desar la configuració dels timbres?</p>
-            </template>
-        </ModularModal>
-    </Transition>
+    <ModularModal :open="modals.submitRelations" type="warning" msg="Desar" title="Desar configuració timbres"
+        @confirm="submitData()" @close="modals.submitRelations = false">
+        <template #title>
+            <h2>Desar configuració timbres</h2>
+        </template>
+        <template #content>
+            <p>Estàs segur que vols desar la configuració dels timbres?</p>
+        </template>
+    </ModularModal>
 
-    <Transition name="fade">
-        <ModularModal v-if="modals.bellsWithoutGroups" type="error" title="Hi ha timbres sense grup assignat"
-            @close="modals.bellsWithoutGroups = false">
-            <template #title>
-                <h2>Hi ha timbres sense grup assignat</h2>
-            </template>
-            <template #content>
-                <p>Totes les franges horàries han de tenir com a mínim un grup assignat.</p>
-            </template>
-        </ModularModal>
-    </Transition>
+    <ModularModal :open="modals.bellsWithoutGroups" type="error" title="Hi ha timbres sense grup assignat"
+        @close="modals.bellsWithoutGroups = false">
+        <template #title>
+            <h2>Hi ha timbres sense grup assignat</h2>
+        </template>
+        <template #content>
+            <p>Totes les franges horàries han de tenir com a mínim un grup assignat.</p>
+        </template>
+    </ModularModal>
 </template>
 
 <script>
