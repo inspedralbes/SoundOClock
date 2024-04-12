@@ -21,7 +21,7 @@ describe('Listen the Server sockets', function () {
     id: "1000",
     title: 'test song',
     artist: 'test artist',
-    votes: 0,
+    totalVotes: 0,
     genre: 'test genre',
     year: 2021,
     submittedBy: 1,
@@ -33,8 +33,8 @@ describe('Listen the Server sockets', function () {
     clientSocket = ioClient(serverAddr);
     await new Promise((resolve) => clientSocket.on('connect', resolve));
     // Mongoose setup for accesing directly to the database
-    mongoose.connect('mongodb://mongoadmin:mongopassword@' + hostMongo +':27017/soundoclock', { authSource: "admin" })
-    .then(() => console.log('MongoDB connected'))
+    mongoose.connect('mongodb://mongoadmin:mongopassword@' + hostMongo + ':27017/soundoclock', { authSource: "admin" })
+      .then(() => console.log('MongoDB connected'))
       .catch(err => console.error('MongoDB connection error:', err));
     // Logins to get the tokens
     let tokens = await comManager.loginUserAndAdmin();
@@ -162,7 +162,7 @@ describe('Listen the Server sockets', function () {
         try {
           // Check if the vote has been casted
           expect(message.status).to.equal('success');
-          expect(message.song.votes).to.equal(1);
+          expect(message.song.totalVotes).to.equal(1);
           // Check voting record
           let votingRecord = await VotingRecord.findOne({ userId: userId });
           expect(votingRecord.votedSongs).to.include(testSong.id);
@@ -184,7 +184,7 @@ describe('Listen the Server sockets', function () {
     clientSocket.on('voteCasted', async (message) => {
       // Check if the vote has been casted
       expect(message.status).to.equal('success');
-      expect(message.song.votes).to.equal(0);
+      expect(message.song.totalVotes).to.equal(0);
       // Check voting record
       let votingRecord = await VotingRecord.findOne({ userId: userId });
       expect(votingRecord.votedSongs).to.not.include(testSong.id);
