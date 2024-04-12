@@ -25,7 +25,7 @@
                                 <div class="song-data text-start">
                                     <p class="font-black basis-1/3">{{ song.title }}</p>
                                     <p class="basis-1/3">{{ song.artist }}</p>
-                                    <p class="basis-1/3">{{ song.votes }} vots</p>
+                                    <p class="basis-1/3">{{ song.totalVotes }} vots</p>
                                 </div>
                             </div>
                             <div v-if=!areAllReportsRead(song)>

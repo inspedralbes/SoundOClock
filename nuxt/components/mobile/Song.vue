@@ -23,7 +23,7 @@
                                     }}</span>
                             </p>
                         </div>
-                        <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.votes }}</p>
+                        <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.totalVotes }}</p>
                     </div>
                     <button @click="playTrack(track)">
                         <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
