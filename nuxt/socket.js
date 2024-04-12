@@ -41,6 +41,8 @@ socket.on("connect", () => {
     }
   });
 
+
+
   socket.on('sendGroups', (data) => {
     pinia.setClassGroups(data);
   });
