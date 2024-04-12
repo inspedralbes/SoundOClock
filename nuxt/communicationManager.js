@@ -15,6 +15,19 @@ function getUserSelectedSongs(id) {
         });
 }
 
+function getSortedVotedSongs() {
+    const store = useAppStore();
+    fetch(`${url}/sortedVotedSongs`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("sortedVotedSongs: ", data)
+            store.setSortedVotedSongs(data);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+}
+
 function getSongs() {
     const store = useAppStore();
     fetch(`${url}/songs`)
@@ -127,6 +140,7 @@ const comManager = {
     getBells,
     logout,
     getUserInfo,
+    getSortedVotedSongs,
 };
 
 export default comManager;

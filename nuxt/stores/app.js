@@ -14,6 +14,7 @@ export const useAppStore = defineStore('app', {
 
     userSelectedSongs: null,
     proposedSongs: [],
+    sortedVotedSongs: [],
     proposedSongsAdminView: [],
     usersAdminView: [],
     filter: 1,
@@ -76,6 +77,9 @@ export const useAppStore = defineStore('app', {
     getPostedSongStatus() {
       return this.postedSongStatus
     },
+    getSortedVotedSongs() {
+      return this.sortedVotedSongs
+    },
 
     //setters
     setUser(id, email, name, token, groups) {
@@ -127,6 +131,9 @@ export const useAppStore = defineStore('app', {
     },
     setPostedSongStatus(postedSongStatus) {
       this.postedSongStatus = postedSongStatus
+    },
+    setSortedVotedSongs(sortedVotedSongs) {
+      this.sortedVotedSongs = sortedVotedSongs
     },
 
     ///Deletes
