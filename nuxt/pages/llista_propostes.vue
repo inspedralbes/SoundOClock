@@ -82,7 +82,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-        reportSongData.reportedSong.artist }}?</p>
+                    reportSongData.reportedSong.artist }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -155,6 +155,7 @@ export default {
             navigateTo({ path: '/' });
         }
         comManager.getSongs();
+        comManager.getUserSelectedSongs();
     },
     beforeUnmount() {
         if (this.currentTrack != null) {
@@ -259,10 +260,10 @@ export default {
 
             switch (this.orderBy) {
                 case 'votes-desc':
-                    filtered.sort((a, b) => b.votes - a.votes);
+                    filtered.sort((a, b) => b.totalVotes - a.totalVotes);
                     break;
                 case 'votes-asc':
-                    filtered.sort((a, b) => a.votes - b.votes);
+                    filtered.sort((a, b) => a.totalVotes - b.totalVotes);
                     break;
                 case 'title-desc':
                     filtered.sort((a, b) => a.title.localeCompare(b.title));
