@@ -46,11 +46,11 @@
         </div>
 
         <!-- Listado canciones -->
-        <div v-if="songs.length != 0" class="mb-20">
+        <TransitionGroup tag="div" v-if="songs.length != 0" class="mb-20" name="song-slide">
             <component :is="activeSong" v-for="track in filteredSongs" :key="track.id" :track="track"
                 :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
                 @report="report($event)" type="vote" />
-        </div>
+        </TransitionGroup>
         <div v-else class="mt-8">
             <p class="text-center text-xl font-bold">Encara no s'ha proposat cap cançó.</p>
             <p class="text-center mt-2">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile"> <a
@@ -82,7 +82,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-        reportSongData.reportedSong.artist }}?</p>
+                    reportSongData.reportedSong.artist }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -265,6 +265,9 @@ export default {
             );
 
             switch (this.orderBy) {
+                case '':
+                    filtered.sort((a, b) => b.totalVotes - a.totalVotes);
+                    break;
                 case 'votes-desc':
                     filtered.sort((a, b) => b.totalVotes - a.totalVotes);
                     break;
@@ -304,6 +307,18 @@ export default {
 </script>
 
 <style scoped>
+.song-slide-enter-active,
+.song-slide-leave-active,
+.song-slide-move {
+    transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.song-slide-enter-from,
+.song-slide-leave-to {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
 .delete-fade-enter-active,
 .delete-fade-leave-active {
     transition: opacity 0.5s;
