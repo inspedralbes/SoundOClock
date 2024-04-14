@@ -307,8 +307,10 @@ io.on('connection', (socket) => {
       if (!votingRecord) {
         let userGroups = user.groups.map(group => group.id);
         await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], groups: userGroups }).save();
+        // await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [], groups: userGroups }).save();
       } else {
         votingRecord.submitted = true;
+        // votingRecord.submitted = false;
         await votingRecord.save();
       }
 
@@ -468,7 +470,6 @@ io.on('connection', (socket) => {
 
   socket.on('getHtmlSpotify', (songId) => {
     comManager.fetchSpotifyPage(songId).then(html => {
-      console.log(html);
       if (html) {
         socket.emit('sendHtmlSpotify', html, songId);
       }
