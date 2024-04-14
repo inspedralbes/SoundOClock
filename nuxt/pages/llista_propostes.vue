@@ -82,7 +82,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-        reportSongData.reportedSong.artist }}?</p>
+                    reportSongData.reportedSong.artist }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -265,6 +265,9 @@ export default {
             );
 
             switch (this.orderBy) {
+                case '':
+                    filtered.sort((a, b) => b.totalVotes - a.totalVotes);
+                    break;
                 case 'votes-desc':
                     filtered.sort((a, b) => b.totalVotes - a.totalVotes);
                     break;
