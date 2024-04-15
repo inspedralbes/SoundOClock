@@ -25,7 +25,8 @@
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 groups
             </span>
-            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Grups</span>
+            <span
+                :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Grups</span>
         </button>
         <!-- --------- -->
         <button @click="selected_screen = 2"
@@ -41,34 +42,42 @@
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 person_cancel
             </span>
-            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Usuaris</span>
+            <span
+                :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Usuaris</span>
         </button>
         <!-- --------- -->
-        <button @click="selected_screen=4" :class="{'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4':true,'isActive':selected_screen===4}">
+        <button @click="selected_screen = 4"
+            :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 4 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 music_off
             </span>
-            <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Llista negra</span>
+            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Llista
+                negra</span>
         </button>
         <!-- --------- -->
-        <button @click="selected_screen=5" :class="{'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4':true,'isActive':selected_screen===5}">
+        <button @click="selected_screen = 5"
+            :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 5 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 music_off
             </span>
-            <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Set songs</span>
+            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Set
+                songs</span>
         </button>
         <!-- --------- -->
-        <button @click="selected_screen=6" :class="{'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4':true,'isActive':selected_screen===6}">
+        <button @click="selected_screen = 6"
+            :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 6 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 pending_actions
             </span>
-            <span :class="{'text text-white transition duration-200 ease-in-out':true,'opacity-0':!isOpen}">Planificar Cançons</span>
+            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Planificar
+                Cançons</span>
         </button>
         <!-- 
             El contenido que vaya dentro del template v-slot:footer se mostrará al final del sidebar-menu.
          -->
         <template v-slot:footer>
-            <button @click="selected_screen=5" :class="{'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4':true,'isActive':selected_screen===3}">
+            <button @click="selected_screen = 5"
+                :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 3 }">
                 <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                     settings
                 </span>
@@ -78,7 +87,7 @@
         </template>
     </SideBarMenu>
 
-    <component :is="active_screen" v-if="!loading"/>
+    <component :is="active_screen" v-if="!loading" />
 </template>
 
 <script>
@@ -90,8 +99,8 @@ export default {
     data() {
         return {
             isOpen: false,
-            selected_screen: 1,
-            screens:{
+            selected_screen: 0,
+            screens: {
                 0: resolveComponent('AdminAlarmsCrud'),
                 1: resolveComponent('AdminGroupsCrud'),
                 2: resolveComponent('BanSong'),
@@ -101,12 +110,12 @@ export default {
                 6: resolveComponent('AdminSetSongs')
             },
             loading: true
-        } 
+        }
     },
     setup() {
-            const store = useAppStore();
-            return { store };
-        },
+        const store = useAppStore();
+        return { store };
+    },
     created() {
         socket.emit('getGroups', this.store.getUser().token);
     },
