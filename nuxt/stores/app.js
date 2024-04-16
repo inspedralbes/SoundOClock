@@ -26,6 +26,7 @@ export const useAppStore = defineStore('app', {
     bells: [],
     currentTrackPlaying: null,
     postedSongStatus: null,
+    roles: null,
 
   }),
   persist: {
@@ -79,6 +80,9 @@ export const useAppStore = defineStore('app', {
     },
     getSortedVotedSongs() {
       return this.sortedVotedSongs
+    },
+    getRoles() {
+      return this.roles
     },
 
     //setters
@@ -134,6 +138,10 @@ export const useAppStore = defineStore('app', {
     },
     setSortedVotedSongs(sortedVotedSongs) {
       this.sortedVotedSongs = sortedVotedSongs
+    },
+    setRoles(roles) {
+      console.log("ROLES", roles)
+      this.roles = roles
     },
 
     ///Deletes

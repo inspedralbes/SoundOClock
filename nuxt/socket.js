@@ -74,6 +74,10 @@ socket.on("connect", () => {
     console.log('socket isReadReportStatusChanged data received', data);
   });
 
+  socket.on('sendRoles', (data) => {
+    pinia.setRoles(data);
+  });
+
   socket.on("disconnect", () => {
 
   });

@@ -301,6 +301,19 @@ async function showUser(token, userId) {
   return jsonResponse;
 }
 
+async function getRoles(token) {
+  const response = await fetch(apiURL + `roles`, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -324,7 +337,8 @@ const comManager = {
   setUserGroups,
   getBells,
   setBellsGroupsConfiguration,
-  showUser
+  showUser,
+  getRoles
 };
 
 export default comManager;

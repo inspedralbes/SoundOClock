@@ -619,7 +619,17 @@ io.on('connection', (socket) => {
     reportSong.isRead = report.isRead;
     await reportSong.save();
     io.emit('isReadReportStatusChanged', { status: 'success', message: `El report amb id ${reportSong._id} ha canviat.` });
-  })
+  });
+
+  socket.on('getRoles', (token) => {
+    comManager.getRoles(token)
+      .then((roles) => {
+        socket.emit('sendRoles', roles);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  });
 
   socket.on('disconnect', () => {
     console.log('user disconnected');

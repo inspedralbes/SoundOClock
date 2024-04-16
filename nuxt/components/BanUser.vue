@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="w-2/3 text-white text-center ml-4 mr-4">
-                    <UserDetails v-bind:user="selectedUser" />
+                    <UserDetails v-bind:user="currentSelectedUser" />
                 </div>
             </div>
         </div>
@@ -38,39 +38,34 @@
 
 <script>
 import { useAppStore } from '@/stores/app';
-import { getUsers } from '../communicationManager';
+// import { getUsers } from '../communicationManager';
 
 export default {
     data() {
         return {
-            loading: true,
+            currentSelectedUser: null
         }
     },
     methods: {
         selectUser(selectedUser) {
-            this.store.setAdminSelectedUser(selectedUser);
+            this.currentSelectedUser = selectedUser;
         },
         isSelected(user) {
             let style = "user-item--not-selected";
 
-            if (user.id == this.selectedUser.id) {
+            if (user.id == this.currentSelectedUser.id) {
                 style = "user-item--selected";
             }
 
             return style;
         },
     },
-    mounted() {
-        this.loading = true;
-        this.users = getUsers();
-        this.loading = false;
+    created() {
+        this.currentSelectedUser = this.users[0];
     },
     computed: {
         users() {
             return this.store.getUsersAdminView();
-        },
-        selectedUser() {
-            return this.store.getAdminSelectedUser();
         },
     },
     setup() {
