@@ -1,6 +1,8 @@
 <template>
-  <NuxtPage class="grow" />
-  <!-- <NuxtPage to="/llista_propostes">About</NuxtPage> -->
+  <!-- <UContainer> -->
+    <NuxtPage class="grow" />
+  <!-- </UContainer> -->
+  <UNotifications />
 </template>
 
 <style>
