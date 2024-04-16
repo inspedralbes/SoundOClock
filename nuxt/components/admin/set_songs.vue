@@ -6,15 +6,43 @@
     <div v-if="!loading">
         <div class="flex flex-col gap-3 ml-20 mr-8">
             <div class="groups-bells-container rounded-lg">
-                <div class="schedule-container text-white text-center gap-4 p-4">
+                <div class="schedule-container text-white text-center gap-2 p-2">
                     <div v-for="(bell, index) in bells"
-                        class="item bg-gray-400 rounded-lg p-4 flex flex-col gap-4 min-h-96">
+                        class="item bg-gray-400 rounded-lg p-2 flex flex-col gap-2 min-h-96">
                         <div class="text-lg p-3 rounded-lg hour-item">{{ bell.hour.substring(0, 5) }}</div>
                         <div v-if="bell.groups.length > 0" v-for="song in getMostVotedSongs(bell.groups)" :key="song.id"
-                            class="group-item min-w-40 h-20 flex flex-row justify-center items-center rounded-lg p-4 relative">
+                            class="group-item min-w-40 h-20 flex flex-row justify-center items-center rounded-lg p-2 relative flex flex-row items-center gap-2"
+                            :class="{ selected: checkIsSelected(bell.id, song.id) }">
 
-                            {{ song.title }} - {{ song.votes }}
+                            <div class="contenidor-img">
+                                <img :src="song.img" :alt="song.title + '_img'" class="rounded-lg">
+                                <button @click="playTrack(song.id)" class="rounded-lg"
+                                    :class="{ playingC: isPlayingCheck(song.id), noPlaying: !isPlayingCheck(song.id) }">
+                                    <!-- fer amb computed la classe -->
+                                    <span v-if="currentTrackId === song.id && isPlaying"
+                                        class="material-symbols-rounded">
+                                        pause
+                                    </span>
+                                    <span v-else class="material-symbols-rounded">
+                                        play_arrow
+                                    </span>
+                                </button>
+                            </div>
 
+                            <div class="song-data">
+                                <p class="font-black basis-1/2">{{ song.title }}</p>
+                                <p class="basis-1/2">Vots: {{ song.votes }}</p>
+                            </div>
+
+                            <div @click="setSelected(bell.id, song.id)">
+                                <span v-if="!checkIsSelected(bell.id, song.id)"
+                                    class="material-symbols-rounded text-5xl text-green-600 cursor-pointer">
+                                    check_circle
+                                </span>
+                                <span v-else class="material-symbols-rounded text-5xl cursor-pointer">
+                                    emoji_events
+                                </span>
+                            </div>
                         </div>
                         <div v-else class="text-xl grow flex items-center justify-center">
                             <span>SENSE CANÇONS</span>
@@ -24,34 +52,13 @@
             </div>
         </div>
     </div>
-    <!-- <Transition name="fade">
-        <ModularModal v-if="modals.submitRelations" type="warning" msg="Desar" title="Desar configuració timbres"
-            @confirm="submitData()" @close="modals.submitRelations = false">
-            <template #title>
-                <h2>Desar configuració timbres</h2>
-            </template>
-<template #content>
-                <p>Estàs segur que vols desar la configuració dels timbres?</p>
-            </template>
-</ModularModal>
-</Transition>
-
-<Transition name="fade">
-    <ModularModal v-if="modals.bellsWithoutGroups" type="error" title="Hi ha timbres sense grup assignat"
-        @close="modals.bellsWithoutGroups = false">
-        <template #title>
-                <h2>Hi ha timbres sense grup assignat</h2>
-            </template>
-        <template #content>
-                <p>Totes les franges horàries han de tenir com a mínim un grup assignat.</p>
-            </template>
-    </ModularModal>
-</Transition> -->
 </template>
 
 <script>
 import { useAppStore } from '@/stores/app';
 import comManager from '../../communicationManager';
+import { socket } from '@/socket';
+const toast = useToast();
 
 export default {
     data() {
@@ -59,11 +66,53 @@ export default {
             store: useAppStore(),
             loading: true,
             groupedSongs: [],
+            currentTrack: null,
+            currentTrackId: null,
+            isPlaying: false,
+            isSelected: {},
         }
     },
     created() {
         comManager.getBells();
         comManager.getSortedVotedSongs();
+    },
+    mounted() {
+        socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
+
+            // Crear un elemento HTML temporal
+            const tempElement = document.createElement('div');
+
+            // Establecer el HTML recibido en el elemento temporal
+            tempElement.innerHTML = htmlSpotify;
+
+            // Obtener el script por su id
+            const scriptElement = tempElement.querySelector('#__NEXT_DATA__');
+
+            // Verificar si se encontró el elemento
+            if (scriptElement) {
+                // Acceder al contenido JSON dentro del script y convertirlo a objeto JavaScript
+                const jsonData = JSON.parse(scriptElement.textContent);
+
+                // Acceder al AudioPreviewURL
+                const AudioPreviewURL = jsonData.props.pageProps.state.data.entity.audioPreview.url;
+
+                // Fetch to AudioPreviewURL to get the audio file .mp3 and play it
+                fetch(AudioPreviewURL)
+                    .then(response => response.blob())
+                    .then(blob => { // blob is the file track.mp3
+                        const audioURL = URL.createObjectURL(blob);
+                        this.currentTrack = new Audio(audioURL);
+                        this.currentTrackId = songId;
+                        this.currentTrack.play();
+                        this.isPlaying = true;
+                    })
+                    .catch(error => {
+                        console.error('Error getting the audio file:', error);
+                    });
+            } else {
+                console.error('No se encontró el script con el id "__NEXT_DATA__" en el HTML recibido');
+            }
+        });
     },
     watch: {
         bells: {
@@ -119,8 +168,6 @@ export default {
                 // console.log("songs", ...groupSongs.songs);
                 result.push(...groupSongs.songs);
             }
-            console.log("result", result)
-            // return result
 
             // Group by song id
             const groupedData = {};
@@ -138,6 +185,56 @@ export default {
 
             console.log("resultArray", resultArray)
             return resultArray;
+        },
+        playTrack(id) {
+            if (this.currentTrackId == id) {
+                if (this.isPlaying == true) {
+                    this.currentTrack.pause();
+                    this.isPlaying = false;
+                } else {
+                    this.currentTrack.play();
+                    this.isPlaying = true;
+                }
+            } else {
+                if (this.currentTrack) {
+                    this.currentTrack.pause();
+                }
+                socket.emit('getHtmlSpotify', id);
+            }
+        },
+        isPlayingCheck(id) {
+            if (this.isPlaying && this.currentTrackId == id) {
+                return true;
+            } else if (!this.isPlaying && this.currentTrackId == id) {
+                return false;
+            }
+        },
+        checkIsSelected(bell, songId) {
+            if (this.isSelected[bell] === songId) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        setSelected(bell, songId) {
+            // Check first that the song is not already selected on another bell
+            for (const key in this.isSelected) {
+                if (this.isSelected[key] === songId && key != bell) {
+                    toast.add({
+                        title: 'Error',
+                        description: 'No es poden repetir cançons en diferents campanes.',
+                        color: 'red',
+                    });
+                    return;
+                }
+            }
+
+            // If the song is not selected on another bell, set it as selected
+            if(this.isSelected[bell] === songId) {
+                this.isSelected[bell] = null;
+            } else {
+                this.isSelected[bell] = songId;
+            }
         }
     },
     computed: {
@@ -157,7 +254,7 @@ export default {
 <style scoped>
 .schedule-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 .group-item {
@@ -175,5 +272,112 @@ export default {
 
 .save-button {
     background-color: var(--pedralbes-blue);
+}
+
+.selected {
+    background-color: rgb(253 224 71);
+    color: rgb(56, 56, 56);
+}
+
+/** RAUL */
+
+.width {
+    width: 85%;
+}
+
+input[type="text"] {
+    color: black;
+    /* Cambiar el color del texto aquí */
+}
+
+.contenidor-canço {
+    background-color: rgb(56, 56, 56);
+    color: white;
+}
+
+.contenidor-canço>*:last-child {
+    justify-self: flex-end;
+}
+
+.contenidor-img {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 20%;
+    min-width: fit-content;
+    height: 100%;
+    width: fit-content;
+}
+
+.contenidor-img>button>span {
+    font-size: 40px;
+    color: white;
+}
+
+.contenidor-img>button>svg {
+    width: 80%;
+    height: auto;
+}
+
+.contenidor-img:hover>button {
+    display: flex;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    right: 0;
+    top: 0;
+    background-color: rgb(0, 0, 0, 0.3);
+    cursor: pointer;
+    z-index: 100;
+}
+
+.playingC {
+    display: flex;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    right: 0;
+    top: 0;
+    background-color: rgb(0, 0, 0, 0.3);
+    cursor: pointer;
+    z-index: 100;
+}
+
+.song-data {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    justify-content: space-evenly;
+    flex-grow: 1;
+    align-items: center;
+    max-width: 100%;
+    min-width: 5%;
+    text-align: center;
+}
+
+.song-data>p {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.contenidor-butons {
+    max-width: 20%;
+    min-width: fit-content;
+    align-self: center;
+}
+
+img {
+    width: 60px;
+    height: 60px;
+}
+
+.noPlaying {
+    display: none;
 }
 </style>

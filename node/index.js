@@ -116,7 +116,7 @@ app.get('/sortedVotedSongs', async (req, res) => {
         $project: {
           _id: 0,
           group: "$_id",
-          songs: { $slice: ["$songs", 10] }
+          songs: "$songs"
         }
       }
     ]);
