@@ -7,6 +7,33 @@
         <div v-else>
             <div class="flex flex-row mt-8">
                 <div class="users-container w-1/3 ml-20 overflow-y-auto">
+                    <div
+                        class="sticky top-0 h-10 w-full flex flex-row justify-center justify-between ml-auto mr-auto gap-1 mb-2">
+                        <input type="text" placeholder="Busca..."
+                            class="h-full w-full items-center rounded-lg p-3 border-2 border-white">
+                        <button @click="isDropdownMenuOpen = !isDropdownMenuOpen; console.log(isDropdownMenuOpen);"
+                            class="h-full w-10 flex justify-center items-center rounded-lg bg-[#383838] border-2 border-white">
+                            <span class="material-symbols-outlined text-white">
+                                tune
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="relative">
+                        <div class="absolute w-full left-0">
+                            <div id="dropdown-menu"
+                                :class="{ 'hidden': !isDropdownMenuOpen, 'block': isDropdownMenuOpen }"
+                                class="bg-[#383838] border-2 border-white rounded-lg shadow-lg">
+                                <ul class="bg-black rounded-lg p-3">
+                                    <li>Opción 1</li>
+                                    <li>Opción 2</li>
+                                    <li>Opción 3</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <div class="width flex flex-col justify-center ml-auto mr-auto gap-3">
                         <button v-for="user in users" @click="selectUser(user)"
                             class="h-16 flex flex-row justify-between items-center rounded-lg p-3"
@@ -38,12 +65,13 @@
 
 <script>
 import { useAppStore } from '@/stores/app';
-import { getUsers } from '../communicationManager';
+import { getUsers } from '../../communicationManager';
 
 export default {
     data() {
         return {
             loading: true,
+            isDropdownMenuOpen: false,
         }
     },
     methods: {
@@ -63,6 +91,7 @@ export default {
     mounted() {
         this.loading = true;
         this.users = getUsers();
+        console.log(this.users);
         this.loading = false;
     },
     computed: {
@@ -81,6 +110,12 @@ export default {
 </script>
 
 <style scoped>
+.sticky-search-bar {
+    position: sticky;
+    top: 0;
+    padding: 10px;
+}
+
 .users-container {
     height: 85vh;
 }

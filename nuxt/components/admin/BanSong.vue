@@ -50,7 +50,7 @@
 
 <script>
 import { useAppStore } from '@/stores/app';
-import comManager from '../communicationManager';
+import comManager from '../../communicationManager';
 
 export default {
     data() {
