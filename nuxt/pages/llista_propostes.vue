@@ -48,7 +48,7 @@
         <TransitionGroup tag="div" v-if="songs.length != 0" class="mb-20" name="song-slide">
             <component :is="activeSong" v-for="track in filteredSongs" :key="track.id" :track="track"
                 :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
-                @report="report($event)" type="vote" />
+                @report="report($event)" :type="getType(track)" />
         </TransitionGroup>
         <div v-else class="mt-8">
             <p class="text-center text-xl font-bold">Encara no s'ha proposat cap cançó.</p>
@@ -81,7 +81,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de {{
-        reportSongData.reportedSong.artists }}?</p>
+                    reportSongData.reportedSong.artists }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -117,6 +117,7 @@ export default {
                 reportModal: false
             },
             songs: computed(() => this.store.proposedSongs),
+            spotifySongs: [],
             loading: false,
             isLoadingVote: computed(() => this.store.isLoadingVote),
             reportSongData: {
@@ -148,6 +149,9 @@ export default {
         }
     },
     created() {
+        socket.on('searchResult', (results) => {
+            this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
+        })
     },
     mounted() {
         if (!this.store.getUser().token) {
@@ -167,10 +171,26 @@ export default {
         }
         this.store.deleteCurrentTrackPlaying();
         socket.off("voteError");
+        socket.off("searchResult");
     },
     methods: {
+        getSongs(filter) {
+            this.filter = filter;
+            if (filter != '') {
+                socket.emit('searchSong', this.filter);
+            } else {
+                this.spotifySongs = [];
+            }
+        },
         deleteSearch() {
             this.filter = '';
+        },
+        getType(track) {
+            if (this.songs.some(song => song.id === track.id)) {
+                return 'vote';
+            } else {
+                return 'propose';
+            }
         },
         report(track) {
             this.modals.reportModal = true;
@@ -256,10 +276,17 @@ export default {
     },
     computed: {
         filteredSongs() {
-            let filtered = this.songs.filter(song =>
+            let array = this.songs;
+
+            if (this.spotifySongs.length > 0) {
+                array = array.concat(this.spotifySongs);
+            }
+
+            let filtered = array.filter(song =>
                 song.name.toLowerCase().includes(this.filter.toLowerCase()) ||
                 song.artists.some(artist => artist.name.toLowerCase().includes(this.filter.toLowerCase()))
             );
+
 
             switch (this.orderBy) {
                 case '':

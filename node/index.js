@@ -310,11 +310,11 @@ io.on('connection', (socket) => {
 
       if (!votingRecord) {
         let userGroups = user.groups.map(group => group.id);
-        await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], groups: userGroups }).save();
-        // await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [], groups: userGroups }).save();
+        // await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], groups: userGroups }).save();
+        await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [], groups: userGroups }).save();
       } else {
-        votingRecord.submitted = true;
-        // votingRecord.submitted = false;
+        // votingRecord.submitted = true;
+        votingRecord.submitted = false;
         await votingRecord.save();
       }
 

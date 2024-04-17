@@ -7,7 +7,7 @@
 
         <div class="title text-white text-center text-4xl font-bold my-4">
             <h1>VOTA LA CANÇÓ</h1>
-            <h2 class="text-3xl text-lg bg-gradient-to-b from-purple-100 to-blue-500 text-transparent bg-clip-text">
+            <h2 class="text-3xl bg-gradient-to-b from-purple-100 to-blue-500 text-transparent bg-clip-text">
                 SENSE DIFICULTAT</h2>
         </div>
 
