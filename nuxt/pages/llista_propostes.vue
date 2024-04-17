@@ -81,8 +81,8 @@
             @confirm="reportTrack">
             <template #title>Reportar cançó</template>
             <template #content>
-                <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.title }}" de {{
-                    reportSongData.reportedSong.artist }}?</p>
+                <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de {{
+                    reportSongData.reportedSong.artists }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -239,7 +239,7 @@ export default {
         },
         isOverflowing(index) {
             let nameLength = 0;
-            nameLength = this.filteredSongs[index].name ? this.filteredSongs[index].name.length : this.filteredSongs[index].title.length;
+            nameLength = this.filteredSongs[index].name ? this.filteredSongs[index].name.length : this.filteredSongs[index].name.length;
             return nameLength > 20;
         }
     },
@@ -260,8 +260,8 @@ export default {
     computed: {
         filteredSongs() {
             let filtered = this.songs.filter(song =>
-                song.title.toLowerCase().includes(this.filter.toLowerCase()) ||
-                song.artist.toLowerCase().includes(this.filter.toLowerCase())
+                song.name.toLowerCase().includes(this.filter.toLowerCase()) ||
+                song.artists[0].toLowerCase().includes(this.filter.toLowerCase())
             );
 
             switch (this.orderBy) {
@@ -275,16 +275,16 @@ export default {
                     filtered.sort((a, b) => a.totalVotes - b.totalVotes);
                     break;
                 case 'title-desc':
-                    filtered.sort((a, b) => a.title.localeCompare(b.title));
+                    filtered.sort((a, b) => a.name.localeCompare(b.name));
                     break;
                 case 'title-asc':
-                    filtered.sort((a, b) => b.title.localeCompare(a.title));
+                    filtered.sort((a, b) => b.name.localeCompare(a.name));
                     break;
                 case 'artist-desc':
-                    filtered.sort((a, b) => a.artist.localeCompare(b.artist));
+                    filtered.sort((a, b) => a.artists[0].localeCompare(b.artists[0]));
                     break;
                 case 'artist-asc':
-                    filtered.sort((a, b) => b.artist.localeCompare(a.artist));
+                    filtered.sort((a, b) => b.artists[0].localeCompare(a.artists[0]));
                     break;
                 default:
                     break;

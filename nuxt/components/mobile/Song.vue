@@ -3,14 +3,14 @@
         <div class="relative flex w-[95%] h-[100px] bg-gray-200 overflow-hidden rounded-lg mt-4">
             <img class="w-full h-auto object-cover object-center brightness-50"
                 :src="track.album ? track.album.images[0].url : track.img"
-                :alt="track.name ? track.name : track.title + '_img'">
+                :alt="track.name ? track.name : track.name + '_img'">
 
             <div class="absolute inset-0 flex flex-row justify-center">
                 <div class="flex flex-row w-full flex justify-between p-2 items-center">
                     <div class="flex flex-col w-[70%] overflow-hidden">
                         <p
                             class="font-bold text-base text-ellipsis uppercase max-w-[200px] overflow-hidden whitespace-nowrap">
-                            {{ track.name ? track.name : track.title }}
+                            {{ track.name ? track.name : track.name }}
                         </p>
                         <div class="flex flex-row text-sm">
                             <p class="text-ellipsis">

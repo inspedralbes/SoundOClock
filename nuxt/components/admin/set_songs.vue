@@ -13,7 +13,7 @@
                         <div v-if="bell.groups.length > 0" v-for="song in getMostVotedSongs(bell.groups)" :key="song.id"
                             class="group-item min-w-40 h-20 flex flex-row justify-center items-center rounded-lg p-4 relative">
 
-                            {{ song.title }} - {{ song.votes }}
+                            {{ song.name }} - {{ song.votes }}
 
                         </div>
                         <div v-else class="text-xl grow flex items-center justify-center">
@@ -128,7 +128,7 @@ export default {
                 if (groupedData[song.id]) {
                     groupedData[song.id].votes += song.votes;
                 } else {
-                    groupedData[song.id] = { id: song.id, votes: song.votes, title: song.title, img: song.img, artist: song.artist, previewUrl: song.previewUrl };
+                    groupedData[song.id] = { id: song.id, votes: song.votes, title: song.name, img: song.img, artist: song.artist, previewUrl: song.previewUrl };
                 }
             });
             const resultArray = Object.values(groupedData);

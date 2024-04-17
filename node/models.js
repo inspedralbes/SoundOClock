@@ -2,11 +2,11 @@ import mongoose from 'mongoose';
 
 const songSchema = new mongoose.Schema({
   id: String,
-  title: String,
-  artist: String,
+  name: String,
+  artists: [String],
   year: Number,
   img: String,
-  previewUrl: String,
+  preview_url: String,
   totalVotes: { type: Number, default: 0 },
   votesPerGroup: { type: Map, of: Number, default: new Map()},
   submitDate: Date,

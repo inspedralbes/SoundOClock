@@ -19,13 +19,15 @@ describe('Listen the Server sockets', function () {
 
   let testSong = {
     id: "1000",
-    title: 'test song',
-    artist: 'test artist',
-    totalVotes: 0,
-    genre: 'test genre',
+    name: 'test song',
+    artists: ['test artists'],
     year: 2021,
-    submittedBy: 1,
-    submitDate: "2024-03-18T10:47:30.104Z"
+    img: 'test img',
+    preview_url: 'test url',
+    totalVotes: 0,
+    votesPerGroup: {},
+    submitDate: "2024-03-18T10:47:30.104Z",
+    submittedBy: 1
   }
 
   before(async () => {
@@ -40,6 +42,8 @@ describe('Listen the Server sockets', function () {
     let tokens = await comManager.loginUserAndAdmin();
     userToken = tokens.userToken;
     adminToken = tokens.adminToken;
+    console.log("USER TOKEN: ", userToken);
+    console.log("ADMIN TOKEN", adminToken);
     let userInfo = await comManager.getUserInfo(userToken);
     userId = userInfo.id;
   });
@@ -206,7 +210,7 @@ describe('Listen the Server sockets', function () {
       done();
     });
 
-    clientSocket.emit('deleteSong', adminToken, testSong);
+    clientSocket.emit('deleteSong', adminToken, testSong.id);
   })
 
   it("should not delete a song if it doesn't exist", (done) => {
@@ -229,7 +233,7 @@ describe('Listen the Server sockets', function () {
       clientSocket.once('songReported', (message) => {
         try {
           expect(message.status).to.equal('success');
-          expect(message.message).to.equal(`La cançó ${testSong.title} ha sigut reportada`);
+          expect(message.message).to.equal(`La cançó ${testSong.name} ha sigut reportada`);
           resolve(); // Resolve the promise if the assertions pass
         } catch (error) {
           reject(error); // Reject the promise if the assertions fail

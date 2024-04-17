@@ -27,7 +27,7 @@ export default {
       this.modals.addSongToBlacklist = true;
     },
     submitData() {
-      socket.emit('deleteSong', this.store.getUser().token, this.song);
+      socket.emit('deleteSong', this.store.getUser().token, this.song.id);
     },
     handleSwitch(reportId, value) {
 
@@ -88,8 +88,8 @@ export default {
       <img :src="song.img" alt="" class="w-1/3 rounded-lg">
       <div class="w-2/3 ml-4 flex flex-col justify-between">
         <div>
-          <p class="text-5xl font-black">{{ song.title }}</p>
-          <p class="text-3xl">{{ song.artist }}</p>
+          <p class="text-5xl font-black">{{ song.name }}</p>
+          <p class="text-3xl">{{ song.artists }}</p>
         </div>
         <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
           @click="deleteSong(song)">AFEGIR A LA LLISTA NEGRA</button>
@@ -127,7 +127,7 @@ export default {
       <h2>Afegir cançó a la llista negra</h2>
     </template>
     <template #content>
-      <p>Segur que vols afegir <span class="font-bold">{{ song.title }}</span> de <span class="font-bold">{{ song.artist
+      <p>Segur que vols afegir <span class="font-bold">{{ song.name }}</span> de <span class="font-bold">{{ song.artists
       }}</span> a la llista negra?</p>
     </template>
   </ModularModal>

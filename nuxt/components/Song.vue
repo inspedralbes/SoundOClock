@@ -2,7 +2,7 @@
     <div class="flex flex-row justify-center m-2">
         <div class="relative flex items-align">
             <img :src="track.album ? track.album.images[0].url : track.img"
-                :alt="track.name ? track.name : track.title + '_img'" class="w-20 h-20 m-2 rounded-full z-0">
+                :alt="track.name ? track.name : track.name + '_img'" class="w-20 h-20 m-2 rounded-full z-0">
             <Transition name="playingFade">
                 <div v-if="currentTrackId === track.id && isPlaying"
                     class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
@@ -12,7 +12,7 @@
         </div>
         <div class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
             <div class="flex flex-col w-[70%]">
-                <p class="font-bold text-base uppercase">{{ track.name ? track.name : track.title }}</p>
+                <p class="font-bold text-base uppercase">{{ track.name ? track.name : track.name }}</p>
                 <div class="flex flex-row text-sm">
                     <p class="whitespace-nowrap overflow-hidden">
                         <span v-if="track.artists" v-for="(artist, index) in track.artists" :key="index">

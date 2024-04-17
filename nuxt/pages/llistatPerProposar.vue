@@ -209,13 +209,18 @@ export default {
                 socket.emit('getHtmlSpotify', track.id);
                 this.isWaitingToPropose = true;
             } else {
+                let artistList = [];
+                track.artists.forEach(artist => {
+                    artistList.push(artist.name);
+                });
+                console.log("Propose song in else");
                 let song = {
                     id: track.id,
-                    title: track.name,
-                    artist: track.artists[0].name,
-                    date: track.album.release_date,
+                    name: track.name,
+                    artists: artistList,
+                    // date: track.album.release_date,
                     img: track.album.images[1].url,
-                    previewUrl: track.preview_url,
+                    preview_url: track.preview_url,
                     submitDate: new Date().toISOString(),
                     submittedBy: this.store.getUser().id,
                 }

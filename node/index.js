@@ -279,6 +279,8 @@ io.on('connection', (socket) => {
 
   // Post song checking for duplicates first
   socket.on('postSong', async (userToken, songData) => {
+    console.log("user", userToken);
+    console.log("POST SONG", songData);
     // Check that the user is authenticated with Laravel Sanctum
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
@@ -303,6 +305,8 @@ io.on('connection', (socket) => {
       // Save the song and update the voting record
       const newSong = new Song(songData);
       await newSong.save();
+
+      console.log("song posted");
 
       if (!votingRecord) {
         let userGroups = user.groups.map(group => group.id);
@@ -423,19 +427,19 @@ io.on('connection', (socket) => {
   });
 
   // Delete a song
-  socket.on('deleteSong', async (userToken, songInfo) => {
+  socket.on('deleteSong', async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
     if (!user.id || user.is_admin === 0) return;
-
+    console.log("song id", songId);
     try {
       // Check if the song exists and delete it
-      const song = await Song.findOneAndDelete({ id: songInfo.id });
+      const song = await Song.findOneAndDelete({ id: songId });
       if (!song) {
         socket.emit('deleteError', { status: 'error', message: 'Song not found' });
         return;
       }
-
+      console.log("in index", song);
       comManager.addSongToBlackList(userToken, song);
 
       io.emit('songDeleted', { status: 'success', song: song });
@@ -462,7 +466,7 @@ io.on('connection', (socket) => {
       // Add a register in ReportSong table
       await new ReportSong({ userId: user.id, userName: user.name, songId: song.id, reason: reportedSong.option, isRead: false }).save();
 
-      io.emit('songReported', { status: 'success', message: `La cançó ${song.title} ha sigut reportada` });
+      io.emit('songReported', { status: 'success', message: `La cançó ${song.name} ha sigut reportada` });
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
     }

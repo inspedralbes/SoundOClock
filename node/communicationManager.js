@@ -42,6 +42,7 @@ async function googleLogin(userToken) {
 async function loginUserAndAdmin() {
   let userInfo = await login("miquel", "miquel@gmail.com");
   let adminInfo = await login("admin", "admin@gmail.com");
+  console.log(userInfo, adminInfo);
   let userToken = userInfo.token;
   let adminToken = adminInfo.token;
   return { userToken, adminToken };
@@ -60,6 +61,7 @@ async function login(name, email) {
     })
   });
   const jsonResponse = await response.json();
+  console.log(jsonResponse);
   return jsonResponse;
 }
 
@@ -100,6 +102,7 @@ async function removeSongFromBlacklist(token, songSpotifyId) {
 }
 
 async function addSongToBlackList(token, song) {
+  console.log(song);
   const response = await fetch(apiURL + 'blacklist', {
     method: 'POST',
     headers: {
@@ -109,11 +112,12 @@ async function addSongToBlackList(token, song) {
     },
     body: JSON.stringify({
       spotify_id: song.id,
-      title: song.title,
-      artist: song.artist,
-      image: song.img,
+      name: song.name,
+      artists: song.artists,
+      img: song.img,
     })
   });
+  console.log(response);
   return response;
 }
 

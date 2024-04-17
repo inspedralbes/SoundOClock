@@ -9,7 +9,7 @@
                 </div>
                 <div class="mt-4 text-center overflow-hidden">
                     <h3 class="text-lg font-semibold text-gray-800 whitespace-nowrap overflow-hidden"
-                        :class="{ 'text-marquee': isOverflowing(1) }">{{ track.name ? track.name : track.title }}
+                        :class="{ 'text-marquee': isOverflowing(1) }">{{ track.name ? track.name : track.name }}
                     </h3>
                     <p class="text-gray-700 whitespace-nowrap overflow-hidden"
                         :class="{ 'text-marquee': isOverflowing(2) }">
@@ -90,7 +90,7 @@ export default {
         isOverflowing(text) {
             let nameLength = 0;
             if (text === 1) {
-                nameLength = this.track.name ? this.track.name.length : this.track.title.length;
+                nameLength = this.track.name ? this.track.name.length : this.track.name.length;
                 return nameLength > 20;
             } else {
                 if (this.track.artists) {

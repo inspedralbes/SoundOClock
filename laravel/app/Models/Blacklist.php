@@ -14,4 +14,8 @@ class Blacklist extends Model
      */
     protected $table = 'blacklist';
 
+    protected $casts = [
+        'artists' => 'array',
+    ];
+    
 }
