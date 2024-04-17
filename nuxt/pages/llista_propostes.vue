@@ -16,8 +16,7 @@
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text" placeholder="Buscar..."
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter"
-                    @keyup.enter="filter = $event.target.value">
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" @keyup.enter="getSongs($event.target.value)">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
                     :class="{ 'text-base': $device.isMobile }">
                     search
@@ -82,7 +81,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de {{
-                    reportSongData.reportedSong.artists }}?</p>
+        reportSongData.reportedSong.artists }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -208,7 +207,6 @@ export default {
                     store.deleteCurrentTrackPlaying();
                 } else {
                     this.currentTrack.load();
-                    this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
                 }
@@ -222,7 +220,6 @@ export default {
                     this.currentTrack = new Audio(track.previewUrl);
                     this.currentTrackId = track.id;
                     this.currentTrack.load();
-                    this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
                 } else {
@@ -261,7 +258,7 @@ export default {
         filteredSongs() {
             let filtered = this.songs.filter(song =>
                 song.name.toLowerCase().includes(this.filter.toLowerCase()) ||
-                song.artists[0].toLowerCase().includes(this.filter.toLowerCase())
+                song.artists.some(artist => artist.name.toLowerCase().includes(this.filter.toLowerCase()))
             );
 
             switch (this.orderBy) {
