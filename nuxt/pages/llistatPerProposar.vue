@@ -213,7 +213,6 @@ export default {
                 track.artists.forEach(artist => {
                     artistList.push(artist.name);
                 });
-                console.log("Propose song in else");
                 let song = {
                     id: track.id,
                     name: track.name,
