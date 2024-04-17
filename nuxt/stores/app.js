@@ -30,7 +30,9 @@ export const useAppStore = defineStore('app', {
       currentTrack: null,
       currentTrackId: null,
       isPlaying: false,
-    }
+    },
+    roles: null,
+
   }),
   persist: {
     storage: persistedState.localStorage,
@@ -86,6 +88,9 @@ export const useAppStore = defineStore('app', {
     },
     getSongStatus() {
       return this.songStatus
+    },
+    getRoles() {
+      return this.roles
     },
 
     //setters
@@ -146,6 +151,10 @@ export const useAppStore = defineStore('app', {
       this.songStatus.currentTrack = currentTrack
       this.songStatus.currentTrackId = currentTrackId
       this.songStatus.isPlaying = isPlaying
+    },
+    setRoles(roles) {
+      console.log("ROLES", roles)
+      this.roles = roles
     },
 
     ///Deletes

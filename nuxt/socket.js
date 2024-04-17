@@ -74,6 +74,18 @@ socket.on("connect", () => {
     console.log('socket isReadReportStatusChanged data received', data);
   });
 
+  socket.on('userRoleModified', (data) => {
+    console.log('socket userRoleModified data received', data);
+  });
+
+  socket.on('refreshUsersData', () => {
+    comManager.getUsers();
+  });
+
+  socket.on('sendRoles', (data) => {
+    pinia.setRoles(data);
+  });
+
   socket.on("disconnect", () => {
 
   });
