@@ -130,7 +130,7 @@ export default {
         }
     },
     watch: {
-        "user.role_id": {
+        user: {
             handler: 'changeCurrentRole',
         },
     },
