@@ -137,7 +137,9 @@ export default {
                 for (let i = 0; i < groups.length; i++) {
                     let groupId = groups[i].id;
                     let groupSongs = this.groupedSongs.find(group => group.group === groupId);
-                    result.push(...groupSongs.songs);
+                    if(groupSongs) {
+                        result.push(...groupSongs.songs);
+                    }
                 }
 
                 // Group by song id
