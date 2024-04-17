@@ -58,7 +58,6 @@
 import { useAppStore } from '@/stores/app';
 import comManager from '../../communicationManager';
 import { socket } from '@/socket';
-const toast = useToast();
 
 export default {
     data() {
@@ -70,6 +69,7 @@ export default {
             currentTrackId: null,
             isPlaying: false,
             isSelected: {},
+            toast: null
         }
     },
     created() {
@@ -77,6 +77,7 @@ export default {
         comManager.getSortedVotedSongs();
     },
     mounted() {
+        this.toast = useToast();
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
 
             // Crear un elemento HTML temporal
@@ -220,7 +221,7 @@ export default {
             // Check first that the song is not already selected on another bell
             for (const key in this.isSelected) {
                 if (this.isSelected[key] === songId && key != bell) {
-                    toast.add({
+                    this.toast.add({
                         title: 'Error',
                         description: 'No es poden repetir cançons en diferents campanes.',
                         color: 'red',
