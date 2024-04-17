@@ -4,14 +4,14 @@
         <Loader />
     </div>
     <div v-if="!loading">
-        <div class="flex flex-col gap-3 ml-20 mr-8">
+        <div class="flex flex-col gap-3 ml-20 mr-8 mb-4">
             <div class="groups-bells-container rounded-lg">
                 <div class="schedule-container text-white text-center gap-2 p-2">
                     <div v-for="(bell, index) in bells"
                         class="item bg-gray-400 rounded-lg p-2 h-96 flex flex-col">
                         <div class="text-lg p-3 rounded-lg hour-item mb-2">{{ bell.hour.substring(0, 5) }}</div>
                         <div class="gap-2 flex flex-col overflow-auto">
-                            <div v-if="bell.groups.length > 0" v-for="song in getMostVotedSongs(bell.groups)"
+                            <div v-if="mostVotedSongs[index].length > 0" v-for="song in mostVotedSongs[index]"
                                 :key="song.id"
                                 class="group-item min-w-40 h-20 flex flex-row justify-center items-center rounded-lg p-2 relative flex flex-row items-center gap-2"
                                 :class="{ selected: checkIsSelected(bell.id, song.id) }">
@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-if="!bell.groups.length > 0" class="text-xl grow flex items-center justify-center">
+                        <div v-if="!mostVotedSongs[index].length > 0" class="text-xl grow flex items-center justify-center">
                             <span>SENSE CANÇONS</span>
                         </div>
                     </div>
@@ -68,6 +68,7 @@ export default {
             store: useAppStore(),
             loading: true,
             groupedSongs: [],
+            mostVotedSongs: [],
             isSelected: {},
             toast: null
         }
@@ -84,27 +85,31 @@ export default {
             handler: 'setLoadingFalse',
         },
         sortedVotedSongs: {
-            handler: 'logSortedVotedSongs',
+            handler: 'handleSortedVotedSongs',
         }
     },
     methods: {
         setLoadingFalse() {
-            if (this.bells.length > 0) {
+            if (this.bells.length > 0 && this.groupedSongs.length > 0) {
                 this.loading = false;
+                this.getMostVotedSongs(this.bells);
             }
         },
-        logSortedVotedSongs() {
+        handleSortedVotedSongs() {
             if (this.sortedVotedSongs.length > 0) {
                 let result = this.fillMissingGroups(this.sortedVotedSongs);
                 console.log("result", result)
                 this.groupedSongs = result;
+                if(this.bells.length > 0) {
+                    this.loading = false;
+                    this.getMostVotedSongs(this.bells);
+                }
             }
         },
         fillMissingGroups(array) {
             let result = []
             let expectedGroup = 1
             let totalGroups = this.classGroups.length
-            console.log("totalGroups", totalGroups)
 
             // Fill in the groups that are missing
             for (let i = 0; i < array.length; i++) {
@@ -112,7 +117,6 @@ export default {
                     result.push({ group: expectedGroup, songs: [] });
                     expectedGroup++;
                 }
-                // result.push(array[i]);
                 result.push({ group: parseInt(array[i].group), songs: array[i].songs })
                 expectedGroup = parseInt(array[i].group) + 1;
             }
@@ -125,31 +129,34 @@ export default {
 
             return result;
         },
-        getMostVotedSongs(groups) {
-            let result = []
-            for (let i = 0; i < groups.length; i++) {
-                let groupId = groups[i].id;
-                let groupSongs = this.groupedSongs.find(group => group.group === groupId);
-                // console.log("songs", ...groupSongs.songs);
-                result.push(...groupSongs.songs);
-            }
+        getMostVotedSongs(bells) {
 
-            // Group by song id
-            const groupedData = {};
-            result.forEach(song => {
-                if (groupedData[song.id]) {
-                    groupedData[song.id].votes += song.votes;
-                } else {
-                    groupedData[song.id] = { id: song.id, votes: song.votes, title: song.title, img: song.img, artist: song.artist, previewUrl: song.previewUrl };
+            this.mostVotedSongs = bells.map(bell => {
+                let groups = bell.groups;
+                let result = []
+                for (let i = 0; i < groups.length; i++) {
+                    let groupId = groups[i].id;
+                    let groupSongs = this.groupedSongs.find(group => group.group === groupId);
+                    result.push(...groupSongs.songs);
                 }
-            });
-            const resultArray = Object.values(groupedData);
 
-            // Sort by votes
-            resultArray.sort((a, b) => b.votes - a.votes);
+                // Group by song id
+                const groupedData = {};
+                result.forEach(song => {
+                    if (groupedData[song.id]) {
+                        groupedData[song.id].votes += song.votes;
+                    } else {
+                        groupedData[song.id] = { id: song.id, votes: song.votes, title: song.title, img: song.img, artist: song.artist, previewUrl: song.previewUrl };
+                    }
+                });
+                const resultArray = Object.values(groupedData);
 
-            console.log("resultArray", resultArray)
-            return resultArray;
+                // Sort by votes
+                resultArray.sort((a, b) => b.votes - a.votes);
+
+                return resultArray;
+            })
+            console.log("mostVotedSongs", this.mostVotedSongs)
         },
         playTrack(id) {
             if (this.currentTrackId == id) {
@@ -225,10 +232,6 @@ export default {
     background-color: rgb(56, 56, 56);
     color: white;
 }
-
-/* .item {
-    overflow-y: auto;
-} */
 
 .hour-item {
     background-color: var(--pedralbes-blue);
