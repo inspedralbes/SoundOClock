@@ -211,7 +211,8 @@ export default {
             } else {
                 let artistList = [];
                 track.artists.forEach(artist => {
-                    artistList.push(artist.name);
+                    // artistList.push(artist.name);
+                    artistList.push({ name: artist.name })
                 });
                 let song = {
                     id: track.id,
