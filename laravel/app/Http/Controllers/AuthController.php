@@ -199,6 +199,7 @@ class AuthController extends Controller
 
         // Update user
         $user->update([
+            'role_id' => $request->input('role_id'),
             'vote_banned_until' => $request->input('vote_banned_until'),
             'propose_banned_until' => $request->input('propose_banned_until'),
         ]);

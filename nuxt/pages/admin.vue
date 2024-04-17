@@ -72,6 +72,15 @@
             <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Planificar
                 Cançons</span>
         </button>
+        <button @click="selected_screen = 7"
+            :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 7 }">
+            <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
+                manage_accounts
+            </span>
+            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Permisos
+                d'usuari
+            </span>
+        </button>
         <!-- 
             El contenido que vaya dentro del template v-slot:footer se mostrará al final del sidebar-menu.
          -->
@@ -107,7 +116,8 @@ export default {
                 3: resolveComponent('BanUser'),
                 4: resolveComponent('AdminBlackListCrud'),
                 5: resolveComponent('AdminScript'),
-                6: resolveComponent('AdminSetSongs')
+                6: resolveComponent('AdminSetSongs'),
+                7: resolveComponent('AdminManageRoles'),
             },
             loading: true
         }
@@ -118,6 +128,8 @@ export default {
     },
     created() {
         socket.emit('getGroups', this.store.getUser().token);
+        socket.emit('getRoles', this.store.getUser().token);
+        comManager.getUsers();
     },
     mounted() {
         const userToken = this.store.getUser().token;

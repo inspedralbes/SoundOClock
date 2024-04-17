@@ -237,7 +237,7 @@ async function getUsers(token) {
   return jsonResponse;
 }
 
-async function banUser(token, user) {
+async function updateUser(token, user) {
   const response = await fetch(apiURL + 'user/' + user.id, {
     method: 'PUT',
     headers: {
@@ -305,6 +305,19 @@ async function showUser(token, userId) {
   return jsonResponse;
 }
 
+async function getRoles(token) {
+  const response = await fetch(apiURL + `roles`, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -322,13 +335,14 @@ const comManager = {
   getPublicGroups,
   fetchSpotifyPage,
   getUsers,
-  banUser,
+  updateUser,
   deleteGroup,
   updateGroup,
   setUserGroups,
   getBells,
   setBellsGroupsConfiguration,
-  showUser
+  showUser,
+  getRoles
 };
 
 export default comManager;
