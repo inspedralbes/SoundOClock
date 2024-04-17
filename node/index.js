@@ -567,12 +567,12 @@ io.on('connection', (socket) => {
 
   socket.on('banUser', async (userToken, bannedUser) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
-    let user = await comManager.getUserInfo(userToken);
-    if (!user.id || user.role_id !== 1) return;
+    // let user = await comManager.getUserInfo(userToken);
+    // if (!user.id || user.role_id !== 1) return;
 
     try {
-      // Ban user
-      comManager.banUser(userToken, bannedUser);
+      // Update user
+      comManager.updateUser(userToken, bannedUser);
 
       io.emit('userBanned', { status: 'success', message: `L'usuari' ${bannedUser.name} ha sigut bloquejat` });
     } catch (err) {
@@ -629,6 +629,22 @@ io.on('connection', (socket) => {
       .catch((err) => {
         console.error(err);
       });
+  });
+
+  socket.on('modifyUserRole', async (userToken, modifiedUser) => {
+
+    try {
+      // Update user
+      comManager.updateUser(userToken, modifiedUser);
+
+      // Notify the user that made the modification
+      socket.emit('userRoleModified', { status: 'success', message: `El rol de l'usuari' ${modifiedUser.name} ha sigut modificat.` });
+
+      // Update the user data to everybody
+      io.emit('refreshUsersData');
+    } catch (err) {
+      socket.emit('reportError', { status: 'error', message: err.message });
+    }
   });
 
   socket.on('disconnect', () => {

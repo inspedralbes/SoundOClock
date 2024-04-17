@@ -31,15 +31,12 @@ export default {
         this.modals.noDateSelected = true;
       } else {
         if (isVotingBeingBanned) {
-          //this.user.vote_banned_until = this.formatDateToLaravel(this.votingBannedUntil);
           this.votingBannedUntil = this.formatDateToLaravel(this.votingBannedUntil);
           this.modals.banUserVotingCapacity = true;
         } else {
           this.proposingBannedUntil = this.formatDateToLaravel(this.proposingBannedUntil);
-          // this.user.propose_banned_until = this.formatDateToLaravel(this.proposingBannedUntil);
           this.modals.banUserProposingCapacity = true;
         }
-        //socket.emit('banUser', this.store.getUser().token, this.user);
       }
 
     },
@@ -52,7 +49,6 @@ export default {
         this.proposingBannedUntil = null;
         this.modals.unbanUserProposingCapacity = true;
       }
-      // socket.emit('banUser', this.store.getUser().token, this.user);
     },
     submitData() {
 

@@ -37,6 +37,7 @@ export default {
         const store = useAppStore();
         return {
             users: computed(() => store.getUsersAdminView()),
+            roles: computed(() => store.getRoles()),
             currentSelectedUser: null,
         }
     },
@@ -56,11 +57,28 @@ export default {
 
             return style;
         },
+        refreshUsersList() {
+            for (let i = 0; i < this.users.length; i++) {
+                if (this.users[i].id == this.currentSelectedUser.id) {
+                    this.currentSelectedUser = this.users[i];
+                }
+            }
+        }
+    },
+    watch: {
+        users: {
+            handler: 'refreshUsersList',
+        },
     },
 }
 </script>
 
 <style scoped>
+
+.users-container {
+    height: 85vh;
+}
+
 .user-item--not-selected {
     background-color: rgb(56, 56, 56);
     color: white;

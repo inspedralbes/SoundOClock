@@ -233,7 +233,7 @@ async function getUsers(token) {
   return jsonResponse;
 }
 
-async function banUser(token, user) {
+async function updateUser(token, user) {
   const response = await fetch(apiURL + 'user/' + user.id, {
     method: 'PUT',
     headers: {
@@ -331,7 +331,7 @@ const comManager = {
   getPublicGroups,
   fetchSpotifyPage,
   getUsers,
-  banUser,
+  updateUser,
   deleteGroup,
   updateGroup,
   setUserGroups,
