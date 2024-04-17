@@ -9,9 +9,9 @@
                 <div class="users-container w-1/3 ml-20 overflow-y-auto">
                     <div
                         class="sticky top-0 h-10 w-full flex flex-row justify-center justify-between ml-auto mr-auto gap-1 mb-2">
-                        <input type="text" placeholder="Busca..."
+                        <input type="text" placeholder="Busca..." v-model="search"
                             class="h-full w-full items-center rounded-lg p-3 border-2 border-white">
-                        <button @click="isDropdownMenuOpen = !isDropdownMenuOpen; console.log(isDropdownMenuOpen);"
+                        <button @click="isDropdownMenuOpen = !isDropdownMenuOpen"
                             class="h-full w-10 flex justify-center items-center rounded-lg bg-[#383838] border-2 border-white">
                             <span class="material-symbols-outlined text-white">
                                 tune
@@ -24,18 +24,17 @@
                             <div id="dropdown-menu"
                                 :class="{ 'hidden': !isDropdownMenuOpen, 'block': isDropdownMenuOpen }"
                                 class="bg-[#383838] border-2 border-white rounded-lg shadow-lg">
-                                <ul class="bg-black rounded-lg p-3">
-                                    <li>Opción 1</li>
-                                    <li>Opción 2</li>
-                                    <li>Opción 3</li>
+                                <ul class="bg-[#383838] rounded-lg">
+                                    <li class="hover:bg-black rounded-lg w-full p-1"><button class="rounded-lg w-full p-1 hover:bg-black text-left" @click="filter='Tots', isDropdownMenuOpen = !isDropdownMenuOpen">Tots</button></li>
+                                    <li class="rounded-lg w-full p-1 hover:bg-black" @click="filter=group.id, isDropdownMenuOpen = !isDropdownMenuOpen" v-for="group, index in classGroups" :key="group.id">
+                                        <button class="rounded-lg w-full p-1 hover:bg-black text-left">{{ group.abbreviation }}</button>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
-
-
                     <div class="width flex flex-col justify-center ml-auto mr-auto gap-3">
-                        <button v-for="user in users" @click="selectUser(user)"
+                        <button v-for="user in filteredUsers" @click="selectUser(user)"
                             class="h-16 flex flex-row justify-between items-center rounded-lg p-3"
                             :class="isSelected(user)">
                             <div class="flex flex-row items-center gap-2">
@@ -56,7 +55,7 @@
                     </div>
                 </div>
                 <div class="w-2/3 text-white text-center ml-4 mr-4">
-                    <UserDetails v-bind:user="selectedUser" />
+                    <UserDetails v-bind:user="selectedUser"/>
                 </div>
             </div>
         </div>
@@ -71,7 +70,11 @@ export default {
     data() {
         return {
             loading: true,
+            search: "",
+            filter: "Tots",
             isDropdownMenuOpen: false,
+            classGroups: computed(() => this.store.getClassGroups()),
+            users: computed(() => this.store.getUsersAdminView()),
         }
     },
     methods: {
@@ -90,8 +93,7 @@ export default {
     },
     mounted() {
         this.loading = true;
-        this.users = getUsers();
-        console.log(this.users);
+        getUsers();
         this.loading = false;
     },
     computed: {
@@ -100,6 +102,24 @@ export default {
         },
         selectedUser() {
             return this.store.getAdminSelectedUser();
+        },
+        filteredUsers() {
+            let filteredUsers;
+
+            if(this.filter !== "Tots") {
+                filteredUsers = this.users.filter((user) => {
+                    return user.groups.some(grupo => grupo.id === this.filter);
+                });
+            } else {
+                filteredUsers = this.users;
+            }
+
+            if (this.search.trim() !== '') {
+                filteredUsers = this.users.filter((user) => {
+                    return user.name.toLowerCase().includes(this.search.toLowerCase());
+                });
+            }
+            return filteredUsers;
         },
     },
     setup() {
