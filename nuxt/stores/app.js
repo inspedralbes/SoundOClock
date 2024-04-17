@@ -26,7 +26,11 @@ export const useAppStore = defineStore('app', {
     bells: [],
     currentTrackPlaying: null,
     postedSongStatus: null,
-
+    songStatus: {
+      currentTrack: null,
+      currentTrackId: null,
+      isPlaying: false,
+    }
   }),
   persist: {
     storage: persistedState.localStorage,
@@ -79,6 +83,9 @@ export const useAppStore = defineStore('app', {
     },
     getSortedVotedSongs() {
       return this.sortedVotedSongs
+    },
+    getSongStatus() {
+      return this.songStatus
     },
 
     //setters
@@ -135,6 +142,11 @@ export const useAppStore = defineStore('app', {
     setSortedVotedSongs(sortedVotedSongs) {
       this.sortedVotedSongs = sortedVotedSongs
     },
+    setSongStatus(currentTrack, currentTrackId, isPlaying) {
+      this.songStatus.currentTrack = currentTrack
+      this.songStatus.currentTrackId = currentTrackId
+      this.songStatus.isPlaying = isPlaying
+    },
 
     ///Deletes
     deleteUser() {
@@ -158,6 +170,20 @@ export const useAppStore = defineStore('app', {
     },
     setAdminSelectedUser(adminSelectedUser) {
       this.adminSelectedUser = adminSelectedUser
+    },
+
+    // Others
+    playSong() {
+      if(this.songStatus.currentTrack) {
+        this.songStatus.isPlaying = true;
+        this.songStatus.currentTrack.play();
+      }
+    },
+    pauseSong() {
+      if(this.songStatus.currentTrack) {
+        this.songStatus.isPlaying = false;
+        this.songStatus.currentTrack.pause();
+      }
     },
   },
 })
