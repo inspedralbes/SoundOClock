@@ -1,6 +1,6 @@
 <template>
   <!-- <UContainer> -->
-    <NuxtPage class="grow" />
+  <NuxtPage class="grow" />
   <!-- </UContainer> -->
   <UNotifications />
 </template>

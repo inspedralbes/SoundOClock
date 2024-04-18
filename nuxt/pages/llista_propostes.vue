@@ -1,22 +1,22 @@
 <template>
     <div :class="{ 'overflow-hidden max-h-dvh': (modals.alreadyVotedModal || modals.reportModal) }">
         <!-- Reproductor -->
-        <component :is="activePlayer" type="vote" @pause="playTrack($event)" @vote="vote($event.id)"
-            @report="report($event)" />
+        <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
+            @report="report($event)" @propose="proposeSong($event)" />
 
         <!-- Titulo -->
-        <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
+        <!-- <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
             Vota
             la teva
             cançó
-            preferida</h1>
+            preferida</h1> -->
 
         <!-- Barra de busqueda -->
         <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text" placeholder="Buscar..."
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                    :class="{ '!py-2 !text-sm': $device.isMobile }" @keyup.enter="getSongs($event.target.value)">
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model.lazy="filter">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
                     :class="{ 'text-base': $device.isMobile }">
                     search
@@ -44,19 +44,40 @@
 
         </div>
 
-        <!-- Listado canciones -->
-        <TransitionGroup tag="div" v-if="songs.length != 0" class="mb-20" name="song-slide">
+        <!-- Listado canciones propuestas -->
+        <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
+        <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
+        <div v-if="songs.length === 0" class="mt-4 w-full">
+            <p class="text-center text-xl">Encara no s'ha proposat cap cançó.</p>
+            <p class="text-center mx-4">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile">
+                cercant a
+                la barra de búsqueda.</p>
+        </div>
+
+        <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4  w-full">
+            <p class="text-center text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
+            <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
+        </div>
+        <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
+        <TransitionGroup name="song-slide" mode="out-in">
             <component :is="activeSong" v-for="track in filteredSongs" :key="track.id" :track="track"
                 :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
-                @report="report($event)" @propose="proposeSong($event)" :type="getType(track)" />
+                @report="report($event)" :type="getType(track.id)" />
         </TransitionGroup>
-        <div v-else class="mt-8">
-            <p class="text-center text-xl font-bold">Encara no s'ha proposat cap cançó.</p>
-            <p class="text-center mt-2">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile"> <a
-                    :href="$router.resolve({ path: '/llistatPerProposar' }).href"
-                    class="text-blue-500 hover:underline">clic
-                    aquí</a>.</p>
-        </div>
+        <!-- </div> -->
+        <!-- </TransitionGroup> -->
+
+
+        <!-- Listado de canciones de Spotify -->
+        <Transition name="song-slide">
+            <h2 v-if="spotifySongs.length > 0" class="text-center text-3xl font-bold mt-10">Resultats de la cerca</h2>
+        </Transition>
+        <TransitionGroup tag="div" class="mb-20" name="song-slide">
+            <component :is="activeSong" v-for="track in spotifySongs" :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
+                :type="getType(track.id)" />
+        </TransitionGroup>
+
 
         <!-- Modales -->
         <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
@@ -80,8 +101,8 @@
             @confirm="reportTrack">
             <template #title>Reportar cançó</template>
             <template #content>
-                <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de {{
-        reportSongData.reportedSong.artists }}?</p>
+                <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de "{{
+                    reportSongData.reportedSong.artists.map(artist => artist.name).join(', ') }}"?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -93,13 +114,13 @@
         </component>
 
         <!-- Boton que redirige a la propuesta de canciones -->
-        <footer class="fixed bottom-2 w-full flex justify-center align-center">
+        <!-- <footer class="fixed bottom-2 w-full flex justify-center align-center">
             <button @click="goToProposar"
                 class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700"
                 :class="{ 'text-sm w-[90%] mb-4': $device.isMobile }">Proposar
                 cançó
             </button>
-        </footer>
+        </footer> -->
     </div>
 </template>
 
@@ -196,9 +217,8 @@ export default {
         socket.off("searchResult");
     },
     methods: {
-        getSongs(filter) {
-            this.filter = filter;
-            if (filter != '') {
+        getSongs() {
+            if (this.filter != '') {
                 socket.emit('searchSong', this.filter);
             } else {
                 this.spotifySongs = [];
@@ -207,8 +227,8 @@ export default {
         deleteSearch() {
             this.filter = '';
         },
-        getType(track) {
-            if (this.songs.some(song => song.id === track.id)) {
+        getType(trackID) {
+            if (this.songs.some(song => song.id === trackID)) {
                 return 'vote';
             } else {
                 return 'propose';
@@ -242,7 +262,6 @@ export default {
 
         getMp3(AudioPreviewURL, songId) {
             let track = this.spotifySongs.find(item => item.id == songId);
-            console.log("track", track);
             track.preview_url = AudioPreviewURL;
             if (this.isWaitingToPlay) {
                 this.playTrack(track);
@@ -254,37 +273,25 @@ export default {
         },
 
         playTrack(track) {
-            console.log('playTrack start');
-            console.log("currentTrack", this.currentTrack);
-            console.log("currentTrackId", this.currentTrackId);
-            console.log("isPlaying", this.isPlaying);
             const store = useAppStore();
             if (this.currentTrackId == track.id) {
-                console.log("la canço que vol sonar es la actual");
                 if (this.isPlaying) {
-                    console.log("la canço que vol sonar es la mateixa que la que ja esta sonant per tant la pauso");
                     this.currentTrack.pause();
                     this.isPlaying = false;
                     store.deleteCurrentTrackPlaying();
                 } else {
-                    console.log("la canço que vol sonar es la mateixa pero no esta sonant per tant li dono play");
                     this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
-                    console.log('else que play if currentTrackId != track.id');
                 }
             } else {
-                console.log("la canço que vol sonar no es la actual");
                 if (track.preview_url != null) {
-                    console.log("la canço que vol sonar te previewUrl");
                     if (this.isPlaying) {
                         this.currentTrack.pause();
                         this.isPlaying = false;
                         store.deleteCurrentTrackPlaying();
-                        console.log("if que pausa la ");
                     }
-                    console.log("play de la canço", track.name, "amb previewUrl", track.preview_url);
                     this.currentTrack = new Audio(track.preview_url);
                     this.currentTrackId = track.id;
                     this.currentTrack.load();
@@ -292,7 +299,6 @@ export default {
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
                 } else {
-                    console.log("la canço que vol sonar no te previewUrl");
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
                 }
@@ -346,18 +352,15 @@ export default {
                     this.modals.proposeSongError = true;
                     this.searchBySongId(this.postedSongId).loading = false;
                 } else {
-                    console.log('postedSongStatus', this.postedSongStatus);
-                    console.log("postedSongId", this.postedSongId);
                     this.searchBySongId(this.postedSongId).loading = false;
                     this.searchBySongId(this.postedSongId).proposed = true;
                     this.spotifySongs.splice(this.spotifySongs.findIndex(song => song.id === this.postedSongId), 1);
                 }
             }
         },
-        spotifySongs: {
-            handler: function () {
-                console.log('spotifySongs', this.spotifySongs);
-            }
+        filter: {
+            handler: 'getSongs',
+            immediate: false,
         },
         'currentTrack': {
             handler: function () {
@@ -373,14 +376,19 @@ export default {
             let array = this.songs;
 
             if (this.spotifySongs.length > 0) {
-                array = array.concat(this.spotifySongs);
+                // array = array.concat(this.spotifySongs);
             }
 
-            let filtered = array.filter(song =>
-                song.name.toLowerCase().includes(this.filter.toLowerCase()) ||
-                song.artists.some(artist => artist.name.toLowerCase().includes(this.filter.toLowerCase()))
-            );
+            let filtered = array.filter(song => {
+                let songName = song.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                let filterText = this.filter.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
+                return songName.includes(filterText) ||
+                    song.artists.some(artist => {
+                        let artistName = artist.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                        return artistName.includes(filterText);
+                    });
+            });
 
             switch (this.orderBy) {
                 case '':
@@ -399,10 +407,18 @@ export default {
                     filtered.sort((a, b) => b.name.localeCompare(a.name));
                     break;
                 case 'artist-desc':
-                    filtered.sort((a, b) => a.artists[0].localeCompare(b.artists[0]));
+                    filtered.sort((a, b) => {
+                        let aArtistNames = a.artists.map(artist => artist.name);
+                        let bArtistNames = b.artists.map(artist => artist.name);
+                        return bArtistNames[0].localeCompare(aArtistNames[0]);
+                    });
                     break;
                 case 'artist-asc':
-                    filtered.sort((a, b) => b.artists[0].localeCompare(a.artists[0]));
+                    filtered.sort((a, b) => {
+                        let aArtistNames = a.artists.map(artist => artist.name);
+                        let bArtistNames = b.artists.map(artist => artist.name);
+                        return aArtistNames[0].localeCompare(bArtistNames[0]);
+                    });
                     break;
                 default:
                     break;
@@ -435,6 +451,7 @@ export default {
 .song-slide-leave-to {
     opacity: 0;
     transform: translateX(-100%);
+    /* transform: translateY(0); */
 }
 
 .delete-fade-enter-active,

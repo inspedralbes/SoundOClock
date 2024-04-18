@@ -279,8 +279,6 @@ io.on('connection', (socket) => {
 
   // Post song checking for duplicates first
   socket.on('postSong', async (userToken, songData) => {
-    console.log("user", userToken);
-    console.log("POST SONG", songData);
     // Check that the user is authenticated with Laravel Sanctum
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
@@ -310,11 +308,11 @@ io.on('connection', (socket) => {
 
       if (!votingRecord) {
         let userGroups = user.groups.map(group => group.id);
-        // await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], groups: userGroups }).save();
-        await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [], groups: userGroups }).save();
+        await new VotingRecord({ userId: user.id, submitted: true, votedSongs: [], groups: userGroups }).save();
+        // await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [], groups: userGroups }).save();
       } else {
-        // votingRecord.submitted = true;
-        votingRecord.submitted = false;
+        votingRecord.submitted = true;
+        // votingRecord.submitted = false;
         await votingRecord.save();
       }
 

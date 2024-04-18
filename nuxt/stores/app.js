@@ -112,7 +112,6 @@ export const useAppStore = defineStore('app', {
       this.userSelectedSongs = userSelectedSongs
     },
     setProposedSongs(proposedSongs) {
-      console.log("proposedSongs", proposedSongs);
       this.proposedSongs = proposedSongs
     },
     setUsersAdminView(usersAdminView) {
@@ -186,27 +185,19 @@ export const useAppStore = defineStore('app', {
 
     playTrack(track, status) {
       if (status.currentTrackId == track.id) {
-        console.log("la canço que vol sonar es la actual");
         if (status.isPlaying) {
-          console.log("la canço que vol sonar es la mateixa que la que ja esta sonant per tant la pauso");
           status.currentTrack.pause();
           status.isPlaying = false;
         } else {
-          console.log("la canço que vol sonar es la mateixa pero no esta sonant per tant li dono play");
           status.currentTrack.load();
           status.currentTrack.play();
           status.isPlaying = true;
-          console.log('else que play if currentTrackId != track.id');
         }
       } else {
-        console.log("la canço que vol sonar no es la actual");
-        console.log("la canço que vol sonar te previewUrl");
         if (status.isPlaying) {
           status.currentTrack.pause();
           status.isPlaying = false;
-          console.log("if que pausa la ");
         }
-        console.log("play de la canço", track.name, "amb previewUrl", track.preview_url);
         status.currentTrack = new Audio(track.preview_url);
         status.currentTrackId = track.id;
         status.currentTrack.load();

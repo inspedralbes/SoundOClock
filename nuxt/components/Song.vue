@@ -2,10 +2,10 @@
     <div class="flex flex-row justify-center m-2">
         <div class="relative flex items-align">
             <img :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'"
-                class="w-20 h-20 m-2 rounded-full z-0">
+                class="w-20 h-20 m-2 rounded-lg z-0">
             <Transition name="playingFade">
                 <div v-if="currentTrackId === track.id && isPlaying"
-                    class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
+                    class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-lg">
                     <div class="loader"></div>
                 </div>
             </Transition>
