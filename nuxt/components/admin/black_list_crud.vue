@@ -33,7 +33,7 @@
                     </span>
                 </button>
                 <ModularModal :open="modalActual === track.spotify_id" @close="modalActual = null"
-                    @confirm="removeFromBlacklist(track.spotify_id)">
+                    @confirm="removeFromBlacklist(track.spotify_id)" msg="Confirmar">
                     <template v-slot:title>
                         <h2>Segur que vols treure aquesta cançó de la blacklist?</h2>
                     </template>

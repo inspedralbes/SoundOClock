@@ -147,9 +147,8 @@ class AuthController extends Controller
         }
     }
 
-    public function index()
-    {
-        return User::all();
+    public function index() {
+        return User::with('groups')->get();
     }
 
     public function show($id)
