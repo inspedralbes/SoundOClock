@@ -133,6 +133,21 @@ async function getUserInfo(token) {
     return data;
 }
 
+async function downloadSongs(songs) {
+    const response = await fetch(`${url}/downloadSongs`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            songs,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
 const comManager = {
     getUserSelectedSongs,
     getSongs,
@@ -144,6 +159,7 @@ const comManager = {
     logout,
     getUserInfo,
     getSortedVotedSongs,
+    downloadSongs,
 };
 
 export default comManager;

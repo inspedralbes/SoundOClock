@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import comManager from './communicationManager.js';
+import downloadsManager from './downloadsManager.cjs';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 import minimist from 'minimist';
@@ -213,6 +214,16 @@ app.post('/logout', async (req, res) => {
 app.post('/userInfo', async (req, res) => {
   try {
     let response = await comManager.getUserInfo(req.body.token);
+    res.json(response);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
+app.post('/downloadSongs', async (req, res) => {
+  try {
+    let response = await downloadsManager.downloadSongs(req.body.songs);
+    console.log("response", response);
     res.json(response);
   } catch (err) {
     res.status(500).send(err);
