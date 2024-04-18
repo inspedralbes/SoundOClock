@@ -4,7 +4,7 @@
         <component :is="activePlayer" @pause="playTrack($event)" @propose="proposeSong($event)" />
 
         <!-- TITULO -->
-        <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
+        <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-0 !ml-0': $device.isMobile }">
             Proposa la teva cançó</h1>
 
         <!-- BARRA DE BUSQUEDA -->
