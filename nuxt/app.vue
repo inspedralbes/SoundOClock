@@ -1,6 +1,7 @@
 <template>
   <!-- <UContainer> -->
-    <NuxtPage class="grow" />
+  <Header v-if="$route.name !== 'admin'"></Header>
+  <NuxtPage class="grow" />
   <!-- </UContainer> -->
   <UNotifications />
 </template>
