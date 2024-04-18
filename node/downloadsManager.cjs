@@ -1,6 +1,7 @@
 const axios = require('axios');
 const fs = require('fs-extra');
 const path = require('path');
+const archiver = require('archiver');
 
 async function downloadSongs(songs) {
   // Make sure the 'downloads' directory exists
@@ -45,8 +46,36 @@ async function downloadSongs(songs) {
   }
 }
 
+function getDownloadedSongs() {
+  // Return a function that handles the request/response streaming
+  return (req, res) => {  // Return an arrow function that takes req and res
+    const downloadsDir = path.join(__dirname, 'downloads');
+
+    res.writeHead(200, {
+      'Content-Type': 'application/zip',
+      'Content-Disposition': 'attachment; filename="downloaded_songs.zip"'
+    });
+
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Compression level
+    });
+
+    archive.on('error', function (err) {
+      console.error('Archiver error:', err);
+      res.status(500).send('Failed to zip files: ' + err.message);
+    });
+
+    archive.pipe(res);  // Pipe the archive data to the response
+
+    archive.directory(downloadsDir, false);  // Append files from the downloads directory
+
+    archive.finalize();  // Finalize the archive (this is where the archiving actually starts)
+  };
+}
+
 const downloadsManager = {
-  downloadSongs
+  downloadSongs,
+  getDownloadedSongs
 }
 
 module.exports = downloadsManager;

@@ -223,12 +223,20 @@ app.post('/userInfo', async (req, res) => {
 app.post('/downloadSongs', async (req, res) => {
   try {
     let response = await downloadsManager.downloadSongs(req.body.songs);
-    console.log("response", response);
     res.json(response);
   } catch (err) {
     res.status(500).send(err);
   }
 })
+
+app.get('/getDownloadedSongs', (req, res) => {
+  try {
+    const handleRequest = downloadsManager.getDownloadedSongs();
+    handleRequest(req, res);  // Pass the req, res to the handler function
+  } catch (err) {
+    res.status(500).send("Error preparing downloads: " + err.message);
+  }
+});
 
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
