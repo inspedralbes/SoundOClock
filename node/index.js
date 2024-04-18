@@ -100,10 +100,10 @@ app.get('/sortedVotedSongs', async (req, res) => {
           songs: {
             $push: {
               id: "$id",
-              title: "$title",
-              artist: "$artist",
+              name: "$name",
+              artists: "$artists",
               img: "$img",
-              previewUrl: "$previewUrl",
+              preview_url: "$preview_url",
               votes: "$votesPerGroupArray.v"
             }
           }
