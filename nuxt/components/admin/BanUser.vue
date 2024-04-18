@@ -7,32 +7,40 @@
         <div v-else>
             <div class="flex flex-row mt-8">
                 <div class="users-container w-1/3 ml-20 overflow-y-auto">
-                    <div
-                        class="sticky top-0 h-10 w-full flex flex-row justify-center justify-between ml-auto mr-auto gap-1 mb-2">
-                        <input type="text" placeholder="Busca..." v-model="search"
-                            class="h-full w-full items-center rounded-lg p-3 border-2 border-white">
-                        <button @click="isDropdownMenuOpen = !isDropdownMenuOpen"
-                            class="h-full w-10 flex justify-center items-center rounded-lg bg-[#383838] border-2 border-white">
-                            <span class="material-symbols-outlined text-white">
-                                tune
-                            </span>
-                        </button>
-                    </div>
+                    <!-- Buscador amb buto de filtres -->
+                    <div class="sticky top-0 h-10 w-full flex flex-col justify-center justify-between ml-auto mr-auto gap-1 mb-2">
+                        <div class="flex flex-row gap-2 h-10" >
+                            <input type="text" placeholder="Busca..." v-model="search"
+                                class="h-full w-full items-center rounded-lg p-3 border-2 border-white">
+                            <button @click="isDropdownMenuOpen = !isDropdownMenuOpen"
+                                class="h-full w-10 flex justify-center items-center rounded-lg bg-[#383838] border-2 border-white">
+                                <span class="material-symbols-outlined text-white">
+                                    tune
+                                </span>
+                            </button>
 
-                    <div class="relative">
-                        <div class="absolute w-full left-0">
-                            <div id="dropdown-menu"
-                                :class="{ 'hidden': !isDropdownMenuOpen, 'block': isDropdownMenuOpen }"
-                                class="bg-[#383838] border-2 border-white rounded-lg shadow-lg">
-                                <ul class="bg-[#383838] rounded-lg">
-                                    <li class="hover:bg-black rounded-lg w-full p-1"><button class="rounded-lg w-full p-1 hover:bg-black text-left" @click="filter='Tots', isDropdownMenuOpen = !isDropdownMenuOpen">Tots</button></li>
-                                    <li class="rounded-lg w-full p-1 hover:bg-black" @click="filter=group.id, isDropdownMenuOpen = !isDropdownMenuOpen" v-for="group, index in classGroups" :key="group.id">
-                                        <button class="rounded-lg w-full p-1 hover:bg-black text-left">{{ group.abbreviation }}</button>
-                                    </li>
-                                </ul>
-                            </div>
+                        </div>
+                        <div class="sticky top-0 w-full left-0">
+                        <div id="dropdown-menu" :class="{ 'hidden': !isDropdownMenuOpen, 'block': isDropdownMenuOpen }"
+                            class="bg-[#383838] border-2 border-white rounded-lg shadow-lg">
+                            <ul class="bg-[#383838] rounded-lg">
+                                <li class="hover:bg-black rounded-lg w-full p-1"><button
+                                        class="rounded-lg w-full p-1 hover:bg-black text-left"
+                                        @click="filter = 'Tots', isDropdownMenuOpen = !isDropdownMenuOpen">Tots</button>
+                                </li>
+                                <li v-for="group, index in classGroups" :key="group.id"
+                                    @click="filter = group.id, isDropdownMenuOpen = !isDropdownMenuOpen"
+                                    class="rounded-lg w-full p-1 hover:bg-black">
+                                    <button class="rounded-lg w-full p-1 hover:bg-black text-left">{{
+                                        group.abbreviation }}</button>
+                                </li>
+                            </ul>
                         </div>
                     </div>
+                    </div>
+
+                    
+
                     <div class="width flex flex-col justify-center ml-auto mr-auto gap-3">
                         <button v-for="user in filteredUsers" @click="selectUser(user)"
                             class="h-16 flex flex-row justify-between items-center rounded-lg p-3"
@@ -55,7 +63,7 @@
                     </div>
                 </div>
                 <div class="w-2/3 text-white text-center ml-4 mr-4">
-                    <UserDetails v-bind:user="selectedUser"/>
+                    <UserDetails v-bind:user="selectedUser" />
                 </div>
             </div>
         </div>
@@ -106,7 +114,7 @@ export default {
         filteredUsers() {
             let filteredUsers;
 
-            if(this.filter !== "Tots") {
+            if (this.filter !== "Tots") {
                 filteredUsers = this.users.filter((user) => {
                     return user.groups.some(grupo => grupo.id === this.filter);
                 });
@@ -115,7 +123,7 @@ export default {
             }
 
             if (this.search.trim() !== '') {
-                filteredUsers = this.users.filter((user) => {
+                filteredUsers = filteredUsers.filter((user) => {
                     return user.name.toLowerCase().includes(this.search.toLowerCase());
                 });
             }
