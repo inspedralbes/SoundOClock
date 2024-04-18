@@ -7,8 +7,7 @@
         <div class="flex flex-col gap-3 ml-20 mr-8 mb-4">
             <div class="groups-bells-container rounded-lg">
                 <div class="schedule-container text-white text-center gap-2 p-2">
-                    <div v-for="(bell, index) in bells"
-                        class="item bg-gray-400 rounded-lg p-2 h-96 flex flex-col">
+                    <div v-for="(bell, index) in bells" class="item bg-gray-400 rounded-lg p-2 h-96 flex flex-col">
                         <div class="text-lg p-3 rounded-lg hour-item mb-2">{{ bell.hour.substring(0, 5) }}</div>
                         <div class="gap-2 flex flex-col overflow-auto">
                             <div v-if="mostVotedSongs[index].length > 0" v-for="song in mostVotedSongs[index]"
@@ -38,7 +37,7 @@
 
                                 <div @click="setSelected(bell.id, song.id)">
                                     <span v-if="!checkIsSelected(bell.id, song.id)"
-                                        class="material-symbols-rounded text-5xl text-green-600 cursor-pointer symbol">
+                                        class="material-symbols-rounded text-5xl green cursor-pointer symbol">
                                         check_circle
                                     </span>
                                     <span v-else class="material-symbols-rounded text-5xl cursor-pointer symbol">
@@ -47,7 +46,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-if="!mostVotedSongs[index].length > 0" class="text-xl grow flex items-center justify-center">
+                        <div v-if="!mostVotedSongs[index].length > 0"
+                            class="text-xl grow flex items-center justify-center">
                             <span>SENSE CANÇONS</span>
                         </div>
                     </div>
@@ -55,6 +55,35 @@
             </div>
         </div>
     </div>
+    <div class="btn-container fixed bottom-0 w-full flex justify-center items-center">
+        <UButton size="xl" class="px-48" @click="openModal">Guardar</UButton>
+    </div>
+    <UModal v-model="isModalOpen">
+        <div>
+            <div v-if="isError">
+                <UAlert icon="i-heroicons-x-circle-16-solid" color="red" variant="subtle" title="ERROR!"
+                    description="Cada franja horaria ha de tindre una cançó seleccionada." class="p-6" />
+            </div>
+            <div v-else>
+                <UAlert title="Estàs segur/a?" icon="i-heroicons-exclamation-triangle-16-solid" color="orange" variant="subtle" class="p-6">
+                    <template #title="{ title }">
+                        <span v-html="title" />
+                    </template>
+                    <template #description>
+                        <div>
+                            Una vegada guardades les cançons, s'enviaran a la màquina de campanes.
+                        </div>
+                        <div class="mt-2 flex gap-2">
+                            <UButton size="md" color="red" @click="closeModal">Enrere</UButton>
+                            <UButton size="md" color="primary" @click="storeSongs">Continuar</UButton>
+                        </div>
+                    </template>
+                </UAlert>
+            </div>
+            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="absolute right-0 top-0"
+                @click="isModalOpen = false" />
+        </div>
+    </UModal>
 </template>
 
 <script>
@@ -70,7 +99,10 @@ export default {
             groupedSongs: [],
             mostVotedSongs: [],
             isSelected: {},
-            toast: null
+            selectedSongs: [],
+            toast: null,
+            isModalOpen: false,
+            isError: false,
         }
     },
     created() {
@@ -100,7 +132,7 @@ export default {
                 let result = this.fillMissingGroups(this.sortedVotedSongs);
                 console.log("result", result)
                 this.groupedSongs = result;
-                if(this.bells.length > 0) {
+                if (this.bells.length > 0) {
                     this.loading = false;
                     this.getMostVotedSongs(this.bells);
                 }
@@ -137,7 +169,7 @@ export default {
                 for (let i = 0; i < groups.length; i++) {
                     let groupId = groups[i].id;
                     let groupSongs = this.groupedSongs.find(group => group.group === groupId);
-                    if(groupSongs) {
+                    if (groupSongs) {
                         result.push(...groupSongs.songs);
                     }
                 }
@@ -199,6 +231,50 @@ export default {
             } else {
                 this.isSelected[bell] = songId;
             }
+        },
+        openModal() {
+            // Check that each bell has a song selected
+            let numBells = 0;
+            for (const key in this.isSelected) {
+                numBells++;
+                if (!this.isSelected[key]) {
+                    this.isError = true;
+                    this.isModalOpen = true;
+                    return;
+                }
+            }
+            if (numBells !== this.bells.length) {
+                this.isError = true;
+                this.isModalOpen = true;
+                return;
+            }
+            this.isError = false;
+            this.isModalOpen = true;
+        },
+        closeModal() {
+            this.isModalOpen = false;
+        },
+        storeSongs() {
+            this.isModalOpen = false;
+            this.loading = true;
+
+            let songs = [];
+            for (const key in this.isSelected) {
+                // Find the song object
+                let song = null;
+                for (let i = 0; i < this.mostVotedSongs.length; i++) {
+                    song = this.mostVotedSongs[i].find(song => song.id === this.isSelected[key]);
+                    if (song) {
+                        break;
+                    }
+                }
+                songs.push({ bellId: key, songId: this.isSelected[key], title: song.title, artist: song.artist, img: song.img, previewUrl: song.previewUrl });
+                // songs.push({ bellId: key, songId: this.isSelected[key] });
+            }
+            console.log("songs", songs)
+
+            // comManager.setSongs(data);
+            // this.isModalOpen = false;
         }
     },
     computed: {
@@ -257,6 +333,16 @@ export default {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.btn-container {
+    background-color: rgba(0, 0, 0, 0.5);
+    height: 5rem;
+    box-shadow: 0px -5px 10px 0px rgba(0, 0, 0, 0.5);
+}
+
+.green {
+    color: rgb(34, 197, 94)
 }
 
 /** RAUL */
