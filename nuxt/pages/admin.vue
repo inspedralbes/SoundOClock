@@ -103,7 +103,7 @@ export default {
             screens: {
                 0: resolveComponent('AdminAlarmsCrud'),
                 1: resolveComponent('AdminGroupsCrud'),
-                2: resolveComponent('AdminBanSong'),
+                2: resolveComponent('BanSong'),
                 3: resolveComponent('AdminBanUser'),
                 4: resolveComponent('AdminBlackListCrud'),
                 5: resolveComponent('AdminScript'),
