@@ -16,7 +16,7 @@
                                 :class="{ selected: checkIsSelected(bell.id, song.id) }">
 
                                 <div class="contenidor-img">
-                                    <img :src="song.img" :alt="song.title + '_img'" class="rounded-lg">
+                                    <img :src="song.img" :alt="song.name + '_img'" class="rounded-lg">
                                     <button @click="playTrack(song.id)" class="rounded-lg"
                                         :class="{ playingC: isPlayingCheck(song.id), noPlaying: !isPlayingCheck(song.id) }">
                                         <!-- fer amb computed la classe -->
@@ -31,7 +31,7 @@
                                 </div>
 
                                 <div class="song-data">
-                                    <p class="font-black basis-1/2">{{ song.title }}</p>
+                                    <p class="font-black basis-1/2">{{ song.name }}</p>
                                     <p class="basis-1/2">Vots: {{ song.votes }}</p>
                                 </div>
 
@@ -180,7 +180,7 @@ export default {
                     if (groupedData[song.id]) {
                         groupedData[song.id].votes += song.votes;
                     } else {
-                        groupedData[song.id] = { id: song.id, votes: song.votes, title: song.title, img: song.img, artist: song.artist, previewUrl: song.previewUrl };
+                        groupedData[song.id] = { id: song.id, votes: song.votes, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
                     }
                 });
                 const resultArray = Object.values(groupedData);
@@ -256,7 +256,7 @@ export default {
         },
         storeSongs() {
             this.isModalOpen = false;
-            this.loading = true;
+            // this.loading = true;
 
             let songs = [];
             for (const key in this.isSelected) {
@@ -268,13 +268,24 @@ export default {
                         break;
                     }
                 }
-                songs.push({ bellId: key, songId: this.isSelected[key], title: song.title, artist: song.artist, img: song.img, previewUrl: song.previewUrl });
+                songs.push({ bellId: key, songId: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url });
                 // songs.push({ bellId: key, songId: this.isSelected[key] });
             }
             console.log("songs", songs)
 
-            // comManager.setSongs(data);
-            // this.isModalOpen = false;
+            comManager.downloadSongs(songs).then(() => {
+                this.toast.add({
+                    title: 'Cançons guardades',
+                    description: 'Les cançons s\'han guardat correctament.',
+                    color: 'green',
+                });
+            }).catch(() => {
+                this.toast.add({
+                    title: 'Error',
+                    description: 'Hi ha hagut un error al guardar les cançons.',
+                    color: 'red',
+                });
+            });
         }
     },
     computed: {
