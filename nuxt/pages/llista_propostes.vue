@@ -48,7 +48,7 @@
         <TransitionGroup tag="div" v-if="songs.length != 0" class="mb-20" name="song-slide">
             <component :is="activeSong" v-for="track in filteredSongs" :key="track.id" :track="track"
                 :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
-                @report="report($event)" :type="getType(track)" />
+                @report="report($event)" @propose="proposeSong($event)" :type="getType(track)" />
         </TransitionGroup>
         <div v-else class="mt-8">
             <p class="text-center text-xl font-bold">Encara no s'ha proposat cap cançó.</p>
@@ -81,7 +81,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de {{
-                    reportSongData.reportedSong.artists }}?</p>
+        reportSongData.reportedSong.artists }}?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -129,6 +129,8 @@ export default {
             userSelectedSongs: computed(() => this.store.userSelectedSongs),
             store: useAppStore(),
             currentTrack: null,
+            postedSongStatus: computed(() => this.store.postedSongStatus),
+            postedSongId: "",
             currentTrackId: null,
             isPlaying: false,
             modalSelector: this.$device.isMobile ? 1 : 0,
@@ -151,7 +153,27 @@ export default {
     created() {
         socket.on('searchResult', (results) => {
             this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
-        })
+        });
+
+        socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
+            // Crear un elemento HTML temporal
+            const tempElement = document.createElement('div');
+            // Establecer el HTML recibido en el elemento temporal
+            tempElement.innerHTML = htmlSpotify;
+            // Obtener el script por su id
+            const scriptElement = tempElement.querySelector('#__NEXT_DATA__');
+            // Verificar si se encontró el elemento
+            if (scriptElement) {
+                // Acceder al contenido JSON dentro del script y convertirlo a objeto JavaScript
+                const jsonData = JSON.parse(scriptElement.textContent);
+                // Acceder al AudioPreviewURL
+                const AudioPreviewURL = jsonData.props.pageProps.state.data.entity.audioPreview.url;
+                // Fetch to AudioPreviewURL to get the audio file .mp3
+                this.getMp3(AudioPreviewURL, songId);
+            } else {
+                console.error('No se encontró el script con el id "__NEXT_DATA__" en el HTML recibido');
+            }
+        });
     },
     mounted() {
         if (!this.store.getUser().token) {
@@ -218,52 +240,124 @@ export default {
             }
         },
 
+        getMp3(AudioPreviewURL, songId) {
+            let track = this.spotifySongs.find(item => item.id == songId);
+            console.log("track", track);
+            track.preview_url = AudioPreviewURL;
+            if (this.isWaitingToPlay) {
+                this.playTrack(track);
+                this.isWaitingToPlay = false;
+            } else if (this.isWaitingToPropose) {
+                this.proposeSong(track);
+                this.isWaitingToPropose = false;
+            }
+        },
+
         playTrack(track) {
+            console.log('playTrack start');
+            console.log("currentTrack", this.currentTrack);
+            console.log("currentTrackId", this.currentTrackId);
+            console.log("isPlaying", this.isPlaying);
             const store = useAppStore();
             if (this.currentTrackId == track.id) {
+                console.log("la canço que vol sonar es la actual");
                 if (this.isPlaying) {
+                    console.log("la canço que vol sonar es la mateixa que la que ja esta sonant per tant la pauso");
                     this.currentTrack.pause();
                     this.isPlaying = false;
                     store.deleteCurrentTrackPlaying();
                 } else {
+                    console.log("la canço que vol sonar es la mateixa pero no esta sonant per tant li dono play");
                     this.currentTrack.load();
+                    this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
+                    console.log('else que play if currentTrackId != track.id');
                 }
             } else {
-                if (track.previewUrl != null) {
-                    if (this.currentTrack != null) {
+                console.log("la canço que vol sonar no es la actual");
+                if (track.preview_url != null) {
+                    console.log("la canço que vol sonar te previewUrl");
+                    if (this.isPlaying) {
                         this.currentTrack.pause();
                         this.isPlaying = false;
                         store.deleteCurrentTrackPlaying();
+                        console.log("if que pausa la ");
                     }
-                    this.currentTrack = new Audio(track.previewUrl);
+                    console.log("play de la canço", track.name, "amb previewUrl", track.preview_url);
+                    this.currentTrack = new Audio(track.preview_url);
                     this.currentTrackId = track.id;
                     this.currentTrack.load();
+                    this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
                 } else {
-                    if (this.currentTrack != null) {
-                        this.isPlaying = false;
-                        this.currentTrack.pause();
-                        store.deleteCurrentTrackPlaying();
-                    }
-                    store.setCurrentTrackPlaying(track);
+                    console.log("la canço que vol sonar no te previewUrl");
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
                 }
             }
         },
+
+        proposeSong(track) {
+            track.loading = true;
+            this.postedSongId = track.id;
+            if (track.preview_url == null) {
+                socket.emit('getHtmlSpotify', track.id);
+                this.isWaitingToPropose = true;
+            } else {
+                let artistList = [];
+                track.artists.forEach(artist => {
+                    // artistList.push(artist.name);
+                    artistList.push({ name: artist.name })
+                });
+                let song = {
+                    id: track.id,
+                    name: track.name,
+                    artists: artistList,
+                    // date: track.album.release_date,
+                    img: track.album.images[1].url,
+                    preview_url: track.preview_url,
+                    submitDate: new Date().toISOString(),
+                    submittedBy: this.store.getUser().id,
+                }
+                socket.emit('postSong', this.store.getUser().token, song);
+            }
+        },
+
         isOverflowing(index) {
             let nameLength = 0;
             nameLength = this.filteredSongs[index].name ? this.filteredSongs[index].name.length : this.filteredSongs[index].name.length;
             return nameLength > 20;
-        }
+        },
+
+        searchBySongId(id) {
+            return this.spotifySongs.find(item => item.id == id);
+        },
     },
     watch: {
         songs: { // Each time songs change execute search() method
             handler: 'search',
             immediate: false,
+        },
+        postedSongStatus: {
+            handler: function () {
+                if (this.postedSongStatus.status == 'error') {
+                    this.modals.proposeSongError = true;
+                    this.searchBySongId(this.postedSongId).loading = false;
+                } else {
+                    console.log('postedSongStatus', this.postedSongStatus);
+                    console.log("postedSongId", this.postedSongId);
+                    this.searchBySongId(this.postedSongId).loading = false;
+                    this.searchBySongId(this.postedSongId).proposed = true;
+                    this.spotifySongs.splice(this.spotifySongs.findIndex(song => song.id === this.postedSongId), 1);
+                }
+            }
+        },
+        spotifySongs: {
+            handler: function () {
+                console.log('spotifySongs', this.spotifySongs);
+            }
         },
         'currentTrack': {
             handler: function () {
