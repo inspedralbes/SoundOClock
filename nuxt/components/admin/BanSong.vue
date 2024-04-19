@@ -1,8 +1,14 @@
 <template>
     <div>
         <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">CENSURAR CANÇÓ</h2>
-        <div>
-            <div class="flex flex-row mt-8">
+        <div v-if="loading" class="loading">
+            <Loader />
+        </div>
+        <div v-else>
+            <div v-if="songs.length === 0" class="mt-4  w-full">
+                <p class="text-center text-xl">No hi ha cap cançó proposada.</p>
+            </div>
+            <div v-else class="flex flex-row mt-8">
                 <div class="songs-container w-1/3 ml-20 overflow-x-hidden overflow-y-auto">
                     <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
                         <button v-for="song in songs" @click="selectSong(song)"
@@ -20,8 +26,8 @@
                                     </button>
                                 </div>
                                 <div class="song-data text-start truncate">
-                                    <p class="font-black basis-1/3">{{ song.title }}</p>
-                                    <p class="basis-1/3">{{ song.artists.join(', ') }}</p>
+                                    <p class="font-black basis-1/3">{{ song.name }}</p>
+                                    <p class="basis-1/3">{{ song.artists.map(artist => artist.name).join(', ') }}</p>
                                     <p class="basis-1/3">{{ song.totalVotes }} vots</p>
                                 </div>
                             </div>
@@ -83,14 +89,14 @@ export default {
             return true;
         }
     },
-    created() {
+    async created() {
         this.loading = true;
-        comManager.getAdminSongs();
+        await comManager.getAdminSongs();
         this.loading = false;
+
     },
     computed: {
         songs() {
-            console.log(this.store.getProposedSongsAdminView());
             this.selectedSong = this.store.getProposedSongsAdminView()[0];
             return this.store.getProposedSongsAdminView();
         },
