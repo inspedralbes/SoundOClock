@@ -68,10 +68,16 @@ export function getUsers() {
         });
 }
 
-async function getPublicGroups() {
-    const response = await fetch(`${url}/publicGroups`);
-    const data = await response.json();
-    return data;
+async function getPublicGroupsAndCategories() {
+    const publicGroupsPromise = fetch(`${url}/publicGroups`).then(response => response.json());
+    const publicCategoriesPromise = fetch(`${url}/publicCategories`).then(response => response.json());
+
+    const [publicGroups, publicCategories] = await Promise.all([publicGroupsPromise, publicCategoriesPromise]);
+
+    return {
+        publicGroups,
+        publicCategories
+    };
 }
 
 async function setUserGroups(userId, groups, token) {
@@ -153,7 +159,7 @@ const comManager = {
     getSongs,
     getAdminSongs,
     getUsers,
-    getPublicGroups,
+    getPublicGroupsAndCategories,
     setUserGroups,
     getBells,
     logout,

@@ -214,6 +214,15 @@ async function getPublicGroups(token) {
   return response.data;
 }
 
+async function getPublicCategories(token) {
+  const response = await axios.get(`${apiURL}groupCategories`, {
+    headers: {
+      "Authorization": "Bearer " + token,
+    }
+  });
+  return response.data;
+}
+
 async function fetchSpotifyPage(id) {
   try {
     const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
@@ -259,7 +268,7 @@ async function setUserGroups(userId, token, groups) {
       "Accept": "application/json",
       "Authorization": "Bearer " + token,
     },
-    body: JSON.stringify(groups)
+    body: JSON.stringify({ groups })
   });
   const jsonResponse = await response.json();
   return jsonResponse;
@@ -333,6 +342,7 @@ const comManager = {
   searchSongId,
   getGroups,
   getPublicGroups,
+  getPublicCategories,
   fetchSpotifyPage,
   getUsers,
   updateUser,
