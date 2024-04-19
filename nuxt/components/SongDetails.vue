@@ -8,14 +8,14 @@ export default {
   },
   data() {
     return {
+      notReadReports: 0,
       modals: {
         addSongToBlacklist: false,
         songAddedToBlacklistSuccessfully: false,
-        notReadReports: null
       },
     }
   },
-  created() {
+  updated() {
     this.countNotReadReports();
   },
   watch: {
@@ -51,14 +51,12 @@ export default {
 
       let counter = 0;
 
-      if (this.song) {
-        for (let i = 0; i < this.song.reports.length; i++) {
-          if (!this.song.reports[i].isRead) {
-            counter++;
-          }
+      for (let i = 0; i < this.song.reports.length; i++) {
+        if (!this.song.reports[i].isRead) {
+          counter++;
         }
-        this.notReadReports = counter;
       }
+      this.notReadReports = counter;
     },
     markAllReportsAsRead() {
 
@@ -107,8 +105,8 @@ export default {
       <img :src="song.img" alt="" class="w-1/3 rounded-lg">
       <div class="w-2/3 ml-4 flex flex-col justify-between">
         <div>
-          <p class="text-5xl font-black">{{ song.title }}</p>
-          <p class="text-3xl">{{ song.artists.join(', ') }}</p>
+          <p class="text-5xl font-black">{{ song.name }}</p>
+          <p class="text-3xl">{{ song.artists.map(artist => artist.name).join(', ') }}</p>
         </div>
         <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
           @click="deleteSong(song)">AFEGIR A LA LLISTA NEGRA</button>
