@@ -646,7 +646,7 @@ io.on('connection', (socket) => {
       comManager.updateUser(userToken, modifiedUser);
 
       // Notify the user that made the modification
-      socket.emit('userRoleModified', { status: 'success', message: `El rol de l'usuari' ${modifiedUser.name} ha sigut modificat.` });
+      socket.emit('userRoleModified', { status: 'success', message: `El rol de l'usuari ${modifiedUser.name} ha sigut modificat.` });
 
       // Update the user data to everybody
       io.emit('refreshUsersData');

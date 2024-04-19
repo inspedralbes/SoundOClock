@@ -81,6 +81,7 @@ socket.on("connect", () => {
 
   socket.on('userRoleModified', (data) => {
     console.log('socket userRoleModified data received', data);
+    pinia.setServerResponse(data);
   });
 
   socket.on('refreshUsersData', () => {

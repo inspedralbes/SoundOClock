@@ -74,8 +74,13 @@ export default {
       this.countNotReadReports();
     },
     notifyServerResponse() {
-      this.modals.songAddedToBlacklistSuccessfully = true;
+      if (this.serverResponse) {
+        this.modals.songAddedToBlacklistSuccessfully = true;
+      }
     },
+  },
+  unmounted() {
+    this.store.setServerResponse(null);
   },
   watch: {
     serverResponse: { // Each time the serverResponse changes execute notifyServerResponse() method
