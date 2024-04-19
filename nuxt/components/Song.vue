@@ -1,25 +1,24 @@
 <template>
     <div class="flex flex-row justify-center m-2">
         <div class="relative flex items-align">
-            <img :src="track.album ? track.album.images[0].url : track.img"
-                :alt="track.name ? track.name : track.name + '_img'" class="w-20 h-20 m-2 rounded-full z-0">
+            <img :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'"
+                class="w-20 h-20 m-2 rounded-lg z-0">
             <Transition name="playingFade">
                 <div v-if="currentTrackId === track.id && isPlaying"
-                    class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-full">
+                    class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-lg">
                     <div class="loader"></div>
                 </div>
             </Transition>
         </div>
-        <div class="border-b border-solid border-gray-300 flex flex-row w-3/5 flex justify-between p-2 items-center">
+        <div class="border-b border-solid border-gray-300 flex-row w-3/5 flex justify-between p-2 items-center">
             <div class="flex flex-col w-[70%]">
-                <p class="font-bold text-base uppercase">{{ track.name ? track.name : track.name }}</p>
+                <p class="font-bold text-base uppercase">{{ track.name }}</p>
                 <div class="flex flex-row text-sm">
                     <p class="whitespace-nowrap overflow-hidden">
-                        <span v-if="track.artists" v-for="(artist, index) in track.artists" :key="index">
+                        <span v-for="(artist, index) in track.artists" :key="index">
                             <span v-if="index !== 0">, </span>
                             {{ artist.name }}
                         </span>
-                        <span v-else>{{ track.artist }}</span>
                     </p>
                 </div>
                 <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.totalVotes }}</p>
@@ -51,6 +50,11 @@
                 @click="vote(track.id)">
                 <span :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id) }">
                     thumb_up
+                </span>
+            </button>
+            <button v-if="type === 'unBan'" @click="unBan(track)">
+                <span class="material-symbols-outlined options-span">
+                    unarchive
                 </span>
             </button>
         </div>
@@ -104,6 +108,9 @@ export default {
         },
         report(track) {
             this.$emit('report', track);
+        },
+        unBan() {
+            this.$emit('unBan');
         },
         isSongVoted(songId) {
             if (this.userSelectedSongs && this.userSelectedSongs.votedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {

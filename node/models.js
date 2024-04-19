@@ -3,12 +3,12 @@ import mongoose from 'mongoose';
 const songSchema = new mongoose.Schema({
   id: String,
   name: String,
-  artists: [String],
+  artists: [Object],
   year: Number,
   img: String,
   preview_url: String,
   totalVotes: { type: Number, default: 0 },
-  votesPerGroup: { type: Map, of: Number, default: new Map()},
+  votesPerGroup: { type: Map, of: Number, default: new Map() },
   submitDate: Date,
   submittedBy: Number,
 });

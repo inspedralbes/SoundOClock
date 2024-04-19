@@ -298,8 +298,6 @@ io.on('connection', (socket) => {
 
   // Post song checking for duplicates first
   socket.on('postSong', async (userToken, songData) => {
-    console.log("user", userToken);
-    console.log("POST SONG", songData);
     // Check that the user is authenticated with Laravel Sanctum
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;

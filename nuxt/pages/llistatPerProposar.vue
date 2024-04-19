@@ -169,7 +169,6 @@ export default {
                     store.deleteCurrentTrackPlaying();
                 } else {
                     this.currentTrack.load();
-                    this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
                 }
@@ -177,18 +176,18 @@ export default {
                 if (track.preview_url != null) {
                     if (this.currentTrack != null) {
                         this.currentTrack.pause();
+                        this.isPlaying = false;
                         store.deleteCurrentTrackPlaying();
                     }
                     this.currentTrack = new Audio(track.preview_url);
                     this.currentTrackId = track.id;
                     this.currentTrack.load();
-                    this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
                 } else {
                     if (this.currentTrack != null) {
-
                         this.currentTrack.pause();
+                        this.isPlaying = false;
                         store.deleteCurrentTrackPlaying();
                     }
                     store.setCurrentTrackPlaying(track);
@@ -211,7 +210,8 @@ export default {
             } else {
                 let artistList = [];
                 track.artists.forEach(artist => {
-                    artistList.push(artist.name);
+                    // artistList.push(artist.name);
+                    artistList.push({ name: artist.name })
                 });
                 let song = {
                     id: track.id,

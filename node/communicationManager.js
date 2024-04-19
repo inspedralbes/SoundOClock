@@ -115,6 +115,7 @@ async function addSongToBlackList(token, song) {
       name: song.name,
       artists: song.artists,
       img: song.img,
+      preview_url: song.preview_url
     })
   });
   console.log(response);

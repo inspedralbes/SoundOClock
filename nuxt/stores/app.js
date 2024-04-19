@@ -182,17 +182,29 @@ export const useAppStore = defineStore('app', {
     },
 
     // Others
-    playSong() {
-      if(this.songStatus.currentTrack) {
-        this.songStatus.isPlaying = true;
-        this.songStatus.currentTrack.play();
+
+    playTrack(track, status) {
+      if (status.currentTrackId == track.id) {
+        if (status.isPlaying) {
+          status.currentTrack.pause();
+          status.isPlaying = false;
+        } else {
+          status.currentTrack.load();
+          status.currentTrack.play();
+          status.isPlaying = true;
+        }
+      } else {
+        if (status.isPlaying) {
+          status.currentTrack.pause();
+          status.isPlaying = false;
+        }
+        status.currentTrack = new Audio(track.preview_url);
+        status.currentTrackId = track.id;
+        status.currentTrack.load();
+        status.currentTrack.play();
+        status.isPlaying = true;
       }
-    },
-    pauseSong() {
-      if(this.songStatus.currentTrack) {
-        this.songStatus.isPlaying = false;
-        this.songStatus.currentTrack.pause();
-      }
+      return status;
     },
   },
 })
