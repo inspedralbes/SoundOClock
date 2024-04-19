@@ -4,66 +4,28 @@
             <input class="cercador w-full ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..."
                 v-model="query" @keyup.enter="getSongs()" />
         </div>
-        <div v-for="track in filteredTracks"
-            class="width mb-3 mx-auto contenidor-canço flex flex-row items-center rounded-lg p-3 gap-2">
-            <div class="contenidor-img">
-                <img :src="track.image" :alt="track.name + '_img'" class="rounded-lg">
-                <button @click="playTrack(track.spotify_id)" class="rounded-lg"
-                    :class="{ playingC: isPlayingCheck(track.spotify_id), noPlaying: !isPlayingCheck(track.spotify_id) }">
-                    <!-- fer amb computed la classe -->
-                    <span v-if="currentTrackId === track.spotify_id && isPlaying" class="material-symbols-rounded">
-                        pause
-                    </span>
-                    <span v-else class="material-symbols-rounded">
-                        play_arrow
-                    </span>
-                </button>
-            </div>
-
-            <div class="song-data">
-                <p class="font-black basis-1/2">{{ track.name }}</p>
-                <p class="basis-1/2">{{ track.artists }}</p>
-            </div>
-
-            <div class="contenidor-butons flex flex-row justify-center items-center gap-1">
-
-                <button @click="modalActual = track.spotify_id" class="hover:rounded-lg hover:bg-black flex">
-                    <span class="material-symbols-outlined options-span">
-                        unarchive
-                    </span>
-                </button>
-                <ModularModal :open="modalActual === track.spotify_id" @close="modalActual = null"
-                    @confirm="removeFromBlacklist(track.spotify_id)">
-                    <template v-slot:title>
-                        <h2>Segur que vols treure aquesta cançó de la blacklist?</h2>
-                    </template>
-                    <template v-slot:content>
-                        <div class="mx-auto contenidor-canço flex flex-row items-center rounded-lg gap-2">
-                            <div class="contenidor-img">
-                                <img :src="track.image" :alt="track.name + '_img'" class="rounded-lg">
-                                <button @click="playSong(track)" class="rounded-lg"
-                                    :class="{ playingC: isPlayingCheck(track.spotify_id), noPlaying: !isPlayingCheck(track.spotify_id) }">
-                                    <!-- fer amb computed la classe -->
-                                    <span v-if="currentTrackId === track.spotify_id && isPlaying"
-                                        class="material-symbols-rounded">
-                                        pause
-                                    </span>
-                                    <span v-else class="material-symbols-rounded">
-                                        play_arrow
-                                    </span>
-                                </button>
-                            </div>
-
-                            <div class="song-data">
-                                <p class="font-black basis-1/2">{{ track.name }}</p>
-                                <p class="basis-1/2">{{ track.artists }}</p>
-                            </div>
-                        </div>
-                    </template>
-                </ModularModal>
-
-            </div>
+        <div v-if="tracks.length == 0 || !loading" class="mt-4  w-full">
+            <p class="text-center text-xl">No hi ha cap cançó bloquejada.</p>
         </div>
+        <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
+        <TransitionGroup name="song-slide" mode="out-in">
+            <Song v-for="track in filteredTracks" :key="track.id" :track="track" :currentTrackId="status.currentTrackId"
+                :isPlaying="status.isPlaying" @play="playSong" @unBan="setSongToUnBan(track), modalActual = true"
+                :type="'unBan'" />
+        </TransitionGroup>
+        <ModularModal :open="modalActual" :msg="'Confirmar'" @close="modalActual = null"
+            @confirm="removeFromBlacklist(songToUnBan.spotify_id)">
+            <template v-slot:title>
+                <h2>Segur que vols treure aquesta cançó de la blacklist?</h2>
+            </template>
+            <template v-slot:content>
+                <p>
+                    Si treus {{ songToUnBan.name }} de
+                    {{ songToUnBan.artists.map(artist => artist.name).join(', ') }}
+                    els usuaris podran tornar a votar-la.
+                </p>
+            </template>
+        </ModularModal>
         <div class="m-8" v-if="loading">
             <Loader />
         </div>
@@ -82,10 +44,8 @@ export default {
             songFile: null,
             query: '',
             tracks: [],
+            songToUnBan: null,
             filteredTracks: [],
-            currentTrack: null,
-            currentTrackId: null,
-            isPlaying: false,
             modalActual: null,
             status: {
                 isPlaying: false,
@@ -114,8 +74,12 @@ export default {
     },
     methods: {
 
+        setSongToUnBan(track) {
+            this.songToUnBan = track;
+        },
+
         playSong(track) {
-            this.store.playTrack(track, this.status);
+            this.status = this.store.playTrack(track, this.status);
         },
 
         getSongs() {

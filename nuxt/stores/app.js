@@ -204,6 +204,7 @@ export const useAppStore = defineStore('app', {
         status.currentTrack.play();
         status.isPlaying = true;
       }
+      return status;
     },
   },
 })

@@ -52,6 +52,11 @@
                     thumb_up
                 </span>
             </button>
+            <button v-if="type === 'unBan'" @click="unBan(track)">
+                <span class="material-symbols-outlined options-span">
+                    unarchive
+                </span>
+            </button>
         </div>
     </div>
 </template>
@@ -103,6 +108,9 @@ export default {
         },
         report(track) {
             this.$emit('report', track);
+        },
+        unBan() {
+            this.$emit('unBan');
         },
         isSongVoted(songId) {
             if (this.userSelectedSongs && this.userSelectedSongs.votedSongs && this.userSelectedSongs.votedSongs.includes(songId)) {
