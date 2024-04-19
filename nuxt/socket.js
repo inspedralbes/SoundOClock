@@ -37,8 +37,8 @@ socket.on("connect", () => {
   socket.on("userBanned", (data) => {
   });
 
-  socket.on("loginData", (id, mail, name, token, groups) => {
-    pinia.setUser(id, mail, name, token, groups);
+  socket.on("loginData", (id, mail, name, token, groups, roleId) => {
+    pinia.setUser(id, mail, name, token, groups, roleId);
     if (pinia.getUser().groups.length > 0) {
       navigateTo({ path: '/llista_propostes' });
     } else {

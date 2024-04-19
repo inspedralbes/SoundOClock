@@ -185,6 +185,25 @@ app.get('/publicGroups', async (req, res) => {
   }
 })
 
+app.get('/publicCategories', async (req, res) => {
+  try {
+    const categories = await comManager.getPublicCategories();
+    res.json(categories);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
+app.get('/allGroupsAndCategories', async (req, res) => {
+  try {
+    const data = await comManager.getAllGroupsAndCategories();
+    console.log("data", data);
+    res.json(data);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
 app.post('/addGroupsToUser', async (req, res) => {
   try {
     const response = await comManager.setUserGroups(req.body.userId, req.body.token, req.body.groups);
@@ -280,16 +299,12 @@ io.on('connection', (socket) => {
       .then((userData) => {
 
         let groups = [];
-        // Populate groups array with group_id and course
+        // Populate groups array with group_id
         userData.user.groups.forEach(group => {
-          let groupObject = {
-            group_id: group.pivot.group_id,
-            course: group.pivot.course,
-          }
-          groups.push(groupObject);
+          groups.push(group.pivot.group_id);
         });
 
-        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.token, groups);
+        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.token, groups, userData.user.role_id);
       })
       .catch((err) => {
         console.error(err);

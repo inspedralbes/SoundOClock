@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Bell;
+use App\Models\User;
+use App\Models\GroupCategory;
 
 class Group extends Model
 {
@@ -14,7 +16,7 @@ class Group extends Model
         'name',
         'abbreviation',
         'is_public',
-        'max_courses'
+        'category_id'
     ];
 
     public function users() {
@@ -23,5 +25,9 @@ class Group extends Model
 
     public function bells() {
         return $this->belongsToMany(Bell::class);
+    }
+
+    public function category() {
+        return $this->belongsTo(GroupCategory::class, 'category_id', 'id');
     }
 }
