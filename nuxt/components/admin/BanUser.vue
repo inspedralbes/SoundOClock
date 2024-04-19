@@ -44,7 +44,7 @@
                     <div class="width flex flex-col justify-center ml-auto mr-auto gap-3">
                         <button v-for="user in filteredUsers" @click="selectUser(user)"
                             class="h-16 flex flex-row justify-between items-center rounded-lg p-3"
-                            :class="isSelected(user)">
+                            :class="user === selectedUser ?'user-item--selected':'user-item--not-selected'">
                             <div class="flex flex-row items-center gap-2">
                                 <div class="song-data text-start">
                                     <p class="font-black basis-1/3">{{ user.name }}</p>
@@ -63,7 +63,7 @@
                     </div>
                 </div>
                 <div class="w-2/3 text-white text-center ml-4 mr-4">
-                    <UserDetails v-bind:user="currentSelectedUser" />
+                    <UserDetails v-bind:user="selectedUser" />
                 </div>
             </div>
         </div>
@@ -87,16 +87,7 @@ export default {
     },
     methods: {
         selectUser(selectedUser) {
-            this.currentSelectedUser = selectedUser;
-        },
-        isSelected(user) {
-            let style = "user-item--not-selected";
-
-            if (user.id == this.currentSelectedUser.id) {
-                style = "user-item--selected";
-            }
-
-            return style;
+            this.store.setAdminSelectedUser(selectedUser);
         },
     },
     mounted() {
