@@ -80,6 +80,12 @@ async function getPublicGroupsAndCategories() {
     };
 }
 
+async function getAllGroupsAndCategories() {
+    const response = await fetch(`${url}/allGroupsAndCategories`);
+    const data = await response.json();
+    return data;
+}
+
 async function setUserGroups(userId, groups, token) {
     const response = await fetch(`${url}/addGroupsToUser`, {
         method: 'POST',
@@ -160,6 +166,7 @@ const comManager = {
     getAdminSongs,
     getUsers,
     getPublicGroupsAndCategories,
+    getAllGroupsAndCategories,
     setUserGroups,
     getBells,
     logout,

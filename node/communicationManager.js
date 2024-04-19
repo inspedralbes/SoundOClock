@@ -223,6 +223,18 @@ async function getPublicCategories(token) {
   return response.data;
 }
 
+async function getAllGroupsAndCategories() {
+  const allGroupsPromise = axios.get(`${apiURL}groupsAll`).then(response => response.data);
+  const allCategoriesPromise = axios.get(`${apiURL}groupCategoriesAll`).then(response => response.data);
+
+  const [allGroups, allCategories] = await Promise.all([allGroupsPromise, allCategoriesPromise]);
+
+  return {
+    allGroups,
+    allCategories
+  };
+}
+
 async function fetchSpotifyPage(id) {
   try {
     const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
@@ -352,7 +364,8 @@ const comManager = {
   getBells,
   setBellsGroupsConfiguration,
   showUser,
-  getRoles
+  getRoles,
+  getAllGroupsAndCategories,
 };
 
 export default comManager;

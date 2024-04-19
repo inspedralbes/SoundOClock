@@ -194,6 +194,16 @@ app.get('/publicCategories', async (req, res) => {
   }
 })
 
+app.get('/allGroupsAndCategories', async (req, res) => {
+  try {
+    const data = await comManager.getAllGroupsAndCategories();
+    console.log("data", data);
+    res.json(data);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
 app.post('/addGroupsToUser', async (req, res) => {
   try {
     const response = await comManager.setUserGroups(req.body.userId, req.body.token, req.body.groups);
