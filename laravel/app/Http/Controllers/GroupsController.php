@@ -38,7 +38,7 @@ class GroupsController extends Controller
             'name' => 'required|string',
             'abbreviation' => 'required|string',
             'is_public' => 'required|int',
-            'max_courses' => 'required|int',
+            'category_id' => 'required|int',
         ]);
 
         return Group::create($request->all());
@@ -68,7 +68,7 @@ class GroupsController extends Controller
             'name' => 'required|string',
             'abbreviation' => 'required|string',
             'is_public' => 'required|int',
-            'max_courses' => 'required|int',
+            'category_id' => 'required|int',
         ]);
 
         $group = Group::findOrfail($id);

@@ -7,6 +7,7 @@ use App\Http\Controllers\BlacklistController;
 use App\Http\Controllers\GroupsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\BellController;
+use App\Http\Controllers\GroupCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,8 @@ Route::post('/login', [AuthController::class,'login']);
 Route::get('/groups', [GroupsController::class, 'index']);
 Route::get('/groupsAll', [GroupsController::class, 'indexAll']);
 Route::get('/users', [AuthController::class, 'index']);
+Route::get('/groupCategories', [GroupCategoryController::class, 'index']);
+Route::get('/groupCategoriesAll', [GroupCategoryController::class, 'indexAll']);
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -46,6 +49,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/groups/{id}', [GroupsController::class, 'destroy']);
     Route::get('/groups/{id}', [GroupsController::class, 'show']);
     Route::put('/groups/{id}', [GroupsController::class, 'update']);
+
+    // Group Categories routes
+    Route::post('/groupCategories', [GroupCategoryController::class, 'store']);
+    Route::get('/groupCategories/{id}', [GroupCategoryController::class, 'show']);
+    Route::put('/groupCategories/{id}', [GroupCategoryController::class, 'update']);
+    Route::delete('/groupCategories/{id}', [GroupCategoryController::class, 'destroy']);
     
     // Groups & Users routes
     Route::get('/getGroupsFromUser/{user_id}', [GroupsController::class, 'getGroupsFromUser']);
