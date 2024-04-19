@@ -32,7 +32,7 @@ export const useAppStore = defineStore('app', {
       isPlaying: false,
     },
     roles: null,
-
+    serverResponse: null,
   }),
   persist: {
     storage: persistedState.localStorage,
@@ -91,6 +91,9 @@ export const useAppStore = defineStore('app', {
     },
     getRoles() {
       return this.roles
+    },
+    getServerResponse() {
+      return this.serverResponse
     },
 
     //setters
@@ -153,8 +156,10 @@ export const useAppStore = defineStore('app', {
       this.songStatus.isPlaying = isPlaying
     },
     setRoles(roles) {
-      console.log("ROLES", roles)
       this.roles = roles
+    },
+    setServerResponse(serverResponse) {
+      this.serverResponse = serverResponse
     },
 
     ///Deletes

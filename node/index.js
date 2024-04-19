@@ -440,8 +440,12 @@ io.on('connection', (socket) => {
         return;
       }
       console.log("in index", song);
-      comManager.addSongToBlackList(userToken, song);
+      const bannedSong = await comManager.addSongToBlackList(userToken, song);
 
+      // Notify the user that banned the song
+      socket.emit('notifySongDeleted', { status: 'success', message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.` });
+
+      // Update the proposed songs list to everybody
       io.emit('songDeleted', { status: 'success', song: song });
     } catch (err) {
       socket.emit('deleteError', { status: 'error', message: err.message });

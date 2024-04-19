@@ -117,8 +117,9 @@ async function addSongToBlackList(token, song) {
       img: song.img,
     })
   });
-  console.log(response);
-  return response;
+  const jsonResponse = await response.json();
+  console.log("POSTED SONG TO BLACKLIST", jsonResponse);
+  return jsonResponse;
 }
 
 async function getPlaylists(playlist, limit, token) {

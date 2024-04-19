@@ -24,6 +24,11 @@ socket.on("connect", () => {
   socket.on("songReported", (data) => {
   });
 
+  socket.on("notifySongDeleted", (data) => {
+    console.log('socket notifySongDeleted data received', data);
+    pinia.setServerResponse(data);
+  });
+
   socket.on("songDeleted", (data) => {
     comManager.getSongs();
     comManager.getAdminSongs();

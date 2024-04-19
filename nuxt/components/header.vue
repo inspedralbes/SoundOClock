@@ -4,7 +4,7 @@
             <!--LOGO AND BRANDNAME-->
             <div class="flex flex-row justify-center items-center gap-4">
                 <img v-if="$device.isDesktopOrTablet" src="/img/soundoclock-logo-Photoroom.png" alt="" class="h-full">
-                <div class="brand-name text-4xl md:text-5xl font-bold">sound<span>o'clock</span></div>
+                <div class="brand-name text-3xl md:text-4xl font-bold">sound<span>o'clock</span></div>
             </div>
             <!--MOBILE AND TABLET DESIGN-->
             <div v-if="$device.isMobileOrTablet" class="flex flex-row items-center relative">
@@ -20,12 +20,12 @@
                     </svg>
                 </button>
                 <!--DROPDOWN-->
-                <div class="dropdown flex flex-col gap-2 rounded border-[1px] border-gray-300 bg-white p-4 absolute top-[80px] md:top-[110px] right-[-20px] w-fit whitespace-nowrap shadow-md text-black z-[100]" :class="{'dropdown--displayed' : showDropdown}">
+                <!-- <div class="dropdown flex flex-col gap-2 rounded border-[1px] border-gray-300 bg-white p-4 absolute top-[80px] md:top-[110px] right-[-20px] w-fit whitespace-nowrap shadow-md text-black z-[100]" :class="{'dropdown--displayed' : showDropdown}">
                     <button class="text-right">Opció 1</button>
                     <button class="text-right">Opció 2</button>
                     <button class="text-right">Opció 3</button>
                     <button class="text-right">Tancar Sessió</button>
-                </div>
+                </div> -->
             </div>
             <!--DESKTOP DESIGN-->
             <div v-else class="flex flex-row justify-center gap-8 text-black text-lg">
@@ -51,7 +51,7 @@ export default {
     methods: {
         toggleDropdown() {
             this.showDropdown = !this.showDropdown;
-        }
+        },
     },
     created() {
 

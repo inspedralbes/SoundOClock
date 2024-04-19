@@ -10,6 +10,7 @@ export default {
     return {
       modals: {
         addSongToBlacklist: false,
+        songAddedToBlacklistSuccessfully: false,
         notReadReports: null
       },
     }
@@ -72,6 +73,19 @@ export default {
 
       this.countNotReadReports();
     },
+    notifyServerResponse() {
+      this.modals.songAddedToBlacklistSuccessfully = true;
+    },
+  },
+  watch: {
+    serverResponse: { // Each time the serverResponse changes execute notifyServerResponse() method
+      handler: 'notifyServerResponse',
+    },
+  },
+  computed: {
+    serverResponse() {
+      return this.store.getServerResponse();
+    },
   },
   setup() {
     const store = useAppStore();
@@ -88,8 +102,8 @@ export default {
       <img :src="song.img" alt="" class="w-1/3 rounded-lg">
       <div class="w-2/3 ml-4 flex flex-col justify-between">
         <div>
-          <p class="text-5xl font-black">{{ song.name }}</p>
-          <p class="text-3xl">{{ song.artists }}</p>
+          <p class="text-5xl font-black">{{ song.title }}</p>
+          <p class="text-3xl">{{ song.artists.join(', ') }}</p>
         </div>
         <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
           @click="deleteSong(song)">AFEGIR A LA LLISTA NEGRA</button>
@@ -127,8 +141,18 @@ export default {
       <h2>Afegir cançó a la llista negra</h2>
     </template>
     <template #content>
-      <p>Segur que vols afegir <span class="font-bold">{{ song.name }}</span> de <span class="font-bold">{{ song.artists
-      }}</span> a la llista negra?</p>
+      <p>Segur que vols afegir <span class="font-bold">{{ song.title }}</span> de <span class="font-bold">{{
+        song.artists.join(', ') }}</span> a la llista negra?</p>
+    </template>
+  </ModularModal>
+
+  <ModularModal :open="modals.songAddedToBlacklistSuccessfully" type="done" title="Cançó afegida a la llista negra"
+    @close="modals.songAddedToBlacklistSuccessfully = false">
+    <template #title>
+      <h2>Cançó afegida a la llista negra</h2>
+    </template>
+    <template #content>
+      <p>{{ serverResponse.message }}</p>
     </template>
   </ModularModal>
 </template>
