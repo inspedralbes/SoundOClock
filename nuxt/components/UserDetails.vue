@@ -16,8 +16,8 @@ export default {
       weeksProposingBannedUntil: null,
       optionVotingBannedUntil: null,
       optionProposingBannedUntil: null,
-      toggleVotingBanUserWeeksOrCustomize: true,
-      toggleProposingBanUserWeeksOrCustomize: true,
+      toggleVotingBanUserCustomize: true,
+      toggleProposingBanUserCustomize: true,
       modals: {
         noDateSelected: false,
         banUserVotingCapacity: false,
@@ -25,7 +25,9 @@ export default {
         banUserProposingCapacity: false,
         unbanUserProposingCapacity: false,
         banUserVotingWithDefaultOptions: false,
-        banUserProposingWithDefaultOptions: false
+        banUserProposingWithDefaultOptions: false,
+        enableUserVotingWithDefaultOptions: false,
+        enableUserProposingWithDefaultOptions: false,
       }
     }
   },
@@ -165,10 +167,10 @@ export default {
             formatDate(user.vote_banned_until) }}</p>
         <p v-else class="mb-2 text-xl text-center font-black">L'usuari no té limitada la capacitat de votar cançons</p>
         <h2 class="text-2xl mb-4 text-center">LIMITAR VOTAR CANÇONS</h2>
-        <div v-if="toggleVotingBanUserWeeksOrCustomize">
+        <div v-if="toggleVotingBanUserCustomize">
           <div v-if="this.user.vote_banned_until">
             <button class="w-fit bg-gray-400 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded"
-              @click="enableUserWithDefaultOptions(1)">HABILITAR VOTACIONS</button>
+              @click="modals.enableUserVotingWithDefaultOptions = true">HABILITAR VOTACIONS</button>
           </div>
           <div v-else>
             <div class="flex justify-center mt-4">
@@ -181,7 +183,7 @@ export default {
                 @click="modals.banUserVotingWithDefaultOptions = true; optionVotingBannedUntil = 3">Ban 1 any</button>
             </div>
             <div>
-              <button @click="toggleVotingBanUserWeeksOrCustomize = false"
+              <button @click="toggleVotingBanUserCustomize = false"
                 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded me-2 mt-5">Personalitzat</button>
             </div>
           </div>
@@ -192,7 +194,7 @@ export default {
           <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded me-2"
             @click="banUser(true)">LIMITAR VOTACIONS</button>
           <button class="w-fit bg-red-400 hover:bg-red-200 text-black font-bold py-2 px-4 rounded float-right"
-            @click="toggleVotingBanUserWeeksOrCustomize = true">Cancela</button>
+            @click="toggleVotingBanUserCustomize = true">Cancela</button>
         </div>
       </div>
       <div class="w-1/2">
@@ -203,22 +205,25 @@ export default {
         </p>
         <h2 class="text-2xl mb-4 text-center">LIMITAR PROPOSAR CANÇONS</h2>
 
-        <div v-if="toggleProposingBanUserWeeksOrCustomize">
+        <div v-if="toggleProposingBanUserCustomize">
           <div v-if="this.user.propose_banned_until">
             <button class="w-fit bg-gray-400 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded"
-              @click="enableUserWithDefaultOptions(1)">HABILITAR PROPOSTES</button>
+              @click="modals.enableUserProposingWithDefaultOptions = true">HABILITAR PROPOSTES</button>
           </div>
           <div v-else>
             <div class="flex justify-center mt-4">
               <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded me-2 w-full"
-                @click="modals.banUserProposingWithDefaultOptions = 1; optionProposingBannedUntil = 1">Ban 3 setmanes</button>
+                @click="modals.banUserProposingWithDefaultOptions = 1; optionProposingBannedUntil = 1">Ban 3
+                setmanes</button>
               <button class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-4 rounded me-2 w-full"
-                @click="modals.banUserProposingWithDefaultOptions = 1; optionProposingBannedUntil = 2">Ban 3 mesos</button>
+                @click="modals.banUserProposingWithDefaultOptions = 1; optionProposingBannedUntil = 2">Ban 3
+                mesos</button>
               <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded me-2 w-full"
-                @click="modals.banUserProposingWithDefaultOptions = 1; optionProposingBannedUntil = 3">Ban 1 any</button>
+                @click="modals.banUserProposingWithDefaultOptions = 1; optionProposingBannedUntil = 3">Ban 1
+                any</button>
             </div>
             <div>
-              <button @click="toggleProposingBanUserWeeksOrCustomize = false"
+              <button @click="toggleProposingBanUserCustomize = false"
                 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded me-2 mt-5">Personalitzat</button>
             </div>
           </div>
@@ -230,7 +235,7 @@ export default {
           <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded me-2"
             @click="banUser(false)">LIMITAR PROPOSTES</button>
           <button class="w-fit bg-red-400 hover:bg-red-200 text-black font-bold py-2 px-4 rounded float-right"
-            @click="toggleProposingBanUserWeeksOrCustomize = true">Cancela</button>
+            @click="toggleProposingBanUserCustomize = true">Cancela</button>
         </div>
 
       </div>
@@ -249,7 +254,7 @@ export default {
   </ModularModal>
 
   <ModularModal :open="modals.banUserVotingCapacity" type="error" msg="Limitar" title="Limitar votacions usuari"
-    @confirm="submitData()" @close="modals.banUserVotingCapacity = false">
+    @confirm="submitData(); this.toggleVotingBanUserCustomize = true;" @close="modals.banUserVotingCapacity = false">
     <template #title>
       <h2>Limitar capacitat de votar</h2>
     </template>
@@ -271,7 +276,8 @@ export default {
   </ModularModal>
 
   <ModularModal :open="modals.banUserProposingCapacity" type="error" msg="Limitar" title="Limitar propostes usuari"
-    @confirm="submitData()" @close="modals.banUserProposingCapacity = false">
+    @confirm="submitData(); this.toggleProposingBanUserCustomize = true;"
+    @close="modals.banUserProposingCapacity = false">
     <template #title>
       <h2>Limitar capacitat de proposar</h2>
     </template>
@@ -324,13 +330,39 @@ export default {
     </template>
   </ModularModal>
 
+  <!-- Modal par habilitar VOTACIONS -->
+  <ModularModal :open="modals.enableUserVotingWithDefaultOptions" type="error" msg="Habilitar"
+    title="Habilitar propostes usuari" @confirm="enableUserWithDefaultOptions(1)"
+    @close="modals.enableUserVotingWithDefaultOptions = false">
+    <template #title>
+      <h2>Habilitar capacitat de votar</h2>
+    </template>
+    <template #content>
+      <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> pugui tornar a votar cançons?
+      </p>
+    </template>
+  </ModularModal>
+
+  <!-- Modal per habilitar PROPOSTES -->
+  <ModularModal :open="modals.enableUserProposingWithDefaultOptions" type="error" msg="Habilitar"
+    title="Habilitar propostes usuari" @confirm="enableUserWithDefaultOptions(2)"
+    @close="modals.enableUserProposingWithDefaultOptions = false">
+    <template #title>
+      <h2>Habilitar capacitat de proposar</h2>
+    </template>
+    <template #content>
+      <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> pugui tornar a proposar cançons?
+      </p>
+    </template>
+  </ModularModal>
+
 
 
 </template>
 
-<style scoped>
-.user-details-container {
-  background-color: rgb(56, 56, 56);
-  height: 85vh;
-}
+  <style scoped>
+  .user-details-container {
+    background-color: rgb(56, 56, 56);
+    height: 85vh;
+  }
 </style>
