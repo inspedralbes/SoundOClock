@@ -6,45 +6,15 @@
         </div>
         <div v-else>
             <div class="flex flex-row mt-8">
-                <div class="users-container w-1/3 ml-20 overflow-y-auto">
+                <div class="users-container w-1/3 ml-20 overflow-y-auto pr-2">
                     <!-- Buscador amb buto de filtres -->
-                    <div class="sticky top-0 h-10 w-full flex flex-col justify-center justify-between ml-auto mr-auto gap-1 mb-2">
-                        <div class="flex flex-row gap-2 h-10" >
-                            <input type="text" placeholder="Busca..." v-model="search"
-                                class="h-full w-full items-center rounded-lg p-3 border-2 border-white">
-                            <button @click="isDropdownMenuOpen = !isDropdownMenuOpen"
-                                class="h-full w-10 flex justify-center items-center rounded-lg bg-[#383838] border-2 border-white">
-                                <span class="material-symbols-outlined text-white">
-                                    tune
-                                </span>
-                            </button>
+                    <SearchWithFilters :filters="classGroups" :filterValue="(filter) => filter.abbreviation" @search="search = $event" @filter="filter = $event" />
 
-                        </div>
-                        <div class="sticky top-0 w-full left-0">
-                        <div id="dropdown-menu" :class="{ 'hidden': !isDropdownMenuOpen, 'block': isDropdownMenuOpen }"
-                            class="bg-[#383838] border-2 border-white rounded-lg shadow-lg">
-                            <ul class="bg-[#383838] rounded-lg">
-                                <li class="hover:bg-black rounded-lg w-full p-1"><button
-                                        class="rounded-lg w-full p-1 hover:bg-black text-left"
-                                        @click="filter = 'Tots', isDropdownMenuOpen = !isDropdownMenuOpen">Tots</button>
-                                </li>
-                                <li v-for="group, index in classGroups" :key="group.id"
-                                    @click="filter = group.id, isDropdownMenuOpen = !isDropdownMenuOpen"
-                                    class="rounded-lg w-full p-1 hover:bg-black">
-                                    <button class="rounded-lg w-full p-1 hover:bg-black text-left">{{
-                                        group.abbreviation }}</button>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    </div>
-
-                    
-
+                    <!-- Llista d'usuaris -->
                     <div class="width flex flex-col justify-center ml-auto mr-auto gap-3">
                         <button v-for="user in filteredUsers" @click="selectUser(user)"
                             class="h-16 flex flex-row justify-between items-center rounded-lg p-3"
-                            :class="user === selectedUser ?'user-item--selected':'user-item--not-selected'">
+                            :class="isSelected(user)">
                             <div class="flex flex-row items-center gap-2">
                                 <div class="song-data text-start">
                                     <p class="font-black basis-1/3">{{ user.name }}</p>
@@ -63,7 +33,7 @@
                     </div>
                 </div>
                 <div class="w-2/3 text-white text-center ml-4 mr-4">
-                    <UserDetails v-bind:user="selectedUser" />
+                    <UserDetails v-bind:user="currentSelectedUser" />
                 </div>
             </div>
         </div>
@@ -78,6 +48,7 @@ export default {
     data() {
         return {
             loading: true,
+            currentSelectedUser: null,
             search: "",
             filter: "Tots",
             isDropdownMenuOpen: false,
@@ -87,7 +58,16 @@ export default {
     },
     methods: {
         selectUser(selectedUser) {
-            this.store.setAdminSelectedUser(selectedUser);
+            this.currentSelectedUser = selectedUser;
+        },
+        isSelected(user) {
+            let style = "user-item--not-selected";
+
+            if (user == this.currentSelectedUser) {
+                style = "user-item--selected";
+            }
+
+            return style;
         },
     },
     mounted() {
@@ -96,9 +76,6 @@ export default {
         this.loading = false;
     },
     computed: {
-        users() {
-            return this.store.getUsersAdminView();
-        },
         selectedUser() {
             return this.store.getAdminSelectedUser();
         },
@@ -133,6 +110,32 @@ export default {
     position: sticky;
     top: 0;
     padding: 10px;
+}
+
+/* Estilos para la barra de desplazamiento en navegadores webkit (Chrome, Safari, etc.) dentro del contenedor .users-container */
+/* Estilos para la barra de desplazamiento vertical */
+.users-container::-webkit-scrollbar {
+  width: 10px; /* Grosor de la barra de desplazamiento vertical */
+}
+
+.users-container::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color del "pulgar" de la barra de desplazamiento */
+  border-radius: 5px; /* Bordes redondeados del "pulgar" */
+}
+
+/* Estilos para el fondo de la barra de desplazamiento */
+.users-container::-webkit-scrollbar-track {
+  background-color: transparent; /* Color del fondo de la barra de desplazamiento (transparente) */
+}
+
+/* Estilos para la barra de desplazamiento horizontal */
+.users-container::-webkit-scrollbar-horizontal {
+  height: 10px; /* Grosor de la barra de desplazamiento horizontal */
+}
+
+/* Pseudo-clase hover para el "pulgar" */
+.users-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Cambiar el color del "pulgar" al pasar el mouse sobre él */
 }
 
 .users-container {
