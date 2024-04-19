@@ -9,8 +9,8 @@
         </div>
         <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
         <TransitionGroup name="song-slide" mode="out-in">
-            <Song v-for="track in filteredTracks" :key="track.id" :track="track" :currentTrackId="status.currentTrackId"
-                :isPlaying="status.isPlaying" @play="playSong" @unBan="setSongToUnBan(track), modalActual = true"
+            <Song v-for="track in filteredTracks" :key="track.id" :track="track" :currentTrackId="store.getSongStatus().currentTrackId"
+                :isPlaying="store.getSongStatus().isPlaying" @play="playSong" @unBan="setSongToUnBan(track), modalActual = true"
                 :type="'unBan'" />
         </TransitionGroup>
         <ModularModal :open="modalActual" :msg="'Confirmar'" @close="modalActual = null"

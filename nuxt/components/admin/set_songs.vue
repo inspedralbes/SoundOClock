@@ -17,7 +17,7 @@
 
                                 <div class="contenidor-img">
                                     <img :src="song.img" :alt="song.name + '_img'" class="rounded-lg">
-                                    <button @click="playTrack(song.id)" class="rounded-lg"
+                                    <button @click="playSong(song)" class="rounded-lg"
                                         :class="{ playingC: isPlayingCheck(song.id), noPlaying: !isPlayingCheck(song.id) }">
                                         <!-- fer amb computed la classe -->
                                         <span v-if="currentTrackId === song.id && isPlaying"
@@ -192,19 +192,8 @@ export default {
             })
             console.log("mostVotedSongs", this.mostVotedSongs)
         },
-        playTrack(id) {
-            if (this.currentTrackId == id) {
-                if (this.isPlaying) {
-                    this.store.pauseSong();
-                } else {
-                    this.store.playSong();
-                }
-            } else {
-                if (this.currentTrack) {
-                    this.store.pauseSong();
-                }
-                socket.emit('getHtmlSpotify', id);
-            }
+        playSong(track) {
+            this.store.playTrack(track);
         },
         isPlayingCheck(id) {
             return this.isPlaying && this.currentTrackId == id;
