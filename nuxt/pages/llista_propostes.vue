@@ -112,7 +112,15 @@
                 </div>
             </template>
         </component>
-
+        <!-- Modal de error al proponer mas de una cancion -->
+        <component :is="activeModal" :open="modals.proposeSongError" @close="modals.proposeSongError = false">
+            <template #title>Ja has proposat una cançó</template>
+            <template #content>
+                <p class="text-center">Ja has proposat una cançó, espera a que la següent votació per proposar una
+                    altra.
+                </p>
+            </template>
+        </component>
         <!-- Boton que redirige a la propuesta de canciones -->
         <!-- <footer class="fixed bottom-2 w-full flex justify-center align-center">
             <button @click="goToProposar"
@@ -135,7 +143,8 @@ export default {
             filter: '',
             modals: {
                 alreadyVotedModal: false,
-                reportModal: false
+                reportModal: false,
+                proposeSongError: false,
             },
             songs: computed(() => this.store.proposedSongs),
             spotifySongs: [],
@@ -154,9 +163,9 @@ export default {
             postedSongId: "",
             currentTrackId: null,
             isPlaying: false,
-            modalSelector: this.$device.isMobile ? 1 : 0,
-            songComponentSelector: this.$device.isMobile ? 1 : 0,
-            playerSelector: this.$device.isMobile ? 1 : 0,
+            mobileDetector: this.$device.isMobile ? 1 : 0,
+            // songComponentSelector: this.$device.isMobile ? 1 : 0,
+            // playerSelector: this.$device.isMobile ? 1 : 0,
             modalComponent: {
                 0: resolveComponent('ModularModal'),
                 1: resolveComponent('MobileModal'),
@@ -427,14 +436,15 @@ export default {
             return filtered;
         },
         activeModal() {
-            return this.modalComponent[this.modalSelector];
+            return this.modalComponent[this.mobileDetector];
         },
         activeSong() {
-            return this.songComponent[this.songComponentSelector];
+            return this.songComponent[this.mobileDetector];
         },
         activePlayer() {
-            return this.activePlayer[this.playerSelector];
+            return this.activePlayer[this.mobileDetector];
         }
+        
     },
 }
 
