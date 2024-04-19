@@ -457,8 +457,12 @@ io.on('connection', (socket) => {
         return;
       }
       console.log("in index", song);
-      comManager.addSongToBlackList(userToken, song);
+      const bannedSong = await comManager.addSongToBlackList(userToken, song);
 
+      // Notify the user that banned the song
+      socket.emit('notifySongDeleted', { status: 'success', message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.` });
+
+      // Update the proposed songs list to everybody
       io.emit('songDeleted', { status: 'success', song: song });
     } catch (err) {
       socket.emit('deleteError', { status: 'error', message: err.message });
@@ -659,7 +663,7 @@ io.on('connection', (socket) => {
       comManager.updateUser(userToken, modifiedUser);
 
       // Notify the user that made the modification
-      socket.emit('userRoleModified', { status: 'success', message: `El rol de l'usuari' ${modifiedUser.name} ha sigut modificat.` });
+      socket.emit('userRoleModified', { status: 'success', message: `El rol de l'usuari ${modifiedUser.name} ha sigut modificat.` });
 
       // Update the user data to everybody
       io.emit('refreshUsersData');

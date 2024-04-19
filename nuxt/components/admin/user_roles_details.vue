@@ -35,6 +35,16 @@
             </p>
         </template>
     </ModularModal>
+
+    <ModularModal :open="modals.userRoleChangedSuccessfully" type="done" title="Permisos d'usari modificats"
+        @close="modals.userRoleChangedSuccessfully = false">
+        <template #title>
+            <h2>Permisos d'usari modificats</h2>
+        </template>
+        <template #content>
+            <p>{{ serverResponse.message }}</p>
+        </template>
+    </ModularModal>
 </template>
 
 <script>
@@ -52,7 +62,8 @@ export default {
             roles: computed(() => this.store.getRoles()),
             selectedRole: null,
             modals: {
-                changeUserRole: false
+                changeUserRole: false,
+                userRoleChangedSuccessfully: false,
             },
         }
     },
@@ -127,11 +138,27 @@ export default {
             let auxUser = Object.assign({}, this.user);
             auxUser.role_id = this.selectedRole;
             socket.emit('modifyUserRole', this.store.getUser().token, auxUser);
-        }
+        },
+        notifyServerResponse() {
+            if (this.serverResponse) {
+                this.modals.userRoleChangedSuccessfully = true;
+            }
+        },
+    },
+    unmounted() {
+        this.store.setServerResponse(null);
+    },
+    computed: {
+        serverResponse() {
+            return this.store.getServerResponse();
+        },
     },
     watch: {
         user: {
             handler: 'changeCurrentRole',
+        },
+        serverResponse: { // Each time the serverResponse changes execute notifyServerResponse() method
+            handler: 'notifyServerResponse',
         },
     },
     setup() {

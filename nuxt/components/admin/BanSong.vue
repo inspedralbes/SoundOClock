@@ -1,12 +1,9 @@
 <template>
     <div>
         <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">CENSURAR CANÇÓ</h2>
-        <div class="m-8" v-if="songs.length === 0">
-            <Loader />
-        </div>
-        <div v-else>
+        <div>
             <div class="flex flex-row mt-8">
-                <div class="songs-container w-1/3 ml-20 overflow-y-auto">
+                <div class="songs-container w-1/3 ml-20 overflow-x-hidden overflow-y-auto">
                     <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
                         <button v-for="song in songs" @click="selectSong(song)"
                             class="flex flex-row justify-between items-center rounded-lg p-3" :class="isSelected(song)">
@@ -22,9 +19,9 @@
                                         </svg>
                                     </button>
                                 </div>
-                                <div class="song-data text-start">
-                                    <p class="font-black basis-1/3">{{ song.name }}</p>
-                                    <p class="basis-1/3">{{ song.artists }}</p>
+                                <div class="song-data text-start truncate">
+                                    <p class="font-black basis-1/3">{{ song.title }}</p>
+                                    <p class="basis-1/3">{{ song.artists.join(', ') }}</p>
                                     <p class="basis-1/3">{{ song.totalVotes }} vots</p>
                                 </div>
                             </div>
@@ -93,6 +90,7 @@ export default {
     },
     computed: {
         songs() {
+            console.log(this.store.getProposedSongsAdminView());
             this.selectedSong = this.store.getProposedSongsAdminView()[0];
             return this.store.getProposedSongsAdminView();
         },

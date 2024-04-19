@@ -118,8 +118,9 @@ async function addSongToBlackList(token, song) {
       preview_url: song.preview_url
     })
   });
-  console.log(response);
-  return response;
+  const jsonResponse = await response.json();
+  console.log("POSTED SONG TO BLACKLIST", jsonResponse);
+  return jsonResponse;
 }
 
 async function getPlaylists(playlist, limit, token) {
