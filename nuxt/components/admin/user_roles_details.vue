@@ -36,15 +36,7 @@
         </template>
     </ModularModal>
 
-    <ModularModal :open="modals.userRoleChangedSuccessfully" type="done" title="Permisos d'usari modificats"
-        @close="modals.userRoleChangedSuccessfully = false">
-        <template #title>
-            <h2>Permisos d'usari modificats</h2>
-        </template>
-        <template #content>
-            <p>{{ serverResponse.message }}</p>
-        </template>
-    </ModularModal>
+    <ModularToast v-bind:serverResponse="serverResponse" time="10000"/>
 </template>
 
 <script>
@@ -63,7 +55,6 @@ export default {
             selectedRole: null,
             modals: {
                 changeUserRole: false,
-                userRoleChangedSuccessfully: false,
             },
         }
     },
@@ -139,11 +130,6 @@ export default {
             auxUser.role_id = this.selectedRole;
             socket.emit('modifyUserRole', this.store.getUser().token, auxUser);
         },
-        notifyServerResponse() {
-            if (this.serverResponse) {
-                this.modals.userRoleChangedSuccessfully = true;
-            }
-        },
     },
     unmounted() {
         this.store.setServerResponse(null);
@@ -156,9 +142,6 @@ export default {
     watch: {
         user: {
             handler: 'changeCurrentRole',
-        },
-        serverResponse: { // Each time the serverResponse changes execute notifyServerResponse() method
-            handler: 'notifyServerResponse',
         },
     },
     setup() {

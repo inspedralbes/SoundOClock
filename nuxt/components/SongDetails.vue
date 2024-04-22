@@ -11,11 +11,10 @@ export default {
       notReadReports: 0,
       modals: {
         addSongToBlacklist: false,
-        songAddedToBlacklistSuccessfully: false,
       },
     }
   },
-  updated() {
+  mounted() {
     this.countNotReadReports();
   },
   watch: {
@@ -71,19 +70,9 @@ export default {
 
       this.countNotReadReports();
     },
-    notifyServerResponse() {
-      if (this.serverResponse) {
-        this.modals.songAddedToBlacklistSuccessfully = true;
-      }
-    },
   },
   unmounted() {
     this.store.setServerResponse(null);
-  },
-  watch: {
-    serverResponse: { // Each time the serverResponse changes execute notifyServerResponse() method
-      handler: 'notifyServerResponse',
-    },
   },
   computed: {
     serverResponse() {
@@ -145,19 +134,11 @@ export default {
     </template>
     <template #content>
       <p>Segur que vols afegir <span class="font-bold">{{ song.title }}</span> de <span class="font-bold">{{
-        song.artists.join(', ') }}</span> a la llista negra?</p>
+        song.artists.map(artist => artist.name).join(', ') }}</span> a la llista negra?</p>
     </template>
   </ModularModal>
 
-  <ModularModal :open="modals.songAddedToBlacklistSuccessfully" type="done" title="Cançó afegida a la llista negra"
-    @close="modals.songAddedToBlacklistSuccessfully = false">
-    <template #title>
-      <h2>Cançó afegida a la llista negra</h2>
-    </template>
-    <template #content>
-      <p>{{ serverResponse.message }}</p>
-    </template>
-  </ModularModal>
+  <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
 </template>
 
 <style scoped>
