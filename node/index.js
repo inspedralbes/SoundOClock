@@ -320,6 +320,14 @@ io.on('connection', (socket) => {
     // TODO: songData does not include the year of the song, it should
 
     try {
+      // Check if the user can post a song
+      if (user.propose_banned_until > new Date().toISOString().substring(0,10)) {
+        socket.emit('postError', { status: 'error', title: `Estàs bloquejat`, message: `You can not propose songs until ${user.propose_banned_until}.` });
+        return;
+      }
+
+      // Check if the song is in the blacklist
+      
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
       if (existingSong) {
@@ -330,7 +338,7 @@ io.on('connection', (socket) => {
       // Check if the user already submitted a song
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
       if (votingRecord && votingRecord.submitted) {
-        socket.emit('postError', { status: 'error', message: 'User already submitted a song' });
+        socket.emit('postError', { status: 'error', title: `Ja has proposat una cançó`, message: 'Ja has proposat una cançó, espera a la següent votació per proposar una altra.' });
         return;
       }
 
@@ -624,6 +632,11 @@ io.on('connection', (socket) => {
 
     try {
       let response = await comManager.setBellsGroupsConfiguration(userToken, bells);
+
+      // Notify the user that made the modification
+      socket.emit('notifyBellsGroupsRelationsUpdated', { status: 'success', message: `La configuració de timbres i grups ha sigut modificada.` });
+
+      // Update the bells groups relations data to everybody
       io.emit('bellsGroupsRelationsUpdated', { status: 'success', message: response });
     } catch (err) {
       socket.emit('updateBellsGroupsRelationsError', { status: 'error', message: err.message });
@@ -671,17 +684,17 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('modifyUserRole', async (userToken, modifiedUser) => {
+  socket.on('updateUserRole', async (userToken, modifiedUser) => {
 
     try {
       // Update user
       comManager.updateUser(userToken, modifiedUser);
 
       // Notify the user that made the modification
-      socket.emit('userRoleModified', { status: 'success', message: `El rol de l'usuari ${modifiedUser.name} ha sigut modificat.` });
+      socket.emit('notifyUserRoleUpdated', { status: 'success', message: `El rol de l'usuari ${modifiedUser.name} ha sigut modificat.` });
 
       // Update the user data to everybody
-      io.emit('refreshUsersData');
+      io.emit('userRoleUpdated');
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
     }

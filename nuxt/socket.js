@@ -65,7 +65,13 @@ socket.on("connect", () => {
   });
 
   socket.on('postError', (data) => {
+    console.log('socket postError data received', data);
     pinia.setPostedSongStatus(data);
+  });
+
+  socket.on('notifyBellsGroupsRelationsUpdated', (data) => {
+    console.log('socket notifyBellsGroupsRelationsUpdated data received', data);
+    pinia.setServerResponse(data);
   });
 
   socket.on('bellsGroupsRelationsUpdated', (data) => {
@@ -80,12 +86,12 @@ socket.on("connect", () => {
     console.log('socket isReadReportStatusChanged data received', data);
   });
 
-  socket.on('userRoleModified', (data) => {
-    console.log('socket userRoleModified data received', data);
+  socket.on('notifyUserRoleUpdated', (data) => {
+    console.log('socket notifyUserRoleUpdated data received', data);
     pinia.setServerResponse(data);
   });
 
-  socket.on('refreshUsersData', () => {
+  socket.on('userRoleUpdated', () => {
     comManager.getUsers();
   });
 

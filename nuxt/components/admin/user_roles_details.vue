@@ -128,7 +128,7 @@ export default {
             // Object.assign() method copies all properties of a source object into a target object ==> Object.assign(target, source)
             let auxUser = Object.assign({}, this.user);
             auxUser.role_id = this.selectedRole;
-            socket.emit('modifyUserRole', this.store.getUser().token, auxUser);
+            socket.emit('updateUserRole', this.store.getUser().token, auxUser);
         },
     },
     unmounted() {

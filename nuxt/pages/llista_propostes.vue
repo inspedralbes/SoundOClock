@@ -114,10 +114,14 @@
         </component>
         <!-- Modal de error al proponer mas de una cancion -->
         <component :is="activeModal" :open="modals.proposeSongError" @close="modals.proposeSongError = false">
-            <template #title>Ja has proposat una cançó</template>
+            <template #title>
+                {{ postedSongStatus.title }}
+                <!-- Ja has proposat una cançó -->
+            </template>
             <template #content>
-                <p class="text-center">Ja has proposat una cançó, espera a que la següent votació per proposar una
-                    altra.
+                <p class="text-center">
+                    {{ postedSongStatus.message }}
+                    <!-- Ja has proposat una cançó, espera a que la següent votació per proposar una altra. -->
                 </p>
             </template>
         </component>
