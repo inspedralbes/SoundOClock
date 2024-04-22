@@ -68,7 +68,7 @@ class GroupsController extends Controller
             'name' => 'required|string',
             'abbreviation' => 'required|string',
             'is_public' => 'required|int',
-            'category_id' => 'required|int',
+            'category_id' => 'int',
         ]);
 
         $group = Group::findOrfail($id);
@@ -112,13 +112,15 @@ class GroupsController extends Controller
     }
 
     // Add groups to the user
-    public function addGroupsToUser(Request $request, string $user_id) {
+    public function addGroupsToUser(Request $request) {
         // Validate the request
         $validated = $request->validate([
+            'user_id' => 'required|int|exists:users,id', // Validates the user_id exists in users table
             'groups' => 'required|array',
             'groups.*' => 'required|exists:groups,id' // Validates each group_id exists in groups table
         ]);
-    
+
+        $user_id = $validated["user_id"];
         $user = User::findOrFail($user_id);
 
         // Attach the groups to the user

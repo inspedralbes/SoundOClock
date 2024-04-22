@@ -275,14 +275,17 @@ async function updateUser(token, user) {
 }
 
 async function setUserGroups(userId, token, groups) {
-  const response = await fetch(apiURL + 'addGroupsToUser/' + userId, {
+  const response = await fetch(apiURL + 'groupsUser', {
     method: 'POST',
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
       "Authorization": "Bearer " + token,
     },
-    body: JSON.stringify({ groups })
+    body: JSON.stringify({ 
+      "groups": groups,
+      "user_id": userId
+     })
   });
   const jsonResponse = await response.json();
   return jsonResponse;

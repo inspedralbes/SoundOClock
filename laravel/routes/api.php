@@ -57,10 +57,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/groupCategories/{id}', [GroupCategoryController::class, 'destroy']);
     
     // Groups & Users routes
-    Route::get('/getGroupsFromUser/{user_id}', [GroupsController::class, 'getGroupsFromUser']);
-    Route::post('/addGroupsToUser/{user_id}', [GroupsController::class, 'addGroupsToUser']);
-    Route::put('/updateGroupsToUser/{user_id}', [GroupsController::class, 'updateGroupsToUser']);
-    Route::delete('/removeGroupsFromUser/{user_id}', [GroupsController::class, 'removeGroupsFromUser']);
+    Route::post('/groupsUser', [GroupsController::class, 'addGroupsToUser']);
+    Route::get('/groupsUser/{user_id}', [GroupsController::class, 'getGroupsFromUser']);
+    Route::put('/groupsUser/{user_id}', [GroupsController::class, 'updateGroupsToUser']);
+    Route::delete('/groupsUser/{user_id}', [GroupsController::class, 'removeGroupsFromUser']);
 
     // Roles routes
     Route::get('/roles', [RolesController::class, 'index']);
