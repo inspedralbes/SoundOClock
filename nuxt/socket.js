@@ -54,6 +54,7 @@ socket.on("connect", () => {
   });
 
   socket.on('groupDeleted', (data) => {
+    console.log('socket groupDeleted data received', data);
     pinia.deleteGroup(data.group_id);
   });
 
