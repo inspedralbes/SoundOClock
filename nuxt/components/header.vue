@@ -2,7 +2,7 @@
     <div class="sticky top-0 left-0 right-0 z-[100] h-fit bg-slate-200 px-8 py-4">
         <div class="flex flex-row justify-between h-14 md:h-20">
             <!--LOGO AND BRANDNAME-->
-            <div class="flex flex-row justify-center items-center gap-4">
+            <div class="flex flex-row  items-center gap-4">
                 <img v-if="$device.isDesktopOrTablet" src="/img/soundoclock-logo-Photoroom.png" alt="" class="h-full">
                 <div class="brand-name text-3xl md:text-4xl font-bold">sound<span>o'clock</span></div>
             </div>
@@ -88,12 +88,11 @@ div>button:active {
 }
 
 .dropdown {
-  transition: transform 0.3s;
-  transform: scaleY(0);
+    transition: transform 0.3s;
+    transform: scaleY(0);
 }
 
 .dropdown--displayed {
-  transform: scaleY(1);
+    transform: scaleY(1);
 }
-
 </style>
