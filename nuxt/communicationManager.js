@@ -160,6 +160,38 @@ async function downloadSongs(songs) {
     return data;
 }
 
+async function createGroupCategory(token, category) {
+    const response = await fetch(`${url}/createGroupCategory`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            token,
+            category,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
+async function createGroup(token, group) {
+    const response = await fetch(`${url}/createGroup`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            token,
+            group,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
 const comManager = {
     getUserSelectedSongs,
     getSongs,
@@ -173,6 +205,8 @@ const comManager = {
     getUserInfo,
     getSortedVotedSongs,
     downloadSongs,
+    createGroupCategory,
+    createGroup,
 };
 
 export default comManager;

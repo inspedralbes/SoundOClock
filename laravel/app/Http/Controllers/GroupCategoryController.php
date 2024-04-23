@@ -18,7 +18,8 @@ class GroupCategoryController extends Controller
      * Display a listing of the resource.
      */
     public function indexAll() {
-        return GroupCategory::all();
+        // Get all group categories with its groups
+        return GroupCategory::with('groups')->get();
     }
 
     /**

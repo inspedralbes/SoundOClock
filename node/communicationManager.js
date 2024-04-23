@@ -237,6 +237,25 @@ async function getAllGroupsAndCategories() {
   };
 }
 
+async function createGroupCategory(token, category) {
+  const response = await axios.post(`${apiURL}groupCategories`, category, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  return response.data;
+}
+
+async function createGroup(token, group) {
+  const response = await axios.post(`${apiURL}groups`, group, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  console.log(response.data)
+  return response.data;
+}
+
 async function fetchSpotifyPage(id) {
   try {
     const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
@@ -371,6 +390,8 @@ const comManager = {
   showUser,
   getRoles,
   getAllGroupsAndCategories,
+  createGroupCategory,
+  createGroup,
 };
 
 export default comManager;

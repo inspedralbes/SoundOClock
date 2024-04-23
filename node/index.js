@@ -197,7 +197,6 @@ app.get('/publicCategories', async (req, res) => {
 app.get('/allGroupsAndCategories', async (req, res) => {
   try {
     const data = await comManager.getAllGroupsAndCategories();
-    console.log("data", data);
     res.json(data);
   } catch (err) {
     res.status(500).send(err);
@@ -236,6 +235,24 @@ app.post('/userInfo', async (req, res) => {
     res.json(response);
   } catch (err) {
     res.status(500).send(err);
+  }
+})
+
+app.post('/createGroupCategory', async (req, res) => {
+  try {
+    let response = await comManager.createGroupCategory(req.body.token, req.body.category);
+    res.json(response);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
+app.post('/createGroup', async (req, res) => {
+  try {
+    let response = await comManager.createGroup(req.body.token, req.body.group);
+    res.json(response);
+  } catch (err) {
+    res.status(500).send
   }
 })
 
@@ -560,8 +577,8 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('updateGroup', (token, groupName) => {
-    comManager.updateGroup(token, groupName)
+  socket.on('updateGroup', (token, group) => {
+    comManager.updateGroup(token, group)
       .then((response) => {
         socket.emit('groupUpdated', response);
       })
