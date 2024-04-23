@@ -1,33 +1,37 @@
 <template>
     <div>
-        <div class="width mx-auto my-5 flex flex-row justify-center">
-            <input class="cercador w-full ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..."
-                v-model="query" @keyup.enter="getSongs()" />
-        </div>
-        <div v-if="tracks.length == 0 || !loading" class="mt-4  w-full">
-            <p class="text-center text-xl">No hi ha cap cançó bloquejada.</p>
-        </div>
-        <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
-        <TransitionGroup name="song-slide" mode="out-in">
-            <Song v-for="track in filteredTracks" :key="track.id" :track="track" :currentTrackId="status.currentTrackId"
-                :isPlaying="status.isPlaying" @play="playSong" @unBan="setSongToUnBan(track), modalActual = true"
-                :type="'unBan'" />
-        </TransitionGroup>
-        <ModularModal :open="modalActual" :msg="'Confirmar'" @close="modalActual = null"
-            @confirm="removeFromBlacklist(songToUnBan.spotify_id)">
-            <template v-slot:title>
-                <h2>Segur que vols treure aquesta cançó de la blacklist?</h2>
-            </template>
-            <template v-slot:content>
-                <p>
-                    Si treus {{ songToUnBan.name }} de
-                    {{ songToUnBan.artists.map(artist => artist.name).join(', ') }}
-                    els usuaris podran tornar a votar-la.
-                </p>
-            </template>
-        </ModularModal>
-        <div class="m-8" v-if="loading">
+        <div class="h-screen flex justify-center" v-if="loading">
             <Loader />
+        </div>
+        <div v-else>
+            <div class="width mx-auto my-5 flex flex-row justify-center">
+                <input class="cercador w-full ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..."
+                    v-model="query" @keyup.enter="getSongs()" />
+            </div>
+            <div v-if="tracks.length == 0" class="mt-4  w-full">
+                <p class="text-center text-xl">No hi ha cap cançó bloquejada.</p>
+            </div>
+            <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
+            <TransitionGroup name="song-slide" mode="out-in">
+                <Song v-for="track in filteredTracks" :key="track.id" :track="track" :currentTrackId="status.currentTrackId"
+                    :isPlaying="status.isPlaying" @play="playSong" @unBan="setSongToUnBan(track), modalActual = true"
+                    :type="'unBan'" />
+            </TransitionGroup>
+            <ModularModal :open="modalActual" :msg="'Confirmar'" @close="modalActual = null"
+                @confirm="removeFromBlacklist(songToUnBan.spotify_id)">
+                <template v-slot:title>
+                    <h2>Segur que vols treure aquesta cançó de la blacklist?</h2>
+                </template>
+                <template v-slot:content>
+                    <p>
+                        Si treus {{ songToUnBan.name }} de
+                        {{ songToUnBan.artists.map(artist => artist.name).join(', ') }}
+                        els usuaris podran tornar a votar-la.
+                    </p>
+                </template>
+            </ModularModal>
+
+            <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
         </div>
     </div>
 </template>
@@ -51,7 +55,8 @@ export default {
                 isPlaying: false,
                 currentTrackId: null,
                 currentTrack: null,
-            }
+            },
+            serverResponse: null
         }
     },
     computed: {
@@ -67,9 +72,20 @@ export default {
             this.loading = false;
         });
 
+        socket.on('notifySongRemovedFromBlacklist', (data) => {
+            console.log("socket notifySongRemovedFromBlacklist data received")
+            this.serverResponse = data;
+        });
+
         socket.on('songRemovedFromBlacklist', (spotify_id) => {
+            console.log("socket songRemovedFromBlacklist data received");
             this.tracks = this.tracks.filter(track => track.spotify_id !== spotify_id);
             this.filteredTracks = this.filteredTracks.filter(track => track.spotify_id !== spotify_id);
+        });
+
+        socket.on('deleteError', (data) => {
+            console.log("socket deleteError data received", data)
+            this.serverResponse = data;
         });
     },
     methods: {

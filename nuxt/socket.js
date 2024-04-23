@@ -30,6 +30,7 @@ socket.on("connect", () => {
   });
 
   socket.on("songDeleted", (data) => {
+    console.log('socket songDeleted data received');
     comManager.getSongs();
     comManager.getAdminSongs();
   });

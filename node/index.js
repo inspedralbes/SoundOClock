@@ -8,6 +8,7 @@ import downloadsManager from './downloadsManager.cjs';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 import minimist from 'minimist';
+import { remove } from 'fs-extra';
 
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || 'mongodb';
@@ -473,11 +474,16 @@ io.on('connection', (socket) => {
       // Check if the song exists and delete it
       await Song.findOneAndDelete({ id: songId });
 
-      await comManager.removeSongFromBlacklist(userToken, songId);
+      const response = await comManager.removeSongFromBlacklist(userToken, songId);
+      const removedSong = await response.json();
 
-      socket.emit('songRemovedFromBlacklist', songId);
+      // Notify the user that has removed the song from the blacklist
+      socket.emit('notifySongRemovedFromBlacklist', { status: 'success', message: `La cançó ${removedSong.name} ha sigut eliminada de la llista negra.` });
+
+      // Update the blacklist to everybody
+      io.emit('songRemovedFromBlacklist', songId);
     } catch (err) {
-      socket.emit('deleteError', { status: 'error', message: err.message });
+      socket.emit('deleteError', { status: 'error', message: `No s'ha pogut eliminar la cançó de la llista negra.`, reason: err.message });
     }
   });
 
