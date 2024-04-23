@@ -61,7 +61,9 @@ socket.on("connect", () => {
   });
 
   socket.on('songPosted', (data) => {
+    console.log("socket songPosted data", data)
     comManager.getSongs();
+    comManager.getAdminSongs();
     pinia.setPostedSongStatus(data);
   });
 
