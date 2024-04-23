@@ -321,17 +321,26 @@ io.on('connection', (socket) => {
 
     try {
       // Check if the user can post a song
-      if (user.propose_banned_until > new Date().toISOString().substring(0,10)) {
-        socket.emit('postError', { status: 'error', title: `Estàs bloquejat`, message: `You can not propose songs until ${user.propose_banned_until}.` });
+      if (user.propose_banned_until > new Date().toISOString().substring(0, 10)) {
+        socket.emit('postError', { status: 'error', title: `Estàs bloquejat`, message: `No pots proposar cançons fins el ${formatDate(user.propose_banned_until)}.` });
         return;
       }
 
       // Check if the song is in the blacklist
-      
+      const response = await comManager.getBlackList(userToken);
+      const blacklistSongs = await response.json();
+
+      for (let i = 0; i < blacklistSongs.length; i++) {
+        if (blacklistSongs[i].spotify_id == songData.id) {
+          socket.emit('postError', { status: 'error', title: `Cançó no disponible`, message: `La cançó ${blacklistSongs[i].name} no està disponible.` });
+          return;
+        }
+      }
+
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
       if (existingSong) {
-        socket.emit('postError', { status: 'error', message: 'Song already exists' });
+        socket.emit('postError', { status: 'error', title: `Cançó ja proposada`, message: `La cançó ${existingSong.name} ja ha sigut proposada per un altre usuari.` });
         return;
       }
 
@@ -372,6 +381,12 @@ io.on('connection', (socket) => {
     if (!user.id) return;
 
     try {
+      // Check if the user can vote a song
+      if (user.vote_banned_until > new Date().toISOString().substring(0, 10)) {
+        socket.emit('voteError', { status: 'error', title: `Estàs bloquejat`, message: `No pots votar cançons fins el ${formatDate(user.vote_banned_until)}.` });
+        return;
+      }
+
       // Check if the song exists
       const song = await Song.findOne({ id: songId });
       if (!song) {
@@ -401,7 +416,7 @@ io.on('connection', (socket) => {
 
       // Check if the user already voted twice
       if (votingRecord && votingRecord.votedSongs.length > 1) {
-        socket.emit('voteError', { status: 'error', message: 'User already voted' });
+        socket.emit('voteError', { status: 'error', title: `Has arribat al màxim de vots`, message: `Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions, promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies per la teva participació!` });
         return;
       }
 
@@ -717,5 +732,9 @@ io.on('connection', (socket) => {
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+function formatDate(date) {
+  return date.substring(8, 10) + "-" + date.substring(5, 7) + "-" + date.substring(0,4);
+}
 
 export { port };

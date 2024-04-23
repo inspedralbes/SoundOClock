@@ -82,16 +82,10 @@
         <!-- Modales -->
         <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
         <component :is="activeModal" :open="modals.alreadyVotedModal" @close="modals.alreadyVotedModal = false">
-            <template #title>Has arribat al màxim de vots</template>
+            <template #title>{{ serverResponse.title }}</template>
             <template #content>
                 <p>
-                    Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura
-                    s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples
-                    opcions,
-                    promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic.
-                    Gràcies
-                    per
-                    la teva participació!
+                    {{ serverResponse.message }}
                 </p>
             </template>
         </component>
@@ -181,7 +175,8 @@ export default {
             activePlayer: {
                 0: resolveComponent('ModularPlayer'),
                 1: resolveComponent('MobilePlayer'),
-            }
+            },
+            serverResponse: null,
         }
     },
     created() {
@@ -217,6 +212,7 @@ export default {
         comManager.getUserSelectedSongs(this.store.getUser().id);
 
         socket.on("voteError", (data) => {
+            this.serverResponse = data;
             this.modals.alreadyVotedModal = true;
             this.isLoadingVote.state = false;
         })
@@ -264,12 +260,12 @@ export default {
         },
         vote(songId) {
             if (!this.isLoadingVote.state) {
-                if (this.userSelectedSongsvotedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
-                    this.modals.alreadyVotedModal = true;
-                } else {
+                // if (this.userSelectedSongsvotedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
+                //     this.modals.alreadyVotedModal = true;
+                // } else {
                     this.store.setIsLoadingVote({ state: true, selectedSong: songId });
                     socket.emit('castVote', this.store.getUser().token, songId);
-                }
+                // }
             }
         },
 
