@@ -31,30 +31,6 @@ mongoose.connect('mongodb://mongoadmin:mongopassword@' + host + ':27017/soundocl
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-async function insertDefaultsMongo() {
-  const songs = [
-    { id: '0VjIjW4GlUZAMYd2vXMi3b', title: 'Blinding Lights', artist: 'The Weeknd', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36', previewUrl: 'https://example.com/blinding-lights-preview', submitDate: new Date('2020-11-29'), submittedBy: 1 },
-    { id: '62PaSfnXSMyLshYJrlTuL3', title: 'Hello', artist: 'Adele', year: 2015, img: 'https://i.scdn.co/image/ab67616d00001e0247ce408fb4926d69da6713c2', previewUrl: 'https://example.com/hello-preview', totalVotes: 300, votesPerGroup: { 1: 2, 2: 8 }, submitDate: new Date('2015-10-23'), submittedBy: 7 },
-    { id: '0sfdiwck2xr4PteGOdyOfz', title: 'Shot in the Dark', artist: 'AC/DC', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e0204db0e3bcd166c1d6cfd81f9', previewUrl: 'https://example.com/shot-in-the-dark-preview', totalVotes: 75, votesPerGroup: { 1: 1, 4: 10 }, submitDate: new Date('2020-10-07'), submittedBy: 2 }
-  ];
-
-  const votingRecords = [
-    { userId: 1, submitted: true, votedSongs: [1, 4], groups: [1] },
-    { userId: 2, submitted: false, votedSongs: [], groups: [2] },
-    { userId: 3, submitted: false, votedSongs: [2], groups: [1] },
-  ];
-
-  // Upsert songs
-  for (const song of songs) {
-    await Song.updateOne({ id: song.id }, { $setOnInsert: song }, { upsert: true });
-  }
-
-  // Upsert voting records
-  for (const record of votingRecords) {
-    await VotingRecord.updateOne({ userId: record.userId }, { $setOnInsert: record }, { upsert: true });
-  }
-}
-
 //FETCH TO GET HTML FROM SPOTIFY
 // insertDefaultsMongo();
 
@@ -757,7 +733,7 @@ server.listen(port, () => {
 });
 
 function formatDate(date) {
-  return date.substring(8, 10) + "-" + date.substring(5, 7) + "-" + date.substring(0,4);
+  return date.substring(8, 10) + "-" + date.substring(5, 7) + "-" + date.substring(0, 4);
 }
 
 export { port };

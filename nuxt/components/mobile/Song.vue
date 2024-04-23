@@ -13,6 +13,8 @@
                         </p>
                         <div class="flex flex-row text-sm">
                             <p class="text-ellipsis">
+                                <span v-if="track.explicit"
+                                    class="bg-[lightgray] text-black px-2 rounded-md mr-2">E</span>
                                 <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="track.artists"
                                     v-for="(artist, index) in track.artists" :key="index">
                                     <span v-if="index !== 0">, </span>

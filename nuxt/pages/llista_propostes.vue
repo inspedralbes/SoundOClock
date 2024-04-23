@@ -345,6 +345,7 @@ export default {
                     // date: track.album.release_date,
                     img: track.album.images[1].url,
                     preview_url: track.preview_url,
+                    explicit: track.explicit,
                     submitDate: new Date().toISOString(),
                     submittedBy: this.store.getUser().id,
                 }
@@ -392,9 +393,7 @@ export default {
         filteredSongs() {
             let array = this.songs;
 
-            if (this.spotifySongs.length > 0) {
-                // array = array.concat(this.spotifySongs);
-            }
+            // if (this.filter.length < 3) return array;
 
             let filtered = array.filter(song => {
                 let songName = song.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();

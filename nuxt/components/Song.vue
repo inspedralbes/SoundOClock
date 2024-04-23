@@ -14,6 +14,7 @@
             <div class="flex flex-col w-[70%]">
                 <p class="font-bold text-base uppercase">{{ track.name }}</p>
                 <div class="flex flex-row text-sm">
+                    <span v-if="track.explicit" class="bg-[lightgray] text-black px-2 rounded-md mr-2">E</span>
                     <p class="whitespace-nowrap overflow-hidden">
                         <span v-for="(artist, index) in track.artists" :key="index">
                             <span v-if="index !== 0">, </span>

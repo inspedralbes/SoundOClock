@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->json('artists');
             $table->string('img')->nullable();
             $table->string('preview_url')->nullable();
+            $table->boolean('explicit')->default(false);
             $table->timestamps();
         });
     }

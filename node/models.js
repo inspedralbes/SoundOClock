@@ -7,6 +7,7 @@ const songSchema = new mongoose.Schema({
   year: Number,
   img: String,
   preview_url: String,
+  explicit: Boolean,
   totalVotes: { type: Number, default: 0 },
   votesPerGroup: { type: Map, of: Number, default: new Map() },
   submitDate: Date,
