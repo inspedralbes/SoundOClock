@@ -247,6 +247,7 @@ export default {
         },
         deleteSearch() {
             this.filter = '';
+            this.spotifySongs = [];
         },
         getType(trackID) {
             if (this.songs.some(song => song.id === trackID)) {
