@@ -379,10 +379,6 @@ export default {
                 }
             }
         },
-        // filter: {
-        //     handler: 'getSongs',
-        //     immediate: false,
-        // },
         'currentTrack': {
             handler: function () {
                 this.currentTrack.onended = () => {
