@@ -319,6 +319,19 @@ async function getRoles(token) {
   return jsonResponse;
 }
 
+async function getSettings(token) {
+  const response = await fetch(apiURL + `settings`, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -343,7 +356,8 @@ const comManager = {
   getBells,
   setBellsGroupsConfiguration,
   showUser,
-  getRoles
+  getRoles,
+  getSettings,
 };
 
 export default comManager;

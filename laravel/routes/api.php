@@ -7,6 +7,7 @@ use App\Http\Controllers\BlacklistController;
 use App\Http\Controllers\GroupsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\BellController;
+use App\Http\Controllers\SettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,4 +65,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/bells', [BellController::class, 'index']);
     Route::post('/bells', [BellController::class, 'store']);
     Route::put('/updateBells', [BellController::class, 'update']);
+
+    // Settings routes
+    Route::get('/settings', [SettingController::class, 'index']);
+    Route::post('/settings', [SettingController::class, 'store']);
+    Route::get('/settings/{id}', [SettingController::class, 'show']);
+    Route::put('/settings', [SettingController::class, 'update']);
+    Route::delete('/settings/{id}', [SettingController::class, 'destroy']);
 });

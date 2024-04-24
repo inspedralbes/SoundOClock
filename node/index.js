@@ -668,6 +668,17 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('getSettings', async (userToken) => {
+    console.log('getSettings');
+    try {
+      let settings = await comManager.getSettings(userToken);
+      console.log('settings', settings);
+      socket.emit('sendSettings', settings);
+    } catch (err) {
+      socket.emit('getSettingsError', { status: 'error', message: err.message });
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
     if (socket.id === dirPC) {
