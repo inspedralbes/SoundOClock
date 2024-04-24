@@ -56,11 +56,15 @@ export default {
                 currentTrackId: null,
                 currentTrack: null,
             },
-            serverResponse: null
         }
     },
+    unmounted() {
+        this.store.setServerResponse(null);
+    },
     computed: {
-
+        serverResponse() {
+            return this.store.getServerResponse();
+        },
     },
     mounted() {
         this.loading = true;
@@ -71,12 +75,7 @@ export default {
             this.filteredTracks = blacklist;
             this.loading = false;
         });
-
-        socket.on('notifySongRemovedFromBlacklist', (data) => {
-            console.log("socket notifySongRemovedFromBlacklist data received")
-            this.serverResponse = data;
-        });
-
+        
         socket.on('songRemovedFromBlacklist', (spotify_id) => {
             console.log("socket songRemovedFromBlacklist data received");
             this.tracks = this.tracks.filter(track => track.spotify_id !== spotify_id);
@@ -85,7 +84,7 @@ export default {
 
         socket.on('deleteError', (data) => {
             console.log("socket deleteError data received", data)
-            this.serverResponse = data;
+            this.store.setServerResponse(data);
         });
     },
     methods: {

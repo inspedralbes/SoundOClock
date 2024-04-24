@@ -24,8 +24,8 @@ socket.on("connect", () => {
   socket.on("songReported", (data) => {
   });
 
-  socket.on("notifySongDeleted", (data) => {
-    console.log('socket notifySongDeleted data received', data);
+  socket.on("notifyServerResponse", (data) => {
+    console.log('socket notifyServerResponse data received', data);
     pinia.setServerResponse(data);
   });
 
@@ -33,11 +33,6 @@ socket.on("connect", () => {
     console.log('socket songDeleted data received');
     comManager.getSongs();
     comManager.getAdminSongs();
-  });
-
-  socket.on("notifyUserBanned", (data) => {
-    console.log('socket notifyUserBanned data received', data);
-    pinia.setServerResponse(data);
   });
 
   socket.on("userBanned", (data) => {
@@ -53,8 +48,6 @@ socket.on("connect", () => {
       navigateTo({ path: '/escollirGrup' });
     }
   });
-
-
 
   socket.on('sendGroups', (data) => {
     pinia.setClassGroups(data);
@@ -79,11 +72,6 @@ socket.on("connect", () => {
     pinia.setPostedSongStatus(data);
   });
 
-  socket.on('notifyBellsGroupsRelationsUpdated', (data) => {
-    console.log('socket notifyBellsGroupsRelationsUpdated data received', data);
-    pinia.setServerResponse(data);
-  });
-
   socket.on('bellsGroupsRelationsUpdated', (data) => {
     console.log('socket bellsGroupsRelationsUpdated data received', data);
   });
@@ -94,11 +82,6 @@ socket.on("connect", () => {
 
   socket.on('isReadReportStatusChanged', (data) => {
     console.log('socket isReadReportStatusChanged data received', data);
-  });
-
-  socket.on('notifyUserRoleUpdated', (data) => {
-    console.log('socket notifyUserRoleUpdated data received', data);
-    pinia.setServerResponse(data);
   });
 
   socket.on('userRoleUpdated', () => {

@@ -478,7 +478,7 @@ io.on('connection', (socket) => {
       const removedSong = await response.json();
 
       // Notify the user that has removed the song from the blacklist
-      socket.emit('notifySongRemovedFromBlacklist', { status: 'success', message: `La cançó ${removedSong.name} ha sigut eliminada de la llista negra.` });
+      socket.emit('notifyServerResponse', { status: 'success', message: `La cançó ${removedSong.name} ha sigut eliminada de la llista negra.` });
 
       // Update the blacklist to everybody
       io.emit('songRemovedFromBlacklist', songId);
@@ -504,7 +504,7 @@ io.on('connection', (socket) => {
       const bannedSong = await comManager.addSongToBlackList(userToken, song);
 
       // Notify the user that banned the song
-      socket.emit('notifySongDeleted', { status: 'success', message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.` });
+      socket.emit('notifyServerResponse', { status: 'success', message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.` });
 
       // Update the proposed songs list to everybody
       io.emit('songDeleted', { status: 'success', song: song });
@@ -656,10 +656,13 @@ io.on('connection', (socket) => {
         message = `pot tornar a proposar cançons`;
       } else if (!user.propose_banned_until && updatedUser.propose_banned_until) {
         message = `no pot proposar cançons fins el ${formatDate(updatedUser.propose_banned_until)}`;
-      } 
+      } else {
+        socket.emit('notifyServerResponse', { status: 'error', message: `Un altre usuari està modificant aquest usuari. Els teus canvis potser no s'han desat.`});
+        return
+      }
 
       // Notify the user that made the modification
-      socket.emit('notifyUserBanned', { status: 'success', message: `L'usuari ${bannedUser.name} ${message}.` });
+      socket.emit('notifyServerResponse', { status: 'success', message: `L'usuari ${bannedUser.name} ${message}.` });
 
       // Update the user banned data to everybody
       io.emit('userBanned', updatedUser);
@@ -674,7 +677,7 @@ io.on('connection', (socket) => {
       let response = await comManager.setBellsGroupsConfiguration(userToken, bells);
 
       // Notify the user that made the modification
-      socket.emit('notifyBellsGroupsRelationsUpdated', { status: 'success', message: `La configuració de timbres i grups ha sigut modificada.` });
+      socket.emit('notifyServerResponse', { status: 'success', message: `La configuració de timbres i grups ha sigut modificada.` });
 
       // Update the bells groups relations data to everybody
       io.emit('bellsGroupsRelationsUpdated', { status: 'success', message: response });
@@ -731,7 +734,7 @@ io.on('connection', (socket) => {
       comManager.updateUser(userToken, modifiedUser);
 
       // Notify the user that made the modification
-      socket.emit('notifyUserRoleUpdated', { status: 'success', message: `El rol de l'usuari ${modifiedUser.name} ha sigut modificat.` });
+      socket.emit('notifyServerResponse', { status: 'success', message: `El rol de l'usuari ${modifiedUser.name} ha sigut modificat.` });
 
       // Update the user data to everybody
       io.emit('userRoleUpdated');
