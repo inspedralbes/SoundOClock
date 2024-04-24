@@ -1,130 +1,160 @@
 <template>
-    <div :class="{ 'overflow-hidden max-h-dvh': (modals.alreadyVotedModal || modals.reportModal) }">
-        <!-- Reproductor -->
-        <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
-            @report="report($event)" @propose="proposeSong($event)" />
+    <!-- <div :class="{ 'overflow-hidden max-h-dvh': (modals.alreadyVotedModal || modals.reportModal) }"> -->
+    <!-- Reproductor -->
+    <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
+        @report="report($event)" @propose="proposeSong($event)" />
 
-        <!-- Titulo -->
-        <!-- <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
+    <!-- Titulo -->
+    <!-- <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
             Vota
             la teva
             cançó
             preferida</h1> -->
 
-        <!-- Barra de busqueda -->
-        <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
-            <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
-                <input type="text" placeholder="Buscar..."
-                    class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
-                    @keydown.enter.prevent="acceptInput">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
-                    :class="{ 'text-base': $device.isMobile }">
-                    search
-                </span>
-                <Transition name="delete-fade">
-                    <button v-if="filter" @click="deleteSearch">
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
-                            :class="{ 'text-base': $device.isMobile }">
-                            Close
-                        </span>
-                    </button>
-                </Transition>
-            </div>
-            <select v-model.lazy="orderBy"
-                class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                :class="{ 'text-sm !p-2': $device.isMobile }" :disabled="songs.length == 0">
-                <option value="" disabled selected>Filtre</option>
-                <option value="votes-desc">Més vots</option>
-                <option value="votes-asc">Menys vots</option>
-                <option value="title-desc">Títol (A-Z)</option>
-                <option value="title-asc">Títol (Z-A)</option>
-                <option value="artist-desc">Artista (A-Z)</option>
-                <option value="artist-asc">Artista (Z-A)</option>
-            </select>
-
+    <!-- Barra de busqueda -->
+    <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
+        <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
+            <input type="text" placeholder="Buscar..."
+                class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
+                @keydown.enter.prevent="acceptInput">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
+                :class="{ 'text-base': $device.isMobile }">
+                search
+            </span>
+            <Transition name="delete-fade">
+                <button v-if="filter" @click="deleteSearch">
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                        :class="{ 'text-base': $device.isMobile }">
+                        Close
+                    </span>
+                </button>
+            </Transition>
         </div>
+        <select v-model.lazy="orderBy"
+            class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+            :class="{ 'text-sm !p-2': $device.isMobile }" :disabled="songs.length == 0">
+            <option value="" disabled selected>Filtre</option>
+            <option value="votes-desc">Més vots</option>
+            <option value="votes-asc">Menys vots</option>
+            <option value="title-desc">Títol (A-Z)</option>
+            <option value="title-asc">Títol (Z-A)</option>
+            <option value="artist-desc">Artista (A-Z)</option>
+            <option value="artist-asc">Artista (Z-A)</option>
+        </select>
 
-        <!-- Listado canciones propuestas -->
-        <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
-        <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
-        <div v-if="songs.length === 0" class="mt-4 w-full">
-            <p class="text-center text-xl">Encara no s'ha proposat cap cançó.</p>
-            <p class="text-center mx-4">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile">
-                cercant a
-                la barra de búsqueda.</p>
-        </div>
+    </div>
 
-        <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4  w-full">
-            <p class="text-center text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
-            <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
-        </div>
-        <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
-        <TransitionGroup name="song-slide" mode="out-in">
-            <component :is="activeSong" v-for="track in filteredSongs" :key="track.id" :track="track"
-                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
-                @report="report($event)" :type="getType(track.id)" />
-        </TransitionGroup>
-        <!-- </div> -->
-        <!-- </TransitionGroup> -->
+    <!-- Listado canciones propuestas -->
+    <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
+    <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
+    <div v-if="songs.length === 0" class="mt-4 w-full">
+        <p class="text-center text-xl">Encara no s'ha proposat cap cançó.</p>
+        <p class="text-center mx-4">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile">
+            cercant a
+            la barra de búsqueda.</p>
+    </div>
 
-
-        <!-- Listado de canciones de Spotify -->
-        <Transition name="song-slide">
-            <h2 v-if="spotifySongs.length > 0" class="text-center text-3xl font-bold mt-10">Resultats de la cerca</h2>
-        </Transition>
-        <TransitionGroup tag="div" class="mb-20" name="song-slide">
-            <component :is="activeSong" v-for="track in spotifySongs" :key="track.id" :track="track"
-                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
-                :type="getType(track.id)" />
-        </TransitionGroup>
+    <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4  w-full">
+        <p class="text-center text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
+        <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
+    </div>
+    <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
+    <TransitionGroup name="song-slide" mode="out-in">
+        <component :is="activeSong" v-for="track in filteredSongs" :key="track.id" :track="track"
+            :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
+            @report="report($event)" :type="getType(track.id)" />
+    </TransitionGroup>
+    <!-- </div> -->
+    <!-- </TransitionGroup> -->
 
 
-        <!-- Modales -->
-        <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
-        <component :is="activeModal" :open="modals.alreadyVotedModal" @close="modals.alreadyVotedModal = false">
-            <template #title>{{ serverResponse.title }}</template>
-            <template #content>
-                <p>
-                    {{ serverResponse.message }}
-                </p>
-            </template>
-        </component>
+    <!-- Listado de canciones de Spotify -->
+    <Transition name="song-slide">
+        <h2 v-if="spotifySongs.length > 0" class="text-center text-3xl font-bold mt-10">Resultats de la cerca</h2>
+    </Transition>
+    <TransitionGroup tag="div" class="mb-20" name="song-slide">
+        <component :is="activeSong" v-for="track in spotifySongs" :key="track.id" :track="track"
+            :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
+            :type="getType(track.id)" />
+    </TransitionGroup>
 
-        <!-- Modal de los reportes -->
-        <component :is="activeModal" msg="Reportar" :open="modals.reportModal" @close="modals.reportModal = false"
-            @confirm="reportTrack">
-            <template #title>Reportar cançó</template>
-            <template #content>
-                <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de "{{
-                    reportSongData.reportedSong.artists.map(artist => artist.name).join(', ') }}"?</p>
-                <div class="flex flex-col mt-4">
-                    <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
-                        <input type="radio" v-model="reportSongData.selectedOption" :value="option"
-                            name="report-option">
-                        <span class="ml-2">{{ option }}</span>
-                    </label>
+
+    <!-- Modales -->
+    <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
+    <UModal v-model="modals.alreadyVotedModal" class="z-[9999]">
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center py-2 rounded-lg shadow-md">
+                    <span class="material-symbols-rounded text-[2rem] text-red-500 mr-4">
+                        error
+                    </span>
+                    <h2 class="text-white
+                    text-xl font-bold">{{ serverResponse.title }}</h2>
                 </div>
             </template>
-        </component>
-        <!-- Modal de error al proponer mas de una cancion -->
-        <component :is="activeModal" :open="modals.proposeSongError" @close="modals.proposeSongError = false">
-            <template #title>
-                {{ postedSongStatus.title }}
+
+            {{ serverResponse.message }}
+        </UCard>
+    </UModal>
+
+    <!-- Modal de los reportes -->
+    <UModal v-model="modals.reportModal" prevent-close class="z-[9999]">
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center justify-between py-2 rounded-lg shadow-md">
+                    <div class="flex flex-row items-center">
+                        <span class="material-symbols-rounded text-[2rem] text-yellow-500 mr-4">
+                            warning
+                        </span>
+                        <h2 class="text-white text-xl font-bold">Reportar cançó</h2>
+                    </div>
+                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                        @click="modals.reportModal = false" />
+                </div>
             </template>
-            <template #content>
-                <p class="text-center">
-                    {{ postedSongStatus.message }}
-                </p>
-            </template>
-        </component>
-        <!-- <UModal v-model="modals.proposeSongError">
-            <div v-if="postedSongStatus">
-                <UAlert icon="i-heroicons-x-circle-16-solid" color="red" variant="solid" :title="postedSongStatus.title"
-                    :description="postedSongStatus.message" class="p-6" />
+
+            <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de "{{
+                reportSongData.reportedSong.artists.map(artist => artist.name).join(', ') }}"?</p>
+            <!-- <URadioGroup v-model="reportSongData.selectedOption" :options="reportSongData.options" class="mt-4">
+            </URadioGroup> -->
+            <div class="flex flex-col mt-4">
+                <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
+                    <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
+                    <span class="ml-2">{{ option }}</span>
+                </label>
             </div>
-        </UModal> -->
-    </div>
+
+            <template #footer>
+                <div class="flex justify-end">
+                    <div class="flex justify-end space-x-4">
+                        <UButton @click="modals.reportModal = false" variant="outline" class="px-4 py-2 text-sm">
+                            Cancel·la
+                        </UButton>
+                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm">
+                            Reporta
+                        </UButton>
+                    </div>
+                </div>
+            </template>
+        </UCard>
+    </UModal>
+
+    <!-- Modal de error al proponer mas de una cancion -->
+    <UModal v-model="modals.proposeSongError" class="z-[9999]">
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center py-2 rounded-lg shadow-md">
+                    <span class="material-symbols-rounded text-[2rem] text-red-500 mr-4">
+                        error
+                    </span>
+                    <h2 class="text-white text-xl font-bold">{{ postedSongStatus.title }}</h2>
+                </div>
+            </template>
+
+            {{ postedSongStatus.message }}
+        </UCard>
+    </UModal>
 </template>
 
 <script>
@@ -139,7 +169,7 @@ export default {
             modals: {
                 alreadyVotedModal: false,
                 reportModal: false,
-                proposeSongError: true,
+                proposeSongError: false,
             },
             songs: computed(() => this.store.proposedSongs),
             spotifySongs: [],
@@ -159,12 +189,6 @@ export default {
             currentTrackId: null,
             isPlaying: false,
             mobileDetector: this.$device.isMobile ? 1 : 0,
-            // songComponentSelector: this.$device.isMobile ? 1 : 0,
-            // playerSelector: this.$device.isMobile ? 1 : 0,
-            modalComponent: {
-                0: resolveComponent('ModularModal'),
-                1: resolveComponent('MobileModal'),
-            },
             songComponent: {
                 0: resolveComponent('Song'),
                 1: resolveComponent('MobileSong'),
@@ -438,9 +462,6 @@ export default {
             }
 
             return filtered;
-        },
-        activeModal() {
-            return this.modalComponent[this.mobileDetector];
         },
         activeSong() {
             return this.songComponent[this.mobileDetector];
