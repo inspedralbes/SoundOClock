@@ -8,7 +8,8 @@
             <div class="flex flex-row mt-8">
                 <div class="users-container w-1/3 ml-20 overflow-y-auto pr-2">
                     <!-- Buscador amb buto de filtres -->
-                    <SearchWithFilters :filters="classGroups" :filterValue="(filter) => filter.abbreviation" @search="search = $event" @filter="filter = $event" />
+                    <SearchWithFilters :filters="classGroups" :filterValue="(filter) => filter.abbreviation"
+                        @search="search = $event" @filter="filter = $event" />
 
                     <!-- Llista d'usuaris -->
                     <div class="width flex flex-col justify-center ml-auto mr-auto gap-3">
@@ -48,7 +49,7 @@ export default {
     data() {
         return {
             loading: true,
-            currentSelectedUser: null,
+            // currentSelectedUser: null,
             search: "",
             filter: "Tots",
             isDropdownMenuOpen: false,
@@ -58,7 +59,7 @@ export default {
     },
     methods: {
         selectUser(selectedUser) {
-            this.currentSelectedUser = selectedUser;
+            this.store.setAdminSelectedUser(selectedUser);
         },
         isSelected(user) {
             let style = "user-item--not-selected";
@@ -76,7 +77,7 @@ export default {
         this.loading = false;
     },
     computed: {
-        selectedUser() {
+        currentSelectedUser() {
             return this.store.getAdminSelectedUser();
         },
         filteredUsers() {
@@ -115,27 +116,33 @@ export default {
 /* Estilos para la barra de desplazamiento en navegadores webkit (Chrome, Safari, etc.) dentro del contenedor .users-container */
 /* Estilos para la barra de desplazamiento vertical */
 .users-container::-webkit-scrollbar {
-  width: 10px; /* Grosor de la barra de desplazamiento vertical */
+    width: 10px;
+    /* Grosor de la barra de desplazamiento vertical */
 }
 
 .users-container::-webkit-scrollbar-thumb {
-  background-color: #888; /* Color del "pulgar" de la barra de desplazamiento */
-  border-radius: 5px; /* Bordes redondeados del "pulgar" */
+    background-color: #888;
+    /* Color del "pulgar" de la barra de desplazamiento */
+    border-radius: 5px;
+    /* Bordes redondeados del "pulgar" */
 }
 
 /* Estilos para el fondo de la barra de desplazamiento */
 .users-container::-webkit-scrollbar-track {
-  background-color: transparent; /* Color del fondo de la barra de desplazamiento (transparente) */
+    background-color: transparent;
+    /* Color del fondo de la barra de desplazamiento (transparente) */
 }
 
 /* Estilos para la barra de desplazamiento horizontal */
 .users-container::-webkit-scrollbar-horizontal {
-  height: 10px; /* Grosor de la barra de desplazamiento horizontal */
+    height: 10px;
+    /* Grosor de la barra de desplazamiento horizontal */
 }
 
 /* Pseudo-clase hover para el "pulgar" */
 .users-container::-webkit-scrollbar-thumb:hover {
-  background-color: #555; /* Cambiar el color del "pulgar" al pasar el mouse sobre él */
+    background-color: #555;
+    /* Cambiar el color del "pulgar" al pasar el mouse sobre él */
 }
 
 .users-container {
@@ -208,5 +215,4 @@ export default {
 img {
     width: 60px;
     height: 60px;
-}
-</style>
+}</style>

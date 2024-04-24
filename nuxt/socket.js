@@ -42,6 +42,7 @@ socket.on("connect", () => {
 
   socket.on("userBanned", (data) => {
     console.log('socket userBanned data received', data);
+    refreshUsersAdminView(data);
   });
 
   socket.on("loginData", (id, mail, name, token, groups, roleId) => {
@@ -144,6 +145,42 @@ socket.on("connect", () => {
       .catch(error => {
         console.error('Error fetching data:', error);
       });
+  }
+
+  function refreshUsersAdminView(user) {
+
+    let usersAdminView = pinia.getUsersAdminView();
+
+    const i = usersAdminView.findIndex(u => u.id === user.id);
+
+    if (i !== -1) {
+      usersAdminView[i] = user;
+      pinia.setUsersAdminView(usersAdminView);
+      refreshAdminSelectedUserView(user);
+    } else {
+      console.log("Not found in the array.");
+    }
+  }
+
+  function refreshAdminSelectedUserView(user) {
+
+    let selectedUser = pinia.getAdminSelectedUser();
+    let usersAdminView = pinia.getUsersAdminView();
+    
+    if (selectedUser.id === user.id) {
+
+      pinia.setAdminSelectedUser(user);
+
+    } else {
+
+      const i = usersAdminView.findIndex(u => u.id === selectedUser.id);
+
+      if (i !== -1) {
+        pinia.setAdminSelectedUser(usersAdminView[i]);
+      } else {
+        console.log("Not found in the array.");
+      }
+    }
   }
 });
 
