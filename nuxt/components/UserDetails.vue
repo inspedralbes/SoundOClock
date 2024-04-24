@@ -146,6 +146,14 @@ export default {
       socket.emit('banUser', this.store.getUser().token, this.user);
     }
   },
+  unmounted() {
+    this.store.setServerResponse(null);
+  },
+  computed: {
+    serverResponse() {
+      return this.store.getServerResponse();
+    },
+  },
   setup() {
     const store = useAppStore();
     return { store };
@@ -356,7 +364,7 @@ export default {
     </template>
   </ModularModal>
 
-
+  <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
 
 </template>
 

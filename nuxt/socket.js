@@ -35,7 +35,13 @@ socket.on("connect", () => {
     comManager.getAdminSongs();
   });
 
+  socket.on("notifyUserBanned", (data) => {
+    console.log('socket notifyUserBanned data received', data);
+    pinia.setServerResponse(data);
+  });
+
   socket.on("userBanned", (data) => {
+    console.log('socket userBanned data received', data);
   });
 
   socket.on("loginData", (id, mail, name, token, groups, roleId) => {

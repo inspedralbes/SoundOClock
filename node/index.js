@@ -635,15 +635,34 @@ io.on('connection', (socket) => {
   });
 
   socket.on('banUser', async (userToken, bannedUser) => {
-    // Check that the user is authenticated with Laravel Sanctum and is an admin
-    // let user = await comManager.getUserInfo(userToken);
-    // if (!user.id || user.role_id !== 1) return;
 
     try {
-      // Update user
-      comManager.updateUser(userToken, bannedUser);
 
-      io.emit('userBanned', { status: 'success', message: `L'usuari' ${bannedUser.name} ha sigut bloquejat` });
+      // Find the user that proposed the song
+      const user = await comManager.showUser(userToken, bannedUser.id);
+
+      // Update user
+      const updatedUser = await comManager.updateUser(userToken, bannedUser);
+      console.log("BAN USER, UPDATED USER", user, updatedUser);
+
+      // Compare the user's changed data to customize the message
+      let message = "default";
+
+      if (user.vote_banned_until && !updatedUser.vote_banned_until) {
+        message = `pot tornar a votar cançons`;
+      } else if (!user.vote_banned_until && updatedUser.vote_banned_until) {
+        message = `no pot votar cançons fins el ${formatDate(updatedUser.vote_banned_until)}`;
+      } else if (user.propose_banned_until && !updatedUser.propose_banned_until) {
+        message = `pot tornar a proposar cançons`;
+      } else if (!user.propose_banned_until && updatedUser.propose_banned_until) {
+        message = `no pot proposar cançons fins el ${formatDate(updatedUser.propose_banned_until)}`;
+      } 
+
+      // Notify the user that made the modification
+      socket.emit('notifyUserBanned', { status: 'success', message: `L'usuari ${bannedUser.name} ${message}.` });
+
+      // Update the user banned data to everybody
+      io.emit('userBanned', updatedUser);
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
     }
