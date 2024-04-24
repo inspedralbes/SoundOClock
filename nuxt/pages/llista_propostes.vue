@@ -97,7 +97,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de "{{
-        reportSongData.reportedSong.artists.map(artist => artist.name).join(', ') }}"?</p>
+                    reportSongData.reportedSong.artists.map(artist => artist.name).join(', ') }}"?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -111,23 +111,19 @@
         <component :is="activeModal" :open="modals.proposeSongError" @close="modals.proposeSongError = false">
             <template #title>
                 {{ postedSongStatus.title }}
-                <!-- Ja has proposat una cançó -->
             </template>
             <template #content>
                 <p class="text-center">
                     {{ postedSongStatus.message }}
-                    <!-- Ja has proposat una cançó, espera a que la següent votació per proposar una altra. -->
                 </p>
             </template>
         </component>
-        <!-- Boton que redirige a la propuesta de canciones -->
-        <!-- <footer class="fixed bottom-2 w-full flex justify-center align-center">
-            <button @click="goToProposar"
-                class="w-1/3 m-2 p-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-700"
-                :class="{ 'text-sm w-[90%] mb-4': $device.isMobile }">Proposar
-                cançó
-            </button>
-        </footer> -->
+        <!-- <UModal v-model="modals.proposeSongError">
+            <div v-if="postedSongStatus">
+                <UAlert icon="i-heroicons-x-circle-16-solid" color="red" variant="solid" :title="postedSongStatus.title"
+                    :description="postedSongStatus.message" class="p-6" />
+            </div>
+        </UModal> -->
     </div>
 </template>
 
@@ -143,7 +139,7 @@ export default {
             modals: {
                 alreadyVotedModal: false,
                 reportModal: false,
-                proposeSongError: false,
+                proposeSongError: true,
             },
             songs: computed(() => this.store.proposedSongs),
             spotifySongs: [],
