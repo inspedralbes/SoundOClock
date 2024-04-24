@@ -4,7 +4,7 @@
             class="fixed bottom-8 right-8 bg-white rounded-lg shadow-sm p-4 w-[200px] overflow-hidden shadow-white">
             <div class="flex flex-col items-center">
                 <div>
-                    <img class="rounded-full object-cover spin"
+                    <img class="rounded-full object-cover spin border border-solid border-gray-500 bg-gray-200 p-1 "
                         :src="track.album ? track.album.images[0].url : track.img" alt="Album Image">
                 </div>
                 <div class="mt-4 text-center overflow-hidden">

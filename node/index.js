@@ -8,6 +8,7 @@ import downloadsManager from './downloadsManager.cjs';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 import minimist from 'minimist';
+import { remove } from 'fs-extra';
 
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || 'mongodb';
@@ -29,30 +30,6 @@ const port = process.env.PORT || 8080;
 mongoose.connect('mongodb://mongoadmin:mongopassword@' + host + ':27017/soundoclock', { authSource: "admin" })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
-
-async function insertDefaultsMongo() {
-  const songs = [
-    { id: '0VjIjW4GlUZAMYd2vXMi3b', title: 'Blinding Lights', artist: 'The Weeknd', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36', previewUrl: 'https://example.com/blinding-lights-preview', submitDate: new Date('2020-11-29'), submittedBy: 1 },
-    { id: '62PaSfnXSMyLshYJrlTuL3', title: 'Hello', artist: 'Adele', year: 2015, img: 'https://i.scdn.co/image/ab67616d00001e0247ce408fb4926d69da6713c2', previewUrl: 'https://example.com/hello-preview', totalVotes: 300, votesPerGroup: { 1: 2, 2: 8 }, submitDate: new Date('2015-10-23'), submittedBy: 7 },
-    { id: '0sfdiwck2xr4PteGOdyOfz', title: 'Shot in the Dark', artist: 'AC/DC', year: 2020, img: 'https://i.scdn.co/image/ab67616d00001e0204db0e3bcd166c1d6cfd81f9', previewUrl: 'https://example.com/shot-in-the-dark-preview', totalVotes: 75, votesPerGroup: { 1: 1, 4: 10 }, submitDate: new Date('2020-10-07'), submittedBy: 2 }
-  ];
-
-  const votingRecords = [
-    { userId: 1, submitted: true, votedSongs: [1, 4], groups: [1] },
-    { userId: 2, submitted: false, votedSongs: [], groups: [2] },
-    { userId: 3, submitted: false, votedSongs: [2], groups: [1] },
-  ];
-
-  // Upsert songs
-  for (const song of songs) {
-    await Song.updateOne({ id: song.id }, { $setOnInsert: song }, { upsert: true });
-  }
-
-  // Upsert voting records
-  for (const record of votingRecords) {
-    await VotingRecord.updateOne({ userId: record.userId }, { $setOnInsert: record }, { upsert: true });
-  }
-}
 
 //FETCH TO GET HTML FROM SPOTIFY
 // insertDefaultsMongo();
@@ -185,6 +162,24 @@ app.get('/publicGroups', async (req, res) => {
   }
 })
 
+app.get('/publicCategories', async (req, res) => {
+  try {
+    const categories = await comManager.getPublicCategories();
+    res.json(categories);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
+app.get('/allGroupsAndCategories', async (req, res) => {
+  try {
+    const data = await comManager.getAllGroupsAndCategories();
+    res.json(data);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
 app.post('/addGroupsToUser', async (req, res) => {
   try {
     const response = await comManager.setUserGroups(req.body.userId, req.body.token, req.body.groups);
@@ -217,6 +212,24 @@ app.post('/userInfo', async (req, res) => {
     res.json(response);
   } catch (err) {
     res.status(500).send(err);
+  }
+})
+
+app.post('/createGroupCategory', async (req, res) => {
+  try {
+    let response = await comManager.createGroupCategory(req.body.token, req.body.category);
+    res.json(response);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+})
+
+app.post('/createGroup', async (req, res) => {
+  try {
+    let response = await comManager.createGroup(req.body.token, req.body.group);
+    res.json(response);
+  } catch (err) {
+    res.status(500).send
   }
 })
 
@@ -280,16 +293,12 @@ io.on('connection', (socket) => {
       .then((userData) => {
 
         let groups = [];
-        // Populate groups array with group_id and course
+        // Populate groups array with group_id
         userData.user.groups.forEach(group => {
-          let groupObject = {
-            group_id: group.pivot.group_id,
-            course: group.pivot.course,
-          }
-          groups.push(groupObject);
+          groups.push(group.pivot.group_id);
         });
 
-        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.token, groups);
+        socket.emit('loginData', userData.user.id, userData.user.email, userData.user.name, userData.token, groups, userData.user.role_id);
       })
       .catch((err) => {
         console.error(err);
@@ -305,17 +314,34 @@ io.on('connection', (socket) => {
     // TODO: songData does not include the year of the song, it should
 
     try {
+      // Check if the user can post a song
+      if (user.propose_banned_until > new Date().toISOString().substring(0, 10)) {
+        socket.emit('postError', { status: 'error', title: `Estàs bloquejat`, message: `No pots proposar cançons fins el ${formatDate(user.propose_banned_until)}.` });
+        return;
+      }
+
+      // Check if the song is in the blacklist
+      const response = await comManager.getBlackList(userToken);
+      const blacklistSongs = await response.json();
+
+      for (let i = 0; i < blacklistSongs.length; i++) {
+        if (blacklistSongs[i].spotify_id == songData.id) {
+          socket.emit('postError', { status: 'error', title: `Cançó no disponible`, message: `La cançó ${blacklistSongs[i].name} no està disponible.` });
+          return;
+        }
+      }
+
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
       if (existingSong) {
-        socket.emit('postError', { status: 'error', message: 'Song already exists' });
+        socket.emit('postError', { status: 'error', title: `Cançó ja proposada`, message: `La cançó ${existingSong.name} ja ha sigut proposada per un altre usuari.` });
         return;
       }
 
       // Check if the user already submitted a song
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
       if (votingRecord && votingRecord.submitted) {
-        socket.emit('postError', { status: 'error', message: 'User already submitted a song' });
+        socket.emit('postError', { status: 'error', title: `Ja has proposat una cançó`, message: 'Ja has proposat una cançó, espera a la següent votació per proposar una altra.' });
         return;
       }
 
@@ -349,6 +375,12 @@ io.on('connection', (socket) => {
     if (!user.id) return;
 
     try {
+      // Check if the user can vote a song
+      if (user.vote_banned_until > new Date().toISOString().substring(0, 10)) {
+        socket.emit('voteError', { status: 'error', title: `Estàs bloquejat`, message: `No pots votar cançons fins el ${formatDate(user.vote_banned_until)}.` });
+        return;
+      }
+
       // Check if the song exists
       const song = await Song.findOne({ id: songId });
       if (!song) {
@@ -378,7 +410,7 @@ io.on('connection', (socket) => {
 
       // Check if the user already voted twice
       if (votingRecord && votingRecord.votedSongs.length > 1) {
-        socket.emit('voteError', { status: 'error', message: 'User already voted' });
+        socket.emit('voteError', { status: 'error', title: `Has arribat al màxim de vots`, message: `Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions, promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies per la teva participació!` });
         return;
       }
 
@@ -435,11 +467,16 @@ io.on('connection', (socket) => {
       // Check if the song exists and delete it
       await Song.findOneAndDelete({ id: songId });
 
-      await comManager.removeSongFromBlacklist(userToken, songId);
+      const response = await comManager.removeSongFromBlacklist(userToken, songId);
+      const removedSong = await response.json();
 
-      socket.emit('songRemovedFromBlacklist', songId);
+      // Notify the user that has removed the song from the blacklist
+      socket.emit('notifySongRemovedFromBlacklist', { status: 'success', message: `La cançó ${removedSong.name} ha sigut eliminada de la llista negra.` });
+
+      // Update the blacklist to everybody
+      io.emit('songRemovedFromBlacklist', songId);
     } catch (err) {
-      socket.emit('deleteError', { status: 'error', message: err.message });
+      socket.emit('deleteError', { status: 'error', message: `No s'ha pogut eliminar la cançó de la llista negra.`, reason: err.message });
     }
   });
 
@@ -457,8 +494,12 @@ io.on('connection', (socket) => {
         return;
       }
       console.log("in index", song);
-      comManager.addSongToBlackList(userToken, song);
+      const bannedSong = await comManager.addSongToBlackList(userToken, song);
 
+      // Notify the user that banned the song
+      socket.emit('notifySongDeleted', { status: 'success', message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.` });
+
+      // Update the proposed songs list to everybody
       io.emit('songDeleted', { status: 'success', song: song });
     } catch (err) {
       socket.emit('deleteError', { status: 'error', message: err.message });
@@ -541,8 +582,8 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('updateGroup', (token, groupName) => {
-    comManager.updateGroup(token, groupName)
+  socket.on('updateGroup', (token, group) => {
+    comManager.updateGroup(token, group)
       .then((response) => {
         socket.emit('groupUpdated', response);
       })
@@ -605,6 +646,11 @@ io.on('connection', (socket) => {
 
     try {
       let response = await comManager.setBellsGroupsConfiguration(userToken, bells);
+
+      // Notify the user that made the modification
+      socket.emit('notifyBellsGroupsRelationsUpdated', { status: 'success', message: `La configuració de timbres i grups ha sigut modificada.` });
+
+      // Update the bells groups relations data to everybody
       io.emit('bellsGroupsRelationsUpdated', { status: 'success', message: response });
     } catch (err) {
       socket.emit('updateBellsGroupsRelationsError', { status: 'error', message: err.message });
@@ -652,17 +698,17 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('modifyUserRole', async (userToken, modifiedUser) => {
+  socket.on('updateUserRole', async (userToken, modifiedUser) => {
 
     try {
       // Update user
       comManager.updateUser(userToken, modifiedUser);
 
       // Notify the user that made the modification
-      socket.emit('userRoleModified', { status: 'success', message: `El rol de l'usuari' ${modifiedUser.name} ha sigut modificat.` });
+      socket.emit('notifyUserRoleUpdated', { status: 'success', message: `El rol de l'usuari ${modifiedUser.name} ha sigut modificat.` });
 
       // Update the user data to everybody
-      io.emit('refreshUsersData');
+      io.emit('userRoleUpdated');
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
     }
@@ -696,5 +742,9 @@ io.on('connection', (socket) => {
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+function formatDate(date) {
+  return date.substring(8, 10) + "-" + date.substring(5, 7) + "-" + date.substring(0, 4);
+}
 
 export { port };

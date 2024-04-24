@@ -68,6 +68,8 @@
             <p>Totes les franges horàries han de tenir com a mínim un grup assignat.</p>
         </template>
     </ModularModal>
+
+    <ModularToast v-bind:serverResponse="serverResponse" time="10000"/>
 </template>
 
 <script>
@@ -147,6 +149,9 @@ export default {
                 }
             }
             return bells;
+        },
+        serverResponse() {
+            return this.store.getServerResponse();
         },
     },
     setup() {

@@ -16,7 +16,8 @@
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text" placeholder="Buscar..."
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model.lazy="filter">
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
+                    @keydown.enter.prevent="acceptInput">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
                     :class="{ 'text-base': $device.isMobile }">
                     search
@@ -82,16 +83,10 @@
         <!-- Modales -->
         <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
         <component :is="activeModal" :open="modals.alreadyVotedModal" @close="modals.alreadyVotedModal = false">
-            <template #title>Has arribat al màxim de vots</template>
+            <template #title>{{ serverResponse.title }}</template>
             <template #content>
                 <p>
-                    Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura
-                    s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples
-                    opcions,
-                    promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic.
-                    Gràcies
-                    per
-                    la teva participació!
+                    {{ serverResponse.message }}
                 </p>
             </template>
         </component>
@@ -102,7 +97,7 @@
             <template #title>Reportar cançó</template>
             <template #content>
                 <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de "{{
-                    reportSongData.reportedSong.artists.map(artist => artist.name).join(', ') }}"?</p>
+        reportSongData.reportedSong.artists.map(artist => artist.name).join(', ') }}"?</p>
                 <div class="flex flex-col mt-4">
                     <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
                         <input type="radio" v-model="reportSongData.selectedOption" :value="option"
@@ -114,10 +109,14 @@
         </component>
         <!-- Modal de error al proponer mas de una cancion -->
         <component :is="activeModal" :open="modals.proposeSongError" @close="modals.proposeSongError = false">
-            <template #title>Ja has proposat una cançó</template>
+            <template #title>
+                {{ postedSongStatus.title }}
+                <!-- Ja has proposat una cançó -->
+            </template>
             <template #content>
-                <p class="text-center">Ja has proposat una cançó, espera a que la següent votació per proposar una
-                    altra.
+                <p class="text-center">
+                    {{ postedSongStatus.message }}
+                    <!-- Ja has proposat una cançó, espera a que la següent votació per proposar una altra. -->
                 </p>
             </template>
         </component>
@@ -177,7 +176,8 @@ export default {
             activePlayer: {
                 0: resolveComponent('ModularPlayer'),
                 1: resolveComponent('MobilePlayer'),
-            }
+            },
+            serverResponse: null,
         }
     },
     created() {
@@ -213,6 +213,7 @@ export default {
         comManager.getUserSelectedSongs(this.store.getUser().id);
 
         socket.on("voteError", (data) => {
+            this.serverResponse = data;
             this.modals.alreadyVotedModal = true;
             this.isLoadingVote.state = false;
         })
@@ -233,8 +234,20 @@ export default {
                 this.spotifySongs = [];
             }
         },
+        handleInput(event) {
+            const value = event.target.value;
+            if (value.length > 3 || value === '') {
+                this.filter = value;
+                this.getSongs();
+            }
+        },
+        acceptInput(event) {
+            this.filter = event.target.value;
+            this.getSongs();
+        },
         deleteSearch() {
             this.filter = '';
+            this.spotifySongs = [];
         },
         getType(trackID) {
             if (this.songs.some(song => song.id === trackID)) {
@@ -260,12 +273,12 @@ export default {
         },
         vote(songId) {
             if (!this.isLoadingVote.state) {
-                if (this.userSelectedSongsvotedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
-                    this.modals.alreadyVotedModal = true;
-                } else {
-                    this.store.setIsLoadingVote({ state: true, selectedSong: songId });
-                    socket.emit('castVote', this.store.getUser().token, songId);
-                }
+                // if (this.userSelectedSongsvotedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {
+                //     this.modals.alreadyVotedModal = true;
+                // } else {
+                this.store.setIsLoadingVote({ state: true, selectedSong: songId });
+                socket.emit('castVote', this.store.getUser().token, songId);
+                // }
             }
         },
 
@@ -333,6 +346,7 @@ export default {
                     // date: track.album.release_date,
                     img: track.album.images[1].url,
                     preview_url: track.preview_url,
+                    explicit: track.explicit,
                     submitDate: new Date().toISOString(),
                     submittedBy: this.store.getUser().id,
                 }
@@ -367,10 +381,6 @@ export default {
                 }
             }
         },
-        filter: {
-            handler: 'getSongs',
-            immediate: false,
-        },
         'currentTrack': {
             handler: function () {
                 this.currentTrack.onended = () => {
@@ -384,9 +394,7 @@ export default {
         filteredSongs() {
             let array = this.songs;
 
-            if (this.spotifySongs.length > 0) {
-                // array = array.concat(this.spotifySongs);
-            }
+            // if (this.filter.length < 3) return array;
 
             let filtered = array.filter(song => {
                 let songName = song.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -444,7 +452,7 @@ export default {
         activePlayer() {
             return this.activePlayer[this.mobileDetector];
         }
-        
+
     },
 }
 

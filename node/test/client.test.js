@@ -24,6 +24,7 @@ describe('Listen the Server sockets', function () {
     year: 2021,
     img: 'test img',
     preview_url: 'test url',
+    explicit: false,
     totalVotes: 0,
     votesPerGroup: {},
     submitDate: "2024-03-18T10:47:30.104Z",

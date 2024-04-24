@@ -9,7 +9,8 @@ export const useAppStore = defineStore('app', {
         email: "",
         name: "",
         groups: [],
-        token: null
+        token: null,
+        role_id: null
       },
 
     userSelectedSongs: [],
@@ -32,7 +33,7 @@ export const useAppStore = defineStore('app', {
       isPlaying: false,
     },
     roles: null,
-
+    serverResponse: null,
   }),
   persist: {
     storage: persistedState.localStorage,
@@ -92,14 +93,18 @@ export const useAppStore = defineStore('app', {
     getRoles() {
       return this.roles
     },
+    getServerResponse() {
+      return this.serverResponse
+    },
 
     //setters
-    setUser(id, email, name, token, groups) {
+    setUser(id, email, name, token, groups, role_id) {
       this.user.id = id;
       this.user.email = email;
       this.user.name = name;
       this.user.groups = groups;
       this.user.token = token;
+      this.user.role_id = role_id;
 
       localStorage.setItem("user", JSON.stringify(this.user));
     },
@@ -153,8 +158,10 @@ export const useAppStore = defineStore('app', {
       this.songStatus.isPlaying = isPlaying
     },
     setRoles(roles) {
-      console.log("ROLES", roles)
       this.roles = roles
+    },
+    setServerResponse(serverResponse) {
+      this.serverResponse = serverResponse
     },
 
     ///Deletes
@@ -164,7 +171,8 @@ export const useAppStore = defineStore('app', {
         email: "",
         name: "",
         groups: [],
-        token: null
+        token: null,
+        role_id: null
       }
     },
     deleteGroup(id) {

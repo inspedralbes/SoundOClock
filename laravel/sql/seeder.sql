@@ -16,22 +16,39 @@ INSERT INTO users (name, email, created_at, updated_at, role_id, vote_banned_unt
 ('pedro', 'pedro@gmail.com', NOW(), NOW(), 4, null, null),
 ('raul', 'raul@gmail.com', NOW(), NOW(), 4, null, null);
 
--- INSERT INTO blacklist (spotify_id, title, artist, image, preview_url) VALUES
--- ('0TlLq3lA83rQOYtrqBqSct', 'Nonstop', 'Drake', 'https://i.scdn.co/image/ab67616d00001e02f907de96b9a4fbc04accc0d5',''),
--- ('5lwWpQ71GKN3sWmk8zZr9g', 'Red Sun', 'Dreamcatcher', 'https://i.scdn.co/image/ab67616d00001e0219224fae0aa53341020f5b12', '');
+INSERT INTO `group_categories` (id, name, abbreviation, is_public) VALUES
+(1, 'Educació Secundària Obligatòria', 'ESO', 1),
+(2, 'Batxillerat', 'BATX', 1),
+(3, 'Cicles Formatius', 'CF', 1),
+(4, 'Programes de Formació i Inserció', 'PFI', 1),
+(5, 'Professorat', 'PROF', 0);
 
-INSERT INTO `groups` (name, abbreviation, is_public, max_courses) VALUES
-('Escola Secundaria Obligatoria', 'ESO', 1, 4),
-('Batxillerat', 'BATX', 1, 2),
-('Sistemes Microinformàtics i Xarxes', 'SMX', 1, 2),
-('Desenvolupament d''Aplicacions Web', 'DAW', 1, 2),
-('Desenvolupament d''Aplicacions Multiplataforma', 'DAM', 1, 2),
-('Desenvolupament d''Aplicacions Multiplataforma - Videojocs i Oci Digital', 'DAM-VI', 1, 2),
-('Administració de Sistemes Informàtics en Xarxa', 'ASIX', 1, 2),
-('Animació 3D, Jocs i Entorns Interactius', 'A3D', 1, 2),
-('Curs d''especialització en Desenvolupament de Videojocs', 'CE', 1, 2),
-('Programes de Formació i Inserció', 'PFI', 1, 2),
-('Direcció', 'DIR', 0, 1);
+INSERT INTO `groups` (name, abbreviation, is_public, category_id) VALUES
+('1er Educació Secundària Obligatòria', '1 ESO', 1, 1),
+('2on Educació Secundària Obligatòria', '2 ESO', 1, 1),
+('3er Educació Secundària Obligatòria', '3 ESO', 1, 1),
+('4rt Educació Secundària Obligatòria', '4 ESO', 1, 1),
+('1er Batxillerat', '1 BATX', 1, 2),
+('2on Batxillerat', '2 BATX', 1, 2),
+('1er Sistemes Microinformàtics i Xarxes', '1 SMX', 1, 3),
+('2on Sistemes Microinformàtics i Xarxes', '2 SMX', 1, 3),
+('1er Desenvolupament d''Aplicacions Web', '1 DAW', 1, 3),
+('2on Desenvolupament d''Aplicacions Web', '2 DAW', 1, 3),
+('1er Desenvolupament d''Aplicacions Multiplataforma', '1 DAM', 1, 3),
+('2on Desenvolupament d''Aplicacions Multiplataforma', '2 DAM', 1, 3),
+('1er Desenvolupament d''Aplicacions Multiplataforma - Videojocs i Oci Digital', '1 DAM-VI', 1, 3),
+('2on Desenvolupament d''Aplicacions Multiplataforma - Videojocs i Oci Digital', '2 DAM-VI', 1, 3),
+('1er Administració de Sistemes Informàtics en Xarxa', '1 ASIX', 1, 3),
+('2on Administració de Sistemes Informàtics en Xarxa', '2 ASIX', 1, 3),
+('1er Animació 3D, Jocs i Entorns Interactius', '1 A3D', 1, 3),
+('2on Animació 3D, Jocs i Entorns Interactius', '2 A3D', 1, 3),
+('1er Curs d''especialització en Desenvolupament de Videojocs', '1 CE', 1, 3),
+('2on Curs d''especialització en Desenvolupament de Videojocs', '2 CE', 1, 3),
+('1er Programes de Formació i Inserció', '1 PFI', 1, 4),
+('2on Programes de Formació i Inserció', '2 PFI', 1, 4),
+('Direcció', 'DIR', 0, 5),
+('Secretaria', 'SECR', 0, 5),
+('Professorat Música', 'PROF MUS', 0, 5);
 
 INSERT INTO `bells` (hour) VALUES
 ('08:00'),

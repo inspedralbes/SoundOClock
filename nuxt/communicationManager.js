@@ -68,8 +68,20 @@ export function getUsers() {
         });
 }
 
-async function getPublicGroups() {
-    const response = await fetch(`${url}/publicGroups`);
+async function getPublicGroupsAndCategories() {
+    const publicGroupsPromise = fetch(`${url}/publicGroups`).then(response => response.json());
+    const publicCategoriesPromise = fetch(`${url}/publicCategories`).then(response => response.json());
+
+    const [publicGroups, publicCategories] = await Promise.all([publicGroupsPromise, publicCategoriesPromise]);
+
+    return {
+        publicGroups,
+        publicCategories
+    };
+}
+
+async function getAllGroupsAndCategories() {
+    const response = await fetch(`${url}/allGroupsAndCategories`);
     const data = await response.json();
     return data;
 }
@@ -148,18 +160,53 @@ async function downloadSongs(songs) {
     return data;
 }
 
+async function createGroupCategory(token, category) {
+    const response = await fetch(`${url}/createGroupCategory`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            token,
+            category,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
+async function createGroup(token, group) {
+    const response = await fetch(`${url}/createGroup`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            token,
+            group,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
 const comManager = {
     getUserSelectedSongs,
     getSongs,
     getAdminSongs,
     getUsers,
-    getPublicGroups,
+    getPublicGroupsAndCategories,
+    getAllGroupsAndCategories,
     setUserGroups,
     getBells,
     logout,
     getUserInfo,
     getSortedVotedSongs,
     downloadSongs,
+    createGroupCategory,
+    createGroup,
 };
 
 export default comManager;

@@ -8,13 +8,13 @@ export default {
   },
   data() {
     return {
+      notReadReports: 0,
       modals: {
         addSongToBlacklist: false,
-        notReadReports: null
       },
     }
   },
-  created() {
+  mounted() {
     this.countNotReadReports();
   },
   watch: {
@@ -50,14 +50,12 @@ export default {
 
       let counter = 0;
 
-      if (this.song) {
-        for (let i = 0; i < this.song.reports.length; i++) {
-          if (!this.song.reports[i].isRead) {
-            counter++;
-          }
+      for (let i = 0; i < this.song.reports.length; i++) {
+        if (!this.song.reports[i].isRead) {
+          counter++;
         }
-        this.notReadReports = counter;
       }
+      this.notReadReports = counter;
     },
     markAllReportsAsRead() {
 
@@ -71,6 +69,14 @@ export default {
       }
 
       this.countNotReadReports();
+    },
+  },
+  unmounted() {
+    this.store.setServerResponse(null);
+  },
+  computed: {
+    serverResponse() {
+      return this.store.getServerResponse();
     },
   },
   setup() {
@@ -89,7 +95,7 @@ export default {
       <div class="w-2/3 ml-4 flex flex-col justify-between">
         <div>
           <p class="text-5xl font-black">{{ song.name }}</p>
-          <p class="text-3xl">{{ song.artists }}</p>
+          <p class="text-3xl">{{ song.artists.map(artist => artist.name).join(', ') }}</p>
         </div>
         <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
           @click="deleteSong(song)">AFEGIR A LA LLISTA NEGRA</button>
@@ -127,10 +133,12 @@ export default {
       <h2>Afegir cançó a la llista negra</h2>
     </template>
     <template #content>
-      <p>Segur que vols afegir <span class="font-bold">{{ song.name }}</span> de <span class="font-bold">{{ song.artists
-      }}</span> a la llista negra?</p>
+      <p>Segur que vols afegir <span class="font-bold">{{ song.title }}</span> de <span class="font-bold">{{
+        song.artists.map(artist => artist.name).join(', ') }}</span> a la llista negra?</p>
     </template>
   </ModularModal>
+
+  <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
 </template>
 
 <style scoped>

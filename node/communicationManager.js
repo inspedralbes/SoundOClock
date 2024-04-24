@@ -118,8 +118,9 @@ async function addSongToBlackList(token, song) {
       preview_url: song.preview_url
     })
   });
-  console.log(response);
-  return response;
+  const jsonResponse = await response.json();
+  console.log("POSTED SONG TO BLACKLIST", jsonResponse);
+  return jsonResponse;
 }
 
 async function getPlaylists(playlist, limit, token) {
@@ -215,6 +216,46 @@ async function getPublicGroups(token) {
   return response.data;
 }
 
+async function getPublicCategories(token) {
+  const response = await axios.get(`${apiURL}groupCategories`, {
+    headers: {
+      "Authorization": "Bearer " + token,
+    }
+  });
+  return response.data;
+}
+
+async function getAllGroupsAndCategories() {
+  const allGroupsPromise = axios.get(`${apiURL}groupsAll`).then(response => response.data);
+  const allCategoriesPromise = axios.get(`${apiURL}groupCategoriesAll`).then(response => response.data);
+
+  const [allGroups, allCategories] = await Promise.all([allGroupsPromise, allCategoriesPromise]);
+
+  return {
+    allGroups,
+    allCategories
+  };
+}
+
+async function createGroupCategory(token, category) {
+  const response = await axios.post(`${apiURL}groupCategories`, category, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  return response.data;
+}
+
+async function createGroup(token, group) {
+  const response = await axios.post(`${apiURL}groups`, group, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  console.log(response.data)
+  return response.data;
+}
+
 async function fetchSpotifyPage(id) {
   try {
     const response = await axios.get(`https://open.spotify.com/embed/track/${id}`);
@@ -253,14 +294,17 @@ async function updateUser(token, user) {
 }
 
 async function setUserGroups(userId, token, groups) {
-  const response = await fetch(apiURL + 'addGroupsToUser/' + userId, {
+  const response = await fetch(apiURL + 'groupsUser', {
     method: 'POST',
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
       "Authorization": "Bearer " + token,
     },
-    body: JSON.stringify(groups)
+    body: JSON.stringify({ 
+      "groups": groups,
+      "user_id": userId
+     })
   });
   const jsonResponse = await response.json();
   return jsonResponse;
@@ -347,6 +391,7 @@ const comManager = {
   searchSongId,
   getGroups,
   getPublicGroups,
+  getPublicCategories,
   fetchSpotifyPage,
   getUsers,
   updateUser,
@@ -358,6 +403,9 @@ const comManager = {
   showUser,
   getRoles,
   getSettings,
+  getAllGroupsAndCategories,
+  createGroupCategory,
+  createGroup,
 };
 
 export default comManager;

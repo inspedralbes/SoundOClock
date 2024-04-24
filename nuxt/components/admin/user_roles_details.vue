@@ -35,6 +35,8 @@
             </p>
         </template>
     </ModularModal>
+
+    <ModularToast v-bind:serverResponse="serverResponse" time="10000"/>
 </template>
 
 <script>
@@ -52,7 +54,7 @@ export default {
             roles: computed(() => this.store.getRoles()),
             selectedRole: null,
             modals: {
-                changeUserRole: false
+                changeUserRole: false,
             },
         }
     },
@@ -126,8 +128,16 @@ export default {
             // Object.assign() method copies all properties of a source object into a target object ==> Object.assign(target, source)
             let auxUser = Object.assign({}, this.user);
             auxUser.role_id = this.selectedRole;
-            socket.emit('modifyUserRole', this.store.getUser().token, auxUser);
-        }
+            socket.emit('updateUserRole', this.store.getUser().token, auxUser);
+        },
+    },
+    unmounted() {
+        this.store.setServerResponse(null);
+    },
+    computed: {
+        serverResponse() {
+            return this.store.getServerResponse();
+        },
     },
     watch: {
         user: {
