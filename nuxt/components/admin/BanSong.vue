@@ -93,7 +93,6 @@ export default {
         this.loading = true;
         await comManager.getAdminSongs();
         this.loading = false;
-
     },
     computed: {
         songs() {
