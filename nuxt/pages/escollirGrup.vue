@@ -58,12 +58,6 @@ export default {
     },
     mounted() {
         let user = this.store.getUser();
-        console.log(user)
-        if (!user.token) {
-            this.$router.push('/');
-        } else if (user.groups.length > 0) {
-            this.$router.push('/llista_propostes');
-        }
         if(user.role_id < 4) {
             // User is a not a student (teacher, admin, etc.)
             comManager.getAllGroupsAndCategories().then((data) => {
