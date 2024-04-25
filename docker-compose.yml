@@ -12,7 +12,7 @@ services:
     image: mysql:8.2.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: S0und0cLocK-MySqL.
+      MYSQL_ROOT_PASSWORD:
       MYSQL_DATABASE: soundoclock
     ports:
       - 3306:3306
@@ -67,8 +67,8 @@ services:
       - 27017:27017
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: mongoadmin
-      MONGO_INITDB_ROOT_PASSWORD: S0und0cLocK-1M0nGo.
+      MONGO_INITDB_ROOT_USERNAME:
+      MONGO_INITDB_ROOT_PASSWORD:
     volumes:
       - ./mongodb_data:/data/db
   mongo-express:
@@ -78,8 +78,10 @@ services:
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: mongoadmin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: mongopassword
+      ME_CONFIG_MONGODB_ADMINUSERNAME:
+      ME_CONFIG_MONGODB_ADMINPASSWORD:
+      ME_CONFIG_BASICAUTH_USERNAME:
+      ME_CONFIG_BASICAUTH_PASSWORD:
       ME_CONFIG_MONGODB_SERVER: mongodb
     depends_on:
       - mongodb
