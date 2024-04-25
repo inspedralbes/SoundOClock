@@ -23,7 +23,6 @@ function getSortedVotedSongs() {
     fetch(`${url}/sortedVotedSongs`)
         .then(response => response.json())
         .then(data => {
-            console.log("sortedVotedSongs: ", data)
             store.setSortedVotedSongs(data);
         })
         .catch(error => {
@@ -107,7 +106,6 @@ async function getBells() {
     fetch(`${url}/bells/${store.getUser().token}`)
         .then(response => response.json())
         .then(data => {
-            console.log("bells: ", data);
             store.setBells(data);
         })
         .catch(error => {
