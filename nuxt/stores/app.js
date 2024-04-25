@@ -34,6 +34,7 @@ export const useAppStore = defineStore('app', {
     },
     roles: null,
     serverResponse: null,
+    loadingAdminComponent: null
   }),
   persist: {
     storage: persistedState.localStorage,
@@ -95,6 +96,9 @@ export const useAppStore = defineStore('app', {
     },
     getServerResponse() {
       return this.serverResponse
+    },
+    getLoadingAdminComponent() {
+      return this.loadingAdminComponent
     },
 
     //setters
@@ -162,6 +166,9 @@ export const useAppStore = defineStore('app', {
     },
     setServerResponse(serverResponse) {
       this.serverResponse = serverResponse
+    },
+    setLoadingAdminComponent(loadingAdminComponent) {
+      this.loadingAdminComponent = loadingAdminComponent
     },
 
     ///Deletes

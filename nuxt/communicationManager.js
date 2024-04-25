@@ -48,6 +48,7 @@ function getAdminSongs() {
         .then(response => response.json())
         .then(data => {
             store.setProposedSongsAdminView(data);
+            store.setLoadingAdminComponent(false);
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -60,6 +61,7 @@ export function getUsers() {
         .then(response => response.json())
         .then(data => {
             store.setUsersAdminView(data);
+            store.setLoadingAdminComponent(false);
             console.log("USERS", data);
         })
         .catch(error => {
@@ -107,6 +109,7 @@ async function getBells() {
         .then(response => response.json())
         .then(data => {
             store.setBells(data);
+            store.setLoadingAdminComponent(false);
         })
         .catch(error => {
             console.error('Error fetching data:', error);
