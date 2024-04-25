@@ -1,10 +1,13 @@
 <template>
     <div>
         <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">BLOQUEJAR USUARIS</h2>
-        <div class="m-8" v-if="users.length === 0">
+        <div v-if="loading" class="loading">
             <Loader />
         </div>
         <div v-else>
+            <div v-if="users.length === 0" class="mt-4  w-full">
+                <p class="text-center text-xl">No hi ha cap usuari registrat a l'aplicació.</p>
+            </div>
             <div class="flex flex-row mt-8">
                 <div class="users-container w-1/3 ml-20 overflow-y-auto pr-2">
                     <!-- Buscador amb buto de filtres -->
@@ -43,12 +46,11 @@
 
 <script>
 import { useAppStore } from '@/stores/app';
-import { getUsers } from '../../communicationManager';
+import comManager from '../communicationManager';
 
 export default {
     data() {
         return {
-            loading: true,
             // currentSelectedUser: null,
             search: "",
             filter: "Tots",
@@ -71,12 +73,17 @@ export default {
             return style;
         },
     },
-    mounted() {
-        this.loading = true;
-        getUsers();
-        this.loading = false;
+    created() {
+        if (this.store.getUsersAdminView().length <= 0) {
+            console.log("entro users");
+            this.store.setLoadingAdminComponent(true);
+            comManager.getUsers();
+        }
     },
     computed: {
+        loading() {
+            return this.store.getLoadingAdminComponent();
+        },
         currentSelectedUser() {
             return this.store.getAdminSelectedUser();
         },

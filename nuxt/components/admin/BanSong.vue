@@ -58,7 +58,6 @@ import comManager from '../communicationManager';
 export default {
     data() {
         return {
-            loading: true,
             selectedSong: null,
         }
     },
@@ -89,12 +88,16 @@ export default {
             return true;
         }
     },
-    async created() {
-        this.loading = true;
-        await comManager.getAdminSongs();
-        this.loading = false;
+    created() {
+        if (this.store.getProposedSongsAdminView().length <= 0) {
+            this.store.setLoadingAdminComponent(true);
+            comManager.getAdminSongs();
+        }
     },
     computed: {
+        loading() {
+            return this.store.getLoadingAdminComponent();
+        },
         songs() {
             this.selectedSong = this.store.getProposedSongsAdminView()[0];
             return this.store.getProposedSongsAdminView();
