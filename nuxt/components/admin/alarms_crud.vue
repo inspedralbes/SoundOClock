@@ -90,9 +90,12 @@ export default {
         }
     },
     created() {
-        this.loading = true;
-        comManager.getBells();
-        this.loading = false;
+        if (this.store.getBells().length <= 0) {
+            console.log("entro bells");
+            this.loading = true;
+            comManager.getBells();
+            this.loading = false;
+        }
     },
     watch: {
         bells: { // Each time bells change execute createRelationsStructure() method

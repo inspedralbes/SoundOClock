@@ -32,7 +32,7 @@
                 <button>Opció 1</button>
                 <button>Opció 2</button>
                 <button>Opció 3</button>
-                <button>Tancar Sessió</button>
+                <button @click="logout()">Tancar Sessió</button>
             </div>
         </div>
     </div>
@@ -52,6 +52,9 @@ export default {
         toggleDropdown() {
             this.showDropdown = !this.showDropdown;
         },
+        logout() {
+            navigateTo({ path: '/logout' });
+        }
     },
     created() {
 
