@@ -1,7 +1,6 @@
 <template>
     <Transition name="player-slide">
-        <div v-if="track != null"
-            class="fixed bottom-8 right-8 bg-white rounded-lg shadow-sm p-4 w-[200px] overflow-hidden shadow-white">
+        <div v-if="track != null" class="fixed bottom-8 right-8 bg-white rounded-lg shadow-sm p-4 w-40 shadow-white">
             <div class="flex flex-col items-center">
                 <div>
                     <img class="rounded-full object-cover spin border border-solid border-gray-500 bg-gray-200 p-1 "
