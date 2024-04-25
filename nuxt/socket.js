@@ -30,14 +30,15 @@ socket.on("connect", () => {
   });
 
   socket.on("songDeleted", (data) => {
-    console.log('socket songDeleted data received');
+    console.log('socket songDeleted data received', data);
     comManager.getSongs();
-    comManager.getAdminSongs();
+    // comManager.getAdminSongs();
+    refreshAdminSongsView(data.song)
   });
 
   socket.on("userBanned", (data) => {
     console.log('socket userBanned data received', data);
-    refreshUsersAdminView(data);
+    refreshAdminUsersView(data);
   });
 
   socket.on("loginData", (id, mail, name, token, groups, roleId) => {
@@ -131,7 +132,7 @@ socket.on("connect", () => {
       });
   }
 
-  function refreshUsersAdminView(user) {
+  function refreshAdminUsersView(user) {
 
     let usersAdminView = pinia.getUsersAdminView();
 
@@ -166,6 +167,42 @@ socket.on("connect", () => {
       }
     }
   }
+
+  function refreshAdminSongsView(song) {
+
+    let songsAdminView = pinia.getProposedSongsAdminView();
+
+    const i = songsAdminView.findIndex(s => s.id === song.id);
+
+    if (i !== -1) {
+      songsAdminView.splice(i, 1);
+      pinia.setProposedSongsAdminView(songsAdminView);
+      // refreshAdminSelectedSongView(song);
+    } else {
+      console.log("Not found in the array.");
+    }
+  }
+
+  // function refreshAdminSelectedSongView(song) {
+
+  //   let selectedSong = pinia.getAdminSelectedSong();
+  //   let songsAdminView = pinia.getProposedSongsAdminView();
+    
+  //   if (selectedSong.id === song.id) {
+
+  //     pinia.setAdminSelectedSong(song);
+
+  //   } else {
+
+  //     const i = songsAdminView.findIndex(s => s.id === selectedSong.id);
+
+  //     if (i !== -1) {
+  //       pinia.setAdminSelectedSong(songsAdminView[i]);
+  //     } else {
+  //       console.log("Not found in the array.");
+  //     }
+  //   }
+  // }
 });
 
 
