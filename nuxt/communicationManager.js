@@ -23,7 +23,6 @@ function getSortedVotedSongs() {
     fetch(`${url}/sortedVotedSongs`)
         .then(response => response.json())
         .then(data => {
-            console.log("sortedVotedSongs: ", data)
             store.setSortedVotedSongs(data);
         })
         .catch(error => {
@@ -49,6 +48,7 @@ function getAdminSongs() {
         .then(response => response.json())
         .then(data => {
             store.setProposedSongsAdminView(data);
+            store.setLoadingAdminComponent(false);
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -61,15 +61,28 @@ export function getUsers() {
         .then(response => response.json())
         .then(data => {
             store.setUsersAdminView(data);
-            store.setAdminSelectedUser(data[0]);
+            store.setLoadingAdminComponent(false);
+            console.log("USERS", data);
         })
         .catch(error => {
             console.error('Error fetching data:', error);
         });
 }
 
-async function getPublicGroups() {
-    const response = await fetch(`${url}/publicGroups`);
+async function getPublicGroupsAndCategories() {
+    const publicGroupsPromise = fetch(`${url}/publicGroups`).then(response => response.json());
+    const publicCategoriesPromise = fetch(`${url}/publicCategories`).then(response => response.json());
+
+    const [publicGroups, publicCategories] = await Promise.all([publicGroupsPromise, publicCategoriesPromise]);
+
+    return {
+        publicGroups,
+        publicCategories
+    };
+}
+
+async function getAllGroupsAndCategories() {
+    const response = await fetch(`${url}/allGroupsAndCategories`);
     const data = await response.json();
     return data;
 }
@@ -95,8 +108,8 @@ async function getBells() {
     fetch(`${url}/bells/${store.getUser().token}`)
         .then(response => response.json())
         .then(data => {
-            console.log("bells: ", data);
             store.setBells(data);
+            store.setLoadingAdminComponent(false);
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -133,17 +146,68 @@ async function getUserInfo(token) {
     return data;
 }
 
+async function downloadSongs(songs) {
+    const response = await fetch(`${url}/downloadSongs`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            songs,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
+async function createGroupCategory(token, category) {
+    const response = await fetch(`${url}/createGroupCategory`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            token,
+            category,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
+async function createGroup(token, group) {
+    const response = await fetch(`${url}/createGroup`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            token,
+            group,
+        }),
+    });
+    const data = await response.json();
+    return data;
+}
+
 const comManager = {
     getUserSelectedSongs,
     getSongs,
     getAdminSongs,
     getUsers,
-    getPublicGroups,
+    getPublicGroupsAndCategories,
+    getAllGroupsAndCategories,
     setUserGroups,
     getBells,
     logout,
     getUserInfo,
     getSortedVotedSongs,
+    downloadSongs,
+    createGroupCategory,
+    createGroup,
 };
 
 export default comManager;

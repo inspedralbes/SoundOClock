@@ -9,7 +9,8 @@ export const useAppStore = defineStore('app', {
         email: "",
         name: "",
         groups: [],
-        token: null
+        token: null,
+        role_id: null
       },
 
     userSelectedSongs: [],
@@ -26,7 +27,14 @@ export const useAppStore = defineStore('app', {
     bells: [],
     currentTrackPlaying: null,
     postedSongStatus: null,
-
+    songStatus: {
+      currentTrack: null,
+      currentTrackId: null,
+      isPlaying: false,
+    },
+    roles: null,
+    serverResponse: null,
+    loadingAdminComponent: null
   }),
   persist: {
     storage: persistedState.localStorage,
@@ -80,14 +88,27 @@ export const useAppStore = defineStore('app', {
     getSortedVotedSongs() {
       return this.sortedVotedSongs
     },
+    getSongStatus() {
+      return this.songStatus
+    },
+    getRoles() {
+      return this.roles
+    },
+    getServerResponse() {
+      return this.serverResponse
+    },
+    getLoadingAdminComponent() {
+      return this.loadingAdminComponent
+    },
 
     //setters
-    setUser(id, email, name, token, groups) {
+    setUser(id, email, name, token, groups, role_id) {
       this.user.id = id;
       this.user.email = email;
       this.user.name = name;
       this.user.groups = groups;
       this.user.token = token;
+      this.user.role_id = role_id;
 
       localStorage.setItem("user", JSON.stringify(this.user));
     },
@@ -135,6 +156,20 @@ export const useAppStore = defineStore('app', {
     setSortedVotedSongs(sortedVotedSongs) {
       this.sortedVotedSongs = sortedVotedSongs
     },
+    setSongStatus(currentTrack, currentTrackId, isPlaying) {
+      this.songStatus.currentTrack = currentTrack
+      this.songStatus.currentTrackId = currentTrackId
+      this.songStatus.isPlaying = isPlaying
+    },
+    setRoles(roles) {
+      this.roles = roles
+    },
+    setServerResponse(serverResponse) {
+      this.serverResponse = serverResponse
+    },
+    setLoadingAdminComponent(loadingAdminComponent) {
+      this.loadingAdminComponent = loadingAdminComponent
+    },
 
     ///Deletes
     deleteUser() {
@@ -143,7 +178,8 @@ export const useAppStore = defineStore('app', {
         email: "",
         name: "",
         groups: [],
-        token: null
+        token: null,
+        role_id: null
       }
     },
     deleteGroup(id) {
@@ -158,6 +194,56 @@ export const useAppStore = defineStore('app', {
     },
     setAdminSelectedUser(adminSelectedUser) {
       this.adminSelectedUser = adminSelectedUser
+    },
+
+    // Others
+
+    // playTrack(track, status) {
+    //   if (status.currentTrackId == track.id) {
+    //     if (status.isPlaying) {
+    //       status.currentTrack.pause();
+    //       status.isPlaying = false;
+    //     } else {
+    //       status.currentTrack.load();
+    //       status.currentTrack.play();
+    //       status.isPlaying = true;
+    //     }
+    //   } else {
+    //     if (status.isPlaying) {
+    //       status.currentTrack.pause();
+    //       status.isPlaying = false;
+    //     }
+    //     status.currentTrack = new Audio(track.preview_url);
+    //     status.currentTrackId = track.id;
+    //     status.currentTrack.load();
+    //     status.currentTrack.play();
+    //     status.isPlaying = true;
+    //   }
+    //   return status;
+    // },
+
+    playTrack(track) {
+      const status = this.songStatus;
+      if (status.currentTrackId == track.id) {
+        if (status.isPlaying) {
+          status.currentTrack.pause();
+          status.isPlaying = false;
+        } else {
+          status.currentTrack.load();
+          status.currentTrack.play();
+          status.isPlaying = true;
+        }
+      } else {
+        if (status.isPlaying) {
+          status.currentTrack.pause();
+          status.isPlaying = false;
+        }
+        status.currentTrack = new Audio(track.preview_url);
+        status.currentTrackId = track.id;
+        status.currentTrack.load();
+        status.currentTrack.play();
+        status.isPlaying = true;
+      }
     },
   },
 })

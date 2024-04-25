@@ -22,13 +22,22 @@ class GroupsUserTest extends TestCase {
     }
     
     // Helper function to create a group
-    private function createGroup($user, $name, $abbreviation, $is_public, $max_courses) {
+    private function createGroup($user, $name, $abbreviation, $is_public) {
+        // Create a group category
+        $response = $this->actingAs($user)
+            ->post('/api/groupCategories', [
+                'name' => 'category1',
+                'abbreviation' => 'c1',
+                'is_public' => 1,
+            ]);
+        $category_id = $response->json('id');
+        // Create a group
         return $this->actingAs($user)
             ->post('/api/groups', [
                 'name' => $name,
                 'abbreviation' => $abbreviation,
                 'is_public' => $is_public,
-                'max_courses' => $max_courses,
+                'category_id' => $category_id,
             ]);
     }
 
@@ -37,20 +46,18 @@ class GroupsUserTest extends TestCase {
         $user = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($user, 'group1', 'g1', 1, 2);
+        $response = $this->createGroup($user, 'group1', 'g1', 1);
         $group_id = $response->json('id');
 
-        // Create object with group id and course and add it to an array
-        $groups = [
-            [
-                'group_id' => $group_id,
-                'course' => 1,
-            ],
+        // Create the groups array with the group id. Add to the body the user id
+        $body = [
+            'groups' => [ $group_id ],
+            'user_id' => $user->id,
         ];
 
         // Directly use the $groups array as the request body
         $response = $this->actingAs($user)
-            ->json('POST', "/api/addGroupsToUser/{$user->id}", $groups);
+            ->json('POST', "/api/groupsUser", $body);
 
 
         // Assert that the response has status 200 and the json response is an array with the group id and course
@@ -60,7 +67,6 @@ class GroupsUserTest extends TestCase {
                     "pivot" => [
                         "user_id" => $user->id,
                         "group_id" => $group_id,
-                        "course" => 1,
                     ],
                 ],
             ]
@@ -72,36 +78,26 @@ class GroupsUserTest extends TestCase {
         $user = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($user, 'group1', 'g1', 1, 2);
+        $response = $this->createGroup($user, 'group1', 'g1', 1);
         $group_id1 = $response->json('id');
 
         // Create a group
-        $response = $this->createGroup($user, 'group2', 'g2', 1, 4);
+        $response = $this->createGroup($user, 'group2', 'g2', 1);
         $group_id2 = $response->json('id');
 
         // Create a group
-        $response = $this->createGroup($user, 'group3', 'g3', 1, 3);
+        $response = $this->createGroup($user, 'group3', 'g3', 1);
         $group_id3 = $response->json('id');
 
-        // Create object with group id and course and add it to an array
-        $groups = [
-            [
-                'group_id' => $group_id1,
-                'course' => 1,
-            ],
-            [
-                'group_id' => $group_id2,
-                'course' => 2,
-            ],
-            [
-                'group_id' => $group_id3,
-                'course' => 3,
-            ],
+        // Create the body
+        $body = [
+            'groups' => [ $group_id1, $group_id2, $group_id3 ],
+            'user_id' => $user->id,
         ];
 
-        // Directly use the $groups array as the request body
+        // Call the endpoint
         $response = $this->actingAs($user)
-            ->json('POST', "/api/addGroupsToUser/{$user->id}", $groups);
+            ->json('POST', "/api/groupsUser", $body);
 
         // Assert that the response has status 200 and the json response is an array with the group id and course
         $response->assertStatus(200)->assertJson([
@@ -110,21 +106,18 @@ class GroupsUserTest extends TestCase {
                     "pivot" => [
                         "user_id" => $user->id,
                         "group_id" => $group_id1,
-                        "course" => 1,
                     ],
                 ],
                 [
                     "pivot" => [
                         "user_id" => $user->id,
                         "group_id" => $group_id2,
-                        "course" => 2,
                     ],
                 ],
                 [
                     "pivot" => [
                         "user_id" => $user->id,
                         "group_id" => $group_id3,
-                        "course" => 3,
                     ],
                 ],
             ]
@@ -136,24 +129,22 @@ class GroupsUserTest extends TestCase {
         $user = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($user, 'group1', 'g1', 1, 2);
+        $response = $this->createGroup($user, 'group1', 'g1', 1);
         $group_id = $response->json('id');
 
-        // Create object with group id and course and add it to an array
-        $groups = [
-            [
-                'group_id' => $group_id,
-                'course' => 1,
-            ],
+        // Create the body
+        $body = [
+            'groups' => [ $group_id ],
+            'user_id' => $user->id,
         ];
 
         // Add group to the user
         $response = $this->actingAs($user)
-            ->json('POST', "/api/addGroupsToUser/{$user->id}", $groups);
+            ->json('POST', "/api/groupsUser", $body);
 
         // Get the groups from the user
         $response = $this->actingAs($user)
-            ->get("/api/getGroupsFromUser/$user->id");
+            ->get("/api/groupsUser/$user->id");
         
         $response->assertStatus(200)->assertJson([
             [
@@ -161,7 +152,6 @@ class GroupsUserTest extends TestCase {
                 "name" => "group1",
                 "abbreviation" => "g1",
                 "is_public" => 1,
-                "max_courses" => 2,
             ],
         ]);
     }
@@ -171,36 +161,31 @@ class GroupsUserTest extends TestCase {
         $user = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($user, 'group1', 'g1', 1, 2);
+        $response = $this->createGroup($user, 'group1', 'g1', 1);
         $group_id = $response->json('id');
 
-        // Create object with group id and course and add it to an array
-        $groups = [
-            [
-                'group_id' => $group_id,
-                'course' => 1,
-            ],
+        // Create the body
+        $body = [
+            'groups' => [ $group_id ],
+            'user_id' => $user->id,
         ];
 
         // Add group to the user
         $response = $this->actingAs($user)
-            ->json('POST', "/api/addGroupsToUser/{$user->id}", $groups);
+            ->json('POST', "/api/groupsUser", $body);
 
         // Create a group
-        $response = $this->createGroup($user, 'group2', 'g2', 1, 3);
+        $response = $this->createGroup($user, 'group2', 'g2', 1);
         $group_id2 = $response->json('id');
 
-        // Create object with group id and course and add it to an array
-        $groups = [
-            [
-                'group_id' => $group_id2,
-                'course' => 2,
-            ],
+        // Create the body
+        $body = [
+            'groups' => [ $group_id2 ],
         ];
 
         // Update the groups from the user
         $response = $this->actingAs($user)
-            ->json('PUT', "/api/updateGroupsToUser/{$user->id}", $groups);
+            ->json('PUT', "/api/groupsUser/{$user->id}", $body);
 
         $response->assertStatus(200)->assertJson([
             'groups' => [
@@ -208,7 +193,6 @@ class GroupsUserTest extends TestCase {
                     "pivot" => [
                         "user_id" => $user->id,
                         "group_id" => $group_id2,
-                        "course" => 2,
                     ],
                 ],
             ],
@@ -220,30 +204,28 @@ class GroupsUserTest extends TestCase {
         $user = $this->loginAsAdmin();
 
         // Create a group
-        $response = $this->createGroup($user, 'group1', 'g1', 1, 2);
+        $response = $this->createGroup($user, 'group1', 'g1', 1);
         $group_id = $response->json('id');
 
-        // Create object with group id and course and add it to an array
-        $groups = [
-            [
-                'group_id' => $group_id,
-                'course' => 1,
-            ],
+        // Create the body
+        $body = [
+            'groups' => [ $group_id ],
+            'user_id' => $user->id,
         ];
 
         // Add group to the user
         $response = $this->actingAs($user)
-            ->json('POST', "/api/addGroupsToUser/{$user->id}", $groups);
+            ->json('POST', "/api/groupsUser", $body);
 
         // Remove the groups from the user
         $response = $this->actingAs($user)
-            ->delete("/api/removeGroupsFromUser/$user->id");
+            ->delete("/api/groupsUser/$user->id");
 
         $response->assertStatus(200);
 
         // Get groups from the user
         $response = $this->actingAs($user)
-            ->get("/api/getGroupsFromUser/$user->id");
+            ->get("/api/groupsUser/$user->id");
 
         // Assert that the user has no groups
         $response->assertStatus(200)->assertJson([]);

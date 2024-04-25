@@ -1,6 +1,9 @@
 <template>
+  <!-- <UContainer> -->
+  <Header v-if="$route.name !== 'index' && $route.name !== 'admin'"></Header>
   <NuxtPage class="grow" />
-  <!-- <NuxtPage to="/llista_propostes">About</NuxtPage> -->
+  <!-- </UContainer> -->
+  <UNotifications />
 </template>
 
 <style>

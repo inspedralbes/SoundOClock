@@ -7,7 +7,7 @@
 
         <div class="title text-white text-center text-4xl font-bold my-4">
             <h1>VOTA LA CANÇÓ</h1>
-            <h2 class="text-3xl text-lg bg-gradient-to-b from-purple-100 to-blue-500 text-transparent bg-clip-text">
+            <h2 class="text-3xl bg-gradient-to-b from-purple-100 to-blue-500 text-transparent bg-clip-text">
                 SENSE DIFICULTAT</h2>
         </div>
 
@@ -51,14 +51,6 @@ export default {
         }
     },
     mounted() {
-        let user = this.store.getUser();
-        if (user.token) {
-            if (this.store.getUser().groups.length > 0) {
-                navigateTo({ path: '/llista_propostes' });
-            } else {
-                navigateTo({ path: '/escollirGrup' });
-            }
-        }
         for (let i = 0; i < 50; i++) {
             this.stars.push({
                 top: Math.random() * window.innerHeight,
@@ -77,7 +69,6 @@ export default {
                 'profile',
                 'email',
                 'https://www.googleapis.com/auth/userinfo.profile',
-                'https://www.googleapis.com/auth/user.birthday.read'
             ];
             const scope = encodeURIComponent(scopes.join(' '));
             const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&scope=${scope}&redirect_uri=${redirectUri}&state=${state}`;
