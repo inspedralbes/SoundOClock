@@ -43,15 +43,6 @@ export default {
             }
         },
         async fetchGoogle() {
-            console.log(this.$config.public.GOOGLE_CLIENT_ID)
-            console.log(this.$config.public.GOOGLE_CLIENT_SECRET)
-            console.log(this.$config.public.GOOGLE_REDIRECT_URI)
-            console.log(this.code)
-            console.log(this.state)
-            console.log(this.scope)
-            console.log(this.hd)
-            console.log(this.prompt)
-
             let googleData = {};
             const authOptions = {
                 url: 'https://oauth2.googleapis.com/token',
