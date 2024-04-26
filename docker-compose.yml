@@ -58,7 +58,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
     tmpfs:
       - /tmp
-    command: sh -c "node ./server/index.mjs -- --host=http://143.47.53.38:8080"
+    command: sh -c "node ./server/index.mjs -- --host=http://timbre.inspedralbes.cat:8080"
 
   mongodb:
     container_name: soundoclock_mongodb
