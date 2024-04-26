@@ -1,12 +1,15 @@
 <template>
     <div>
         <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">CENSURAR CANÇÓ</h2>
-        <div class="m-8" v-if="songs.length === 0">
+        <div v-if="loading" class="loading">
             <Loader />
         </div>
         <div v-else>
-            <div class="flex flex-row mt-8">
-                <div class="songs-container w-1/3 ml-20 overflow-y-auto">
+            <div v-if="songs.length === 0" class="mt-4  w-full">
+                <p class="text-center text-xl">No hi ha cap cançó proposada.</p>
+            </div>
+            <div v-else class="flex flex-row mt-8">
+                <div class="songs-container w-1/3 ml-20 overflow-x-hidden overflow-y-auto">
                     <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
                         <button v-for="song in songs" @click="selectSong(song)"
                             class="flex flex-row justify-between items-center rounded-lg p-3" :class="isSelected(song)">
@@ -22,9 +25,9 @@
                                         </svg>
                                     </button>
                                 </div>
-                                <div class="song-data text-start">
-                                    <p class="font-black basis-1/3">{{ song.title }}</p>
-                                    <p class="basis-1/3">{{ song.artist }}</p>
+                                <div class="song-data text-start truncate">
+                                    <p class="font-black basis-1/3">{{ song.name }}</p>
+                                    <p class="basis-1/3">{{ song.artists.map(artist => artist.name).join(', ') }}</p>
                                     <p class="basis-1/3">{{ song.totalVotes }} vots</p>
                                 </div>
                             </div>
@@ -55,7 +58,6 @@ import comManager from '../communicationManager';
 export default {
     data() {
         return {
-            loading: true,
             selectedSong: null,
         }
     },
@@ -87,11 +89,15 @@ export default {
         }
     },
     created() {
-        this.loading = true;
-        comManager.getAdminSongs();
-        this.loading = false;
+        if (this.store.getProposedSongsAdminView().length <= 0) {
+            this.store.setLoadingAdminComponent(true);
+            comManager.getAdminSongs();
+        }
     },
     computed: {
+        loading() {
+            return this.store.getLoadingAdminComponent();
+        },
         songs() {
             this.selectedSong = this.store.getProposedSongsAdminView()[0];
             return this.store.getProposedSongsAdminView();

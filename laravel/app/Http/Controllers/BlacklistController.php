@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Blacklist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BlacklistController extends Controller
 {
@@ -60,7 +61,7 @@ class BlacklistController extends Controller
         //
     }
 
-    
+
     /**
      * @OA\Post(
      *      path="/api/blacklist",
@@ -106,16 +107,19 @@ class BlacklistController extends Controller
      *      )
      * )
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         // Validate the request data
         $request->validate([
             'spotify_id' => 'required|string',
-            'title' => 'required|string',
-            'artist' => 'required|string',
-            'image' => 'string',
+            'name' => 'required|string',
+            'artists' => 'required|array',
+            'img' => 'string',
             'preview_url' => 'string'
         ]);
+
+        Log::info('[DEBUG] Request data: ' . json_encode($request->all()));
 
         // Check that the user is an admin
         if (auth()->user()->role_id !== 1) {
@@ -124,12 +128,12 @@ class BlacklistController extends Controller
                 'message' => 'You do not have admin permissions.'
             ], 404);
         }
-        
+
         $song = new Blacklist();
         $song->spotify_id = $request->spotify_id;
-        $song->title = $request->title;
-        $song->artist = $request->artist;
-        $song->image = $request->image;
+        $song->name = $request->name;
+        $song->artists = $request->artists;
+        $song->img = $request->img;
         $song->preview_url = $request->preview_url;
         $song->save();
 
@@ -141,7 +145,7 @@ class BlacklistController extends Controller
      */
     public function show($id)
     {
-        
+
         // Check that the user is an admin
         if (auth()->user()->role_id !== 1) {
             return response()->json([
@@ -214,7 +218,8 @@ class BlacklistController extends Controller
      *      )
      * )
      */
-    public function destroy($id) {
+    public function destroy($id)
+    {
 
         // Check that the user is an admin
         if (auth()->user()->role_id !== 1) {
@@ -223,7 +228,7 @@ class BlacklistController extends Controller
                 'message' => 'You do not have admin permissions.'
             ], 404);
         }
-        
+
         // Check that the song exists in the blacklist cheking the idSoptify
         $song = Blacklist::where('spotify_id', $id)->first();
         if ($song == null) {
@@ -232,10 +237,10 @@ class BlacklistController extends Controller
                 'message' => 'The song does not exist.'
             ], 404);
         }
-        
+
         // Delete the song
         $song->delete();
-        
-        return response()->json($song); 
-        }
+
+        return response()->json($song);
+    }
 }

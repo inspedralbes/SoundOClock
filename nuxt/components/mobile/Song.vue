@@ -2,25 +2,23 @@
     <div class="w-full flex justify-center">
         <div class="relative flex w-[95%] h-[100px] bg-gray-200 overflow-hidden rounded-lg mt-4">
             <img class="w-full h-auto object-cover object-center brightness-50"
-                :src="track.album ? track.album.images[0].url : track.img"
-                :alt="track.name ? track.name : track.title + '_img'">
+                :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'">
 
             <div class="absolute inset-0 flex flex-row justify-center">
-                <div class="flex flex-row w-full flex justify-between p-2 items-center">
+                <div class="flex flex-row w-full justify-between p-2 items-center">
                     <div class="flex flex-col w-[70%] overflow-hidden">
                         <p
                             class="font-bold text-base text-ellipsis uppercase max-w-[200px] overflow-hidden whitespace-nowrap">
-                            {{ track.name ? track.name : track.title }}
+                            {{ track.name }}
                         </p>
                         <div class="flex flex-row text-sm">
                             <p class="text-ellipsis">
+                                <UBadge v-if="track.explicit" color="black">E</UBadge>
                                 <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="track.artists"
                                     v-for="(artist, index) in track.artists" :key="index">
                                     <span v-if="index !== 0">, </span>
                                     {{ artist.name }}
                                 </span>
-                                <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-else>{{ track.artist
-                                    }}</span>
                             </p>
                         </div>
                         <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.totalVotes }}</p>
