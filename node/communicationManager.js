@@ -49,7 +49,7 @@ async function loginUserAndAdmin() {
 }
 
 async function login(name, email) {
-  const response = await fetch(apiURL + 'login', {
+  const response = await fetch(apiURL + 'login/', {
     method: 'POST',
     headers: {
       "Content-Type": "application/json",
