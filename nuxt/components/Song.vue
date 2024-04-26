@@ -157,7 +157,6 @@ export default {
             if (!this.track.reports) {
                 return 0;
             }
-            console.log(this.track.reports.length)
             return this.track.reports.length;
         }
     }

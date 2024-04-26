@@ -15,7 +15,8 @@
                         <span>Accions</span>
                     </div>
                     <div v-if="item.item.groups.length == 0">
-                        <UAlert title="No hi han grups en aquesta categoria!" variant="outline" color="white" class="text-center" />
+                        <UAlert title="No hi han grups en aquesta categoria!" variant="outline" color="white"
+                            class="text-center" />
                     </div>
                     <div v-for="group in item.item.groups" class="mx-4" v-else>
                         <div class="grid group text-gray-200">
@@ -38,7 +39,8 @@
                 </template>
             </UAccordion>
             <div class="flex justify-center mt-5 gap-3">
-                <UButton @click="openModal('createCategory', null)" class="w-1/3 flex justify-center" color="white" variant="outline" size="xl">
+                <UButton @click="openModal('createCategory', null)" class="w-1/3 flex justify-center" color="white"
+                    variant="outline" size="xl">
                     Crear Categoria
                 </UButton>
                 <UButton @click="openModal('createGroup', null)" class="w-1/3 flex justify-center" color="white"
@@ -88,7 +90,8 @@
             </UFormGroup>
 
             <UFormGroup label="Categoria" name="category">
-                <USelect v-model="formState.category" placeholder="Selecciona categoria..." :options="getCategories()" />
+                <USelect v-model="formState.category" placeholder="Selecciona categoria..."
+                    :options="getCategories()" />
             </UFormGroup>
 
             <UFormGroup label="Public" name="isPublic">
@@ -217,17 +220,16 @@ export default {
         refreshData() {
             this.isLoading = true
             comManager.getAllGroupsAndCategories()
-            .then((data) => {
-                console.log(data)
-                this.groupCategories = data.allCategories
-                this.groups = data.allGroups
+                .then((data) => {
+                    this.groupCategories = data.allCategories
+                    this.groups = data.allGroups
 
-                // Fill itemsAccordion with data from the API
-                this.itemsAccordion = this.groupCategories.map((category) => {
-                    return { label: `${category.id}. ${category.name} (${category.abbreviation})`, groups: category.groups, id: category.id }
+                    // Fill itemsAccordion with data from the API
+                    this.itemsAccordion = this.groupCategories.map((category) => {
+                        return { label: `${category.id}. ${category.name} (${category.abbreviation})`, groups: category.groups, id: category.id }
+                    })
+                    this.isLoading = false
                 })
-                this.isLoading = false
-            })
         },
         onSubmitCategory(event) {
             const data = {
@@ -235,13 +237,11 @@ export default {
                 abbreviation: event.data.abbreviation,
                 is_public: event.data.is_public ? 1 : 0,
             }
-            console.log(data)
             this.modals.createCategory = false
             this.isLoading = true
-                        
+
             comManager.createGroupCategory(this.store.getUser().token, data)
                 .then((res) => {
-                    console.log(res)
                     this.toast.add({
                         title: 'Success!',
                         description: 'La categoria s\'ha creat correctament!',
@@ -249,7 +249,6 @@ export default {
                     });
                 })
                 .catch((err) => {
-                    console.log(err)
                     this.toast.add({
                         title: 'Error!',
                         description: 'Hi ha hagut un error al crear la categoria!',
@@ -267,13 +266,11 @@ export default {
                 is_public: event.data.is_public ? 1 : 0,
                 category_id: event.data.category,
             }
-            console.log(data)
             this.modals.createGroup = false
             this.isLoading = true
-            
+
             comManager.createGroup(this.store.getUser().token, data)
                 .then((res) => {
-                    console.log(res)
                     this.toast.add({
                         title: 'Success!',
                         description: 'El grup s\'ha creat correctament!',
@@ -281,7 +278,6 @@ export default {
                     });
                 })
                 .catch((err) => {
-                    console.log(err)
                     this.toast.add({
                         title: 'Error!',
                         description: 'Hi ha hagut un error al crear el grup!',

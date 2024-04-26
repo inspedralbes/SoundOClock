@@ -11,8 +11,9 @@
                         <div class="text-lg p-3 rounded-lg hour-item mb-2">{{ bell.hour.substring(0, 5) }}</div>
                         <div class="gap-2 flex flex-col overflow-auto">
                             <MobileSong v-for="song in mostVotedSongs[index]" :track="song"
-                                :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying" :bell="bell"
-                                :type="'admin'" @play="playSong" @setSelected="setSelected" :isSelected="isSelected[bell.id] === song.id">
+                                :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying"
+                                :bell="bell" :type="'admin'" @play="playSong" @setSelected="setSelected"
+                                :isSelected="isSelected[bell.id] === song.id">
                             </MobileSong>
                         </div>
                         <div v-if="!mostVotedSongs[index].length > 0"
@@ -99,7 +100,6 @@ export default {
         handleSortedVotedSongs() {
             if (this.sortedVotedSongs.length > 0) {
                 let result = this.fillMissingGroups(this.sortedVotedSongs);
-                console.log("result", result)
                 this.groupedSongs = result;
                 if (this.bells.length > 0) {
                     this.loading = false;
@@ -159,7 +159,6 @@ export default {
 
                 return resultArray;
             })
-            console.log("mostVotedSongs", this.mostVotedSongs)
         },
         playSong(track) {
             this.store.playTrack(track)
@@ -223,7 +222,6 @@ export default {
                 songs.push({ bellId: key, songId: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url });
                 // songs.push({ bellId: key, songId: this.isSelected[key] });
             }
-            console.log("songs", songs)
 
             comManager.downloadSongs(songs).then(() => {
                 this.toast.add({

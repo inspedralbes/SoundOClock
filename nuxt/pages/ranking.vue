@@ -2,7 +2,7 @@
     <h2 class="text-4xl text-white text-center font-black my-8">RANKING</h2>
     <div class="w-screen h-20" v-if="loading">
         <div class="mx-3 flex flex-col gap-2">
-            <USkeleton class="h-11 w-full" v-for="i in 8"/>
+            <USkeleton class="h-11 w-full" v-for="i in 8" />
         </div>
     </div>
     <div v-if="!loading" class="mx-3">
@@ -12,9 +12,10 @@
                     <UAlert title="No hi han cançons!" variant="outline" color="white" class="text-center" />
                 </div>
                 <div v-for="(song, index) in item.item.songs" :key="song.id" class="flex">
-                    <div class="position flex justify-center items-center text-center text-white font-bold text-2xl">{{ index + 1 }}</div>
+                    <div class="position flex justify-center items-center text-center text-white font-bold text-2xl">{{
+                        index + 1 }}</div>
                     <Song :track="song" :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying"
-                        :isFirstPlace="index === 0" class="w-full justify-around" @play="playSong" :type="'ranking'"/>
+                        :isFirstPlace="index === 0" class="w-full justify-around" @play="playSong" :type="'ranking'" />
                 </div>
             </template>
         </UAccordion>
@@ -57,12 +58,10 @@ export default {
             // Check if sortedVoted songs is loaded and set the groupedSongs
             if (this.sortedVotedSongs.length > 0 && this.groupedSongs.length === 0) {
                 let result = this.fillMissingGroups(this.sortedVotedSongs);
-                console.log("result", result)
                 this.groupedSongs = result;
             }
             // Check if bells is loaded and set the mostVotedSongs
             if (this.bells.length > 0 && this.groupedSongs.length > 0) {
-                console.log("bells loaded", this.bells)
                 this.loading = false;
                 this.getMostVotedSongs(this.bells);
             }
@@ -116,7 +115,6 @@ export default {
 
                 // Sort by votes
                 resultArray.sort((a, b) => b.votes - a.votes);
-                console.log("resultArray", resultArray)
 
                 // Return an object with the bell name and the most voted songs
                 return { label: this.formatHour(bell.hour), songs: resultArray.slice(0, 5) };

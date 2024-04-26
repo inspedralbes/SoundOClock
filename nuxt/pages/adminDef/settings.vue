@@ -140,7 +140,6 @@ export default {
                 initDate.setDate(initDate.getDate() + minDateDays + 1);
             }
             endDate.setDate(initDate.getDate() + days);
-            console.log(initDate, endDate);
             initDate = this.formatDateToLaravel(initDate);
             endDate = this.formatDateToLaravel(endDate);
             return { initDate, endDate };
@@ -160,18 +159,15 @@ export default {
             if (this.settings.voteDuration != 0) {
                 this.settings.voteDuration = this.isVoteInDays ? this.settings.voteDuration : this.settings.voteDuration * 7;
                 setVoteDate = this.daySetter(this.settings.voteDuration, 0);
-                console.log("setVoteDate", setVoteDate);
                 this.settings.start_vote = setVoteDate.initDate;
                 this.settings.end_vote = setVoteDate.endDate;
                 if (this.settings.moderationDuration != 0) {
                     this.settings.moderationDuration = this.isModInDays ? this.settings.moderationDuration : this.settings.moderationDuration * 7;
                     setModDate = this.daySetter(this.settings.moderationDuration, this.settings.voteDuration);
-                    console.log("setModDate", setModDate);
                     this.settings.start_moderation = setModDate.initDate;
                     this.settings.end_moderation = setModDate.endDate;
                 }
             }
-            console.log(this.settings);
             socket.emit('setSettings', this.store.getUser().token, this.settings);
         },
 
@@ -181,7 +177,6 @@ export default {
         socket.emit('getSettings', this.store.getUser().token);
 
         socket.on('sendSettings', (settings) => {
-            console.log(settings);
             if (settings.length != 0) {
                 this.settings = settings[0];
             }

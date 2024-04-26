@@ -2,11 +2,9 @@ import comManager from "~/communicationManager";
 
 export default async function defineNuxtRouteMiddleware(to, from) {
     // Do nothing if page is SSR
-    console.log("window", window)
     if(!window) return;
 
     const userData = JSON.parse(window.localStorage.getItem('user'));
-    console.log(userData)
     const isAuthenticated = userData && userData.token;
 
     if (!isAuthenticated && to.path !== '/' && to.path !== '/auth/callback/google') {

@@ -75,7 +75,6 @@ export default {
     },
     created() {
         if (this.store.getUsersAdminView().length <= 0) {
-            console.log("entro users");
             this.store.setLoadingAdminComponent(true);
             comManager.getUsers();
         }
@@ -222,4 +221,5 @@ export default {
 img {
     width: 60px;
     height: 60px;
-}</style>
+}
+</style>
