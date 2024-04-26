@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">ADMINISTRAR PERMISOS D'USUARI</h2>
-        <div class="m-8" v-if="users.length === 0">
+        <div class="m-8" v-if="loading">
             <Loader />
         </div>
         <div v-else>
@@ -48,7 +48,11 @@ export default {
         }
     },
     created() {
-        this.currentSelectedUser = this.users[0];
+        if (this.store.getBells().length <= 0) {
+            this.store.setLoadingAdminComponent(true);
+            socket.emit('getRoles', this.store.getUser().token);
+        }
+        //this.currentSelectedUser = this.users[0];
     },
     methods: {
         selectUser(selectedUser) {
