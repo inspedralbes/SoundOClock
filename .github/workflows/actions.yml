@@ -1,5 +1,5 @@
 name: Sound O'Clock Deploy Actions
-run-name: ${{ github.actor }} is deploying Spottunes 🌯
+run-name: ${{ github.actor }} is deploying Sound O'Clock 🌯
 on:
   push:
     branches:
