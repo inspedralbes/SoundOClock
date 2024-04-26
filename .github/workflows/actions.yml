@@ -91,6 +91,9 @@ jobs:
     needs: [LARAVEL-TEST]
     runs-on: ubuntu-latest
     steps:
+      - name: Obtaining repository code
+        uses: actions/checkout@v4
+
       - name: Stop Docker
         run: |
           echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
