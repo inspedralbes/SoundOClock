@@ -1,0 +1,209 @@
+name: Sound O'Clock Deploy Actions
+run-name: ${{ github.actor }} is deploying Spottunes 🌯
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  LARAVEL-TEST:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: soundoclock
+        ports:
+          - 3306:3306
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: mongoadmin
+          MONGO_INITDB_ROOT_PASSWORD: mongopassword
+
+    steps:
+      - name: Obtaining repository code
+        uses: actions/checkout@v4
+
+      - name: Checking Laravel
+        run: |
+          cd laravel 
+          composer install
+          cp .env.example .env
+          sed -i 's/DB_HOST=/DB_HOST=127.0.0.1/g' .env
+          sed -i 's/DB_DATABASE=/DB_DATABASE=soundoclock/g' .env
+          sed -i 's/DB_USERNAME=/DB_USERNAME=root/g' .env
+          sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/g' .env
+          php artisan migrate --env=testing
+          php artisan migrate:fresh --seed
+          php artisan test
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  NODE-TEST:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: soundoclock
+        ports:
+          - 3306:3306
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: mongoadmin
+          MONGO_INITDB_ROOT_PASSWORD: mongopassword
+
+    steps:
+      - name: Obtaining repository code
+        uses: actions/checkout@v4
+
+      - name: Engegar Laravel
+        run: |
+          cd laravel 
+          composer install
+          cp .env.example .env
+          sed -i 's/DB_HOST=/DB_HOST=127.0.0.1/g' .env
+          sed -i 's/DB_DATABASE=/DB_DATABASE=soundoclock/g' .env
+          sed -i 's/DB_USERNAME=/DB_USERNAME=root/g' .env
+          sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/g' .env
+          php artisan migrate --env=testing
+          php artisan migrate:fresh --seed
+          php artisan serve > /dev/null 2>&1 &
+
+      - name: Checking Node
+        run: |
+          cd node
+          npm install
+          cp .env.example .env
+          sed -i 's/NODE_ENV=/NODE_ENV=development /g' .env
+          npm run dev -- --host=127.0.0.1 > node.log 2>&1 &
+          npm run test -- --host=127.0.0.1
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  STOP-DOCKER:
+    needs: [LARAVEL-TEST, NODE-TEST]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stop Docker
+        run: |
+          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "docker compose down"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  FILL-DOCKER-COMPOSE:
+    needs: [STOP-DOCKER]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtaining repository code
+        uses: actions/checkout@v4
+
+      - name: Update Docker Compose
+        run: |
+          echo "Connecting to the server and running docker-compose commands"
+          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          sed -i 's#MYSQL_ROOT_PASSWORD:#MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}#g' docker-compose.yml
+          sed -i 's#MONGO_INITDB_ROOT_USERNAME:#MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}#g' docker-compose.yml
+          sed -i 's#MONGO_INITDB_ROOT_PASSWORD:#MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}#g' docker-compose.yml
+          sed -i 's#ME_CONFIG_MONGODB_ADMINUSERNAME:#ME_CONFIG_MONGODB_ADMINUSERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}#g' docker-compose.yml
+          sed -i 's#ME_CONFIG_MONGODB_ADMINPASSWORD:#ME_CONFIG_MONGODB_ADMINPASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}#g' docker-compose.yml
+          sed -i 's#ME_CONFIG_BASICAUTH_USERNAME:#ME_CONFIG_BASICAUTH_USERNAME: ${{ secrets.MONGO_USER }}#g' docker-compose.yml
+          sed -i 's#ME_CONFIG_BASICAUTH_PASSWORD:#ME_CONFIG_BASICAUTH_PASSWORD: ${{ secrets.MONGO_PASSWORD }}#g' docker-compose.yml
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./docker-compose.yml ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:docker-compose.yml
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  LARAVEL-DEPLOY:
+    needs: [FILL-DOCKER-COMPOSE]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtaining repository code
+        uses: actions/checkout@v4
+
+      - name: Laravel Deploy
+        run: |
+          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          cd laravel
+          cp .env.example .env
+          sed -i 's/DB_HOST=/DB_HOST=db/g' .env
+          sed -i 's/DB_DATABASE=/DB_DATABASE=soundoclock/g' .env
+          sed -i 's/DB_USERNAME=/DB_USERNAME=${{ secrets.DB_USERNAME }}/g' .env
+          sed -i 's#DB_PASSWORD=#DB_PASSWORD=${{ secrets.DB_PASSWORD }}#g' .env
+          cd ${{ github.workspace }}
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d projecte/laravel ] && sudo rm -r projecte/laravel"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "cd projecte && mkdir laravel"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:./projecte/laravel
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/.env ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:./projecte/laravel
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "chmod -R 775 projecte/laravel/"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  NODE-DEPLOY:
+    needs: [FILL-DOCKER-COMPOSE]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtaining repository code
+        uses: actions/checkout@v4
+
+      - name: Node Deploy
+        run: |
+          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          cd node
+          cp .env.example .env
+          sed -i 's/NODE_ENV=/NODE_ENV=production /g' .env
+          sed -i 's/SPOTIFY_CLIENT_ID=/SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}/g' .env
+          sed -i 's/SPOTIFY_CLIENT_SECRET=/SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}/g' .env
+          sed -i 's#PRODUCTION_API_URL=/PRODUCTION_API_URL=${{ secrets.PRODUCTION_API_URL }}#g' .env
+          cd ${{ github.workspace }}
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d projecte/node ] && sudo rm -r projecte/node"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "cd projecte && mkdir node"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./node/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:./projecte/node
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./node/.env ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:./projecte/node
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "chmod -R 775 projecte/node/"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  NUXT-DEPLOY:
+    needs: [FILL-DOCKER-COMPOSE]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtaining repository code
+        uses: actions/checkout@v4
+
+      - name: Front Deploy
+        run: |
+          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          cd ${{ github.workspace }}
+          cd nuxt
+          mv .env.example .env
+          npm install
+          npm install -D sass
+          sed -i 's/GOOGLE_CLIENT_ID=/GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}/g' .env
+          sed -i 's/GOOGLE_CLIENT_SECRET=/GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}/g' .env
+          sed -i 's#GOOGLE_REDIRECT_URI=#GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}#g' .env
+          npm run build
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d projecte/nuxt ] && sudo rm -r projecte/nuxt"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r .output ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:./projecte/nuxt
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  START-DOCKER:
+    needs: [LARAVEL-DEPLOY, NODE-DEPLOY, NUXT-DEPLOY]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start Docker
+        run: |
+          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "cd projecte && docker compose up -d"
+      - name: Iniciar Portainer
+        run: |
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "docker start portainer"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
