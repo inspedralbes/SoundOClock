@@ -27,11 +27,13 @@ const io = new Server(server, {
   }
 });
 const port = process.env.PORT || 8080;
+const mongoUser=process.env.MONGO_USER;
+const mongoPassword=process.env.MONGO_PASSWORD;
 console.log(process.env.MONGO_USER);
 console.log(process.env.MONGO_PASSWORD);
 
 // Mongoose setup
-mongoose.connect('mongodb://mongoadmin:mongopassword@' + host + ':27017/soundoclock', { authSource: "admin" })
+mongoose.connect(`mongodb://${mongoUser}:${mongoPassword}@` + host + ':27017/soundoclock', { authSource: "admin" })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
