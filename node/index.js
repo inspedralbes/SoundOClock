@@ -8,10 +8,12 @@ import downloadsManager from './downloadsManager.cjs';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 import minimist from 'minimist';
+import dotenv from 'dotenv';
 import { remove } from 'fs-extra';
 
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || 'mongodb';
+
 
 const app = express();
 app.use(cors());
@@ -25,9 +27,12 @@ const io = new Server(server, {
   }
 });
 const port = process.env.PORT || 8080;
+const mongoUser=process.env.MONGO_USER;
+const mongoPassword=process.env.MONGO_PASSWORD;
+
 
 // Mongoose setup
-mongoose.connect('mongodb://mongoadmin:mongopassword@' + host + ':27017/soundoclock', { authSource: "admin" })
+mongoose.connect(`mongodb://${mongoUser}:${mongoPassword}@` + host + ':27017/soundoclock', { authSource: "admin" })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -736,6 +741,25 @@ io.on('connection', (socket) => {
       io.emit('userRoleUpdated');
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
+    }
+  });
+
+  socket.on('setSettings', async (userToken, settings) => {
+    try {
+      let response = await comManager.setSettings(userToken, settings);
+      console.log('response', response);
+      socket.emit('settingsUpdated', response);
+    } catch (err) {
+      socket.emit('setSettingsError', { status: 'error', message: err.message });
+    }
+  });
+
+  socket.on('getSettings', async (userToken) => {
+    try {
+      let settings = await comManager.getSettings(userToken);
+      socket.emit('sendSettings', settings);
+    } catch (err) {
+      socket.emit('getSettingsError', { status: 'error', message: err.message });
     }
   });
 
