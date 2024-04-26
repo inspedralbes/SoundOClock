@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">CENSURAR CANÇÓ</h2>
-        <div v-if="loading" class="loading">
+        <div v-if="loading">
             <Loader />
         </div>
         <div v-else>
@@ -12,17 +12,23 @@
                 <div class="songs-container w-1/3 ml-20 overflow-x-hidden overflow-y-auto">
                     <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
                         <button v-for="song in songs" @click="selectSong(song)"
-                            class="flex flex-row justify-between items-center rounded-lg p-3" :class="isSelected(song)">
-                            <div class="flex flex-row items-center gap-2">
+                            class="flex flex-row justify-between items-center rounded-lg" :class="isSelected(song)">
+
+                            <Song :track="song" :currentTrackId="songStatus.currentTrackId"
+                                :isPlaying="songStatus.isPlaying" class="w-full justify-around" @play="playSong"
+                                :type="'admin'" :isSelected="selectedSong.id === song.id"
+                                :isReported="!areAllReportsRead(song)" />
+                            <!-- <div class="flex flex-row items-center gap-2">
                                 <div class="contenidor-img">
                                     <img :src="song.img" alt="Song img" class="rounded-lg">
-                                    <button class="rounded-lg">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                            class="icon icon-tabler icons-tabler-filled icon-tabler-player-play">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path
-                                                d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" />
-                                        </svg>
+                                    <button @click="playSong(song)">
+                                        <span v-if="songStatus.currentTrackId === song.id && songStatus.isPlaying"
+                                            class="material-symbols-rounded text-4xl">
+                                            pause
+                                        </span>
+                                        <span v-else class="material-symbols-rounded text-4xl">
+                                            play_arrow
+                                        </span>
                                     </button>
                                 </div>
                                 <div class="song-data text-start truncate">
@@ -39,8 +45,9 @@
                                     <path
                                         d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" />
                                 </svg>
-                            </div>
+                            </div> -->
                         </button>
+
                     </div>
                 </div>
                 <div class="w-2/3 text-white text-center ml-4 mr-4">
@@ -58,7 +65,14 @@ import comManager from '../communicationManager';
 export default {
     data() {
         return {
+            store: useAppStore(),
             selectedSong: null,
+        }
+    },
+    created() {
+        if (this.store.getProposedSongsAdminView().length === 0) {
+            this.store.setLoadingAdminComponent(true);
+            comManager.getAdminSongs();
         }
     },
     methods: {
@@ -86,26 +100,27 @@ export default {
             }
 
             return true;
-        }
-    },
-    created() {
-        if (this.store.getProposedSongsAdminView().length <= 0) {
-            this.store.setLoadingAdminComponent(true);
-            comManager.getAdminSongs();
-        }
+        },
+        playSong(track) {
+            this.store.playTrack(track)
+        },
     },
     computed: {
         loading() {
             return this.store.getLoadingAdminComponent();
         },
         songs() {
-            this.selectedSong = this.store.getProposedSongsAdminView()[0];
-            return this.store.getProposedSongsAdminView();
+            // Sort songs by the number of reports
+            const songs = this.store.getProposedSongsAdminView();
+            songs.sort((a, b) => b.reports.length - a.reports.length);
+            console.log(songs)
+
+            this.selectedSong = songs[0];
+            return songs;
         },
-    },
-    setup() {
-        const store = useAppStore();
-        return { store };
+        songStatus() {
+            return this.store.getSongStatus();
+        }
     },
 }
 </script>
@@ -154,6 +169,7 @@ export default {
 .contenidor-img:hover>button>svg {
     width: 80%;
     height: auto;
+    border-radius: 0.5rem;
 }
 
 .contenidor-img:hover>button {
@@ -168,6 +184,7 @@ export default {
     background-color: rgb(0, 0, 0, 0.3);
     cursor: pointer;
     z-index: 100;
+    border-radius: 0.5rem;
 }
 
 .song-data {
