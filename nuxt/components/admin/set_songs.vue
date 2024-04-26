@@ -10,41 +10,10 @@
                     <div v-for="(bell, index) in bells" class="item bg-gray-400 rounded-lg p-2 h-96 flex flex-col">
                         <div class="text-lg p-3 rounded-lg hour-item mb-2">{{ bell.hour.substring(0, 5) }}</div>
                         <div class="gap-2 flex flex-col overflow-auto">
-                            <div v-if="mostVotedSongs[index].length > 0" v-for="song in mostVotedSongs[index]"
-                                :key="song.id"
-                                class="group-item min-w-40 h-20 flex flex-row justify-center items-center rounded-lg p-2 relative flex flex-row items-center gap-2"
-                                :class="{ selected: checkIsSelected(bell.id, song.id) }">
-
-                                <div class="contenidor-img">
-                                    <img :src="song.img" :alt="song.name + '_img'" class="rounded-lg">
-                                    <button @click="playSong(song)" class="rounded-lg"
-                                        :class="{ playingC: isPlayingCheck(song.id), noPlaying: !isPlayingCheck(song.id) }">
-                                        <!-- fer amb computed la classe -->
-                                        <span v-if="currentTrackId === song.id && isPlaying"
-                                            class="material-symbols-rounded">
-                                            pause
-                                        </span>
-                                        <span v-else class="material-symbols-rounded">
-                                            play_arrow
-                                        </span>
-                                    </button>
-                                </div>
-
-                                <div class="song-data">
-                                    <p class="font-black basis-1/2">{{ song.name }}</p>
-                                    <p class="basis-1/2">Vots: {{ song.votes }}</p>
-                                </div>
-
-                                <div @click="setSelected(bell.id, song.id)">
-                                    <span v-if="!checkIsSelected(bell.id, song.id)"
-                                        class="material-symbols-rounded text-5xl green cursor-pointer symbol">
-                                        check_circle
-                                    </span>
-                                    <span v-else class="material-symbols-rounded text-5xl cursor-pointer symbol">
-                                        emoji_events
-                                    </span>
-                                </div>
-                            </div>
+                            <MobileSong v-for="song in mostVotedSongs[index]" :track="song"
+                                :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying" :bell="bell"
+                                :type="'admin'" @play="playSong" @setSelected="setSelected" :isSelected="isSelected[bell.id] === song.id">
+                            </MobileSong>
                         </div>
                         <div v-if="!mostVotedSongs[index].length > 0"
                             class="text-xl grow flex items-center justify-center">
@@ -65,7 +34,8 @@
                     description="Cada franja horaria ha de tindre una cançó seleccionada." class="p-6" />
             </div>
             <div v-else>
-                <UAlert title="Estàs segur/a?" icon="i-heroicons-exclamation-triangle-16-solid" color="orange" variant="subtle" class="p-6">
+                <UAlert title="Estàs segur/a?" icon="i-heroicons-exclamation-triangle-16-solid" color="orange"
+                    variant="subtle" class="p-6">
                     <template #title="{ title }">
                         <span v-html="title" />
                     </template>
@@ -89,7 +59,6 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import comManager from '../../communicationManager';
-import { socket } from '@/socket';
 
 export default {
     data() {
@@ -193,13 +162,7 @@ export default {
             console.log("mostVotedSongs", this.mostVotedSongs)
         },
         playSong(track) {
-            this.store.playTrack(track);
-        },
-        isPlayingCheck(id) {
-            return this.isPlaying && this.currentTrackId == id;
-        },
-        checkIsSelected(bell, songId) {
-            return this.isSelected[bell] === songId;
+            this.store.playTrack(track)
         },
         setSelected(bell, songId) {
             // Check first that the song is not already selected on another bell
@@ -287,15 +250,9 @@ export default {
         classGroups() {
             return this.store.getClassGroups();
         },
-        currentTrackId() {
-            return this.store.getSongStatus().currentTrackId;
+        songStatus() {
+            return this.store.getSongStatus();
         },
-        currentTrack() {
-            return this.store.getSongStatus().currentTrack;
-        },
-        isPlaying() {
-            return this.store.getSongStatus().isPlaying;
-        }
     }
 }
 </script>
@@ -319,107 +276,9 @@ export default {
     background-color: rgb(56, 56, 56);
 }
 
-.save-button {
-    background-color: var(--pedralbes-blue);
-}
-
-.selected {
-    background-color: rgb(253 224 71);
-    color: rgb(56, 56, 56);
-}
-
-.symbol {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
 .btn-container {
     background-color: rgba(0, 0, 0, 0.5);
     height: 5rem;
     box-shadow: 0px -5px 10px 0px rgba(0, 0, 0, 0.5);
-}
-
-.green {
-    color: rgb(34, 197, 94)
-}
-
-/** RAUL */
-
-.contenidor-img {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 20%;
-    min-width: fit-content;
-    height: 100%;
-    width: fit-content;
-}
-
-.contenidor-img>button>span {
-    font-size: 40px;
-    color: white;
-}
-
-.contenidor-img>button>svg {
-    width: 80%;
-    height: auto;
-}
-
-.contenidor-img:hover>button {
-    display: flex;
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    right: 0;
-    top: 0;
-    background-color: rgb(0, 0, 0, 0.3);
-    cursor: pointer;
-    z-index: 100;
-}
-
-.playingC {
-    display: flex;
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    right: 0;
-    top: 0;
-    background-color: rgb(0, 0, 0, 0.3);
-    cursor: pointer;
-    z-index: 100;
-}
-
-.song-data {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    justify-content: space-evenly;
-    flex-grow: 1;
-    align-items: center;
-    max-width: 100%;
-    min-width: 5%;
-    text-align: center;
-}
-
-.song-data>p {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-img {
-    width: 60px;
-    height: 60px;
-}
-
-.noPlaying {
-    display: none;
 }
 </style>

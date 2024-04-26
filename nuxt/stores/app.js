@@ -203,13 +203,14 @@ export const useAppStore = defineStore('app', {
       this.adminSelectedUser = adminSelectedUser
     },
 
-    // Others
-
-    playTrack(track, songStatus) {
-      if (this.songStatus.currentTrackId == track.id) {
-        if (this.songStatus.isPlaying) {
-          this.songStatus.currentTrack.pause();
-          this.songStatus.isPlaying = false;
+    // Other 
+    
+    playTrack(track) {
+      const status = this.songStatus;
+      if (status.currentTrackId == track.id) {
+        if (status.isPlaying) {
+          status.currentTrack.pause();
+          status.isPlaying = false;
         } else {
           this.songStatus.currentTrack.load();
           this.songStatus.currentTrack.play();
