@@ -1,6 +1,6 @@
 <template>
   <!-- <UContainer> -->
-  <Header v-if="$route.name !== 'index' && $route.name !== 'admin'"></Header>
+  <Header v-if="$route.name !== 'index' && $route.name !== 'admin' && $route.name !== 'auth-callback-google'"></Header>
   <NuxtPage class="grow" />
   <!-- </UContainer> -->
   <UNotifications />

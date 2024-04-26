@@ -92,6 +92,7 @@ socket.on("connect", () => {
 
   socket.on('sendRoles', (data) => {
     pinia.setRoles(data);
+    console.log("ROLES", data);
     pinia.setLoadingAdminComponent(false);
   });
 

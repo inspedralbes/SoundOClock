@@ -32,7 +32,7 @@ export const useAppStore = defineStore('app', {
       currentTrackId: null,
       isPlaying: false,
     },
-    roles: null,
+    roles: [],
     serverResponse: null,
     loadingAdminComponent: null,
     blacklist: [],
