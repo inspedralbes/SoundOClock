@@ -19,13 +19,16 @@ describe('Listen the Server sockets', function () {
 
   let testSong = {
     id: "1000",
-    title: 'test song',
-    artist: 'test artist',
-    totalVotes: 0,
-    genre: 'test genre',
+    name: 'test song',
+    artists: ['test artists'],
     year: 2021,
-    submittedBy: 1,
-    submitDate: "2024-03-18T10:47:30.104Z"
+    img: 'test img',
+    preview_url: 'test url',
+    explicit: false,
+    totalVotes: 0,
+    votesPerGroup: {},
+    submitDate: "2024-03-18T10:47:30.104Z",
+    submittedBy: 1
   }
 
   before(async () => {
@@ -40,6 +43,8 @@ describe('Listen the Server sockets', function () {
     let tokens = await comManager.loginUserAndAdmin();
     userToken = tokens.userToken;
     adminToken = tokens.adminToken;
+    console.log("USER TOKEN: ", userToken);
+    console.log("ADMIN TOKEN", adminToken);
     let userInfo = await comManager.getUserInfo(userToken);
     userId = userInfo.id;
   });
@@ -90,7 +95,8 @@ describe('Listen the Server sockets', function () {
       clientSocket.once('postError', (message) => {
         try {
           expect(message.status).to.equal('error');
-          expect(message.message).to.equal('User already submitted a song');
+          expect(message.title).to.equal('Ja has proposat una cançó');
+          expect(message.message).to.equal('Ja has proposat una cançó, espera a la següent votació per proposar una altra.');
           resolve(); // Resolve the promise if the assertions pass
         } catch (error) {
           reject(error); // Reject the promise if the assertions fail
@@ -115,7 +121,8 @@ describe('Listen the Server sockets', function () {
       clientSocket.once('postError', (message) => {
         try {
           expect(message.status).to.equal('error');
-          expect(message.message).to.equal('Song already exists');
+          expect(message.title).to.equal('Cançó ja proposada');
+          expect(message.message).to.equal(`La cançó ${testSong.name} ja ha sigut proposada per un altre usuari.`);
           resolve(); // Resolve the promise if the assertions pass
         } catch (error) {
           reject(error); // Reject the promise if the assertions fail
@@ -206,7 +213,7 @@ describe('Listen the Server sockets', function () {
       done();
     });
 
-    clientSocket.emit('deleteSong', adminToken, testSong);
+    clientSocket.emit('deleteSong', adminToken, testSong.id);
   })
 
   it("should not delete a song if it doesn't exist", (done) => {
@@ -219,6 +226,17 @@ describe('Listen the Server sockets', function () {
     clientSocket.emit('deleteSong', adminToken, testSong.id);
   })
 
+  it("should remove a song from the blacklist", (done) => {
+    console.log("REMOVE SONG FROM BLACKLIST")
+    clientSocket.on('notifyServerResponse', (message) => {
+      expect(message.status).to.equal('success');
+      expect(message.message).to.equal(`La cançó ${testSong.name} ha sigut eliminada de la llista negra.`);
+      done();
+    });
+
+    clientSocket.emit('removeFromBlacklist', adminToken, testSong.id);
+  })
+
   it("should report a song", async () => {
     console.log("REPORT SONG TEST")
     // Add the song to the database first
@@ -229,7 +247,7 @@ describe('Listen the Server sockets', function () {
       clientSocket.once('songReported', (message) => {
         try {
           expect(message.status).to.equal('success');
-          expect(message.message).to.equal(`La cançó ${testSong.title} ha sigut reportada`);
+          expect(message.message).to.equal(`La cançó ${testSong.name} ha sigut reportada`);
           resolve(); // Resolve the promise if the assertions pass
         } catch (error) {
           reject(error); // Reject the promise if the assertions fail

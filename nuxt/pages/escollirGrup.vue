@@ -9,22 +9,25 @@
         <div v-else>
             <div class="flex flex-col items-center justify-center mb-5">
                 <label for="grup">Grup:</label>
-                <select name="grup" id="grup" v-model="selectedGroupId" class="w-80 p-3 rounded">
+                <select name="grup" id="grup" v-model="selectedCategoryId" class="w-80 p-3 rounded">
                     <option value="">-- Escull el teu grup --</option>
-                    <option :value="group.id" v-for="group in groups" :key="group.id">
-                        {{ group.abbreviation }}
+                    <option :value="category.id" v-for="category in categories" :key="category.id">
+                        {{ category.abbreviation }}
                     </option>
                 </select>
             </div>
             <div class="flex flex-col items-center justify-center">
                 <label for="curs">Curs:</label>
-                <select name="curs" id="curs" :disabled="!selectedGroupId" v-model="selectedCourse" class="w-80 p-3 rounded">
+                <select name="curs" id="curs" :disabled="!selectedCategoryId" v-model="selectedGroupId"
+                    class="w-80 p-3 rounded">
                     <option value="">-- Escull el teu curs --</option>
-                    <option :value="course" v-for="course in availableCourses" :key="course">{{ formatCourse(course) }}</option>
+                    <option :value="course.id" v-for="course in availableCourses" :key="course">{{ course.abbreviation }}
+                    </option>
                 </select>
             </div>
             <div class="mt-6 w-80">
-                <button @click="storeGroup" class="btn flex justify-center p-3 bg-green-600 rounded w-full" :disabled="checkCorrectOptions()">
+                <button @click="storeGroup" class="btn flex justify-center p-3 bg-green-600 rounded w-full"
+                    :disabled="checkCorrectOptions()">
                     <span v-if="storeGroupsLoading" class="py-1">
                         <Loader />
                     </span>
@@ -46,40 +49,43 @@ export default {
             store: useAppStore(),
             loading: true,
             groups: [],
+            categories: [],
             disabled: true,
+            selectedCategoryId: '',
             selectedGroupId: '',
-            selectedCourse: '',
-            storeGroupsLoading: false
+            storeGroupsLoading: false,
         }
     },
     mounted() {
         let user = this.store.getUser();
-        if (!user.token) {
-            this.$router.push('/');
-        } else if (user.groups.length > 0) {
-            this.$router.push('/llista_propostes');
+        if(user.role_id < 4) {
+            // User is a not a student (teacher, admin, etc.)
+            comManager.getAllGroupsAndCategories().then((data) => {
+                this.groups = data.allGroups;
+                this.categories = data.allCategories;
+                this.loading = false;
+            });
+        } else {
+            // User is a student
+            comManager.getPublicGroupsAndCategories().then((data) => {
+                this.groups = data.publicGroups;
+                this.categories = data.publicCategories;
+                this.loading = false;
+            });
         }
-        comManager.getPublicGroups().then((groups) => {
-            this.groups = groups;
-            this.loading = false;
-        });
     },
     computed: {
         availableCourses() {
-            // Get selected group
-            const selectedGroup = this.groups.find(group => group.id === this.selectedGroupId);
-            // Return an array with the number of courses available
-            return selectedGroup ? Array.from({ length: selectedGroup.max_courses }, (_, i) => i + 1) : [];
+            return this.groups.filter(group => {
+                return group.category_id === this.selectedCategoryId
+            })
         }
     },
 
     methods: {
         storeGroup() {
             this.storeGroupsLoading = true;
-            let groups = [{
-                group_id: this.selectedGroupId,
-                course: this.selectedCourse
-            }];
+            let groups = [ this.selectedGroupId ];
             let userId = this.store.getUser().id;
             let userToken = this.store.getUser().token;
             comManager.setUserGroups(userId, groups, userToken).then((data) => {
@@ -92,31 +98,13 @@ export default {
             });
         },
         checkCorrectOptions() {
-            let selectedGroup = this.groups.find(group => group.id === this.selectedGroupId);
-            return ((selectedGroup && this.selectedCourse > selectedGroup.max_courses) ||  !this.selectedGroupId || !this.selectedCourse);
+            return !this.selectedGroupId || !this.selectedCategoryId;
         },
-        formatCourse(course) {
-            // Return the course with the correct format in catalan (1er, 2on, 3er, 4rt)
-            switch (course) {
-                case 1:
-                    return '1er';
-                case 2:
-                    return '2on';
-                case 3:
-                    return '3er';
-                case 4:
-                    return '4rt';
-                default:
-                    return course;
-            }
-        }
     }
-
 }
 </script>
 
 <style scoped>
-
 .loading {
     display: flex;
     justify-content: center;
@@ -135,5 +123,4 @@ export default {
     background-color: #999;
     cursor: not-allowed;
 }
-
 </style>

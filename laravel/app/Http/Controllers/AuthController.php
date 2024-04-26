@@ -6,55 +6,65 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-class AuthController extends Controller {
-     
+class AuthController extends Controller
+{
 
-/**
- * @OA\Post(
- *     path="/api/login",
- *     operationId="login",
- *     tags={"Authentication"},
- *     summary="User login",
- *     description="Logs in a user with email and name.",
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\MediaType(
- *             mediaType="application/x-www-form-urlencoded",
- *             @OA\Schema(
- *                 required={"email", "name"},
- *                 @OA\Property(property="email", type="string", format="email", example="user@example.com"),
- *                 @OA\Property(property="name", type="string", example="John Doe")
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=201,
- *         description="User logged in successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...")
- *         )
- *     ),
- *     @OA\Response(
- *         response=422,
- *         description="Validation error",
- *         @OA\JsonContent(
- *             @OA\Property(property="message", type="string", example="The given data was invalid."),
- *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}})
- *         )
- *     )
- * )
- */
-    public function login(Request $request) {
+
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     operationId="login",
+     *     tags={"Authentication"},
+     *     summary="User login",
+     *     description="Logs in a user with email and name.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 required={"email", "name"},
+     *                 @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *                 @OA\Property(property="name", type="string", example="John Doe")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User logged in successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object", example={"email": {"The email field is required."}})
+     *         )
+     *     )
+     * )
+     */
+    public function login(Request $request)
+    {
         $fields = $request->validate([
             'email' => 'required|string',
             'name' => 'required|string',
         ]);
 
-        // check if mail exists and if not exist create a new user
-        $user = User::firstOrCreate([
-            'email' => $fields['email'],
-            'name' => $fields['name'],
-        ]);
+        // check if mail exists
+        $user = User::where('email', $fields['email'])->first();
+
+        if (!$user) {
+
+            $role = preg_match('/[0-9]/', $fields['email']) ? 4 : 3;
+
+            $user = User::create([
+                'email' => $fields['email'],
+                'name' => $fields['name'],
+                'role_id' => $role,
+            ]);
+        }
 
         $user->load('groups');
 
@@ -85,7 +95,8 @@ class AuthController extends Controller {
      *     )
      * )
      */
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         auth()->user()->tokens()->delete();
 
         return [
@@ -122,9 +133,10 @@ class AuthController extends Controller {
      *     )
      * )
      */
-    public function getUser(Request $request) {
+    public function getUser(Request $request)
+    {
         $user = auth()->user();
-    
+
         if ($user) {
             $user->load('groups');
             return response($user, 200);
@@ -136,10 +148,11 @@ class AuthController extends Controller {
     }
 
     public function index() {
-        return User::all();
+        return User::with('groups')->get();
     }
 
-    public function show($id) {
+    public function show($id)
+    {
 
         // Validar que l'usuari sigui administrador
         if (auth()->user()->role_id !== 1) {
@@ -162,7 +175,8 @@ class AuthController extends Controller {
         return response()->json($user);
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
 
         // Validar que l'usuari sigui administrador
         if (auth()->user()->role_id !== 1) {
@@ -184,6 +198,7 @@ class AuthController extends Controller {
 
         // Update user
         $user->update([
+            'role_id' => $request->input('role_id'),
             'vote_banned_until' => $request->input('vote_banned_until'),
             'propose_banned_until' => $request->input('propose_banned_until'),
         ]);

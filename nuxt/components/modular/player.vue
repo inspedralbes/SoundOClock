@@ -1,15 +1,14 @@
 <template>
     <Transition name="player-slide">
-        <div v-if="track != null"
-            class="fixed bottom-8 right-8 bg-white rounded-lg shadow-sm p-4 w-[200px] overflow-hidden shadow-white">
+        <div v-if="track != null" class="fixed bottom-8 right-8 bg-white rounded-lg shadow-sm p-4 w-40 shadow-white">
             <div class="flex flex-col items-center">
                 <div>
-                    <img class="rounded-full object-cover spin"
+                    <img class="rounded-full object-cover spin border border-solid border-gray-500 bg-gray-200 p-1 "
                         :src="track.album ? track.album.images[0].url : track.img" alt="Album Image">
                 </div>
                 <div class="mt-4 text-center overflow-hidden">
                     <h3 class="text-lg font-semibold text-gray-800 whitespace-nowrap overflow-hidden"
-                        :class="{ 'text-marquee': isOverflowing(1) }">{{ track.name ? track.name : track.title }}
+                        :class="{ 'text-marquee': isOverflowing(1) }">{{ track.name ? track.name : track.name }}
                     </h3>
                     <p class="text-gray-700 whitespace-nowrap overflow-hidden"
                         :class="{ 'text-marquee': isOverflowing(2) }">
@@ -90,7 +89,7 @@ export default {
         isOverflowing(text) {
             let nameLength = 0;
             if (text === 1) {
-                nameLength = this.track.name ? this.track.name.length : this.track.title.length;
+                nameLength = this.track.name ? this.track.name.length : this.track.name.length;
                 return nameLength > 20;
             } else {
                 if (this.track.artists) {
