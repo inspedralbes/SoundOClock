@@ -49,20 +49,16 @@ async function loginUserAndAdmin() {
 }
 
 async function login(name, email) {
-  const response = await fetch(apiURL + 'login', {
-    method: 'POST',
+  const response = await axios.post(apiURL + 'login', {
+    email: email,
+    name: name,
+  }, {
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
-    },
-    body: JSON.stringify({
-      email: email,
-      name: name,
-    })
+    }
   });
-  const jsonResponse = await response.json();
-  console.log(jsonResponse);
-  return jsonResponse;
+  return response.data;
 }
 
 async function logout(token) {
