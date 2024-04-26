@@ -158,7 +158,7 @@ jobs:
           chmod 600 ~/prod_key.pem
           cd node
           cp .env.example .env
-          sed -i 's/NODE_ENV=/NODE_ENV='production' /g' .env
+          sed -i 's/NODE_ENV=/NODE_ENV=production /g' .env
           sed -i 's/SPOTIFY_CLIENT_ID=/SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}/g' .env
           sed -i 's/SPOTIFY_CLIENT_SECRET=/SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}/g' .env
           sed -i 's#PRODUCTION_API_URL=/PRODUCTION_API_URL=${{ secrets.PRODUCTION_API_URL }}#g' .env
