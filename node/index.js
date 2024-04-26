@@ -31,7 +31,7 @@ const port = 8080;
 const mongoUser=process.env.MONGO_USER;
 const mongoPassword=process.env.MONGO_PASSWORD;
 
-mongoose.connect(`mongodb://${mongoUser}:${mongoPassword}@${host}:27017/soundoclock`, { authSource: "admin", useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(`mongodb://${mongoUser}:${mongoPassword}@${host}:27017/soundoclock`, { authSource: "admin"})
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 

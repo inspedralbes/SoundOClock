@@ -61,7 +61,6 @@ async function login(name, email) {
     })
   });
   const jsonResponse = await response.json();
-  console.log(jsonResponse);
   return jsonResponse;
 }
 
