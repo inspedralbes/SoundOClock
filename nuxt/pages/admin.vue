@@ -119,7 +119,7 @@ export default {
                 6: resolveComponent('AdminSetSongs'),
                 7: resolveComponent('AdminManageRoles'),
             },
-            loading: true
+            loading: false
         }
     },
     setup() {
@@ -129,23 +129,6 @@ export default {
     created() {
         socket.emit('getGroups', this.store.getUser().token);
         socket.emit('getRoles', this.store.getUser().token);
-        comManager.getUsers();
-    },
-    mounted() {
-        const userToken = this.store.getUser().token;
-
-        // Check if the user is authenticated
-        if (!userToken) {
-            navigateTo({ path: '/' });
-        }
-
-        // Check if the user is an admin
-        comManager.getUserInfo(userToken).then((response) => {
-            if (response.role_id !== 1) {
-                navigateTo({ path: '/' });
-            }
-            this.loading = false;
-        });
     },
     computed: {
         active_screen() {

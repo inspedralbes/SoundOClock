@@ -226,9 +226,6 @@ export default {
         });
     },
     mounted() {
-        if (!this.store.getUser().token) {
-            navigateTo({ path: '/' });
-        }
         comManager.getSongs();
         comManager.getUserSelectedSongs(this.store.getUser().id);
 

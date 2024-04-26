@@ -34,6 +34,8 @@ export const useAppStore = defineStore('app', {
     },
     roles: null,
     serverResponse: null,
+    loadingAdminComponent: null,
+    blacklist: [],
   }),
   persist: {
     storage: persistedState.localStorage,
@@ -95,6 +97,12 @@ export const useAppStore = defineStore('app', {
     },
     getServerResponse() {
       return this.serverResponse
+    },
+    getLoadingAdminComponent() {
+      return this.loadingAdminComponent
+    },
+    getBlacklist() {
+      return this.blacklist
     },
 
     //setters
@@ -163,6 +171,12 @@ export const useAppStore = defineStore('app', {
     setServerResponse(serverResponse) {
       this.serverResponse = serverResponse
     },
+    setLoadingAdminComponent(loadingAdminComponent) {
+      this.loadingAdminComponent = loadingAdminComponent
+    },
+    setBlacklist(blacklist) {
+      this.blacklist = blacklist
+    },
 
     ///Deletes
     deleteUser() {
@@ -191,7 +205,32 @@ export const useAppStore = defineStore('app', {
 
     // Others
 
-    playTrack(track, status) {
+    // playTrack(track, status) {
+    //   if (status.currentTrackId == track.id) {
+    //     if (status.isPlaying) {
+    //       status.currentTrack.pause();
+    //       status.isPlaying = false;
+    //     } else {
+    //       status.currentTrack.load();
+    //       status.currentTrack.play();
+    //       status.isPlaying = true;
+    //     }
+    //   } else {
+    //     if (status.isPlaying) {
+    //       status.currentTrack.pause();
+    //       status.isPlaying = false;
+    //     }
+    //     status.currentTrack = new Audio(track.preview_url);
+    //     status.currentTrackId = track.id;
+    //     status.currentTrack.load();
+    //     status.currentTrack.play();
+    //     status.isPlaying = true;
+    //   }
+    //   return status;
+    // },
+
+    playTrack(track) {
+      const status = this.songStatus;
       if (status.currentTrackId == track.id) {
         if (status.isPlaying) {
           status.currentTrack.pause();
@@ -212,7 +251,6 @@ export const useAppStore = defineStore('app', {
         status.currentTrack.play();
         status.isPlaying = true;
       }
-      return status;
     },
   },
 })

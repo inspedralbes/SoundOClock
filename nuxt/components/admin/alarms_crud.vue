@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">RELACIONAR GRUPS AMB TIMBRES</h2>
-        <div class="m-8" v-if="bells.length === 0">
+        <div class="m-8" v-if="loading">
             <Loader />
         </div>
         <div v-else>
@@ -90,9 +90,10 @@ export default {
         }
     },
     created() {
-        this.loading = true;
-        comManager.getBells();
-        this.loading = false;
+        if (this.store.getBells().length <= 0) {
+            this.store.setLoadingAdminComponent(true);
+            comManager.getBells();
+        }
     },
     watch: {
         bells: { // Each time bells change execute createRelationsStructure() method
@@ -141,6 +142,9 @@ export default {
         }
     },
     computed: {
+        loading() {
+            return this.store.getLoadingAdminComponent();
+        },
         bells() {
             let bells = this.store.getBells();
             for (let i = 0; i < bells.length; i++) {

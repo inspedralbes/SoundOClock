@@ -23,7 +23,6 @@ function getSortedVotedSongs() {
     fetch(`${url}/sortedVotedSongs`)
         .then(response => response.json())
         .then(data => {
-            console.log("sortedVotedSongs: ", data)
             store.setSortedVotedSongs(data);
         })
         .catch(error => {
@@ -49,6 +48,7 @@ function getAdminSongs() {
         .then(response => response.json())
         .then(data => {
             store.setProposedSongsAdminView(data);
+            store.setLoadingAdminComponent(false);
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -61,6 +61,7 @@ export function getUsers() {
         .then(response => response.json())
         .then(data => {
             store.setUsersAdminView(data);
+            store.setLoadingAdminComponent(false);
             console.log("USERS", data);
         })
         .catch(error => {
@@ -107,8 +108,8 @@ async function getBells() {
     fetch(`${url}/bells/${store.getUser().token}`)
         .then(response => response.json())
         .then(data => {
-            console.log("bells: ", data);
             store.setBells(data);
+            store.setLoadingAdminComponent(false);
         })
         .catch(error => {
             console.error('Error fetching data:', error);
