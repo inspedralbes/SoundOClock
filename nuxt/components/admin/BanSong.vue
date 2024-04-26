@@ -113,7 +113,6 @@ export default {
             // Sort songs by the number of reports
             const songs = this.store.getProposedSongsAdminView();
             songs.sort((a, b) => b.reports.length - a.reports.length);
-            console.log(songs)
 
             this.selectedSong = songs[0];
             return songs;

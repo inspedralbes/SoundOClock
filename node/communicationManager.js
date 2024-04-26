@@ -42,7 +42,6 @@ async function googleLogin(userToken) {
 async function loginUserAndAdmin() {
   let userInfo = await login("miquel", "miquel@gmail.com");
   let adminInfo = await login("admin", "admin@gmail.com");
-  console.log(userInfo, adminInfo);
   let userToken = userInfo.token;
   let adminToken = adminInfo.token;
   return { userToken, adminToken };

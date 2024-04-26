@@ -101,15 +101,13 @@ export default {
             this.filteredTracks = blacklist;
             this.loading = false;
         });
-        
+
         socket.on('songRemovedFromBlacklist', (spotify_id) => {
-            console.log("socket songRemovedFromBlacklist data received");
             this.tracks = this.tracks.filter(track => track.spotify_id !== spotify_id);
             this.filteredTracks = this.filteredTracks.filter(track => track.spotify_id !== spotify_id);
         });
 
         socket.on('deleteError', (data) => {
-            console.log("socket deleteError data received", data)
             this.store.setServerResponse(data);
         });
     },
