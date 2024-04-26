@@ -5,7 +5,7 @@ import comManager from './communicationManager';
 
 const router = useRouter();
 
-const url = "http://143.47.53.38:8080";
+const url = "http://timbre.inspedralbes.cat:8080";
 // const url = "http://localhost:8080";
 
 export const socket = io(url);
