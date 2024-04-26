@@ -741,6 +741,25 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('setSettings', async (userToken, settings) => {
+    try {
+      let response = await comManager.setSettings(userToken, settings);
+      console.log('response', response);
+      socket.emit('settingsUpdated', response);
+    } catch (err) {
+      socket.emit('setSettingsError', { status: 'error', message: err.message });
+    }
+  });
+
+  socket.on('getSettings', async (userToken) => {
+    try {
+      let settings = await comManager.getSettings(userToken);
+      socket.emit('sendSettings', settings);
+    } catch (err) {
+      socket.emit('getSettingsError', { status: 'error', message: err.message });
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
     if (socket.id === dirPC) {
