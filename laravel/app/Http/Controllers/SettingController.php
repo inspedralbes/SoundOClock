@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Setting;
+use Illuminate\Support\Facades\DB;
 
 class SettingController extends Controller
 {
@@ -30,14 +31,14 @@ class SettingController extends Controller
     {
 
         if (Setting::count() > 0) {
-            // Si ya existe una configuración, puedes manejarlo de acuerdo a tus necesidades,
-            // por ejemplo, retornando un mensaje de error o actualizando la configuración existente
             return response()->json(['message' => 'Ya existe una configuración en la base de datos'], 400);
         }
 
         $request->validate([
+            'voteDuration' => 'integer',
             'start_vote' => 'date',
             'end_vote' => 'date',
+            'moderationDuration' => 'integer',
             'start_moderation' => 'date',
             'end_moderation' => 'date',
             'showExplicit' => 'boolean',
@@ -81,24 +82,25 @@ class SettingController extends Controller
 
         // Validar los datos de entrada
         $request->validate([
+            'voteDuration' => 'integer',
             'start_vote' => 'date',
             'end_vote' => 'date',
+            'moderationDuration' => 'integer',
             'start_moderation' => 'date',
             'end_moderation' => 'date',
             'showExplicit' => 'boolean',
             'letProposeExplicit' => 'boolean',
             'alertExplicit' => 'boolean',
-            'theme' => 'string',
-            'teacher_email_key' => 'string',
-            'student_email_key' => 'string',
         ]);
 
-        $setting = Setting::first();
+        $settingArray = DB::select('SELECT * FROM settings LIMIT 1');
 
-        // Si no hay configuración existente, puedes crearla
-        if (!$setting) {
+        if (empty($settingArray)) {
             return Setting::create($request->all());
         }
+
+        $setting = Setting::find($settingArray[0]->id);
+
 
         // Actualizar la configuración existente
         $setting->update($request->all());

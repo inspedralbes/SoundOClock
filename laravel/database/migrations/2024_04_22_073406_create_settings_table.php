@@ -12,8 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('settings', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('voteDuration')->nullable();
             $table->date('start_vote')->nullable();
             $table->date('end_vote')->nullable();
+            $table->integer('moderationDuration')->nullable();
             $table->date('start_moderation')->nullable();
             $table->date('end_moderation')->nullable();
             $table->boolean('showExplicit')->default(false);

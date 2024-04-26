@@ -15,8 +15,10 @@ class Setting extends Model
     protected $fillable = [
         'start_vote',
         'end_vote',
+        'voteDuration',
         'start_moderation',
         'end_moderation',
+        'moderationDuration',
         'showExplicit',
         'letProposeExplicit',
         'alertExplicit',
