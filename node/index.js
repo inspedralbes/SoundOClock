@@ -283,6 +283,7 @@ setInterval(obtenerActualizarTokenSpotify, 59 * 60 * 1000);
 obtenerActualizarTokenSpotify();
 
 let dirPC = null;
+let configuration = null;
 
 // Sockets
 io.on('connection', (socket) => {
@@ -367,7 +368,7 @@ io.on('connection', (socket) => {
 
       io.emit('songPosted', { status: 'success', song: songData });
     } catch (err) {
-       console.log('postError Ja has proposat una cançó');
+      console.log('postError Ja has proposat una cançó');
       socket.emit('postError', { status: 'error', message: err.message });
       console.error('postError', err.message);
     }
@@ -655,7 +656,7 @@ io.on('connection', (socket) => {
       } else if (!user.propose_banned_until && updatedUser.propose_banned_until) {
         message = `no pot proposar cançons fins el ${formatDate(updatedUser.propose_banned_until)}`;
       } else {
-        socket.emit('notifyServerResponse', { status: 'error', message: `Un altre usuari està modificant aquest usuari. Els teus canvis potser no s'han desat.`});
+        socket.emit('notifyServerResponse', { status: 'error', message: `Un altre usuari està modificant aquest usuari. Els teus canvis potser no s'han desat.` });
         return
       }
 
@@ -753,7 +754,15 @@ io.on('connection', (socket) => {
 
   socket.on('getSettings', async (userToken) => {
     try {
-      let settings = await comManager.getSettings(userToken);
+      console.log(configuration);
+      let settings;
+      if (configuration != null) {
+        settings = configuration;
+      } else {
+        settings = await comManager.getSettings(userToken);
+        configuration = settings;
+      }
+      console.log('settings', settings);
       socket.emit('sendSettings', settings);
     } catch (err) {
       socket.emit('getSettingsError', { status: 'error', message: err.message });

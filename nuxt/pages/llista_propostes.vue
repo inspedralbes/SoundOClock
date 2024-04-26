@@ -12,6 +12,7 @@
             preferida</h1> -->
 
     <!-- Barra de busqueda -->
+    <h1 class="mx-auto text-4xl py-8">{{ settings.theme }}</h1>
     <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
         <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
             <input type="text" placeholder="Buscar..."
@@ -115,7 +116,7 @@
             </template>
 
             <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de "{{
-                reportSongData.reportedSong.artists.map(artist => artist.name).join(', ') }}"?</p>
+        reportSongData.reportedSong.artists.map(artist => artist.name).join(', ') }}"?</p>
             <!-- <URadioGroup v-model="reportSongData.selectedOption" :options="reportSongData.options" class="mt-4">
             </URadioGroup> -->
             <div class="flex flex-col mt-4">
@@ -165,6 +166,7 @@ import comManager from '../communicationManager';
 export default {
     data() {
         return {
+            settings: {},
             filter: '',
             modals: {
                 alreadyVotedModal: false,
@@ -224,10 +226,21 @@ export default {
                 console.error('No se encontró el script con el id "__NEXT_DATA__" en el HTML recibido');
             }
         });
+
+        socket.on('sendSettings', (settings) => {
+            console.log("settings", settings);
+            if (settings.length != 0) {
+                this.settings = settings[0];
+            }
+        });
     },
     mounted() {
         comManager.getSongs();
         comManager.getUserSelectedSongs(this.store.getUser().id);
+
+        socket.emit('getSettings', this.store.getUser().token);
+
+
 
         socket.on("voteError", (data) => {
             this.serverResponse = data;
@@ -242,6 +255,8 @@ export default {
         this.store.deleteCurrentTrackPlaying();
         socket.off("voteError");
         socket.off("searchResult");
+        socket.off("sendHtmlSpotify");
+        socket.off("sendSettings");
     },
     methods: {
         getSongs() {
