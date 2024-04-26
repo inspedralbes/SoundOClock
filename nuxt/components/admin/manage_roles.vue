@@ -72,6 +72,9 @@ export default {
         }
     },
     computed:{
+        loading() {
+            return this.store.getLoadingAdminComponent();
+        },
         filteredUsers() {
             let filteredUsers;
 

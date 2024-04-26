@@ -95,7 +95,8 @@ describe('Listen the Server sockets', function () {
       clientSocket.once('postError', (message) => {
         try {
           expect(message.status).to.equal('error');
-          expect(message.message).to.equal('User already submitted a song');
+          expect(message.title).to.equal('Ja has proposat una cançó');
+          expect(message.message).to.equal('Ja has proposat una cançó, espera a la següent votació per proposar una altra.');
           resolve(); // Resolve the promise if the assertions pass
         } catch (error) {
           reject(error); // Reject the promise if the assertions fail
@@ -120,7 +121,8 @@ describe('Listen the Server sockets', function () {
       clientSocket.once('postError', (message) => {
         try {
           expect(message.status).to.equal('error');
-          expect(message.message).to.equal('Song already exists');
+          expect(message.title).to.equal('Cançó ja proposada');
+          expect(message.message).to.equal(`La cançó ${testSong.name} ja ha sigut proposada per un altre usuari.`);
           resolve(); // Resolve the promise if the assertions pass
         } catch (error) {
           reject(error); // Reject the promise if the assertions fail
@@ -222,6 +224,17 @@ describe('Listen the Server sockets', function () {
     });
 
     clientSocket.emit('deleteSong', adminToken, testSong.id);
+  })
+
+  it("should remove a song from the blacklist", (done) => {
+    console.log("REMOVE SONG FROM BLACKLIST")
+    clientSocket.on('notifyServerResponse', (message) => {
+      expect(message.status).to.equal('success');
+      expect(message.message).to.equal(`La cançó ${testSong.name} ha sigut eliminada de la llista negra.`);
+      done();
+    });
+
+    clientSocket.emit('removeFromBlacklist', adminToken, testSong.id);
   })
 
   it("should report a song", async () => {

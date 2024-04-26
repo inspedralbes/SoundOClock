@@ -34,7 +34,8 @@ export const useAppStore = defineStore('app', {
     },
     roles: null,
     serverResponse: null,
-    loadingAdminComponent: null
+    loadingAdminComponent: null,
+    blacklist: [],
   }),
   persist: {
     storage: persistedState.localStorage,
@@ -99,6 +100,9 @@ export const useAppStore = defineStore('app', {
     },
     getLoadingAdminComponent() {
       return this.loadingAdminComponent
+    },
+    getBlacklist() {
+      return this.blacklist
     },
 
     //setters
@@ -169,6 +173,9 @@ export const useAppStore = defineStore('app', {
     },
     setLoadingAdminComponent(loadingAdminComponent) {
       this.loadingAdminComponent = loadingAdminComponent
+    },
+    setBlacklist(blacklist) {
+      this.blacklist = blacklist
     },
 
     ///Deletes
