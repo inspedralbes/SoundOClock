@@ -14,6 +14,7 @@ import { remove } from 'fs-extra';
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || 'mongodb';
 
+dotenv.config();
 
 const app = express();
 app.use(cors());
@@ -26,10 +27,9 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   }
 });
-const port = process.env.PORT || 8080;
+const port = 8080;
 const mongoUser=process.env.MONGO_USER;
 const mongoPassword=process.env.MONGO_PASSWORD;
-
 
 // Mongoose setup
 mongoose.connect(`mongodb://${mongoUser}:${mongoPassword}@` + host + ':27017/soundoclock', { authSource: "admin" })
