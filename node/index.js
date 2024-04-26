@@ -8,10 +8,12 @@ import downloadsManager from './downloadsManager.cjs';
 import { Song, VotingRecord, ReportSong } from './models.js';
 import axios from 'axios';
 import minimist from 'minimist';
+import dotenv from 'dotenv';
 import { remove } from 'fs-extra';
 
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || 'mongodb';
+
 
 const app = express();
 app.use(cors());
@@ -25,9 +27,12 @@ const io = new Server(server, {
   }
 });
 const port = process.env.PORT || 8080;
+const mongoUser=process.env.MONGO_USER;
+const mongoPassword=process.env.MONGO_PASSWORD;
+
 
 // Mongoose setup
-mongoose.connect('mongodb://mongoadmin:mongopassword@' + host + ':27017/soundoclock', { authSource: "admin" })
+mongoose.connect(`mongodb://${mongoUser}:${mongoPassword}@` + host + ':27017/soundoclock', { authSource: "admin" })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
