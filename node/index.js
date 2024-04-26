@@ -316,6 +316,7 @@ io.on('connection', (socket) => {
     try {
       // Check if the user can post a song
       if (user.propose_banned_until > new Date().toISOString().substring(0, 10)) {
+        console.log('postError Estàs bloquejat');
         socket.emit('postError', { status: 'error', title: `Estàs bloquejat`, message: `No pots proposar cançons fins el ${formatDate(user.propose_banned_until)}.` });
         return;
       }
@@ -326,6 +327,7 @@ io.on('connection', (socket) => {
 
       for (let i = 0; i < blacklistSongs.length; i++) {
         if (blacklistSongs[i].spotify_id == songData.id) {
+          console.log('postError Cançó no disponibl');
           socket.emit('postError', { status: 'error', title: `Cançó no disponible`, message: `La cançó ${blacklistSongs[i].name} no està disponible.` });
           return;
         }
@@ -334,6 +336,7 @@ io.on('connection', (socket) => {
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
       if (existingSong) {
+        console.log('postError Cançó ja proposada');
         socket.emit('postError', { status: 'error', title: `Cançó ja proposada`, message: `La cançó ${existingSong.name} ja ha sigut proposada per un altre usuari.` });
         return;
       }
@@ -341,6 +344,7 @@ io.on('connection', (socket) => {
       // Check if the user already submitted a song
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
       if (votingRecord && votingRecord.submitted) {
+        console.log('postError Ja has proposat una cançó');
         socket.emit('postError', { status: 'error', title: `Ja has proposat una cançó`, message: 'Ja has proposat una cançó, espera a la següent votació per proposar una altra.' });
         return;
       }
@@ -363,6 +367,7 @@ io.on('connection', (socket) => {
 
       io.emit('songPosted', { status: 'success', song: songData });
     } catch (err) {
+       console.log('postError Ja has proposat una cançó');
       socket.emit('postError', { status: 'error', message: err.message });
       console.error('postError', err.message);
     }
