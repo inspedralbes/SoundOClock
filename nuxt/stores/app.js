@@ -196,32 +196,8 @@ export const useAppStore = defineStore('app', {
       this.adminSelectedUser = adminSelectedUser
     },
 
-    // Others
-
-    // playTrack(track, status) {
-    //   if (status.currentTrackId == track.id) {
-    //     if (status.isPlaying) {
-    //       status.currentTrack.pause();
-    //       status.isPlaying = false;
-    //     } else {
-    //       status.currentTrack.load();
-    //       status.currentTrack.play();
-    //       status.isPlaying = true;
-    //     }
-    //   } else {
-    //     if (status.isPlaying) {
-    //       status.currentTrack.pause();
-    //       status.isPlaying = false;
-    //     }
-    //     status.currentTrack = new Audio(track.preview_url);
-    //     status.currentTrackId = track.id;
-    //     status.currentTrack.load();
-    //     status.currentTrack.play();
-    //     status.isPlaying = true;
-    //   }
-    //   return status;
-    // },
-
+    // Other 
+    
     playTrack(track) {
       const status = this.songStatus;
       if (status.currentTrackId == track.id) {

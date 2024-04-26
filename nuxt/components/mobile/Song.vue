@@ -1,12 +1,12 @@
 <template>
     <div class="w-full flex justify-center">
-        <div class="relative flex w-[95%] h-[100px] bg-gray-200 overflow-hidden rounded-lg mt-4">
-            <img class="w-full h-auto object-cover object-center brightness-50"
+        <div class="relative flex w-[95%] h-[100px] bg-gray-200 overflow-hidden rounded-lg" :class="{'mt-4': type !== 'admin'}">
+            <img class="w-full h-auto object-cover object-center brightness-50" :class="{ 'opacity-100': type === 'admin' && isSelected, 'opacity-75': type === 'admin' && !isSelected}"
                 :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'">
 
             <div class="absolute inset-0 flex flex-row justify-center">
                 <div class="flex flex-row w-full justify-between p-2 items-center">
-                    <div class="flex flex-col w-[70%] overflow-hidden">
+                    <div class="flex flex-col w-[70%] overflow-hidden items-start">
                         <p
                             class="font-bold text-base text-ellipsis uppercase max-w-[200px] overflow-hidden whitespace-nowrap">
                             {{ track.name }}
@@ -22,6 +22,7 @@
                             </p>
                         </div>
                         <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.totalVotes }}</p>
+                        <p v-if="type === 'admin'" class="text-sm">Vots: {{ track.votes }}</p>
                     </div>
                     <button @click="playTrack(track)">
                         <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
@@ -54,6 +55,9 @@
                             thumb_up
                         </span>
                     </button>
+                    <div v-if="type === 'admin'" class="mx-2">
+                            <input type="checkbox" name="selected" id="selected" :checked="isSelected" @change="e => setSelected(e, bell.id, track.id)" class="h-6 w-6" >
+                    </div>
                 </div>
             </div>
         </div>
@@ -62,7 +66,6 @@
 
 
 <script>
-import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
 import { computed } from 'vue';
 
@@ -81,6 +84,14 @@ export default {
         type: {
             type: String,
             default: 'propose'
+        },
+        bell: {
+            type: Object,
+            default: null
+        },
+        isSelected: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -89,12 +100,6 @@ export default {
             isLoadingVote: computed(() => this.store.isLoadingVote),
             userSelectedSongs: computed(() => this.store.userSelectedSongs)
         }
-    },
-    created() {
-
-    },
-    mounted() {
-
     },
     methods: {
         playTrack(track) {
@@ -115,6 +120,12 @@ export default {
             } else {
                 return false;
             }
+        },
+        setSelected(e, bellId, songId) {
+            // Prevent the checkbox from being checked
+            e.target.checked = false;
+            // Then emit the event
+            this.$emit('setSelected', bellId, songId);
         },
     },
     watch: {
