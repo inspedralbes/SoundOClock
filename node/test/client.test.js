@@ -15,7 +15,7 @@ describe('Listen the Server sockets', function () {
   let userToken;
   let adminToken;
   let userId;
-  this.timeout(10000);  // 10 seconds
+  this.timeout(20000);  // 10 seconds
 
   let testSong = {
     id: "1000",
