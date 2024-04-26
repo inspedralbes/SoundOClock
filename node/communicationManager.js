@@ -301,10 +301,10 @@ async function setUserGroups(userId, token, groups) {
       "Accept": "application/json",
       "Authorization": "Bearer " + token,
     },
-    body: JSON.stringify({ 
+    body: JSON.stringify({
       "groups": groups,
       "user_id": userId
-     })
+    })
   });
   const jsonResponse = await response.json();
   return jsonResponse;
@@ -363,6 +363,33 @@ async function getRoles(token) {
   return jsonResponse;
 }
 
+async function setSettings(token, settings) {
+  const response = await fetch(apiURL + `settings`, {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "authorization": "Bearer " + token,
+    },
+    body: JSON.stringify(settings)
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
+async function getSettings(token) {
+  const response = await fetch(apiURL + `settings`, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -389,6 +416,8 @@ const comManager = {
   setBellsGroupsConfiguration,
   showUser,
   getRoles,
+  getSettings,
+  setSettings,
   getAllGroupsAndCategories,
   createGroupCategory,
   createGroup,
