@@ -12,7 +12,7 @@
             preferida</h1> -->
 
     <!-- Barra de busqueda -->
-    <h1 class="mx-auto text-4xl py-8 smallCaps">{{ 'La temàtica és: ' + settings.theme }}</h1>
+    <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' + settings.theme }}</h1>
     <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
         <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
             <input type="text"
