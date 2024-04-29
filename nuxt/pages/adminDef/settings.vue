@@ -178,7 +178,7 @@ export default {
 
         socket.on('sendSettings', (settings) => {
             console.log("settings", settings);
-            if (settings) {
+            if (settings && !settings.message) {
                 this.settings = settings;
             }
                 this.isLoading = false;
