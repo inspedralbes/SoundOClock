@@ -33,6 +33,7 @@
 <script>
 import { computed } from 'vue';
 import { useAppStore } from '@/stores/app';
+import comManager from '../../communicationManager';
 import { socket } from '@/socket';
 
 export default {
@@ -44,40 +45,47 @@ export default {
             classGroups: computed(() => store.getClassGroups()),
             users: computed(() => store.getUsersAdminView()),
             roles: computed(() => store.getRoles()),
-            currentSelectedUser: null,
         }
     },
-    created() {
-        if (this.store.getBells().length <= 0) {
+    async created() {
+        if (this.store.getRoles().length <= 0 || this.store.getUsersAdminView().length <= 0) {
             this.store.setLoadingAdminComponent(true);
-            socket.emit('getRoles', this.store.getUser().token);
+            await comManager.getRoles();
+            comManager.getUsers();
         }
-        //this.currentSelectedUser = this.users[0];
+    },
+    unmounted() {
+        if (this.users.length > 0) {
+            this.store.setAdminSelectedUser(this.users[0]);
+        }
     },
     methods: {
         selectUser(selectedUser) {
-            this.currentSelectedUser = selectedUser;
+            this.store.setAdminSelectedUser(selectedUser);
         },
         isSelected(user) {
             let style = "user-item--not-selected";
-
             if (user.id == this.currentSelectedUser.id) {
                 style = "user-item--selected";
             }
 
             return style;
         },
-        refreshUsersList() {
-            for (let i = 0; i < this.users.length; i++) {
-                if (this.users[i].id == this.currentSelectedUser.id) {
-                    this.currentSelectedUser = this.users[i];
-                }
-            }
-        }
+        // refreshUsersList() {
+        //     console.log("REFRESH USER LIST")
+        //     for (let i = 0; i < this.users.length; i++) {
+        //         if (this.users[i].id == this.currentSelectedUser.id) {
+        //             this.store.setAdminSelectedUser(this.users[i]);
+        //         }
+        //     }
+        // }
     },
     computed:{
         loading() {
             return this.store.getLoadingAdminComponent();
+        },
+        currentSelectedUser() {
+            return this.store.getAdminSelectedUser()
         },
         filteredUsers() {
             let filteredUsers;
@@ -99,9 +107,13 @@ export default {
         },
     },
     watch: {
-        users: {
-            handler: 'refreshUsersList',
-        },
+        // users: {
+        //     handler: 'refreshUsersList',
+        // },
+    },
+    setup() {
+        const store = useAppStore();
+        return { store };
     },
 }
 </script>
