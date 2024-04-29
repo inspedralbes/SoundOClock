@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "mocha",
-    "dev": "nodemon index.js -L"
+    "dev": "nodemon index.js -L",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
