@@ -744,7 +744,7 @@ io.on('connection', (socket) => {
       socket.emit('notifyServerResponse', { status: 'success', message: `El rol de l'usuari ${modifiedUser.name} ha sigut modificat.` });
 
       // Update the user data to everybody
-      io.emit('userRoleUpdated');
+      io.emit('userRoleUpdated', modifiedUser);
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
     }

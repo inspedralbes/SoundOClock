@@ -86,8 +86,8 @@ socket.on("connect", () => {
     console.log('socket isReadReportStatusChanged data received', data);
   });
 
-  socket.on('userRoleUpdated', () => {
-    comManager.getUsers();
+  socket.on('userRoleUpdated', (data) => {
+    refreshAdminUsersView(data)
   });
 
   socket.on('sendRoles', (data) => {
@@ -153,7 +153,7 @@ socket.on("connect", () => {
 
     let selectedUser = pinia.getAdminSelectedUser();
     let usersAdminView = pinia.getUsersAdminView();
-    
+
     if (selectedUser.id === user.id) {
 
       pinia.setAdminSelectedUser(user);

@@ -71,13 +71,14 @@ export default {
 
             return style;
         },
-        refreshUsersList() {
-            for (let i = 0; i < this.users.length; i++) {
-                if (this.users[i].id == this.currentSelectedUser.id) {
-                    this.currentSelectedUser = this.users[i];
-                }
-            }
-        }
+        // refreshUsersList() {
+        //     console.log("REFRESH USER LIST")
+        //     for (let i = 0; i < this.users.length; i++) {
+        //         if (this.users[i].id == this.currentSelectedUser.id) {
+        //             this.store.setAdminSelectedUser(this.users[i]);
+        //         }
+        //     }
+        // }
     },
     computed:{
         loading() {
@@ -106,9 +107,9 @@ export default {
         },
     },
     watch: {
-        users: {
-            handler: 'refreshUsersList',
-        },
+        // users: {
+        //     handler: 'refreshUsersList',
+        // },
     },
     setup() {
         const store = useAppStore();
