@@ -774,7 +774,6 @@ io.on('connection', (socket) => {
 
   socket.on('getSettings', async (userToken) => {
     try {
-      console.log(configuration);
       let settings;
       if (configuration != null) {
         settings = configuration;
