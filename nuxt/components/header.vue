@@ -9,7 +9,12 @@
             <!--MOBILE AND TABLET DESIGN-->
             <div v-if="$device.isMobileOrTablet" class="flex flex-row items-center relative">
                 <!--NAVBAR BURGER BUTTON-->
-                <button @click="toggleDropdown()">
+                <button class="flex flex-row items-center" @click="logout()">
+                    <span class="material-symbols-outlined text-[2rem]">
+                        logout
+                    </span>
+                </button>
+                <!-- <button @click="toggleDropdown()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="icon icon-tabler icons-tabler-outline icon-tabler-menu-2">
@@ -18,7 +23,7 @@
                         <path d="M4 12l16 0" />
                         <path d="M4 18l16 0" />
                     </svg>
-                </button>
+                </button> -->
                 <!--DROPDOWN-->
                 <!-- <div class="dropdown flex flex-col gap-2 rounded border-[1px] border-gray-300 bg-white p-4 absolute top-[80px] md:top-[110px] right-[-20px] w-fit whitespace-nowrap shadow-md text-black z-[100]" :class="{'dropdown--displayed' : showDropdown}">
                     <button class="text-right">Tancar Sessió</button>
