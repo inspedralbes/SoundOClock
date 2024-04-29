@@ -2,7 +2,7 @@
     <div class="w-screen h-screen" v-if="loading">
         <Loader />
     </div>
-    <SideBarMenu @toggle-menu="isOpen = $event" v-if="!loading">
+    <SideBarMenu @toggle-menu="isOpen = $event" v-if="!loading" @mouseover="isOpen = true" @mouseleave="isOpen = false">
         <!-- 
             - Cada 'button' de dentro del sidebar-menu es un boton que cambia la pantalla. 
             - La pantalla que se muestra depende de la variable 'selected_screen'.
@@ -55,14 +55,14 @@
                 negra</span>
         </button>
         <!-- --------- -->
-        <button @click="selected_screen = 5"
+        <!-- <button @click="selected_screen = 5"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 5 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
-                music_off
+                lyrics
             </span>
             <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Set
                 songs</span>
-        </button>
+        </button> -->
         <!-- --------- -->
         <button @click="selected_screen = 6"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 6 }">
@@ -95,7 +95,7 @@
             </button>
         </template>
     </SideBarMenu>
-
+<!-- </div> -->
     <component :is="active_screen" v-if="!loading" />
 </template>
 
@@ -107,7 +107,7 @@ import comManager from '@/communicationManager';
 export default {
     data() {
         return {
-            isOpen: false,
+            isOpen: true,
             selected_screen: 0,
             screens: {
                 0: resolveComponent('AdminAlarmsCrud'),
@@ -128,7 +128,6 @@ export default {
     },
     created() {
         socket.emit('getGroups', this.store.getUser().token);
-        //socket.emit('getRoles', this.store.getUser().token);
     },
     computed: {
         active_screen() {

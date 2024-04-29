@@ -76,9 +76,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/updateBells', [BellController::class, 'update']);
 
     // Settings routes
-    Route::get('/settings', [SettingController::class, 'index']);
+    Route::get('/allSettings', [SettingController::class, 'index']);
     Route::post('/settings', [SettingController::class, 'store']);
-    Route::get('/settings/{id}', [SettingController::class, 'show']);
+    Route::get('/settings', [SettingController::class, 'show']);
     Route::put('/settings', [SettingController::class, 'update']);
     Route::delete('/settings/{id}', [SettingController::class, 'destroy']);
 });

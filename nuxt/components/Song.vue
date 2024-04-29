@@ -33,7 +33,7 @@
             <div class="flex flex-col w-[70%] items-start">
                 <p class="font-bold text-base uppercase">{{ track.name }}</p>
                 <div class="flex flex-row items-center text-sm py-1">
-                    <UBadge v-if="track.explicit" color="black" class="mr-2">E</UBadge>
+                    <UBadge v-if="track.explicit" color="white" class="mr-2">E</UBadge>
                     <p class="whitespace-nowrap overflow-hidden">
                         <span v-for="(artist, index) in track.artists" :key="index">
                             <span v-if="index !== 0">, </span>
