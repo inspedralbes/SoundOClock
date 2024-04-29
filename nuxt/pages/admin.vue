@@ -128,7 +128,6 @@ export default {
     },
     created() {
         socket.emit('getGroups', this.store.getUser().token);
-        //socket.emit('getRoles', this.store.getUser().token);
     },
     computed: {
         active_screen() {
