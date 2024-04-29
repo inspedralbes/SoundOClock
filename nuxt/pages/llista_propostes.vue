@@ -12,36 +12,76 @@
             preferida</h1> -->
 
     <!-- Barra de busqueda -->
-    <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
-        <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
-            <input type="text" placeholder="Buscar..."
-                class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
-                @keydown.enter.prevent="acceptInput">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
-                :class="{ 'text-base': $device.isMobile }">
-                search
-            </span>
-            <Transition name="delete-fade">
-                <button v-if="filter" @click="deleteSearch">
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
-                        :class="{ 'text-base': $device.isMobile }">
-                        Close
-                    </span>
+    <div class="w-full flex flex-col justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
+        <div class="w-full flex flex-row justify-center items-center">
+            <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
+                <input type="text" placeholder="Buscar..."
+                    class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
+                    @keydown.enter.prevent="acceptInput">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
+                    :class="{ 'text-base': $device.isMobile }">
+                    search
+                </span>
+                <Transition name="delete-fade">
+                    <button v-if="filter" @click="deleteSearch">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                            :class="{ 'text-base': $device.isMobile }">
+                            Close
+                        </span>
+                    </button>
+                </Transition>
+            </div>
+            <div class="dropdown relative z-50">
+                <button
+                    class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    id="buttonFilters" @click="isFiltersOpen = !isFiltersOpen">
+                    Filtres
                 </button>
-            </Transition>
+                <div v-if="isFiltersOpen" id="contentDropDownFilters"
+                    class="absolute bg-neutral-700 overflow-auto h-96 w-40">
+
+                    <!-- FILTRES PER GRUPS/CATEGORIES -->
+                    <div id="filterGroup" class="flex flex-col">
+                        <button class="hover:bg-neutral-600"
+                            @click="console.log('Tots els cursos')">
+                            <strong>Tots els crusos</strong>
+                        </button>
+
+                        <div v-for="(category, index) in categories" class="flex flex-col">
+
+                            <button class="hover:bg-neutral-600"
+                                @click="console.log('categoria: ', category.abbreviation)">
+                                {{ category.abbreviation }}
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- FILTRES PER HORA -->
+                    <div id="filterBell" class="flex flex-col">
+                        <button class="hover:bg-neutral-600" @click="console.log('allBells')">
+                            <strong>Tots els horaris</strong>
+                        </button>
+                        <button class="hover:bg-neutral-600" v-for="bell in bells"
+                            @click="console.log('Bell: ', bell.hour)">
+                            {{ formatTime(bell.hour) }}
+                        </button>
+                    </div>
+
+                </div>
+            </div>
         </div>
-        <select v-model.lazy="orderBy"
-            class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-            :class="{ 'text-sm !p-2': $device.isMobile }" :disabled="songs.length == 0">
-            <option value="" disabled selected>Filtre</option>
-            <option value="votes-desc">Més vots</option>
-            <option value="votes-asc">Menys vots</option>
-            <option value="title-desc">Títol (A-Z)</option>
-            <option value="title-asc">Títol (Z-A)</option>
-            <option value="artist-desc">Artista (A-Z)</option>
-            <option value="artist-asc">Artista (Z-A)</option>
-        </select>
+        <button 
+            @click="
+                console.log('sortedSongs: ', this.store.getSortedVotedSongs());
+                console.log('classGroups: ', classGroups);
+                console.log('categories: ', categories);
+            "
+            >
+            AAAA
+        </button>
+
 
     </div>
 
@@ -180,6 +220,7 @@ export default {
                 options: ["La cançó té contingut inadequat", "La cançó no s'adequa a la temàtica"],
                 selectedOption: "La cançó té contingut inadequat"
             },
+            isFiltersOpen: false,
             orderBy: '',
             userSelectedSongs: computed(() => this.store.userSelectedSongs),
             store: useAppStore(),
@@ -227,7 +268,14 @@ export default {
     },
     mounted() {
         comManager.getSongs();
+        comManager.getBells();
         comManager.getUserSelectedSongs(this.store.getUser().id);
+
+        comManager.getSortedVotedSongs();
+        comManager.getPublicGroupsAndCategories().then((data) => {
+            this.store.setClassGroups(data.publicGroups);
+            this.store.setCategories(data.publicCategories);
+        });
 
         socket.on("voteError", (data) => {
             this.serverResponse = data;
@@ -244,6 +292,12 @@ export default {
         socket.off("searchResult");
     },
     methods: {
+        formatTime(timeString) {
+            // Separar la cadena en horas y minutos y convertirlos a números
+            const [hours, minutes] = timeString.split(':').map(part => parseInt(part, 10));
+            // Formatear las horas y minutos
+            return `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+        },
         getSongs() {
             if (this.filter != '') {
                 socket.emit('searchSong', this.filter);
@@ -465,14 +519,52 @@ export default {
         },
         activePlayer() {
             return this.activePlayer[this.mobileDetector];
-        }
-
+        },
+        bells() {
+            return this.store.getBells();
+        },
+        sortedVotedSongs() {
+            return this.store.getSortedVotedSongs();
+        },
+        classGroups() {
+            return this.store.getClassGroups();
+        },
+        categories() {
+            return this.store.getCategories();
+        },
     },
 }
 
 </script>
 
 <style scoped>
+#contentDropDownFilters {
+    border-radius: 10px;
+    padding: 0.5rem;
+}
+
+#contentDropDownFilters::-webkit-scrollbar {
+    width: 10px;
+    /* Ancho de la barra de desplazamiento */
+}
+
+#contentDropDownFilters::-webkit-scrollbar-track {
+    background: none;
+    /* Hacemos transparente el fondo del riel */
+}
+
+#contentDropDownFilters::-webkit-scrollbar-thumb {
+    background-color: #999;
+    /* Color del pulgar */
+    border-radius: 10px;
+    /* Bordes redondos */
+}
+
+#contentDropDownFilters::-webkit-scrollbar-button {
+    display: none;
+    /* Ocultamos los botones de la barra de desplazamiento */
+}
+
 .song-slide-enter-active,
 .song-slide-leave-active,
 .song-slide-move {
