@@ -287,10 +287,13 @@ setInterval(obtenerActualizarTokenSpotify, 59 * 60 * 1000);
 obtenerActualizarTokenSpotify();
 
 let dirPC = null;
+let amountUsers = 0;
 
 // Sockets
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  amountUsers++;
+  console.log('A user connected- Total users:', amountUsers);
+
 
   socket.on('googleLogin', (userToken) => {
     comManager.googleLogin(userToken)
@@ -749,7 +752,6 @@ io.on('connection', (socket) => {
   socket.on('setSettings', async (userToken, settings) => {
     try {
       let response = await comManager.setSettings(userToken, settings);
-      console.log('response', response);
       socket.emit('settingsUpdated', response);
     } catch (err) {
       socket.emit('setSettingsError', { status: 'error', message: err.message });
@@ -766,7 +768,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    amountUsers--;
+    console.log('User disconnected. Total users:', amountUsers);
     if (socket.id === dirPC) {
       dirPC = null;
       socket.emit('dirPCStatus', false);
