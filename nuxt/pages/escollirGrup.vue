@@ -9,7 +9,7 @@
         <div v-else>
             <div class="flex flex-col items-center justify-center mb-5">
                 <label for="grup">Grup:</label>
-                <select name="grup" id="grup" v-model="selectedCategoryId" class="w-80 p-3 rounded">
+                <select name="grup" id="grup" v-model="selectedCategoryId" class="w-80 p-3 rounded border-slate-400 border-2">
                     <option value="">-- Escull el teu grup --</option>
                     <option :value="category.id" v-for="category in categories" :key="category.id">
                         {{ category.abbreviation }}
@@ -19,7 +19,7 @@
             <div class="flex flex-col items-center justify-center">
                 <label for="curs">Curs:</label>
                 <select name="curs" id="curs" :disabled="!selectedCategoryId" v-model="selectedGroupId"
-                    class="w-80 p-3 rounded">
+                    class="w-80 p-3 rounded border-slate-400 border-2">
                     <option value="">-- Escull el teu curs --</option>
                     <option :value="course.id" v-for="course in availableCourses" :key="course">{{ course.abbreviation }}
                     </option>
@@ -92,7 +92,7 @@ export default {
                 this.storeGroupsLoading = false;
                 // Maybe in a future consider to retrieve the user groups from the DB (data variable)
                 // and store them in the store
-
+  
                 this.store.setUserGroups(groups);
                 this.$router.push('/llista_propostes');
             });

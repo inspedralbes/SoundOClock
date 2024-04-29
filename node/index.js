@@ -430,7 +430,7 @@ io.on('connection', (socket) => {
 
       // Check if the user already voted twice
       if (votingRecord && votingRecord.votedSongs.length > 1) {
-        socket.emit('voteError', { status: 'error', title: `Has arribat al màxim de vots`, message: `Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions, promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies per la teva participació!` });
+        socket.emit('voteError', { status: 'error', title: `Has arribat al límit`, message: `Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions, promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies per la teva participació!` });
         return;
       }
 
