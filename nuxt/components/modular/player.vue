@@ -6,7 +6,7 @@
                     <img class="rounded-full object-cover spin border border-solid border-gray-500 bg-gray-200 p-1 "
                         :src="track.album ? track.album.images[0].url : track.img" alt="Album Image">
                 </div>
-                <div class="mt-4 text-center overflow-hidden">
+                <div class="mt-4 text-center overflow-hidden w-full">
                     <h3 class="text-lg font-semibold text-gray-800 whitespace-nowrap overflow-hidden"
                         :class="{ 'text-marquee': isOverflowing(1) }">{{ track.name ? track.name : track.name }}
                     </h3>
@@ -90,7 +90,7 @@ export default {
             let nameLength = 0;
             if (text === 1) {
                 nameLength = this.track.name ? this.track.name.length : this.track.name.length;
-                return nameLength > 20;
+                return nameLength > 10;
             } else {
                 if (this.track.artists) {
                     for (const artist of this.track.artists) {

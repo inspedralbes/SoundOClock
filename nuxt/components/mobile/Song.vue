@@ -13,7 +13,7 @@
                         </p>
                         <div class="flex flex-row text-sm">
                             <p class="text-ellipsis">
-                                <UBadge v-if="track.explicit" color="black">E</UBadge>
+                                <UBadge v-if="track.explicit" color="gray">E</UBadge>
                                 <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="track.artists"
                                     v-for="(artist, index) in track.artists" :key="index">
                                     <span v-if="index !== 0">, </span>
