@@ -7,10 +7,15 @@
                 <div class="brand-name text-3xl md:text-4xl font-bold">sound<span>o'clock</span></div>
             </div>
             <!--MOBILE AND TABLET DESIGN-->
-            <div v-if="$device.isMobileOrTablet" class="flex flex-row items-center relative">
+            <div v-if="$device.isMobileOrTablet" class="flex flex-row items-center gap-3 relative">
                 <!--NAVBAR BURGER BUTTON-->
+                <button class="flex flex-row items-center" @click="feedback()">
+                    <span class="material-symbols-outlined text-black text-[2rem]">
+                        unknown_document
+                    </span>
+                </button>
                 <button class="flex flex-row items-center" @click="logout()">
-                    <span class="material-symbols-outlined text-[2rem]">
+                    <span class="material-symbols-outlined text-black text-[2rem]">
                         logout
                     </span>
                 </button>
@@ -31,6 +36,7 @@
             </div>
             <!--DESKTOP DESIGN-->
             <div v-else class="flex flex-row justify-center gap-8 text-black text-lg">
+                <button @click="feedback()">Feedback</button>
                 <button @click="logout()">Tancar Sessió</button>
             </div>
         </div>
@@ -50,6 +56,11 @@ export default {
     methods: {
         toggleDropdown() {
             this.showDropdown = !this.showDropdown;
+        },
+        feedback() {
+            navigateTo('https://forms.gle/qKtFKNCgtQjXmpyNA', {
+                external: true
+            })
         },
         logout() {
             navigateTo({ path: '/logout' });
