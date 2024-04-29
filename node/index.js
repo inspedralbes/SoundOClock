@@ -255,6 +255,15 @@ app.get('/getDownloadedSongs', (req, res) => {
   }
 });
 
+app.get('/roles/:userToken', async (req, res) => {
+  try {
+    let roles = await comManager.getRoles(req.params.userToken);
+    res.json(roles);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {
@@ -720,15 +729,15 @@ io.on('connection', (socket) => {
     io.emit('isReadReportStatusChanged', { status: 'success', message: `El report amb id ${reportSong._id} ha canviat.` });
   });
 
-  socket.on('getRoles', (token) => {
-    comManager.getRoles(token)
-      .then((roles) => {
-        socket.emit('sendRoles', roles);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  });
+  // socket.on('getRoles', (token) => {
+  //   comManager.getRoles(token)
+  //     .then((roles) => {
+  //       socket.emit('sendRoles', roles);
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //     });
+  // });
 
   socket.on('updateUserRole', async (userToken, modifiedUser) => {
 
@@ -740,7 +749,7 @@ io.on('connection', (socket) => {
       socket.emit('notifyServerResponse', { status: 'success', message: `El rol de l'usuari ${modifiedUser.name} ha sigut modificat.` });
 
       // Update the user data to everybody
-      io.emit('userRoleUpdated');
+      io.emit('userRoleUpdated', modifiedUser);
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
     }
