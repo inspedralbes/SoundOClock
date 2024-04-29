@@ -358,7 +358,7 @@ io.on('connection', (socket) => {
 
       // Check if the user already submitted a song
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
-      if (votingRecord && votingRecord.submitted) {
+      if (votingRecord && votingRecord.submitted && user.role_id >= 4) {
         console.log('postError Ja has proposat una cançó');
         socket.emit('postError', { status: 'error', title: `Ja has proposat una cançó`, message: 'Ja has proposat una cançó, espera a la següent votació per proposar una altra.' });
         return;
@@ -427,8 +427,9 @@ io.on('connection', (socket) => {
       }
 
       // Check if the user already voted twice
-      if (votingRecord && votingRecord.votedSongs.length > 1) {
-        socket.emit('voteError', { status: 'error', title: `Has arribat al màxim de vots`, message: `Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions, promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies per la teva participació!` });
+      if (votingRecord && votingRecord.votedSongs.length > 1 && user.role_id >= 4) {
+        console.log(user)
+        socket.emit('voteError', { status: 'error', title: `Has arribat al límit`, message: `Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions, promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies per la teva participació!` });
         return;
       }
 

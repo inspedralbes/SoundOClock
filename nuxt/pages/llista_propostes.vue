@@ -12,7 +12,7 @@
             preferida</h1> -->
 
     <!-- Barra de busqueda -->
-    <h1 class="mx-auto text-4xl py-8 smallCaps">{{ 'La temàtica és: ' + settings.theme }}</h1>
+    <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' + settings.theme }}</h1>
     <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
         <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
             <input type="text"
@@ -84,40 +84,41 @@
 
     <!-- Modales -->
     <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
-    <UModal v-model="modals.alreadyVotedModal" class="z-[9999]">
+    <UModal v-model="modals.alreadyVotedModal" class="z-[9999] text-black">
         <UCard>
             <template #header>
-                <div class="flex flex-row items-center py-2 rounded-lg shadow-md">
-                    <span class="material-symbols-rounded text-[2rem] text-red-500 mr-4">
-                        error
-                    </span>
-                    <h2 class="text-white
-                    text-xl font-bold">{{ serverResponse.title }}</h2>
+                <div class="flex flex-row items-center justify-between rounded-lg">
+                    <div class="flex flex-row items-center">
+                        <span class="material-symbols-rounded text-[2rem] text-red-500 mr-4">
+                            error
+                        </span>
+                        <h2 class="text-xl font-bold">{{ serverResponse.title }}</h2>
+                    </div>
+                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                        @click="modals.alreadyVotedModal = false" />
                 </div>
             </template>
-
             {{ serverResponse.message }}
         </UCard>
     </UModal>
 
     <!-- Modal de los reportes -->
-    <UModal v-model="modals.reportModal" prevent-close class="z-[9999]">
+    <UModal v-model="modals.reportModal" class="z-[9999] text-black">
         <UCard>
             <template #header>
-                <div class="flex flex-row items-center justify-between py-2 rounded-lg shadow-md">
+                <div class="flex flex-row items-center justify-between">
                     <div class="flex flex-row items-center">
                         <span class="material-symbols-rounded text-[2rem] text-yellow-500 mr-4">
                             warning
                         </span>
-                        <h2 class="text-white text-xl font-bold">Reportar cançó</h2>
+                        <h2 class="text-xl font-bold">Reportar cançó</h2>
                     </div>
                     <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
                         @click="modals.reportModal = false" />
                 </div>
             </template>
 
-            <p>Per quin motiu vols reportar la cançó "{{ reportSongData.reportedSong.name }}" de "{{
-        reportSongData.reportedSong.artists.map(artist => artist.name).join(', ') }}"?</p>
+            <p>Per quin motiu vols reportar la cançó <b>'{{ reportSongData.reportedSong.name }}'</b>?</p>
             <!-- <URadioGroup v-model="reportSongData.selectedOption" :options="reportSongData.options" class="mt-4">
             </URadioGroup> -->
             <div class="flex flex-col mt-4">
@@ -133,7 +134,10 @@
                         <UButton @click="modals.reportModal = false" variant="outline" class="px-4 py-2 text-sm">
                             Cancel·la
                         </UButton>
-                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm">
+                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading">
+                            Reporta
+                        </UButton>
+                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm" v-else loading>
                             Reporta
                         </UButton>
                     </div>
@@ -143,14 +147,18 @@
     </UModal>
 
     <!-- Modal de error al proponer mas de una cancion -->
-    <UModal v-model="modals.proposeSongError" class="z-[9999]">
+    <UModal v-model="modals.proposeSongError" class="z-[9999] text-black">
         <UCard>
             <template #header>
-                <div class="flex flex-row items-center py-2 rounded-lg shadow-md">
-                    <span class="material-symbols-rounded text-[2rem] text-red-500 mr-4">
-                        error
-                    </span>
-                    <h2 class="text-white text-xl font-bold">{{ postedSongStatus.title }}</h2>
+                <div class="flex flex-row items-center justify-between">
+                    <div class="flex flex-row items-center">
+                        <span class="material-symbols-rounded text-[2rem] text-red-500 mr-4">
+                            error
+                        </span>
+                        <h2 class="text-xl font-bold">{{ postedSongStatus.title }}</h2>
+                    </div>
+                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                        @click="modals.proposeSongError = false" />
                 </div>
             </template>
 
@@ -201,6 +209,8 @@ export default {
                 1: resolveComponent('MobilePlayer'),
             },
             serverResponse: null,
+            toast: null,
+            isReportLoading: false,
         }
     },
     created() {
@@ -234,6 +244,28 @@ export default {
                 this.settings = settings;
             }
         });
+        
+        socket.on('songReported', (data) => {
+            this.modals.reportModal = false;
+            this.isReportLoading = false;
+
+            this.toast.add({
+                title: 'Cançó reportada!',
+                description: `${data.message}`,
+                color: 'green',
+            });
+        });
+
+        socket.on('reportError', (data) => {
+            this.modals.reportModal = false;
+            this.isReportLoading = false;
+
+            this.toast.add({
+                title: 'Error',
+                description: `${data.message}`,
+                color: 'red',
+            });
+        });
     },
     mounted() {
         comManager.getSongs();
@@ -248,6 +280,8 @@ export default {
             this.modals.alreadyVotedModal = true;
             this.isLoadingVote.state = false;
         })
+
+        this.toast = useToast();
     },
     beforeUnmount() {
         if (this.currentTrack != null) {
@@ -294,6 +328,7 @@ export default {
             this.reportSongData.reportedSong = track;
         },
         reportTrack() {
+            this.isReportLoading = true;
             const song = { songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
             socket.emit('reportSong', this.store.getUser().token, song);
         },
