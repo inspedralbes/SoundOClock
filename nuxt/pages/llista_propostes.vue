@@ -12,10 +12,11 @@
             preferida</h1> -->
 
     <!-- Barra de busqueda -->
-    <h1 class="mx-auto text-4xl py-8">{{ settings.theme }}</h1>
+    <h1 class="mx-auto text-4xl py-8 smallCaps">{{ 'La temàtica és: ' + settings.theme }}</h1>
     <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
         <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
-            <input type="text" placeholder="Buscar..."
+            <input type="text"
+                :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
                 class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
                 :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
                 @keydown.enter.prevent="acceptInput">
@@ -62,7 +63,7 @@
     </div>
     <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
     <TransitionGroup name="song-slide" mode="out-in">
-        <component :is="activeSong" v-for="track in filteredSongs" :key="track.id" :track="track"
+        <component :is="activeSong" v-for=" track  in  filteredSongs " :key="track.id" :track="track"
             :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
             @report="report($event)" :type="getType(track.id)" />
     </TransitionGroup>
@@ -75,7 +76,7 @@
         <h2 v-if="spotifySongs.length > 0" class="text-center text-3xl font-bold mt-10">Resultats de la cerca</h2>
     </Transition>
     <TransitionGroup tag="div" class="mb-20" name="song-slide">
-        <component :is="activeSong" v-for="track in spotifySongs" :key="track.id" :track="track"
+        <component :is="activeSong" v-for=" track  in  spotifySongs " :key="track.id" :track="track"
             :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
             :type="getType(track.id)" />
     </TransitionGroup>
@@ -120,7 +121,7 @@
             <!-- <URadioGroup v-model="reportSongData.selectedOption" :options="reportSongData.options" class="mt-4">
             </URadioGroup> -->
             <div class="flex flex-col mt-4">
-                <label v-for="(option, index) in reportSongData.options" class="flex flex-row">
+                <label v-for="( option, index ) in  reportSongData.options " class="flex flex-row">
                     <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
                     <span class="ml-2">{{ option }}</span>
                 </label>
@@ -229,8 +230,8 @@ export default {
 
         socket.on('sendSettings', (settings) => {
             console.log("settings", settings);
-            if (settings.length != 0) {
-                this.settings = settings[0];
+            if (settings != null) {
+                this.settings = settings;
             }
         });
     },
@@ -509,5 +510,9 @@ export default {
 .delete-fade-enter-from,
 .delete-fade-leave-to {
     opacity: 0;
+}
+
+.smallCaps{
+    font-variant: small-caps;
 }
 </style>

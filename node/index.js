@@ -746,6 +746,8 @@ io.on('connection', (socket) => {
     try {
       let response = await comManager.setSettings(userToken, settings);
       console.log('response', response);
+      settings = await comManager.getSettings(userToken);
+      configuration = settings;
       socket.emit('settingsUpdated', response);
     } catch (err) {
       socket.emit('setSettingsError', { status: 'error', message: err.message });
@@ -763,6 +765,7 @@ io.on('connection', (socket) => {
         configuration = settings;
       }
       console.log('settings', settings);
+      console.log("settings", settings);
       socket.emit('sendSettings', settings);
     } catch (err) {
       socket.emit('getSettingsError', { status: 'error', message: err.message });

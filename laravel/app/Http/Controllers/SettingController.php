@@ -56,10 +56,17 @@ class SettingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show()
     {
+        $setting = Setting::first();
 
-        $setting = Setting::findOrFail($id);
+
+        // dd($setting);
+        
+        if ($setting === null) {
+            return response()->json(['message' => 'No existe una configuración en la base de datos'], 404);
+        }
+
         return $setting;
 
     }
@@ -83,11 +90,11 @@ class SettingController extends Controller
         // Validar los datos de entrada
         $request->validate([
             'voteDuration' => 'integer',
-            'start_vote' => 'date',
-            'end_vote' => 'date',
+            'start_vote' => 'date|nullable',
+            'end_vote' => 'date|nullable',
             'moderationDuration' => 'integer',
-            'start_moderation' => 'date',
-            'end_moderation' => 'date',
+            'start_moderation' => 'date|nullable',
+            'end_moderation' => 'date|nullable',
             'showExplicit' => 'boolean',
             'letProposeExplicit' => 'boolean',
             'alertExplicit' => 'boolean',
