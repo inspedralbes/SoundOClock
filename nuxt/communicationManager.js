@@ -61,6 +61,7 @@ export function getUsers() {
         .then(response => response.json())
         .then(data => {
             store.setUsersAdminView(data);
+            store.setAdminSelectedUser(data[0]);
             store.setLoadingAdminComponent(false);
         })
         .catch(error => {
@@ -192,6 +193,18 @@ async function createGroup(token, group) {
     return data;
 }
 
+export function getRoles() {
+    const store = useAppStore();
+    fetch(`${url}/roles/${store.getUser().token}`)
+        .then(response => response.json())
+        .then(data => {
+            store.setRoles(data);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+}
+
 const comManager = {
     getUserSelectedSongs,
     getSongs,
@@ -207,6 +220,7 @@ const comManager = {
     downloadSongs,
     createGroupCategory,
     createGroup,
+    getRoles,
 };
 
 export default comManager;

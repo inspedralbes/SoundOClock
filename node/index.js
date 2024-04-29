@@ -255,6 +255,15 @@ app.get('/getDownloadedSongs', (req, res) => {
   }
 });
 
+app.get('/roles/:userToken', async (req, res) => {
+  try {
+    let roles = await comManager.getRoles(req.params.userToken);
+    res.json(roles);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {
@@ -287,10 +296,14 @@ setInterval(obtenerActualizarTokenSpotify, 59 * 60 * 1000);
 obtenerActualizarTokenSpotify();
 
 let dirPC = null;
+let configuration = null;
+let amountUsers = 0;
 
 // Sockets
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  amountUsers++;
+  console.log('A user connected- Total users:', amountUsers);
+
 
   socket.on('googleLogin', (userToken) => {
     comManager.googleLogin(userToken)
@@ -348,7 +361,7 @@ io.on('connection', (socket) => {
 
       // Check if the user already submitted a song
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
-      if (votingRecord && votingRecord.submitted) {
+      if (votingRecord && votingRecord.submitted && user.role_id >= 4) {
         console.log('postError Ja has proposat una cançó');
         socket.emit('postError', { status: 'error', title: `Ja has proposat una cançó`, message: 'Ja has proposat una cançó, espera a la següent votació per proposar una altra.' });
         return;
@@ -370,7 +383,7 @@ io.on('connection', (socket) => {
 
       io.emit('songPosted', { status: 'success', song: songData });
     } catch (err) {
-       console.log('postError Ja has proposat una cançó');
+      console.log('postError Ja has proposat una cançó');
       socket.emit('postError', { status: 'error', message: err.message });
       console.error('postError', err.message);
     }
@@ -417,8 +430,9 @@ io.on('connection', (socket) => {
       }
 
       // Check if the user already voted twice
-      if (votingRecord && votingRecord.votedSongs.length > 1) {
-        socket.emit('voteError', { status: 'error', title: `Has arribat al màxim de vots`, message: `Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions, promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies per la teva participació!` });
+      if (votingRecord && votingRecord.votedSongs.length > 1 && user.role_id >= 4) {
+        console.log(user)
+        socket.emit('voteError', { status: 'error', title: `Has arribat al límit`, message: `Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions, promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies per la teva participació!` });
         return;
       }
 
@@ -658,7 +672,7 @@ io.on('connection', (socket) => {
       } else if (!user.propose_banned_until && updatedUser.propose_banned_until) {
         message = `no pot proposar cançons fins el ${formatDate(updatedUser.propose_banned_until)}`;
       } else {
-        socket.emit('notifyServerResponse', { status: 'error', message: `Un altre usuari està modificant aquest usuari. Els teus canvis potser no s'han desat.`});
+        socket.emit('notifyServerResponse', { status: 'error', message: `Un altre usuari està modificant aquest usuari. Els teus canvis potser no s'han desat.` });
         return
       }
 
@@ -718,15 +732,15 @@ io.on('connection', (socket) => {
     io.emit('isReadReportStatusChanged', { status: 'success', message: `El report amb id ${reportSong._id} ha canviat.` });
   });
 
-  socket.on('getRoles', (token) => {
-    comManager.getRoles(token)
-      .then((roles) => {
-        socket.emit('sendRoles', roles);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  });
+  // socket.on('getRoles', (token) => {
+  //   comManager.getRoles(token)
+  //     .then((roles) => {
+  //       socket.emit('sendRoles', roles);
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //     });
+  // });
 
   socket.on('updateUserRole', async (userToken, modifiedUser) => {
 
@@ -738,7 +752,7 @@ io.on('connection', (socket) => {
       socket.emit('notifyServerResponse', { status: 'success', message: `El rol de l'usuari ${modifiedUser.name} ha sigut modificat.` });
 
       // Update the user data to everybody
-      io.emit('userRoleUpdated');
+      io.emit('userRoleUpdated', modifiedUser);
     } catch (err) {
       socket.emit('reportError', { status: 'error', message: err.message });
     }
@@ -748,6 +762,8 @@ io.on('connection', (socket) => {
     try {
       let response = await comManager.setSettings(userToken, settings);
       console.log('response', response);
+      settings = await comManager.getSettings(userToken);
+      configuration = settings;
       socket.emit('settingsUpdated', response);
     } catch (err) {
       socket.emit('setSettingsError', { status: 'error', message: err.message });
@@ -756,7 +772,15 @@ io.on('connection', (socket) => {
 
   socket.on('getSettings', async (userToken) => {
     try {
-      let settings = await comManager.getSettings(userToken);
+      let settings;
+      if (configuration != null) {
+        settings = configuration;
+      } else {
+        settings = await comManager.getSettings(userToken);
+        configuration = settings;
+      }
+      console.log('settings', settings);
+      console.log("settings", settings);
       socket.emit('sendSettings', settings);
     } catch (err) {
       socket.emit('getSettingsError', { status: 'error', message: err.message });
@@ -764,7 +788,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    amountUsers--;
+    console.log('User disconnected. Total users:', amountUsers);
     if (socket.id === dirPC) {
       dirPC = null;
       socket.emit('dirPCStatus', false);

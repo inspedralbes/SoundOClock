@@ -177,11 +177,16 @@ export default {
         socket.emit('getSettings', this.store.getUser().token);
 
         socket.on('sendSettings', (settings) => {
-            if (settings.length != 0) {
-                this.settings = settings[0];
+            console.log("settings", settings);
+            if (settings) {
+                this.settings = settings;
             }
-            this.isLoading = false;
+                this.isLoading = false;
         });
+    },
+
+    beforeUnmount() {
+        socket.off('sendSettings');
     },
 
     setup() {
