@@ -87,22 +87,22 @@ jobs:
   #         npm run test -- --host=127.0.0.1
   #     - run: echo "🍏 This job's status is ${{ job.status }}."
 
-  # STOP-DOCKER:
-  #   needs: [LARAVEL-TEST]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout del código
-  #       uses: actions/checkout@v4
+  STOP-DOCKER:
+    needs: [LARAVEL-TEST]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
 
-  #     - name: Conexión al servidor y stop de docker-compose
-  #       run: |
-  #         echo "${{ secrets.PRE_SECRET_KEY }}" > ~/prod_key.pem
-  #         chmod 600 ~/prod_key.pem
-  #         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "docker compose down"
-  #     - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Conexión al servidor y stop de docker-compose
+        run: |
+          echo "${{ secrets.PRE_SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "docker compose down"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
 
   FILL-DOCKER-COMPOSE:
-    # needs: [STOP-DOCKER]
+    needs: [STOP-DOCKER]
     runs-on: ubuntu-latest
     steps:
       - name: Obtaining repository code
