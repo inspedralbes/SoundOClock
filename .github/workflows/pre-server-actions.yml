@@ -9,9 +9,9 @@ jobs:
   TEST-CONNECTION:
     runs-on: ubuntu-latest
     steps:
-      - name: Node Deploy
+      - name: Testing connection
         run: |
-          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          echo "${{ secrets.PRE_SECRET_KEY }}" > ~/prod_key.pem
           chmod 600 ~/prod_key.pem
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "echo "Hello World""
   # LARAVEL-TEST:
