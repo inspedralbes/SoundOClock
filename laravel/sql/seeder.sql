@@ -72,3 +72,6 @@ INSERT INTO `bells` (hour) VALUES
 
 INSERT INTO `bell_group` (bell_id, group_id) VALUES
 (1, 1), (1, 2), (1, 3), (1, 4), (2, 1), (2, 2),(2, 3), (3, 2), (3, 4), (4, 5), (5, 6);
+
+INSERT INTO `bans` (forVoting, banned_from, banned_until, user_id) VALUES
+(1, '2024-06-29', '2024-07-29', 5), (1, '2024-06-29', '2024-07-29', 6), (0, '2024-06-29', '2024-07-29', 6), (0, '2024-06-29', '2024-07-29', 7);

@@ -28,6 +28,7 @@ export default {
         banUserProposingWithDefaultOptions: false,
         enableUserVotingWithDefaultOptions: false,
         enableUserProposingWithDefaultOptions: false,
+        showBanHistory: false
       }
     }
   },
@@ -144,6 +145,9 @@ export default {
           break;
       }
       socket.emit('banUser', this.store.getUser().token, this.user);
+    },
+    showBanHistory() {
+      this.modals.showBanHistory = true;
     }
   },
   unmounted() {
@@ -168,7 +172,7 @@ export default {
     <div class="mb-10">
       <p class="text-5xl font-black">{{ user.name }}</p>
     </div>
-    <div class="flex flex-row gap-8">
+    <div class="flex flex-row gap-8 mb-4">
       <div class="w-1/2">
         <p v-if="user.vote_banned_until" class="mb-2 text-xl text-center font-black">L'usuari no pot votar cançons fins
           el {{
@@ -197,12 +201,11 @@ export default {
           </div>
         </div>
         <div v-else>
-          <Calendar class="mb-4" v-bind:date="user.vote_banned_until" :isVotingBannedDate=true
-            @changeDate="changeDate" />
+          <Calendar class="mb-4" v-bind:date="user.vote_banned_until" :isVotingBannedDate=true @changeDate="changeDate" />
           <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded me-2"
             @click="banUser(true)">LIMITAR VOTACIONS</button>
           <button class="w-fit bg-red-400 hover:bg-red-200 text-black font-bold py-2 px-4 rounded float-right"
-            @click="toggleVotingBanUserCustomize = true">Cancela</button>
+            @click="toggleVotingBanUserCustomize = true">Cancel·la</button>
         </div>
       </div>
       <div class="w-1/2">
@@ -243,11 +246,14 @@ export default {
           <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded me-2"
             @click="banUser(false)">LIMITAR PROPOSTES</button>
           <button class="w-fit bg-red-400 hover:bg-red-200 text-black font-bold py-2 px-4 rounded float-right"
-            @click="toggleProposingBanUserCustomize = true">Cancela</button>
+            @click="toggleProposingBanUserCustomize = true">Cancel·la</button>
         </div>
 
       </div>
     </div>
+    <button v-if="user.bans.length > 0"
+      class="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded me-2 w-fit"
+      @click="showBanHistory()">HISTORIAL DE SANCIONS</button>
   </div>
 
   <ModularModal :open="modals.noDateSelected" type="error" title="No hi ha cap data seleccionada"
@@ -295,8 +301,8 @@ export default {
     </template>
   </ModularModal>
 
-  <ModularModal :open="modals.unbanUserProposingCapacity" type="error" msg="Habilitar"
-    title="Habilitar propostes usuari" @confirm="submitData()" @close="modals.unbanUserProposingCapacity = false">
+  <ModularModal :open="modals.unbanUserProposingCapacity" type="error" msg="Habilitar" title="Habilitar propostes usuari"
+    @confirm="submitData()" @close="modals.unbanUserProposingCapacity = false">
     <template #title>
       <h2>Habilitar capacitat de proposar</h2>
     </template>
@@ -306,8 +312,8 @@ export default {
   </ModularModal>
 
   <!-- modal per banejar les votacions -->
-  <ModularModal :open="modals.banUserVotingWithDefaultOptions" type="error" msg="Limitar"
-    title="Limitar propostes usuari" @confirm="banUserVotingWithDefaultOptions(optionVotingBannedUntil)"
+  <ModularModal :open="modals.banUserVotingWithDefaultOptions" type="error" msg="Limitar" title="Limitar propostes usuari"
+    @confirm="banUserVotingWithDefaultOptions(optionVotingBannedUntil)"
     @close="modals.banUserVotingWithDefaultOptions = false; optionVotingBannedUntil = null">
     <template #title>
       <h2>Limitar capacitat de votar {{ optionVotingBannedUntil === 1 ? '3 setmanes' : optionVotingBannedUntil === 2 ?
@@ -364,13 +370,25 @@ export default {
     </template>
   </ModularModal>
 
-  <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
+  <!-- Modal per veure historial de sancions -->
+  <UModal v-model="modals.showBanHistory" class="z-[9999] text-black w-[1000px]" fullscreen>
+    <UCard>
+      <template #header>
+        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="float-right"
+          @click="modals.showBanHistory = false" />
+        <!--<div class="flex flex-row items-center justify-between rounded-lg">-->
+        <AdminBanHistory class="clear-both" :user="user"></AdminBanHistory>
+        <!--</div>-->
+      </template>
+    </UCard>
+  </UModal>
 
+  <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
 </template>
 
-  <style scoped>
-  .user-details-container {
-    background-color: rgb(56, 56, 56);
-    height: 85vh;
-  }
+<style scoped>
+.user-details-container {
+  background-color: rgb(56, 56, 56);
+  height: 85vh;
+}
 </style>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Ban;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -147,8 +148,9 @@ class AuthController extends Controller
         }
     }
 
-    public function index() {
-        return User::with('groups')->get();
+    public function index()
+    {
+        return User::with('groups', 'bans')->get();
     }
 
     public function show($id)
@@ -196,6 +198,24 @@ class AuthController extends Controller
             ], 404);
         }
 
+        if (($user->vote_banned_until != $request->input('vote_banned_until') && $request->input('vote_banned_until') != null) || ($user->propose_banned_until != $request->input('propose_banned_until') && $request->input('propose_banned_until') != null)) {
+
+            $ban = new Ban();
+
+            if ($user->vote_banned_until != $request->input('vote_banned_until')) {
+                $ban->forVoting = 1;
+                $ban->banned_until = $request->input('vote_banned_until');
+            } else {
+                $ban->forVoting = 0;
+                $ban->banned_until = $request->input('vote_banned_until');
+            }
+
+            $ban->banned_from = date("Y/m/d");
+            $ban->user_id = $user->id;
+            $ban->save();
+            
+        }
+
         // Update user
         $user->update([
             'role_id' => $request->input('role_id'),
@@ -203,6 +223,6 @@ class AuthController extends Controller
             'propose_banned_until' => $request->input('propose_banned_until'),
         ]);
 
-        return response()->json($user);
+        return response()->json($user->load('bans'));
     }
 }
