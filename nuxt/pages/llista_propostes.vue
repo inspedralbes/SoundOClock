@@ -7,7 +7,7 @@
 
         <!-- Barra de busqueda -->
         <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
-        settings.theme }}</h1>
+            settings.theme }}</h1>
         <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text"
@@ -58,7 +58,7 @@
         </div>
         <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
         <TransitionGroup name="song-slide" mode="out-in">
-            <component :is="activeSong" v-for=" track  in  filteredSongs " :key="track.id" :track="track"
+            <component :is="activeSong" v-for=" track in filteredSongs " :key="track.id" :track="track"
                 :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
                 @report="report($event)" :type="getType(track.id)" />
         </TransitionGroup>
@@ -78,7 +78,7 @@
         <h2 v-if="spotifySongs.length > 0" class="text-center text-3xl font-bold mt-10">Resultats de la cerca</h2>
     </Transition>
     <TransitionGroup tag="div" class="mb-20" name="song-slide">
-        <component :is="activeSong" v-for=" track  in  spotifySongs " :key="track.id" :track="track"
+        <component :is="activeSong" v-for=" track in spotifySongs " :key="track.id" :track="track"
             :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
             :type="getType(track.id)" />
     </TransitionGroup>
@@ -124,7 +124,7 @@
             <!-- <URadioGroup v-model="reportSongData.selectedOption" :options="reportSongData.options" class="mt-4">
             </URadioGroup> -->
             <div class="flex flex-col mt-4">
-                <label v-for="( option, index ) in  reportSongData.options " class="flex flex-row">
+                <label v-for="( option, index ) in reportSongData.options " class="flex flex-row">
                     <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
                     <span class="ml-2">{{ option }}</span>
                 </label>
@@ -523,7 +523,7 @@ export default {
             let endMod = new Date(this.settings.end_moderation);
             if (today <= endVote) {
                 return "vote";
-            } else if (today >= startMod && today <= endMod) {
+            } else if (today > startMod && today <= endMod) {
                 return "mod";
             } else {
                 return "none";

@@ -330,7 +330,7 @@ io.on("connection", (socket) => {
     comManager
       .googleLogin(userToken)
       .then((userData) => {
-        console.log("UserData:", userData);
+        // console.log("UserData:", userData);
         let groups = [];
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
