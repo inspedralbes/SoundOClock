@@ -32,6 +32,9 @@ export const useAppStore = defineStore('app', {
       currentTrackId: null,
       isPlaying: false,
     },
+    admin:{
+      selected_screen:0
+    },
     roles: [],
     serverResponse: null,
     loadingAdminComponent: null,
@@ -39,10 +42,9 @@ export const useAppStore = defineStore('app', {
   }),
   persist: {
     storage: persistedState.localStorage,
-    paths: ['user']
+    paths: ['user','admin']
   },
   actions: {
-
     //getters
     getUser() {
       return this.user
@@ -176,6 +178,9 @@ export const useAppStore = defineStore('app', {
     },
     setBlacklist(blacklist) {
       this.blacklist = blacklist
+    },
+    setAdminSelectedScreen(screen) {
+      this.admin.selected_screen = screen
     },
 
     ///Deletes
