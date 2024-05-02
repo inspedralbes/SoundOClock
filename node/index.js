@@ -302,7 +302,7 @@ let amountUsers = 0;
 // Sockets
 io.on('connection', (socket) => {
   amountUsers++;
-  console.log('A user connected- Total users:', amountUsers);
+  console.log('A user connected. Total users:', amountUsers);
 
 
   socket.on('googleLogin', (userToken) => {
