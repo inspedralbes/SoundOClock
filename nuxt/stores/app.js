@@ -39,6 +39,7 @@ export const useAppStore = defineStore('app', {
     serverResponse: null,
     loadingAdminComponent: null,
     blacklist: [],
+    settings:{}
   }),
   persist: {
     storage: persistedState.localStorage,
@@ -181,6 +182,9 @@ export const useAppStore = defineStore('app', {
     },
     setAdminSelectedScreen(screen) {
       this.admin.selected_screen = screen
+    },
+    setSettings(settings) {
+      this.settings = settings
     },
 
     ///Deletes

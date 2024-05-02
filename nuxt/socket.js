@@ -96,6 +96,12 @@ socket.on("connect", () => {
     pinia.setLoadingAdminComponent(false);
   });
 
+  socket.on('sendSettings', (settings) => {
+    if (settings != null) {
+        pinia.setSettings(settings)
+    }
+});
+
   socket.on("disconnect", () => {
 
   });

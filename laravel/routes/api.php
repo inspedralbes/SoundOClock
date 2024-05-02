@@ -32,6 +32,7 @@ Route::get('/groupsAll', [GroupsController::class, 'indexAll']);
 Route::get('/users', [AuthController::class, 'index']);
 Route::get('/groupCategories', [GroupCategoryController::class, 'index']);
 Route::get('/groupCategoriesAll', [GroupCategoryController::class, 'indexAll']);
+Route::get('/allSettings', [SettingController::class, 'index']);
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -76,7 +77,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/updateBells', [BellController::class, 'update']);
 
     // Settings routes
-    Route::get('/allSettings', [SettingController::class, 'index']);
     Route::post('/settings', [SettingController::class, 'store']);
     Route::get('/settings', [SettingController::class, 'show']);
     Route::put('/settings', [SettingController::class, 'update']);
