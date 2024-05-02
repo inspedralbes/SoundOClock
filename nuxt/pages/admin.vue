@@ -55,14 +55,14 @@
                 negra</span>
         </button>
         <!-- --------- -->
-        <!-- <button @click="selected_screen = 5"
+        <button @click="selected_screen = 5"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 5 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 lyrics
             </span>
             <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Set
                 songs</span>
-        </button> -->
+        </button>
         <!-- --------- -->
         <button @click="selected_screen = 6"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 6 }">
