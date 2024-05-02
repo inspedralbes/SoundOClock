@@ -65,7 +65,7 @@
     </div>
     <div v-else>
         <div>
-            <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}" finalitzada
+            <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings }}" finalitzada
             </h2>
             <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
         </div>
