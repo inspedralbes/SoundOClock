@@ -915,7 +915,7 @@ io.on("connection", (socket) => {
       if (configuration != null) {
         settings = configuration;
       } else {
-        settings = await comManager.getSettings(userToken);
+        settings = await comManager.getPublicSettings();
         configuration = settings;
       }
       socket.emit("sendSettings", settings);
