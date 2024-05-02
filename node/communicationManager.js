@@ -384,6 +384,16 @@ async function getSettings(token) {
   return jsonResponse;
 }
 
+async function getPublicSettings() {
+  const response = await axios.get(apiURL + 'allSettings', {
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+  });
+  return response.data;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -411,6 +421,7 @@ const comManager = {
   showUser,
   getRoles,
   getSettings,
+  getPublicSettings,
   setSettings,
   getAllGroupsAndCategories,
   createGroupCategory,

@@ -1,73 +1,75 @@
 <template>
-    <!-- <div :class="{ 'overflow-hidden max-h-dvh': (modals.alreadyVotedModal || modals.reportModal) }"> -->
-    <!-- Reproductor -->
-    <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
-        @report="report($event)" @propose="proposeSong($event)" />
+    <div v-if="checkVotingState === 'vote'">
+        <!-- Reproductor -->
+        <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
+            @report="report($event)" @propose="proposeSong($event)" />
 
-    <!-- Titulo -->
-    <!-- <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
-            Vota
-            la teva
-            cançó
-            preferida</h1> -->
 
-    <!-- Barra de busqueda -->
-    <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' + settings.theme }}</h1>
-    <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
-        <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
-            <input type="text"
-                :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
-                class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
-                @keydown.enter.prevent="acceptInput">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
-                :class="{ 'text-base': $device.isMobile }">
-                search
-            </span>
-            <Transition name="delete-fade">
-                <button v-if="filter" @click="deleteSearch">
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
-                        :class="{ 'text-base': $device.isMobile }">
-                        Close
-                    </span>
-                </button>
-            </Transition>
+        <!-- Barra de busqueda -->
+        <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
+        settings.theme }}</h1>
+        <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
+            <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
+                <input type="text"
+                    :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
+                    class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
+                    @keydown.enter.prevent="acceptInput">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
+                    :class="{ 'text-base': $device.isMobile }">
+                    search
+                </span>
+                <Transition name="delete-fade">
+                    <button v-if="filter" @click="deleteSearch">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                            :class="{ 'text-base': $device.isMobile }">
+                            Close
+                        </span>
+                    </button>
+                </Transition>
+            </div>
+            <select v-model.lazy="orderBy"
+                class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                :class="{ 'text-sm !p-2': $device.isMobile }" :disabled="songs.length == 0">
+                <option value="" disabled selected>Filtre</option>
+                <option value="votes-desc">Més vots</option>
+                <option value="votes-asc">Menys vots</option>
+                <option value="title-desc">Títol (A-Z)</option>
+                <option value="title-asc">Títol (Z-A)</option>
+                <option value="artist-desc">Artista (A-Z)</option>
+                <option value="artist-asc">Artista (Z-A)</option>
+            </select>
+
         </div>
-        <select v-model.lazy="orderBy"
-            class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-            :class="{ 'text-sm !p-2': $device.isMobile }" :disabled="songs.length == 0">
-            <option value="" disabled selected>Filtre</option>
-            <option value="votes-desc">Més vots</option>
-            <option value="votes-asc">Menys vots</option>
-            <option value="title-desc">Títol (A-Z)</option>
-            <option value="title-asc">Títol (Z-A)</option>
-            <option value="artist-desc">Artista (A-Z)</option>
-            <option value="artist-asc">Artista (Z-A)</option>
-        </select>
 
-    </div>
+        <!-- Listado canciones propuestas -->
+        <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
+        <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
+        <div v-if="songs.length === 0" class="mt-4 w-full">
+            <p class="text-center text-xl">Encara no s'ha proposat cap cançó.</p>
+            <p class="text-center mx-4">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile">
+                cercant a
+                la barra de búsqueda.</p>
+        </div>
 
-    <!-- Listado canciones propuestas -->
-    <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
-    <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
-    <div v-if="songs.length === 0" class="mt-4 w-full">
-        <p class="text-center text-xl">Encara no s'ha proposat cap cançó.</p>
-        <p class="text-center mx-4">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile">
-            cercant a
-            la barra de búsqueda.</p>
+        <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4  w-full">
+            <p class="text-center text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
+            <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
+        </div>
+        <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
+        <TransitionGroup name="song-slide" mode="out-in">
+            <component :is="activeSong" v-for=" track  in  filteredSongs " :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
+                @report="report($event)" :type="getType(track.id)" />
+        </TransitionGroup>
     </div>
-
-    <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4  w-full">
-        <p class="text-center text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
-        <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
+    <div v-else>
+        <div>
+            <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}" finalitzada
+            </h2>
+            <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
+        </div>
     </div>
-    <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
-    <TransitionGroup name="song-slide" mode="out-in">
-        <component :is="activeSong" v-for=" track  in  filteredSongs " :key="track.id" :track="track"
-            :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
-            @report="report($event)" :type="getType(track.id)" />
-    </TransitionGroup>
-    <!-- </div> -->
     <!-- </TransitionGroup> -->
 
 
@@ -175,7 +177,7 @@ import comManager from '../communicationManager';
 export default {
     data() {
         return {
-            settings: {},
+            settings: computed(() => this.store.settings),
             filter: '',
             modals: {
                 alreadyVotedModal: false,
@@ -238,13 +240,8 @@ export default {
             }
         });
 
-        socket.on('sendSettings', (settings) => {
-            console.log("settings", settings);
-            if (settings != null) {
-                this.settings = settings;
-            }
-        });
-        
+        socket.emit('getSettings', this.store.getUser().token);
+
         socket.on('songReported', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
@@ -271,7 +268,7 @@ export default {
         comManager.getSongs();
         comManager.getUserSelectedSongs(this.store.getUser().id);
 
-        socket.emit('getSettings', this.store.getUser().token);
+
 
 
 
@@ -431,6 +428,7 @@ export default {
         searchBySongId(id) {
             return this.spotifySongs.find(item => item.id == id);
         },
+
     },
     watch: {
         songs: { // Each time songs change execute search() method
@@ -516,8 +514,21 @@ export default {
         },
         activePlayer() {
             return this.activePlayer[this.mobileDetector];
+        },
+        checkVotingState() {
+            let today = new Date();
+            let startVote = new Date(this.settings.start_vote);
+            let endVote = new Date(this.settings.end_vote);
+            let startMod = new Date(this.settings.start_moderation);
+            let endMod = new Date(this.settings.end_moderation);
+            if (today <= endVote) {
+                return "vote";
+            } else if (today >= startMod && today <= endMod) {
+                return "mod";
+            } else {
+                return "none";
+            }
         }
-
     },
 }
 
@@ -547,7 +558,7 @@ export default {
     opacity: 0;
 }
 
-.smallCaps{
+.smallCaps {
     font-variant: small-caps;
 }
 </style>
