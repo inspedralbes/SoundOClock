@@ -19,22 +19,28 @@
                     No deixar que les cançons marcades com a explicites per spotify es mostrin a la llista per
                     proposar
                 </label>
-                <ModularSwitch :value="settings.showExplicit" :canSwitch=true
-                    @input="handleSwitch('showExplicit', $event)" class="w-16" />
+                <UToggle v-model="settings.showExplicit" on-icon="i-heroicons-check-20-solid"
+                    off-icon="i-heroicons-x-mark-20-solid" color="sky" />
+                <!-- <ModularSwitch :value="settings.showExplicit" :canSwitch=true
+                    @input="handleSwitch('showExplicit', $event)" class="w-16" /> -->
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label class="text-lg" for="letProposeExplicit">
                     No deixar que les cançons marcades com a explicites per spotify siguin proposades
                 </label>
-                <ModularSwitch :value="settings.letProposeExplicit" :canSwitch=true
-                    @input="handleSwitch('letProposeExplicit', $event)" class="w-16" />
+                <UToggle v-model="settings.letProposeExplicit" on-icon="i-heroicons-check-20-solid"
+                    off-icon="i-heroicons-x-mark-20-solid" color="sky" />
+                <!-- <ModularSwitch :value="settings.letProposeExplicit" :canSwitch=true
+                    @input="handleSwitch('letProposeExplicit', $event)" class="w-16" /> -->
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label class="text-lg" for="alertExplicit">
                     Alertar si una cançó marcada com a explicita per spotify es proposa
                 </label>
-                <ModularSwitch :value="settings.alertExplicit" :canSwitch=true
-                    @input="handleSwitch('alertExplicit', $event)" class="w-16" />
+                <UToggle v-model="settings.alertExplicit" on-icon="i-heroicons-check-20-solid"
+                    off-icon="i-heroicons-x-mark-20-solid" color="sky" />
+                <!-- <ModularSwitch :value="settings.alertExplicit" :canSwitch=true
+                    @input="handleSwitch('alertExplicit', $event)" class="w-16" /> -->
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label for="theme" class="text-lg basis-1/5">
@@ -177,11 +183,10 @@ export default {
         socket.emit('getSettings', this.store.getUser().token);
 
         socket.on('sendSettings', (settings) => {
-            console.log("settings", settings);
-            if (settings && !settings.message) {
+            if (settings) {
                 this.settings = settings;
             }
-                this.isLoading = false;
+            this.isLoading = false;
         });
     },
 

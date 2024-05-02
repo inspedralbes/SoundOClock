@@ -11,7 +11,7 @@
             Iconos disponibles en: https://fonts.google.com/icons?selected=Material+Symbols+Rounded:alarm:FILL@1;wght@400;GRAD@0;opsz@24&icon.query=clock&icon.set=Material+Symbols&icon.style=Rounded
         -->
         <!-- --------- -->
-        <button @click="selected_screen = 0"
+        <button @click="changeScreen(0)"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 0 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 alarm
@@ -20,7 +20,7 @@
                 :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Alarma</span>
         </button>
         <!-- --------- -->
-        <button @click="selected_screen = 1"
+        <button @click="changeScreen(1)"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 1 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 groups
@@ -29,7 +29,7 @@
                 :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Grups</span>
         </button>
         <!-- --------- -->
-        <button @click="selected_screen = 2"
+        <button @click="changeScreen(2)"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 2 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 warning
@@ -37,7 +37,7 @@
             <span
                 :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Informes</span>
         </button>
-        <button @click="selected_screen = 3"
+        <button @click="changeScreen(3)"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 3 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 person_cancel
@@ -46,7 +46,7 @@
                 :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Usuaris</span>
         </button>
         <!-- --------- -->
-        <button @click="selected_screen = 4"
+        <button @click="changeScreen(4)"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 4 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 music_off
@@ -55,7 +55,7 @@
                 negra</span>
         </button>
         <!-- --------- -->
-        <button @click="selected_screen = 5"
+        <button @click="changeScreen(5)"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 5 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 lyrics
@@ -64,20 +64,22 @@
                 songs</span>
         </button>
         <!-- --------- -->
-        <button @click="selected_screen = 6"
+        <button @click="changeScreen(6)"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 6 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 pending_actions
             </span>
-            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Planificar
+            <span
+                :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Planificar
                 Cançons</span>
         </button>
-        <button @click="selected_screen = 7"
+        <button @click="changeScreen(7)"
             :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 7 }">
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 manage_accounts
             </span>
-            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Permisos
+            <span
+                :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Permisos
                 d'usuari
             </span>
         </button>
@@ -85,7 +87,7 @@
             El contenido que vaya dentro del template v-slot:footer se mostrará al final del sidebar-menu.
          -->
         <template v-slot:footer>
-            <button @click="selected_screen = 5"
+            <button @click="changeScreen(7)"
                 :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 3 }">
                 <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                     settings
@@ -95,7 +97,7 @@
             </button>
         </template>
     </SideBarMenu>
-<!-- </div> -->
+    <!-- </div> -->
     <component :is="active_screen" v-if="!loading" />
 </template>
 
@@ -107,8 +109,8 @@ import comManager from '@/communicationManager';
 export default {
     data() {
         return {
-            isOpen: true,
-            selected_screen: 0,
+            store: useAppStore(),
+            selected_screen: computed(() => this.store.admin.selected_screen),
             screens: {
                 0: resolveComponent('AdminAlarmsCrud'),
                 1: resolveComponent('AdminGroupsCrud'),
@@ -119,7 +121,7 @@ export default {
                 6: resolveComponent('AdminSetSongs'),
                 7: resolveComponent('AdminManageRoles'),
             },
-            loading: false
+            loading: false,
         }
     },
     setup() {
@@ -128,6 +130,11 @@ export default {
     },
     created() {
         socket.emit('getGroups', this.store.getUser().token);
+    },
+    methods: {
+        changeScreen(screen) {
+            this.store.setAdminSelectedScreen(screen);
+        }
     },
     computed: {
         active_screen() {
