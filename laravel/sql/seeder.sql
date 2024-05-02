@@ -4,18 +4,6 @@ INSERT INTO `roles` (name, description) VALUES
 ('Professor', 'User that will vote on more than one group (class)'),
 ('Student', 'User that will vote in only one group (class)');
 
-INSERT INTO users (name, email, created_at, updated_at, role_id, vote_banned_until, propose_banned_until) VALUES
-('admin', 'admin@gmail.com', NOW(), NOW(), 1, null, null),
-('moderator', 'moderator@gmail.com', NOW(), NOW(), 2, null, null),
-('professor', 'professor@gmail.com', NOW(), NOW(), 3, null, null),
-('student', 'student@gmail.com', NOW(), NOW(), 4, null, null),
-('santi', 'santi@gmail.com', NOW(), NOW(), 4, '2024-06-29', '2024-06-29'),
-('alvaro', 'alvaro@gmail.com', NOW(), NOW(), 4, null, '2024-05-15'),
-('david', 'david@gmail.com', NOW(), NOW(), 4, '2024-04-02', null),
-('miquel', 'miquel@gmail.com', NOW(), NOW(), 4, null, null),
-('pedro', 'pedro@gmail.com', NOW(), NOW(), 4, null, null),
-('raul', 'raul@gmail.com', NOW(), NOW(), 4, null, null);
-
 INSERT INTO `group_categories` (id, name, abbreviation, is_public) VALUES
 (1, 'Educació Secundària Obligatòria', 'ESO', 1),
 (2, 'Batxillerat', 'BATX', 1),
