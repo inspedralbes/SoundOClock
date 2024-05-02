@@ -896,7 +896,7 @@ io.on("connection", (socket) => {
     try {
       let response = await comManager.setSettings(userToken, settings);
       console.log("response", response);
-      settings = await comManager.getSettings(userToken);
+      settings = await comManager.getPublicSettings();
       configuration = settings;
       socket.emit("settingsUpdated", response);
     } catch (err) {
@@ -913,7 +913,7 @@ io.on("connection", (socket) => {
       if (configuration != null) {
         settings = configuration;
       } else {
-        settings = await comManager.getSettings(userToken);
+        settings = await comManager.getPublicSettings();
         configuration = settings;
       }
       socket.emit("sendSettings", settings);
