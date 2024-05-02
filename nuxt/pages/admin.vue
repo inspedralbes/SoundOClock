@@ -110,7 +110,6 @@ export default {
     data() {
         return {
             store: useAppStore(),
-            isOpen: true,
             selected_screen: computed(() => this.store.admin.selected_screen),
             screens: {
                 0: resolveComponent('AdminAlarmsCrud'),
