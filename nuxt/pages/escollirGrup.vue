@@ -9,7 +9,8 @@
         <div v-else>
             <div class="flex flex-col items-center justify-center mb-5">
                 <label for="grup">Grup:</label>
-                <select name="grup" id="grup" v-model="selectedCategoryId" class="w-80 p-3 rounded border-slate-400 border-2">
+                <select name="grup" id="grup" v-model="selectedCategoryId"
+                    class="w-80 p-3 rounded border-slate-400 border-2">
                     <option value="">-- Escull el teu grup --</option>
                     <option :value="category.id" v-for="category in categories" :key="category.id">
                         {{ category.abbreviation }}
@@ -21,7 +22,8 @@
                 <select name="curs" id="curs" :disabled="!selectedCategoryId" v-model="selectedGroupId"
                     class="w-80 p-3 rounded border-slate-400 border-2">
                     <option value="">-- Escull el teu curs --</option>
-                    <option :value="course.id" v-for="course in availableCourses" :key="course">{{ course.abbreviation }}
+                    <option :value="course.id" v-for="course in availableCourses" :key="course">{{ course.abbreviation
+                        }}
                     </option>
                 </select>
             </div>
@@ -54,11 +56,12 @@ export default {
             selectedCategoryId: '',
             selectedGroupId: '',
             storeGroupsLoading: false,
+            postGroups: computed(() => this.store.getUser().groups),
         }
     },
     mounted() {
         let user = this.store.getUser();
-        if(user.role_id < 4) {
+        if (user.role_id < 4) {
             // User is a not a student (teacher, admin, etc.)
             comManager.getAllGroupsAndCategories().then((data) => {
                 this.groups = data.allGroups;
@@ -85,17 +88,19 @@ export default {
     methods: {
         storeGroup() {
             this.storeGroupsLoading = true;
-            let groups = [ this.selectedGroupId ];
-            let userId = this.store.getUser().id;
-            let userToken = this.store.getUser().token;
-            comManager.setUserGroups(userId, groups, userToken).then((data) => {
-                this.storeGroupsLoading = false;
-                // Maybe in a future consider to retrieve the user groups from the DB (data variable)
-                // and store them in the store
-  
-                this.store.setUserGroups(groups);
-                this.$router.push('/llista_propostes');
-            });
+            if (!this.postGroups.includes(this.selectedGroupId)) {
+                this.postGroups = [this.selectedGroupId];
+                let userId = this.store.getUser().id;
+                let userToken = this.store.getUser().token;
+                comManager.setUserGroups(userId, this.postGroups, userToken).then((data) => {
+                    this.storeGroupsLoading = false;
+                    // Maybe in a future consider to retrieve the user groups from the DB (data variable)
+                    // and store them in the store
+
+                    this.store.setUserGroups(this.postGroups);
+                    this.$router.push('/llista_propostes');
+                });
+            }
         },
         checkCorrectOptions() {
             return !this.selectedGroupId || !this.selectedCategoryId;

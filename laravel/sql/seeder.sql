@@ -1,8 +1,9 @@
-INSERT INTO `roles` (name, description) VALUES 
-('Administrator', 'All power'),
-('Moderator', 'Censor users and songs'),
-('Professor', 'User that will vote on more than one group (class)'),
-('Student', 'User that will vote in only one group (class)');
+INSERT INTO `roles` (id, name, description) VALUES 
+(1,'Tech', 'User that will have access to the tech section'),
+(2,'Administrator', 'All power'),
+(3,'Moderator', 'Censor users and songs'),
+(4,'Professor', 'User that will vote on more than one group (class)'),
+(5,'Student', 'User that will vote in only one group (class)');
 
 INSERT INTO users (name, email, created_at, updated_at, role_id, vote_banned_until, propose_banned_until) VALUES
 ('admin', 'admin@gmail.com', NOW(), NOW(), 1, null, null),
