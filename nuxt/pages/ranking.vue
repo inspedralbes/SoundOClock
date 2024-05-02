@@ -26,6 +26,7 @@
 
 import { useAppStore } from '@/stores/app';
 import comManager from '../../communicationManager';
+import { socket } from '../socket';
 
 export default {
     data() {
@@ -39,6 +40,9 @@ export default {
         }
     },
     created() {
+        if(this.store.getClassGroups().length === 0) {
+            socket.emit("getGroups");
+        }
         comManager.getBells();
         comManager.getSortedVotedSongs();
     },
@@ -51,12 +55,15 @@ export default {
         },
         sortedVotedSongs: {
             handler: 'handleResults',
+        },
+        classGroups: {
+            handler: 'handleResults',
         }
     },
     methods: {
         handleResults() {
             // Check if sortedVoted songs is loaded and set the groupedSongs
-            if (this.sortedVotedSongs.length > 0 && this.groupedSongs.length === 0) {
+            if (this.sortedVotedSongs.length > 0 && this.groupedSongs.length === 0 && this.classGroups.length > 0) {
                 let result = this.fillMissingGroups(this.sortedVotedSongs);
                 this.groupedSongs = result;
             }
