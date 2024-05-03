@@ -1,14 +1,12 @@
 import { useAppStore } from "./stores/app.js";
 
-let url;
-setTimeout(() => {
-  const config = useNuxtApp().$config;
-  const environment = config.public;
+// let url;
+// const config = useNuxtApp().$config;
+// const environment = config.public;
 
-  url = environment.SOCKET_URI;
-}, 5000);
+// url = environment.SOCKET_URI;
 
-// const url = "http://presound.daw.inspedralbes.cat:8080";
+const url = "http://presound.daw.inspedralbes.cat:8080";
 
 function getUserSelectedSongs(id) {
   const store = useAppStore();

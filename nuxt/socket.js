@@ -3,15 +3,16 @@ import { useAppStore } from "./stores/app";
 import { useRouter } from "vue-router";
 import comManager from "./communicationManager";
 
-const router = useRouter();
-let url;
-setTimeout(() => {
-  const config = useNuxtApp().$config;
-  const environment = config.public;
+const getEnv = getEnv();
+console.log(getEnv);
 
-  url = environment.SOCKET_URI;
-}, 5000);
-// const url = "http://presound.daw.inspedralbes.cat:8080";
+const router = useRouter();
+// let url;
+// const config = useNuxtApp().$config;
+// const environment = config.public;
+
+// url = environment.SOCKET_URI;
+const url = "http://presound.daw.inspedralbes.cat:8080";
 
 export const socket = io(url);
 
