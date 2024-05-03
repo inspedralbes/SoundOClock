@@ -1,10 +1,9 @@
 import { useAppStore } from "./stores/app.js";
 
-// LOCAL
-// const url = "http://localhost:8080";
+const config = useRuntimeConfig();
+const environment = config.public;
 
-// PRODUCCIÓN
-const url = "http://presound.daw.inspedralbes.cat:8080";
+const url = environment.SOCKET_URI;
 
 function getUserSelectedSongs(id) {
   const store = useAppStore();
