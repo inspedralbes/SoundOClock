@@ -236,7 +236,7 @@ export const useAppStore = defineStore('app', {
         this.songStatus.currentTrack.play();
         this.songStatus.isPlaying = true;
       }
-      // return this.songStatus;
+      return this.songStatus;
     },
   },
 })
