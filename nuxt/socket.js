@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import comManager from "./communicationManager";
 
 const router = useRouter();
+let url;
 setTimeout(() => {
   const config = useNuxtApp().$config;
   const environment = config.public;
