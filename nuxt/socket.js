@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import comManager from "./communicationManager";
 
 // const router = useRouter();
-// const env = useEnv();
+const env = useEnv();
 console.log(env);
 
 // let url;
