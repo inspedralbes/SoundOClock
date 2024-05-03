@@ -5,6 +5,7 @@ import comManager from "./communicationManager";
 
 const router = useRouter();
 const env = useEnv();
+console.log(env);
 
 let url;
 
