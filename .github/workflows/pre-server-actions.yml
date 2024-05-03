@@ -168,7 +168,7 @@ jobs:
           sed -i 's#NODE_ENV=#NODE_ENV=production#g' .env
           sed -i "s#SPOTIFY_CLIENT_ID=#SPOTIFY_CLIENT_ID=$(echo "${{ secrets.SPOTIFY_CLIENT_ID }}")#g" .env
           sed -i "s#SPOTIFY_CLIENT_SECRET=#SPOTIFY_CLIENT_SECRET=$(echo "${{ secrets.SPOTIFY_CLIENT_SECRET }}")#g" .env
-          sed -i "s#PRODUCTION_API_URL=#PRODUCTION_API_URL=$(echo "${{ secrets.PRODUCTION_API_URL }}")#g" .env
+          sed -i "s#PRODUCTION_API_URL=#PRODUCTION_API_URL=$(echo "${{ secrets.PREPRODUCTION_API_URI }}")#g" .env
           sed -i "s#MONGO_USER=#MONGO_USER=$(echo "${{ secrets.MONGO_INITDB_ROOT_USERNAME }}")#g" .env
           sed -i "s#MONGO_PASSWORD=#MONGO_PASSWORD=$(echo "${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}")#g" .env
 
