@@ -1,7 +1,4 @@
 import { useAppStore } from "./stores/app.js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 // LOCAL
 const url = "http://localhost:8080";
