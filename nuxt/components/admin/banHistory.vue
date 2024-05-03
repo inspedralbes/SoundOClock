@@ -8,8 +8,11 @@ export default {
     },
     data() {
         return {
-
+            bans: [],
         }
+    },
+    created() {
+        this.user.bans.sort((a, b) => new Date(b.banned_from) - new Date(a.banned_from));
     },
     methods: {
         formatDate(date) {
@@ -27,38 +30,25 @@ export default {
         <p class="text-5xl font-black mb-4">{{ user.name }}</p>
         <div class="w-100 p-0 flex flex-col gap-2">
             <p class="text-xl mb-2">SANCIONS PRÈVIES: {{ user.bans.length }}</p>
-            <table>
-                <thead>
-                    <tr class="text-center">
-                        <th class="w-3/5">SANCIÓ</th>
-                        <th class="w-1/5">DATA INICI</th>
-                        <th class="w-1/5">DATA FINAL</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="ban in user.bans">
-                        <td v-if="ban.forVoting" class="col-span-4">VOTAR CANÇONS</td>
-                        <td v-else class="col-span-4">PROPOSAR CANÇONS</td>
-                        <td class="text-center">{{ formatDate(ban.banned_from) }}</td>
-                        <td class="text-center">{{ formatDate(ban.banned_until) }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- <div class="flex flex-col gap-2">
-                <div
-                    class="report-container text-white p-4 grid grid-cols-12 gap-3 rounded-lg items-center">
-                    <span class="col-span-4">SANCIÓ</span>
-                    <span class="col-span-4 text-center">DATA INICI</span>
-                    <span class="col-span-4 text-center">DATA FINAL</span>
-                </div>
-                <div v-for="ban in user.bans"
-                    class="report-container text-white p-4 grid grid-cols-12 gap-3 rounded-lg items-center">
-                    <span v-if="ban.forVoting" class="col-span-4">VOTAR CANÇONS</span>
-                    <span v-else class="col-span-4">PROPOSAR CANÇONS</span>
-                    <span class="col-span-4 text-center">{{ formatDate(ban.banned_from) }}</span>
-                    <span class="col-span-4 text-center">{{ formatDate(ban.banned_until) }}</span>
-                </div>
-            </div> -->
+            <div class="h-[36rem] overflow-y-auto grow">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-center">
+                            <th class="w-3/5">SANCIÓ</th>
+                            <th class="w-1/5">DATA INICI</th>
+                            <th class="w-1/5">DATA FINAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="ban in user.bans">
+                            <td v-if="ban.forVoting" class="col-span-4">VOTAR CANÇONS</td>
+                            <td v-else class="col-span-4">PROPOSAR CANÇONS</td>
+                            <td class="text-center">{{ formatDate(ban.banned_from) }}</td>
+                            <td class="text-center">{{ formatDate(ban.banned_until) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </template>

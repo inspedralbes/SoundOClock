@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Ban;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -198,31 +199,53 @@ class AuthController extends Controller
             ], 404);
         }
 
-        if (($user->vote_banned_until != $request->input('vote_banned_until') && $request->input('vote_banned_until') != null) || ($user->propose_banned_until != $request->input('propose_banned_until') && $request->input('propose_banned_until') != null)) {
+        // Wrap the operation inside a transaction
+        DB::beginTransaction();
 
-            $ban = new Ban();
+        try {
 
-            if ($user->vote_banned_until != $request->input('vote_banned_until')) {
-                $ban->forVoting = 1;
-                $ban->banned_until = $request->input('vote_banned_until');
-            } else {
-                $ban->forVoting = 0;
-                $ban->banned_until = $request->input('vote_banned_until');
+            // If the user is being banned...
+            if (($user->vote_banned_until != $request->input('vote_banned_until') && $request->input('vote_banned_until') != null) || ($user->propose_banned_until != $request->input('propose_banned_until') && $request->input('propose_banned_until') != null)) {
+
+                // Create a new register in the bans table
+                $ban = new Ban();
+
+                if ($user->vote_banned_until != $request->input('vote_banned_until')) {
+                    $ban->forVoting = 1;
+                    $ban->banned_until = $request->input('vote_banned_until');
+                } else {
+                    $ban->forVoting = 0;
+                    $ban->banned_until = $request->input('vote_banned_until');
+                }
+
+                $ban->banned_from = date("Y/m/d");
+                $ban->user_id = $user->id;
+                $ban->save();
+
             }
 
-            $ban->banned_from = date("Y/m/d");
-            $ban->user_id = $user->id;
-            $ban->save();
+            // Update user
+            $user->update([
+                'role_id' => $request->input('role_id'),
+                'vote_banned_until' => $request->input('vote_banned_until'),
+                'propose_banned_until' => $request->input('propose_banned_until'),
+            ]);
+
+            // Commit the transaction if everything is successful
+            DB::commit();
+
+            return response()->json($user->load('bans'));
+
+        } catch (\Exception $e) {
+
+            // Rollback the transaction in case of any error
+            DB::rollback();
             
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred. Transaction rolled back.'
+            ], 500);
         }
 
-        // Update user
-        $user->update([
-            'role_id' => $request->input('role_id'),
-            'vote_banned_until' => $request->input('vote_banned_until'),
-            'propose_banned_until' => $request->input('propose_banned_until'),
-        ]);
-
-        return response()->json($user->load('bans'));
     }
 }
