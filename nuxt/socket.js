@@ -10,7 +10,7 @@ setTimeout(() => {
   const environment = config.public;
 
   url = environment.SOCKET_URI;
-}, 1000);
+}, 5000);
 // const url = "http://presound.daw.inspedralbes.cat:8080";
 
 export const socket = io(url);
