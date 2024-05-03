@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row justify-center gap-3 m-2 p-2 rounded text-gray-200"
-        :class="{ 'bg-yellow-200 text-gray-800': isFirstPlace, 'text-gray-800': isSelected }">
+        :class="{ 'bg-yellow-200 text-gray-800': isFirstPlace, 'text-gray-800': isSelected, 'justify-between': type === 'admin_set_song' }">
         <UChip size="3xl" color="red" v-if="numReports > 0 && type === 'admin'">
             <template #content>
                 <div>{{ numReports }}</div>
@@ -29,7 +29,7 @@
             </Transition>
         </div>
         <div class="flex-row w-3/5 flex justify-between items-center"
-            :class="{ 'border-gray-800': isFirstPlace, 'border-b border-solid border-gray-300 px-2 pb-2': type !== 'admin' }">
+            :class="{ 'border-gray-800': isFirstPlace, 'border-b border-solid border-gray-300 px-2 pb-2': type !== 'admin', 'w-9/12': type === 'admin_set_song' }">
             <div class="flex flex-col w-[70%] items-start">
                 <p class="font-bold text-base uppercase">{{ track.name }}</p>
                 <div class="flex flex-row items-center text-sm py-1">
@@ -44,7 +44,7 @@
                 <p v-if="type === 'vote' || type === 'admin'" class="text-sm">Vots: {{ track.totalVotes }}</p>
                 <p v-if="type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
             </div>
-            <button @click="playTrack(track)">
+            <button @click="playTrack(track)" v-if="!songWaitingToPlay || songWaitingToPlay != track.id">
                 <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
                     pause
                 </span>
@@ -52,12 +52,15 @@
                     play_arrow
                 </span>
             </button>
+            <div v-if="songWaitingToPlay == track.id"
+                class="loader-track">
+            </div>
             <button v-if="type === 'vote'" @click="report(track)">
                 <span class="material-symbols-rounded text-4xl">
                     report
                 </span>
             </button>
-            <button @click="proposeSong(track)" v-if="type === 'propose' && (!track.loading && !track.proposed)">
+            <button @click="proposeSong(track)" v-if="(type === 'propose' || type === 'admin_set_song') && (!track.loading && !track.proposed)">
                 <span class="material-symbols-rounded text-4xl">
                     add_circle
                 </span>
@@ -120,6 +123,10 @@ export default {
             type: Boolean,
             default: false
         },
+        songWaitingToPlay: {
+            type: String,
+            default: null
+        }
     },
     data() {
         return {
