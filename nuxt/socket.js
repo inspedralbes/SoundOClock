@@ -5,9 +5,10 @@ import comManager from "./communicationManager";
 
 // const router = useRouter();
 const env = useEnv();
-console.log(env);
+console.log(env.SOCKET_URI);
 
-// let url;
+let url2 = env.SOCKET_URI;
+console.log("Url2:", url2);
 
 // url = env.SOCKET_URI;
 const url = "http://presound.daw.inspedralbes.cat:8080";
