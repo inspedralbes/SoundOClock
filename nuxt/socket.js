@@ -4,10 +4,10 @@ import { useRouter } from "vue-router";
 import comManager from "./communicationManager";
 
 // const router = useRouter();
-const env = useEnv();
+// const env = useEnv();
 
-const url = env.SOCKET_URI;
-// const url = "http://presound.daw.inspedralbes.cat:8080";
+// const url = env.SOCKET_URI;
+const url = "http://presound.daw.inspedralbes.cat:8080";
 
 export const socket = io(url);
 
