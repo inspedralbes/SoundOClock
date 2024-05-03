@@ -92,7 +92,7 @@ export default {
         },
 
         playSong(track) {
-            this.status = this.store.playTrack(track, this.status);
+            this.status = this.store.playTrack(track);
         },
 
         getSongs() {
