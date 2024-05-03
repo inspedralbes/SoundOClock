@@ -3,12 +3,12 @@ import { useAppStore } from "./stores/app";
 import { useRouter } from "vue-router";
 import comManager from "./communicationManager";
 
-const getEnv = getEnv();
-console.log(getEnv);
-
 const router = useRouter();
+const env = useEnv();
+console.log(env);
+
 // let url;
-// const config = useNuxtApp().$config;
+// const config = useRuneTimeConfig();
 // const environment = config.public;
 
 // url = environment.SOCKET_URI;
