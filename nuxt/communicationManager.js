@@ -1,11 +1,11 @@
 import { useAppStore } from "./stores/app.js";
 
-// const config = useRuntimeConfig();
-// const environment = config.public;
+const config = useNuxtApp().$config;
+const environment = config.public;
 
-// const url = environment.SOCKET_URI;
+const url = environment.SOCKET_URI;
 
-const url = "http://presound.daw.inspedralbes.cat:8080";
+// const url = "http://presound.daw.inspedralbes.cat:8080";
 
 function getUserSelectedSongs(id) {
   const store = useAppStore();
