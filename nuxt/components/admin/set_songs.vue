@@ -8,7 +8,14 @@
             <div class="groups-bells-container rounded-lg">
                 <div class="schedule-container text-white text-center gap-2 p-2">
                     <div v-for="(bell, index) in bells" class="item bg-gray-400 rounded-lg p-2 h-96 flex flex-col">
-                        <div class="text-lg p-3 rounded-lg hour-item mb-2">{{ bell.hour.substring(0, 5) }}</div>
+                        <div class="text-lg p-3 rounded-lg hour-item mb-2 flex items-center justify-between">
+                            <div>
+                                {{ bell.hour.substring(0, 5) }}
+                            </div>
+                            <span class="material-symbols-rounded text-4xl cursor-pointer" @click="openAddModal(index)">
+                                add_circle
+                            </span>
+                        </div>
                         <div class="gap-2 flex flex-col overflow-auto">
                             <MobileSong v-for="song in mostVotedSongs[index]" :track="song"
                                 :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying"
@@ -28,31 +35,54 @@
     <div class="btn-container fixed bottom-0 w-full flex justify-center items-center">
         <UButton size="xl" class="px-48" @click="openModal">Guardar</UButton>
     </div>
-    <UModal v-model="isModalOpen">
+    <UModal v-model="modals.errorModal">
+        <UAlert icon="i-heroicons-x-circle-16-solid" color="red" variant="subtle" title="ERROR!"
+            description="Cada franja horaria ha de tindre una cançó seleccionada." class="p-6" />
+    </UModal>
+    <UModal v-model="modals.confirmationModal">
         <div>
-            <div v-if="isError">
-                <UAlert icon="i-heroicons-x-circle-16-solid" color="red" variant="subtle" title="ERROR!"
-                    description="Cada franja horaria ha de tindre una cançó seleccionada." class="p-6" />
-            </div>
-            <div v-else>
-                <UAlert title="Estàs segur/a?" icon="i-heroicons-exclamation-triangle-16-solid" color="orange"
-                    variant="subtle" class="p-6">
-                    <template #title="{ title }">
-                        <span v-html="title" />
-                    </template>
-                    <template #description>
-                        <div>
-                            Una vegada guardades les cançons, s'enviaran a la màquina de campanes.
-                        </div>
-                        <div class="mt-2 flex gap-2">
-                            <UButton size="md" color="red" @click="closeModal">Enrere</UButton>
-                            <UButton size="md" color="primary" @click="storeSongs">Continuar</UButton>
-                        </div>
-                    </template>
-                </UAlert>
-            </div>
+            <UAlert title="Estàs segur/a d'elegir aquestes cançons?" icon="i-heroicons-exclamation-triangle-16-solid"
+                color="orange" variant="subtle" class="p-6">
+                <template #title="{ title }">
+                    <span v-html="title" />
+                </template>
+                <template #description>
+                    <div class="mt-2 flex gap-2">
+                        <UButton size="md" color="red" @click="closeModal">Enrere</UButton>
+                        <UButton size="md" color="primary" @click="storeSongs">Continuar</UButton>
+                    </div>
+                </template>
+            </UAlert>
             <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="absolute right-0 top-0"
-                @click="isModalOpen = false" />
+                @click="modals.confirmationModal = false" />
+        </div>
+    </UModal>
+
+    <!-- Afegir cançons directament a un timbre -->
+    <UModal v-model="modals.addModal">
+        <div class="p-4">
+            <h2 class="text-2xl text-center mb-4">Busca una cançó</h2>
+            <div class="relative m-2 text-center">
+                <input type="text"
+                    class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                    v-model="search" @input="handleInput" @keydown.enter.prevent="acceptInput">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded">
+                    search
+                </span>
+                <Transition name="delete-fade">
+                    <button v-if="search" @click="deleteSearch">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded">
+                            Close
+                        </span>
+                    </button>
+                </Transition>
+            </div>
+            <div class="h-96 overflow-auto">
+                <Song v-for="song in spotifySongs" :key="song.id" :track="song" :currentTrackId="currentTrackId"
+                    :isPlaying="isPlaying" @play="playTrack" :type="'admin_set_song'" @propose="addSong"
+                    :songWaitingToPlay="songWaitingToPlay">
+                </Song>
+            </div>
         </div>
     </UModal>
 </template>
@@ -60,6 +90,7 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import comManager from '../../communicationManager';
+import { socket } from '@/socket';
 
 export default {
     data() {
@@ -71,61 +102,93 @@ export default {
             isSelected: {},
             selectedSongs: [],
             toast: null,
-            isModalOpen: false,
             isError: false,
+            modals: {
+                errorModal: false,
+                confirmationModal: false,
+                addModal: false
+            },
+            search: '',
+            spotifySongs: [],
+            selectedBellIndex: null,
+            currentTrack: null,
+            currentTrackId: null,
+            isPlaying: false,
+            postedSongId: "",
+            isWaitingToAdd: false,
+            songWaitingToPlay: null,
         }
     },
     created() {
         comManager.getBells();
         comManager.getSortedVotedSongs();
+        if (this.store.getClassGroups().length === 0) {
+            socket.emit("getGroups");
+        }
+
+        socket.on('searchResult', (results) => {
+            this.spotifySongs = results;
+        });
+
+        socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
+            // Crear un elemento HTML temporal
+            const tempElement = document.createElement('div');
+            // Establecer el HTML recibido en el elemento temporal
+            tempElement.innerHTML = htmlSpotify;
+            // Obtener el script por su id
+            const scriptElement = tempElement.querySelector('#__NEXT_DATA__');
+            // Verificar si se encontró el elemento
+            if (scriptElement) {
+                // Acceder al contenido JSON dentro del script y convertirlo a objeto JavaScript
+                const jsonData = JSON.parse(scriptElement.textContent);
+                // Acceder al AudioPreviewURL
+                const AudioPreviewURL = jsonData.props.pageProps.state.data.entity.audioPreview.url;
+                // Fetch to AudioPreviewURL to get the audio file .mp3
+                this.getMp3(AudioPreviewURL, songId);
+            } else {
+                console.error('No se encontró el script con el id "__NEXT_DATA__" en el HTML recibido');
+            }
+        });
     },
     mounted() {
         this.toast = useToast();
     },
     watch: {
         bells: {
-            handler: 'setLoadingFalse',
+            handler: 'handleResults',
         },
         sortedVotedSongs: {
-            handler: 'handleSortedVotedSongs',
-        }
+            handler: 'handleResults',
+        },
+        classGroups: {
+            handler: 'handleResults',
+        },
     },
     methods: {
-        setLoadingFalse() {
+        handleResults() {
+            // Check if sortedVoted songs is loaded and set the groupedSongs
+            if (this.sortedVotedSongs.length > 0 && this.groupedSongs.length === 0 && this.classGroups.length > 0) {
+                let result = this.fillMissingGroups(this.sortedVotedSongs);
+                this.groupedSongs = result;
+            }
+            // Check if bells is loaded and set the mostVotedSongs
             if (this.bells.length > 0 && this.groupedSongs.length > 0) {
                 this.loading = false;
                 this.getMostVotedSongs(this.bells);
             }
         },
-        handleSortedVotedSongs() {
-            if (this.sortedVotedSongs.length > 0) {
-                let result = this.fillMissingGroups(this.sortedVotedSongs);
-                this.groupedSongs = result;
-                if (this.bells.length > 0) {
-                    this.loading = false;
-                    this.getMostVotedSongs(this.bells);
-                }
-            }
-        },
         fillMissingGroups(array) {
             let result = []
-            let expectedGroup = 1
-            let totalGroups = this.classGroups.length
 
-            // Fill in the groups that are missing
-            for (let i = 0; i < array.length; i++) {
-                while (expectedGroup < parseInt(array[i].group)) {
-                    result.push({ group: expectedGroup, songs: [] });
-                    expectedGroup++;
+            for (let i = 0; i < this.classGroups.length; i++) {
+
+                let group = array.find(group => parseInt(group.group) === i + 1);
+
+                if (group) {
+                    result.push({ group: parseInt(group.group), songs: group.songs });
+                } else {
+                    result.push({ group: i + 1, songs: [] });
                 }
-                result.push({ group: parseInt(array[i].group), songs: array[i].songs })
-                expectedGroup = parseInt(array[i].group) + 1;
-            }
-
-            // If last group in the array isn't 11, fill in the remaining groups
-            while (expectedGroup <= totalGroups) {
-                result.push({ group: expectedGroup, songs: [] });
-                expectedGroup++;
             }
 
             return result;
@@ -189,25 +252,21 @@ export default {
             for (const key in this.isSelected) {
                 numBells++;
                 if (!this.isSelected[key]) {
-                    this.isError = true;
-                    this.isModalOpen = true;
+                    this.modals.errorModal = true;
                     return;
                 }
             }
             if (numBells !== this.bells.length) {
-                this.isError = true;
-                this.isModalOpen = true;
+                this.modals.errorModal = true;
                 return;
             }
-            this.isError = false;
-            this.isModalOpen = true;
+            this.modals.confirmationModal = true;
         },
         closeModal() {
-            this.isModalOpen = false;
+            this.modals.confirmationModal = false;
         },
         storeSongs() {
-            this.isModalOpen = false;
-            // this.loading = true;
+            this.modals.confirmationModal = false;
 
             let songs = [];
             for (const key in this.isSelected) {
@@ -236,7 +295,125 @@ export default {
                     color: 'red',
                 });
             });
-        }
+        },
+        deleteSearch() {
+            this.search = '';
+            this.spotifySongs = [];
+        },
+        handleInput(event) {
+            const value = event.target.value;
+            if (value.length > 3 || value === '') {
+                this.search = value;
+                this.getSongs();
+            }
+        },
+        acceptInput(event) {
+            this.search = event.target.value;
+            this.getSongs();
+        },
+        getSongs() {
+            if (this.search != '') {
+                socket.emit('searchSong', this.search);
+            } else {
+                this.spotifySongs = [];
+            }
+        },
+        openAddModal(index) {
+            this.selectedBellIndex = index;
+            this.modals.addModal = true;
+        },
+        getMp3(AudioPreviewURL, songId) {
+            let track = this.spotifySongs.find(item => item.id == songId);
+            track.preview_url = AudioPreviewURL;
+            if (this.songWaitingToPlay) {
+                this.playTrack(track);
+                this.songWaitingToPlay = null;
+            } else if (this.isWaitingToAdd) {
+                this.addSong(track);
+                this.isWaitingToAdd = false;
+            }
+        },
+        playTrack(track) {
+            if (this.currentTrackId == track.id) {
+                if (this.isPlaying) {
+                    this.currentTrack.pause();
+                    this.isPlaying = false;
+                    this.store.deleteCurrentTrackPlaying();
+                } else {
+                    this.currentTrack.load();
+                    this.currentTrack.play();
+                    this.isPlaying = true;
+                    this.store.setCurrentTrackPlaying(track);
+                }
+            } else {
+                if (track.preview_url != null) {
+                    if (this.isPlaying) {
+                        this.currentTrack.pause();
+                        this.isPlaying = false;
+                        this.store.deleteCurrentTrackPlaying();
+                    }
+                    this.currentTrack = new Audio(track.preview_url);
+                    this.currentTrackId = track.id;
+                    this.currentTrack.load();
+                    this.currentTrack.play();
+                    this.isPlaying = true;
+                    this.store.setCurrentTrackPlaying(track);
+                } else {
+                    this.songWaitingToPlay = track.id;
+                    socket.emit('getHtmlSpotify', track.id);
+                }
+            }
+        },
+        addSong(track) {
+            track.loading = true;
+            this.postedSongId = track.id;
+            if (track.preview_url == null) {
+                socket.emit('getHtmlSpotify', track.id);
+                this.isWaitingToAdd = true;
+            } else {
+                let artistList = [];
+                track.artists.forEach(artist => {
+                    artistList.push({ name: artist.name })
+                });
+                let song = {
+                    id: track.id,
+                    name: track.name,
+                    artists: artistList,
+                    img: track.album.images[1].url,
+                    preview_url: track.preview_url,
+                    explicit: track.explicit,
+                    submitDate: new Date().toISOString(),
+                    submittedBy: this.store.getUser().id,
+                }
+
+                // Add song to the bell
+                this.mostVotedSongs[this.selectedBellIndex].unshift(song);
+
+                // Close modal and clear search
+                this.searchBySongId(this.postedSongId).loading = false;
+                this.searchBySongId(this.postedSongId).proposed = true;
+                this.search = '';
+                this.spotifySongs = [];
+                this.modals.addModal = false;
+
+                if (this.currentTrack) {
+                    this.currentTrack.pause();
+                }
+                this.isPlaying = false;
+                this.currentTrackId = null;
+                this.currentTrack = null;
+
+                // Notify the user
+                this.toast.add({
+                    title: 'Cançó afegida!',
+                    description: 'La cançó s\'ha afegit correctament.',
+                    color: 'green',
+                });
+            }
+        },
+        searchBySongId(id) {
+            return this.spotifySongs.find(item => item.id == id);
+        },
     },
     computed: {
         bells() {
@@ -251,7 +428,7 @@ export default {
         songStatus() {
             return this.store.getSongStatus();
         },
-    }
+    },
 }
 </script>
 
