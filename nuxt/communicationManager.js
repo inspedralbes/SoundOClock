@@ -6,7 +6,7 @@ setTimeout(() => {
   const environment = config.public;
 
   url = environment.SOCKET_URI;
-}, 3000);
+}, 1000);
 
 // const url = "http://presound.daw.inspedralbes.cat:8080";
 

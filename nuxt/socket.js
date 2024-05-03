@@ -4,11 +4,12 @@ import { useRouter } from "vue-router";
 import comManager from "./communicationManager";
 
 const router = useRouter();
-const config = useNuxtApp().$config;
-const environment = config.public;
+setTimeout(() => {
+  const config = useNuxtApp().$config;
+  const environment = config.public;
 
-const url = environment.SOCKET_URI;
-
+  url = environment.SOCKET_URI;
+}, 1000);
 // const url = "http://presound.daw.inspedralbes.cat:8080";
 
 export const socket = io(url);
