@@ -26,6 +26,7 @@
 
 import { useAppStore } from '@/stores/app';
 import comManager from '../../communicationManager';
+import { socket } from '../socket';
 
 export default {
     data() {
@@ -39,6 +40,9 @@ export default {
         }
     },
     created() {
+        if(this.store.getClassGroups().length === 0) {
+            socket.emit("getGroups");
+        }
         comManager.getBells();
         comManager.getSortedVotedSongs();
     },
@@ -51,12 +55,15 @@ export default {
         },
         sortedVotedSongs: {
             handler: 'handleResults',
+        },
+        classGroups: {
+            handler: 'handleResults',
         }
     },
     methods: {
         handleResults() {
             // Check if sortedVoted songs is loaded and set the groupedSongs
-            if (this.sortedVotedSongs.length > 0 && this.groupedSongs.length === 0) {
+            if (this.sortedVotedSongs.length > 0 && this.groupedSongs.length === 0 && this.classGroups.length > 0) {
                 let result = this.fillMissingGroups(this.sortedVotedSongs);
                 this.groupedSongs = result;
             }
@@ -68,23 +75,16 @@ export default {
         },
         fillMissingGroups(array) {
             let result = []
-            let expectedGroup = 1
-            let totalGroups = this.classGroups.length
 
-            // Fill in the groups that are missing
-            for (let i = 0; i < array.length; i++) {
-                while (expectedGroup < parseInt(array[i].group)) {
-                    result.push({ group: expectedGroup, songs: [] });
-                    expectedGroup++;
+            for (let i = 0; i < this.classGroups.length; i++) {
+
+                let group = array.find(group => parseInt(group.group) === i + 1);
+
+                if (group) {
+                    result.push({ group: parseInt(group.group), songs: group.songs });
+                } else {
+                    result.push({ group: i + 1, songs: [] });
                 }
-                result.push({ group: parseInt(array[i].group), songs: array[i].songs })
-                expectedGroup = parseInt(array[i].group) + 1;
-            }
-
-            // If last group in the array isn't 11, fill in the remaining groups
-            while (expectedGroup <= totalGroups) {
-                result.push({ group: expectedGroup, songs: [] });
-                expectedGroup++;
             }
 
             return result;

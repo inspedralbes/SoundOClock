@@ -86,7 +86,7 @@
 
     <!-- Modales -->
     <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
-    <UModal v-model="modals.alreadyVotedModal" class="z-[9999] text-black">
+    <UModal v-model="modals.alreadyVotedModal" class="z-[9999]">
         <UCard>
             <template #header>
                 <div class="flex flex-row items-center justify-between rounded-lg">
@@ -105,7 +105,7 @@
     </UModal>
 
     <!-- Modal de los reportes -->
-    <UModal v-model="modals.reportModal" class="z-[9999] text-black">
+    <UModal v-model="modals.reportModal" class="z-[9999]">
         <UCard>
             <template #header>
                 <div class="flex flex-row items-center justify-between">
@@ -149,7 +149,7 @@
     </UModal>
 
     <!-- Modal de error al proponer mas de una cancion -->
-    <UModal v-model="modals.proposeSongError" class="z-[9999] text-black">
+    <UModal v-model="modals.proposeSongError" class="z-[9999]">
         <UCard>
             <template #header>
                 <div class="flex flex-row items-center justify-between">
