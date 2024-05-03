@@ -75,23 +75,16 @@ export default {
         },
         fillMissingGroups(array) {
             let result = []
-            let expectedGroup = 1
-            let totalGroups = this.classGroups.length
 
-            // Fill in the groups that are missing
-            for (let i = 0; i < array.length; i++) {
-                while (expectedGroup < parseInt(array[i].group)) {
-                    result.push({ group: expectedGroup, songs: [] });
-                    expectedGroup++;
+            for (let i = 0; i < this.classGroups.length; i++) {
+
+                let group = array.find(group => parseInt(group.group) === i + 1);
+
+                if (group) {
+                    result.push({ group: parseInt(group.group), songs: group.songs });
+                } else {
+                    result.push({ group: i + 1, songs: [] });
                 }
-                result.push({ group: parseInt(array[i].group), songs: array[i].songs })
-                expectedGroup = parseInt(array[i].group) + 1;
-            }
-
-            // If last group in the array isn't 11, fill in the remaining groups
-            while (expectedGroup <= totalGroups) {
-                result.push({ group: expectedGroup, songs: [] });
-                expectedGroup++;
             }
 
             return result;
