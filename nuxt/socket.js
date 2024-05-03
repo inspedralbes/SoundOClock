@@ -3,14 +3,14 @@ import { useAppStore } from "./stores/app";
 import { useRouter } from "vue-router";
 import comManager from "./communicationManager";
 
-const router = useRouter();
-const env = useEnv();
+// const router = useRouter();
+// const env = useEnv();
 console.log(env);
 
-let url;
+// let url;
 
-url = env.SOCKET_URI;
-// const url = "http://presound.daw.inspedralbes.cat:8080";
+// url = env.SOCKET_URI;
+const url = "http://presound.daw.inspedralbes.cat:8080";
 
 export const socket = io(url);
 
