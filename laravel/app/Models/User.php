@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Group;
+use App\Models\Ban;
 
 class User extends Authenticatable
 {
@@ -28,6 +29,10 @@ class User extends Authenticatable
 
     public function groups() {
         return $this->belongsToMany(Group::class)->withPivot('group_id', 'user_id');
+    }
+
+    public function bans() {
+        return $this->hasMany(Ban::class, 'user_id', 'id');
     }
 
     /**
