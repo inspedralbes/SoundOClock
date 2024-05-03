@@ -1,9 +1,10 @@
 import { useAppStore } from "./stores/app.js";
 
-const config = useRuntimeConfig();
-const environment = config.public;
+// const config = useRuntimeConfig();
+// const environment = config.public;
 
-const url = environment.SOCKET_URI;
+// const url = environment.SOCKET_URI;
+const url = "http://localhost:8080";
 
 function getUserSelectedSongs(id) {
   const store = useAppStore();
