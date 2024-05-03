@@ -5,14 +5,11 @@ import comManager from "./communicationManager";
 
 const router = useRouter();
 const env = useEnv();
-console.log(env);
 
-// let url;
-// const config = useRuneTimeConfig();
-// const environment = config.public;
+let url;
 
-// url = environment.SOCKET_URI;
-const url = "http://presound.daw.inspedralbes.cat:8080";
+url = env.SOCKET_URI;
+// const url = "http://presound.daw.inspedralbes.cat:8080";
 
 export const socket = io(url);
 
