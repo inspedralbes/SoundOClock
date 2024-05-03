@@ -1,18 +1,20 @@
 <template>
     <div class="w-full flex justify-center">
-        <div class="relative flex w-[95%] h-[100px] bg-gray-200 overflow-hidden rounded-lg" :class="{'mt-4': type !== 'admin'}">
-            <img class="w-full h-auto object-cover object-center brightness-50" :class="{ 'opacity-100': type === 'admin' && isSelected, 'opacity-75': type === 'admin' && !isSelected}"
+        <div class="relative flex w-[95%] h-[100px] bg-gray-200 overflow-hidden rounded-lg"
+            :class="{ 'mt-4': type !== 'admin' }">
+            <img class="w-full h-auto object-cover object-center brightness-50"
+                :class="{ 'opacity-100': type === 'admin' && isSelected, 'opacity-75': type === 'admin' && !isSelected }"
                 :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'">
 
             <div class="absolute inset-0 flex flex-row justify-center">
                 <div class="flex flex-row w-full justify-between p-2 items-center">
                     <div class="flex flex-col w-[70%] overflow-hidden items-start">
                         <p
-                            class="font-bold text-base text-ellipsis uppercase max-w-[200px] overflow-hidden whitespace-nowrap">
+                            class="font-bold text-base bg-black bg-opacity-60 text-ellipsis uppercase max-w-[200px] overflow-hidden whitespace-nowrap">
                             {{ track.name }}
                         </p>
                         <div class="flex flex-row text-sm">
-                            <p class="text-ellipsis">
+                            <p class="text-ellipsis bg-black bg-opacity-60">
                                 <UBadge v-if="track.explicit" color="gray">E</UBadge>
                                 <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="track.artists"
                                     v-for="(artist, index) in track.artists" :key="index">
@@ -20,9 +22,11 @@
                                     {{ artist.name }}
                                 </span>
                             </p>
+
                         </div>
-                        <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.totalVotes }}</p>
-                        <p v-if="type === 'admin'" class="text-sm">Vots: {{ track.votes }}</p>
+                        <p v-if="type === 'vote'" class="bg-black bg-opacity-60 text-sm">Vots: {{ track.totalVotes }}
+                        </p>
+                        <p v-if="type === 'admin'" class="bg-black bg-opacity-60 text-sm">Vots: {{ track.votes }}</p>
                     </div>
                     <button @click="playTrack(track)">
                         <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
@@ -56,7 +60,8 @@
                         </span>
                     </button>
                     <div v-if="type === 'admin'" class="mx-2">
-                            <input type="checkbox" name="selected" id="selected" :checked="isSelected" @change="e => setSelected(e, bell.id, track.id)" class="h-6 w-6" >
+                        <input type="checkbox" name="selected" id="selected" :checked="isSelected"
+                            @change="e => setSelected(e, bell.id, track.id)" class="h-6 w-6">
                     </div>
                 </div>
             </div>
