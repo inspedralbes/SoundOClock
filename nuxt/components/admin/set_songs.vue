@@ -165,16 +165,16 @@ export default {
         },
         setSelected(bell, songId) {
             // Check first that the song is not already selected on another bell
-            for (const key in this.isSelected) {
-                if (this.isSelected[key] === songId && key != bell) {
-                    this.toast.add({
-                        title: 'Error',
-                        description: 'No es poden repetir cançons en diferents campanes.',
-                        color: 'red',
-                    });
-                    return;
-                }
-            }
+            // for (const key in this.isSelected) {
+            //     if (this.isSelected[key] === songId && key != bell) {
+            //         this.toast.add({
+            //             title: 'Error',
+            //             description: 'No es poden repetir cançons en diferents campanes.',
+            //             color: 'red',
+            //         });
+            //         return;
+            //     }
+            // }
 
             // If the song is not selected on another bell, set it as selected
             if (this.isSelected[bell] === songId) {
