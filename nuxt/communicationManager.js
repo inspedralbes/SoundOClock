@@ -1,9 +1,12 @@
 import { useAppStore } from "./stores/app.js";
 
-const config = useNuxtApp().$config;
-const environment = config.public;
+let url;
+setTimeout(() => {
+  const config = useNuxtApp().$config;
+  const environment = config.public;
 
-const url = environment.SOCKET_URI;
+  url = environment.SOCKET_URI;
+}, 3000);
 
 // const url = "http://presound.daw.inspedralbes.cat:8080";
 
