@@ -1,7 +1,5 @@
 import { useAppStore } from "./stores/app.js";
 
-const env = useEnv();
-
 // const url = env.SOCKET_URI;
 const url = "http://presound.daw.inspedralbes.cat:8080";
 
