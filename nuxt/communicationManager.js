@@ -1,10 +1,9 @@
 import { useAppStore } from "./stores/app.js";
 
-const env = useEnv();
 let url;
-url = env.SOCKET_URI;
 
-// const url = "http://presound.daw.inspedralbes.cat:8080";
+url = import.meta.env.VITE_APP_SOCKET_URI;
+// url = "http://localhost:8080";
 
 function getUserSelectedSongs(id) {
   const store = useAppStore();

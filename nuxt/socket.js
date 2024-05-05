@@ -4,12 +4,10 @@ import { useRouter } from "vue-router";
 import comManager from "./communicationManager";
 
 const router = useRouter();
-const env = useEnv();
-
 let url;
 
-url = env.SOCKET_URI;
-// const url = "http://presound.daw.inspedralbes.cat:8080";
+url = import.meta.env.VITE_APP_SOCKET_URI;
+// url = "http://localhost:8080";
 
 export const socket = io(url);
 
