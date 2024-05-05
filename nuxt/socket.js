@@ -7,7 +7,6 @@ let url;
 const config = useRuntimeConfig();
 
 url = config.public.SOCKET_URI;
-console.log("url", url);
 // url = "http://presound.daw.inspedralbes.cat:8080";
 
 export const socket = io(url);
