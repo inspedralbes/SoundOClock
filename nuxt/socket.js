@@ -4,9 +4,7 @@ import comManager from "./communicationManager";
 
 let url;
 
-const config = useRuntimeConfig();
-
-url = config.public.SOCKET_URI;
+url = import.meta.env.VITE_APP_SOCKET_URI;
 // url = "http://presound.daw.inspedralbes.cat:8080";
 
 export const socket = io(url);

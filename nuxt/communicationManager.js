@@ -3,7 +3,7 @@ import { useAppStore } from "./stores/app.js";
 let url;
 const config = useRuntimeConfig();
 
-url = config.public.SOCKET_URI;
+url = import.meta.env.VITE_APP_SOCKET_URI;
 // url = "http://presound.daw.inspedralbes.cat:8080";
 
 function getUserSelectedSongs(id) {
