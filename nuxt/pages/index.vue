@@ -51,7 +51,7 @@ export default {
         }
     },
     mounted() {
-        console.log(process.env);
+        console.log(process.env - VITE_APP_GOOGLE_REDIRECT_URI);
         for (let i = 0; i < 50; i++) {
             this.stars.push({
                 top: Math.random() * window.innerHeight,
