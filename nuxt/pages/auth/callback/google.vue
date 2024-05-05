@@ -48,9 +48,9 @@ export default {
                 url: 'https://oauth2.googleapis.com/token',
                 data: new URLSearchParams({
                     code: this.code,
-                    client_id: this.$config.GOOGLE_CLIENT_ID,
-                    client_secret: this.$config.GOOGLE_CLIENT_SECRET,
-                    redirect_uri: this.$config.GOOGLE_REDIRECT_URI,
+                    client_id: this.$config.public.GOOGLE_CLIENT_ID,
+                    client_secret: this.$config.public.GOOGLE_CLIENT_SECRET,
+                    redirect_uri: this.$config.public.GOOGLE_REDIRECT_URI,
                     grant_type: 'authorization_code',
                     scope: 'openid profile email'
                 }),
