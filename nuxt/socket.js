@@ -1,13 +1,14 @@
 import { io } from "socket.io-client";
 import { useAppStore } from "./stores/app";
-import { useRouter } from "vue-router";
 import comManager from "./communicationManager";
 
-// const router = useRouter();
-// const env = useEnv();
+let url;
 
-// const url = env.SOCKET_URI;
-const url = "http://presound.daw.inspedralbes.cat:8080";
+const config = useRuntimeConfig();
+
+url = config.public.SOCKET_URI;
+console.log("url", url);
+url = "http://presound.daw.inspedralbes.cat:8080";
 
 export const socket = io(url);
 

@@ -24,10 +24,10 @@ export default defineNuxtConfig({
     refreshOnResize: true
   },
   runtimeConfig: {
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     public: {
-      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-      GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
-      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
       SOCKET_URI: process.env.SOCKET_URI,
     },
     private: {

@@ -51,6 +51,7 @@ export default {
         }
     },
     mounted() {
+        console.log(this.$config)
         for (let i = 0; i < 50; i++) {
             this.stars.push({
                 top: Math.random() * window.innerHeight,
@@ -61,8 +62,8 @@ export default {
     },
     methods: {
         loginGoogle() {
-            const clientId = this.$config.public.GOOGLE_CLIENT_ID;
-            const redirectUri = this.$config.public.GOOGLE_REDIRECT_URI;
+            const clientId = this.$config.GOOGLE_CLIENT_ID;
+            const redirectUri = this.$config.GOOGLE_REDIRECT_URI;
             const state = this.generateRandomString(16);
             const scopes = [
                 'openid',
