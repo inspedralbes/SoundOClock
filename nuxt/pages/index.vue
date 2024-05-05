@@ -61,6 +61,7 @@ export default {
     },
     methods: {
         loginGoogle() {
+
             const clientId = this.$config.public.GOOGLE_CLIENT_ID;
             const redirectUri = this.$config.public.GOOGLE_REDIRECT_URI;
             const state = this.generateRandomString(16);

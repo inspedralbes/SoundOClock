@@ -34,6 +34,10 @@ Route::get('/groupCategories', [GroupCategoryController::class, 'index']);
 Route::get('/groupCategoriesAll', [GroupCategoryController::class, 'indexAll']);
 Route::get('/allSettings', [SettingController::class, 'index']);
 
+Route::get('/', function () {
+    return response()->json(['message' => 'API Laravel 8'], 200);
+});
+
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     // Auth routes

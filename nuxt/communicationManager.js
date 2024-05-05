@@ -1,10 +1,10 @@
 import { useAppStore } from "./stores/app.js";
 
-// LOCAL
-// const url = "http://localhost:8080";
+let url;
+const config = useRuntimeConfig();
 
-// PRODUCCIÓN
-const url = "http://timbre.inspedralbes.cat:8080";
+url = import.meta.env.VITE_APP_SOCKET_URI;
+// url = "http://presound.daw.inspedralbes.cat:8080";
 
 function getUserSelectedSongs(id) {
   const store = useAppStore();

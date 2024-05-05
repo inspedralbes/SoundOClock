@@ -1,12 +1,11 @@
 import { io } from "socket.io-client";
 import { useAppStore } from "./stores/app";
-import { useRouter } from "vue-router";
 import comManager from "./communicationManager";
 
-const router = useRouter();
+let url;
 
-const url = "http://timbre.inspedralbes.cat:8080";
-// const url = "http://localhost:8080";
+url = import.meta.env.VITE_APP_SOCKET_URI;
+// url = "http://presound.daw.inspedralbes.cat:8080";
 
 export const socket = io(url);
 

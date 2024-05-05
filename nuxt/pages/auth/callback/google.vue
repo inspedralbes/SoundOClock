@@ -43,6 +43,7 @@ export default {
             }
         },
         async fetchGoogle() {
+
             let googleData = {};
             const authOptions = {
                 url: 'https://oauth2.googleapis.com/token',
