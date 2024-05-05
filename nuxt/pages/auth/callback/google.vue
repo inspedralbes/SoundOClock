@@ -43,14 +43,16 @@ export default {
             }
         },
         async fetchGoogle() {
+            const config = useRuntimeConfig();
+
             let googleData = {};
             const authOptions = {
                 url: 'https://oauth2.googleapis.com/token',
                 data: new URLSearchParams({
                     code: this.code,
-                    client_id: this.$config.public.GOOGLE_CLIENT_ID,
-                    client_secret: this.$config.public.GOOGLE_CLIENT_SECRET,
-                    redirect_uri: this.$config.public.GOOGLE_REDIRECT_URI,
+                    client_id: config.GOOGLE_CLIENT_ID,
+                    client_secret: config.GOOGLE_CLIENT_SECRET,
+                    redirect_uri: config.GOOGLE_REDIRECT_URI,
                     grant_type: 'authorization_code',
                     scope: 'openid profile email'
                 }),

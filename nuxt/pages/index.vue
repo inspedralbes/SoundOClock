@@ -51,7 +51,8 @@ export default {
         }
     },
     mounted() {
-        console.log(this.$config.private.PRIVATE_GOOGLE_CLIENT_ID);
+        const config = useRuntimeConfig();
+        console.log(config);
         for (let i = 0; i < 50; i++) {
             this.stars.push({
                 top: Math.random() * window.innerHeight,
@@ -62,8 +63,10 @@ export default {
     },
     methods: {
         loginGoogle() {
-            const clientId = this.$config.public.GOOGLE_CLIENT_ID;
-            const redirectUri = this.$config.public.GOOGLE_REDIRECT_URI;
+            const config = useRuntimeConfig();
+
+            const clientId = config.GOOGLE_CLIENT_ID;
+            const redirectUri = config.GOOGLE_REDIRECT_URI;
             const state = this.generateRandomString(16);
             const scopes = [
                 'openid',
