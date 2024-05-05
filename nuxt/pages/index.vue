@@ -51,7 +51,7 @@ export default {
         }
     },
     mounted() {
-        console.log(this.$config);
+        console.log(this.$config.private.PRIVATE_GOOGLE_CLIENT_ID);
         for (let i = 0; i < 50; i++) {
             this.stars.push({
                 top: Math.random() * window.innerHeight,
