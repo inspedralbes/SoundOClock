@@ -51,6 +51,7 @@ export default {
         }
     },
     mounted() {
+        console.log(process.env);
         for (let i = 0; i < 50; i++) {
             this.stars.push({
                 top: Math.random() * window.innerHeight,
@@ -61,7 +62,6 @@ export default {
     },
     methods: {
         loginGoogle() {
-            console.log(process.env);
             const clientId = process.env.GOOGLE_CLIENT_ID;
             const redirectUri = process.env.GOOGLE_REDIRECT_URI;
             const state = this.generateRandomString(16);
