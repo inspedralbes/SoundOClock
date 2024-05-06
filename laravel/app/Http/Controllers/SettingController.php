@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class SettingController extends Controller
 {
@@ -101,6 +102,10 @@ class SettingController extends Controller
 
         if (empty($settingArray)) {
             return Setting::create($request->all());
+        }
+
+        if ($settingArray[0]->theme !== $request->theme) {
+            
         }
 
         $setting = Setting::find($settingArray[0]->id);
