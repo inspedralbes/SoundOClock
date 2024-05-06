@@ -914,6 +914,11 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("getPcDirLogs", (logs) => {
+    console.log("logs", logs);
+    socket.emit("sendPcDirLogs", logs);
+  });
+
   // socket.on('getRoles', (token) => {
   //   comManager.getRoles(token)
   //     .then((roles) => {
