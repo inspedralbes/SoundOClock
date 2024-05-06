@@ -23,7 +23,7 @@
             </div>
         </div>
     </div>
-    <UModal v-model="modals.reportUser" class="z-[9999] text-black">
+    <UModal v-model="modals.reportUser" class="z-[9999]">
         <UCard>
             <template #header>
                 <div class="flex flex-row items-center justify-between">
