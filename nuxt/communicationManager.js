@@ -152,14 +152,15 @@ async function getUserInfo(token) {
   return data;
 }
 
-async function downloadSongs(songs) {
-  const response = await fetch(`${url}/downloadSongs`, {
+async function storeSelectedSongs(token, songs) {
+  const response = await fetch(`${url}/storeSelectedSongs`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
     body: JSON.stringify({
+      token,
       songs,
     }),
   });
@@ -223,10 +224,10 @@ const comManager = {
   logout,
   getUserInfo,
   getSortedVotedSongs,
-  downloadSongs,
   createGroupCategory,
   createGroup,
   getRoles,
+  storeSelectedSongs,
 };
 
 export default comManager;
