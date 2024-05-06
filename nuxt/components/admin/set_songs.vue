@@ -97,7 +97,7 @@ export default {
         return {
             store: useAppStore(),
             loading: true,
-            groupedSongs: [],
+            groupedSongs: null,
             mostVotedSongs: [],
             isSelected: {},
             selectedSongs: [],
