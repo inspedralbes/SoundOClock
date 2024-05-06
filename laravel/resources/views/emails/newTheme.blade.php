@@ -3,70 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
     <title>Nova temàtica</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        header p {
-            color: #fff;
-            font-size: 42px;
-            font-weight: bold;
-        }
-        
-        .brand-name > span {
-            background: linear-gradient(90deg, cyan, #af4261);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        header svg {
-            width: 100px;
-            height: auto;
-            margin-right: 10px;
-        }
-
-        section {
-            background-color: #fff;
-            padding: 20px;
-            margin: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            color: #333;
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
-        p {
-            color: #666;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -230,12 +168,12 @@
         <p class="brand-name">Sound<span>O'Clock</span></p>
     </header>
     <section>
-        <h1>Hola, {{$user->name}}</h1>
-        <h2>S'ha escollit una nova temàtica: {{$theme}}!</h2>
-        <p>T'animem a votar i a compartir les teves idees sobre aquest tema emocionant! No deixis passar aquesta oportunitat. La votació acaba el proper dia {{ date('d/m/Y', strtotime($endingTime)) }}.</p>
+      <h1>Hola, {{$user->name}}</h1>
+      <h2>S'ha escollit una nova temàtica: {{$theme}}!</h2>
+      <p>T'animem a votar i a compartir les teves idees sobre aquest tema emocionant! No deixis passar aquesta oportunitat. La votació acaba el proper dia {{ date('d/m/Y', strtotime($endingTime)) }}.</p>
 
-        <p>Gràcies per ser part de la nostra comunitat!</p>
-
+      <p>Gràcies per ser part de la nostra comunitat!</p>
     </section>
+
 </body>
 </html>
