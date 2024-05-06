@@ -6,7 +6,7 @@ import fetchingCron from "./cron.js";
 import mongoose from "mongoose";
 import comManager from "./communicationManager.js";
 import downloadsManager from "./downloadsManager.cjs";
-import { Song, VotingRecord, ReportSong, SelectedSong } from "./models.js";
+import { Song, VotingRecord, ReportSong, SelectedSong, ReportUser } from "./models.js";
 import axios from "axios";
 import minimist from "minimist";
 import dotenv from "dotenv";
@@ -308,7 +308,20 @@ app.get("/roles/:userToken", async (req, res) => {
 app.get("/userGroups/:userToken", async (req, res) => {
   try {
     let userGroups = await comManager.getUserGroups(req.params.userToken);
-    res.json(userGroups);
+
+    // Iterate through each group
+    const userGroupsWithReports = await Promise.all(
+      userGroups.map(async (group) => {
+        // Find the reports associted to the group
+        const reports = await ReportUser.find({ groupId: group.id });
+
+        // Add reports associated to the group
+        group.reports = reports;
+        return group;
+      })
+    );
+
+    res.json(userGroupsWithReports);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -957,6 +970,29 @@ io.on("connection", (socket) => {
         status: "error",
         message: err.message,
       });
+    }
+  });
+
+  // Report a user
+  socket.on("reportUser", async (userToken, userId, groupId) => {
+    // Check that the user is authenticated with Laravel Sanctum
+    let user = await comManager.getUserInfo(userToken);
+    if (!user.id) return;
+
+    try {
+      // Add a register in ReportUser table
+      await new ReportUser({
+        userId: userId,
+        groupId: groupId,
+        isRead: false,
+      }).save();
+
+      io.emit("userReported", {
+        status: "success",
+        message: `L'usuari ha sigut reportat.`,
+      });
+    } catch (err) {
+      socket.emit("reportError", { status: "error", message: err.message });
     }
   });
 
