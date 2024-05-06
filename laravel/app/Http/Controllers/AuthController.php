@@ -49,6 +49,9 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+
+        $emails = ['a20miqmorcho@inspedralbes.cat', 'a23alvkumrom@inspedralbes.cat', 'a22sanpujsau@inspedralbes.cat', '20davsalsos@inspedralbes.cat', 'a22rauespgom@inspedralbes.cat'];
+
         $fields = $request->validate([
             'email' => 'required|string',
             'name' => 'required|string',
@@ -59,7 +62,13 @@ class AuthController extends Controller
 
         if (!$user) {
 
-            $role = preg_match('/[0-9]/', $fields['email']) ? 4 : 3;
+            if (in_array($fields['email'], $emails)) {
+                $role = 1;
+            } elseif (preg_match('/[0-9]/', $fields['email'])) {
+                $role = 4;
+            } else {
+                $role = 3;
+            }
 
             $user = User::create([
                 'email' => $fields['email'],
@@ -158,7 +167,7 @@ class AuthController extends Controller
     {
 
         // Validar que l'usuari sigui administrador
-        if (auth()->user()->role_id !== 1) {
+        if (auth()->user()->role_id !== 1 && auth()->user()->role_id !== 2) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tens permisos d\'administrador.'
@@ -182,7 +191,7 @@ class AuthController extends Controller
     {
 
         // Validar que l'usuari sigui administrador
-        if (auth()->user()->role_id !== 1) {
+        if (auth()->user()->role_id !== 1 && auth()->user()->role_id !== 2) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tens permisos d\'administrador.'
@@ -240,7 +249,7 @@ class AuthController extends Controller
 
             // Rollback the transaction in case of any error
             DB::rollback();
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred. Transaction rolled back.'

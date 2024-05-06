@@ -267,6 +267,7 @@ export default {
         },
         storeSongs() {
             this.modals.confirmationModal = false;
+            const token = this.store.getUser().token;
 
             let songs = [];
             for (const key in this.isSelected) {
@@ -278,11 +279,10 @@ export default {
                         break;
                     }
                 }
-                songs.push({ bellId: key, songId: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url });
-                // songs.push({ bellId: key, songId: this.isSelected[key] });
+                songs.push({ bellId: key, id: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url });
             }
 
-            comManager.downloadSongs(songs).then(() => {
+            comManager.storeSelectedSongs(token, songs).then(() => {
                 this.toast.add({
                     title: 'Cançons guardades',
                     description: 'Les cançons s\'han guardat correctament.',

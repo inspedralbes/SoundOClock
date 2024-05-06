@@ -6,7 +6,7 @@ import fetchingCron from "./cron.js";
 import mongoose from "mongoose";
 import comManager from "./communicationManager.js";
 import downloadsManager from "./downloadsManager.cjs";
-import { Song, VotingRecord, ReportSong } from "./models.js";
+import { Song, VotingRecord, ReportSong, SelectedSong } from "./models.js";
 import axios from "axios";
 import minimist from "minimist";
 import dotenv from "dotenv";
@@ -39,9 +39,6 @@ mongoose
   )
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
-
-//FETCH TO GET HTML FROM SPOTIFY
-// insertDefaultsMongo();
 
 // API routes
 app.get("/songs", async (req, res) => {
@@ -254,28 +251,64 @@ app.post("/createGroup", async (req, res) => {
   }
 });
 
-app.post("/downloadSongs", async (req, res) => {
+app.post("/storeSelectedSongs", async (req, res) => {
   try {
-    let response = await downloadsManager.downloadSongs(req.body.songs);
-    res.json(response);
+    // Check that the user is authenticated with Laravel Sanctum and is not a student
+    let user = await comManager.getUserInfo(req.body.token);
+    if (!user.id || user.role_id >= 4) return;
+
+    // Remove all selected songs from the database
+    await SelectedSong.deleteMany({});
+
+    // Save the selected songs to mongo db
+    const songs = req.body.songs;
+    songs.forEach(async (song) => {
+      await new SelectedSong({
+        id: song.id,
+        bellId: song.bellId,
+        name: song.name,
+        artists: song.artists,
+        img: song.img,
+        preview_url: song.preview_url,
+        selectedDate: new Date(),
+      }).save();
+    });
+
+    res.json({ status: "success" });
+
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-app.get("/getDownloadedSongs", (req, res) => {
+app.get('/selectedSongs', async (req, res) => {
   try {
+
+    const selectedSongs = await SelectedSong.find({});
+    await downloadsManager.downloadSongs(selectedSongs);
+
     const handleRequest = downloadsManager.getDownloadedSongs();
     handleRequest(req, res); // Pass the req, res to the handler function
+
   } catch (err) {
-    res.status(500).send("Error preparing downloads: " + err.message);
+    res.status(500).send(err);
   }
 });
+
 
 app.get("/roles/:userToken", async (req, res) => {
   try {
     let roles = await comManager.getRoles(req.params.userToken);
     res.json(roles);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/userGroups/:userToken", async (req, res) => {
+  try {
+    let userGroups = await comManager.getUserGroups(req.params.userToken);
+    res.json(userGroups);
   } catch (err) {
     res.status(500).send(err);
   }

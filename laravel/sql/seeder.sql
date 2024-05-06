@@ -1,8 +1,9 @@
-INSERT INTO `roles` (name, description) VALUES 
-('Administrator', 'All power'),
-('Moderator', 'Censor users and songs'),
-('Professor', 'User that will vote on more than one group (class)'),
-('Student', 'User that will vote in only one group (class)');
+INSERT INTO `roles` (id, name, description) VALUES 
+(1,'Tech', 'User that will have access to the tech section'),
+(2,'Administrator', 'All power'),
+(3,'Moderator', 'Censor users and songs'),
+(4,'Professor', 'User that will vote on more than one group (class)'),
+(5,'Student', 'User that will vote in only one group (class)');
 
 INSERT INTO `group_categories` (id, name, abbreviation, is_public) VALUES
 (1, 'Educació Secundària Obligatòria', 'ESO', 1),

@@ -1,10 +1,9 @@
 import { useAppStore } from "./stores/app.js";
 
 let url;
-const config = useRuntimeConfig();
 
 url = import.meta.env.VITE_APP_SOCKET_URI;
-// url = "http://presound.daw.inspedralbes.cat:8080";
+// url = "http://localhost:8080";
 
 function getUserSelectedSongs(id) {
   const store = useAppStore();
@@ -153,14 +152,15 @@ async function getUserInfo(token) {
   return data;
 }
 
-async function downloadSongs(songs) {
-  const response = await fetch(`${url}/downloadSongs`, {
+async function storeSelectedSongs(token, songs) {
+  const response = await fetch(`${url}/storeSelectedSongs`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
     body: JSON.stringify({
+      token,
       songs,
     }),
   });
@@ -212,6 +212,14 @@ export function getRoles() {
     });
 }
 
+async function getUserGroups() {
+  const store = useAppStore();
+  const response = await fetch(`${url}/userGroups/${store.getUser().token}`);
+  const data = await response.json();
+  console.log("USER GROUPS", data);
+  return data;
+}
+
 const comManager = {
   getUserSelectedSongs,
   getSongs,
@@ -224,10 +232,11 @@ const comManager = {
   logout,
   getUserInfo,
   getSortedVotedSongs,
-  downloadSongs,
   createGroupCategory,
   createGroup,
   getRoles,
+  storeSelectedSongs,
+  getUserGroups,
 };
 
 export default comManager;
