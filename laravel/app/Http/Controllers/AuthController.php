@@ -167,7 +167,7 @@ class AuthController extends Controller
     {
 
         // Validar que l'usuari sigui administrador
-        if (auth()->user()->role_id !== 1) {
+        if (auth()->user()->role_id !== 1 && auth()->user()->role_id !== 2) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tens permisos d\'administrador.'
@@ -191,7 +191,7 @@ class AuthController extends Controller
     {
 
         // Validar que l'usuari sigui administrador
-        if (auth()->user()->role_id !== 1) {
+        if (auth()->user()->role_id !== 1 && auth()->user()->role_id !== 2) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tens permisos d\'administrador.'
@@ -249,7 +249,7 @@ class AuthController extends Controller
 
             // Rollback the transaction in case of any error
             DB::rollback();
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred. Transaction rolled back.'

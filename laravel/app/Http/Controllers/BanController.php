@@ -27,7 +27,7 @@ class BanController extends Controller
     public function store(Request $request)
     {
         // Validate that user is admin
-        if (auth()->user()->role_id !== 1) {
+        if (auth()->user()->role_id !== 1 && auth()->user()->role_id !== 2) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'
@@ -50,7 +50,7 @@ class BanController extends Controller
         ]);
 
         // Check that the user is an admin
-        if (auth()->user()->role_id !== 1) {
+        if (auth()->user()->role_id !== 1 && auth()->user()->role_id !== 2) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'
@@ -113,7 +113,7 @@ class BanController extends Controller
     {
 
         // Validar que l'usuari sigui administrador
-        if (auth()->user()->role_id !== 1) {
+        if (auth()->user()->role_id !== 1 && auth()->user()->role_id !== 2) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tens permisos d\'administrador.'

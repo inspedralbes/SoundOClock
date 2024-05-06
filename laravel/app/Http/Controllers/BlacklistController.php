@@ -122,7 +122,7 @@ class BlacklistController extends Controller
         Log::info('[DEBUG] Request data: ' . json_encode($request->all()));
 
         // Check that the user is an admin
-        if (auth()->user()->role_id !== 1) {
+        if (auth()->user()->role_id !== 1 && auth()->user()->role_id !== 2) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'
@@ -147,7 +147,7 @@ class BlacklistController extends Controller
     {
 
         // Check that the user is an admin
-        if (auth()->user()->role_id !== 1) {
+        if (auth()->user()->role_id !== 1 && auth()->user()->role_id !== 2) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'
@@ -222,7 +222,7 @@ class BlacklistController extends Controller
     {
 
         // Check that the user is an admin
-        if (auth()->user()->role_id !== 1) {
+        if (auth()->user()->role_id !== 1 && auth()->user()->role_id !== 2) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have admin permissions.'
