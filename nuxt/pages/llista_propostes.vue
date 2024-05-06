@@ -12,15 +12,16 @@
             preferida</h1> -->
 
     <!-- Barra de busqueda -->
-    <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' + settings.theme }}</h1>
+    <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
+        settings.theme }}</h1>
     <div class="w-full flex flex-col justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
         <div class="w-full flex flex-row justify-center items-center">
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text"
-                :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
-                class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
-                @keydown.enter.prevent="acceptInput">
+                    :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
+                    class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
+                    @keydown.enter.prevent="acceptInput">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
                     :class="{ 'text-base': $device.isMobile }">
                     search
@@ -45,8 +46,7 @@
 
                     <!-- FILTRES PER GRUPS/CATEGORIES -->
                     <div id="filterGroup" class="flex flex-col">
-                        <button class="hover:bg-neutral-600"
-                            @click="console.log('Tots els cursos')">
+                        <button class="hover:bg-neutral-600" @click="console.log('Tots els cursos')">
                             <strong>Tots els crusos</strong>
                         </button>
 
@@ -62,11 +62,11 @@
 
                     <!-- FILTRES PER HORA -->
                     <div id="filterBell" class="flex flex-col">
-                        <button class="hover:bg-neutral-600" @click="console.log('allBells')">
+                        <button class="hover:bg-neutral-600" @click="filterBell = null">
                             <strong>Tots els horaris</strong>
                         </button>
                         <button class="hover:bg-neutral-600" v-for="bell in bells"
-                            @click="console.log('Bell: ', bell.hour)">
+                            @click="filterBell = bell.id">
                             {{ formatTime(bell.hour) }}
                         </button>
                     </div>
@@ -74,15 +74,26 @@
                 </div>
             </div>
         </div>
-        <button 
-            @click="
-                console.log('sortedSongs: ', this.store.getSortedVotedSongs());
-                console.log('classGroups: ', classGroups);
-                console.log('categories: ', categories);
-            "
-            >
+        <button @click="
+            console.log('sortedSongs: ', sortedVotedSongs);
+            console.log('classGroups: ', classGroups);
+            console.log('categories: ', categories);
+            console.log('bells: ', bells);
+        ">
             AAAA
         </button>
+        <div class="w-full flex flex-col justify-center items-center overflow-x-auto">
+            <div id="buttonsFilterGroup"
+                class="w-[70%] overflow-x-auto whitespace-nowrap flex flex-row"
+            >
+                <button 
+                    v-for="(group, index) in classGroups"
+                    class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {{ group.abbreviation }}
+                </button>
+            </div>
+        </div>
 
 
     </div>
@@ -103,7 +114,7 @@
     </div>
     <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
     <TransitionGroup name="song-slide" mode="out-in">
-        <component :is="activeSong" v-for=" track  in  filteredSongs " :key="track.id" :track="track"
+        <component :is="activeSong" v-for=" track in filteredSongs " :key="track.id" :track="track"
             :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
             @report="report($event)" :type="getType(track.id)" />
     </TransitionGroup>
@@ -116,7 +127,7 @@
         <h2 v-if="spotifySongs.length > 0" class="text-center text-3xl font-bold mt-10">Resultats de la cerca</h2>
     </Transition>
     <TransitionGroup tag="div" class="mb-20" name="song-slide">
-        <component :is="activeSong" v-for=" track  in  spotifySongs " :key="track.id" :track="track"
+        <component :is="activeSong" v-for=" track in spotifySongs " :key="track.id" :track="track"
             :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
             :type="getType(track.id)" />
     </TransitionGroup>
@@ -162,7 +173,7 @@
             <!-- <URadioGroup v-model="reportSongData.selectedOption" :options="reportSongData.options" class="mt-4">
             </URadioGroup> -->
             <div class="flex flex-col mt-4">
-                <label v-for="( option, index ) in  reportSongData.options " class="flex flex-row">
+                <label v-for="( option, index ) in reportSongData.options " class="flex flex-row">
                     <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
                     <span class="ml-2">{{ option }}</span>
                 </label>
@@ -233,6 +244,10 @@ export default {
             },
             isFiltersOpen: false,
             orderBy: '',
+            filterBell: null,
+            filterGroup: null,
+            groupedSongs: [],
+            mostVotedSongsPerBell: [],
             userSelectedSongs: computed(() => this.store.userSelectedSongs),
             store: useAppStore(),
             currentTrack: null,
@@ -285,7 +300,7 @@ export default {
                 this.settings = settings;
             }
         });
-        
+
         socket.on('songReported', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
@@ -341,11 +356,94 @@ export default {
         socket.off("sendSettings");
     },
     methods: {
+        handleResults() {
+            // Check if sortedVoted songs is loaded and set the groupedSongs
+            if (this.sortedVotedSongs.length > 0 && this.groupedSongs.length === 0) {
+                let result = this.fillMissingGroups(this.sortedVotedSongs);
+                this.groupedSongs = result;
+                console.log('groupedSongs: ', this.groupedSongs);
+            }
+            // Check if bells is loaded and set the mostVotedSongs
+            if (this.bells.length > 0 && this.groupedSongs.length > 0) {
+                this.loading = false;
+                this.mostVotedSongsPerBell = this.getMostVotedSongs(this.bells);
+                console.log('mostVotedSongsPerBell: ', this.mostVotedSongsPerBell);
+            }
+        },
+        fillMissingGroups(array) {
+            let result = []
+            let expectedGroup = 1
+            let totalGroups = this.classGroups.length
+
+            // Fill in the groups that are missing
+            for (let i = 0; i < array.length; i++) {
+                while (expectedGroup < parseInt(array[i].group)) {
+                    result.push({ group: expectedGroup, songs: [] });
+                    expectedGroup++;
+                }
+                result.push({ group: parseInt(array[i].group), songs: array[i].songs })
+                expectedGroup = parseInt(array[i].group) + 1;
+            }
+
+            // If last group in the array isn't 11, fill in the remaining groups
+            while (expectedGroup <= totalGroups) {
+                result.push({ group: expectedGroup, songs: [] });
+                expectedGroup++;
+            }
+
+            return result;
+        },
+        getMostVotedSongs(bells) {
+
+            let mostVotedSongsPerBell = bells.map(bell => {
+                let groups = bell.groups;
+                let result = []
+                for (let i = 0; i < groups.length; i++) {
+                    let groupId = groups[i].id;
+                    let groupSongs = this.groupedSongs.find(group => group.group === groupId);
+                    if (groupSongs) {
+                        result.push(...groupSongs.songs);
+                    }
+                }
+
+                // Group by song id
+                const groupedData = {};
+                result.forEach(song => {
+                    if (groupedData[song.id]) {
+                        groupedData[song.id].votes += song.votes;
+                    } else {
+                        groupedData[song.id] = { id: song.id, votes: song.votes, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
+                    }
+                });
+                const resultArray = Object.values(groupedData);
+
+                // Sort by votes
+                resultArray.sort((a, b) => b.votes - a.votes);
+
+                // Return an object with the bell name and the most voted songs
+                return { ...bell, songs: resultArray.slice(0, 5) };
+            })
+            return mostVotedSongsPerBell;
+        },
         formatTime(timeString) {
-            // Separar la cadena en horas y minutos y convertirlos a números
-            const [hours, minutes] = timeString.split(':').map(part => parseInt(part, 10));
-            // Formatear las horas y minutos
-            return `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+            // Assuming the time is in HH:MM:SS format and for today's date
+            const [hours, minutes, seconds] = timeString.split(':');
+            const date = new Date();
+            date.setHours(parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10));
+
+            // Determine whether to show minutes based on their value
+            const options = {
+                hour: 'numeric',
+                hour12: true
+            };
+            if (parseInt(minutes, 10) !== 0) {
+                options.minute = '2-digit';  // Include minutes if they are non-zero
+            }
+
+            // Format the time in AM/PM format, possibly including minutes
+            const formattedTime = date.toLocaleTimeString('en-US', options);
+
+            return formattedTime;
         },
         getSongs() {
             if (this.filter != '') {
@@ -510,23 +608,42 @@ export default {
                 }
             }
         },
+        bells: {
+            handler: 'handleResults',
+        },
+        sortedVotedSongs: {
+            handler: 'handleResults',
+        },
     },
     computed: {
         filteredSongs() {
             let array = this.songs;
+            let filtered;
 
             // if (this.filter.length < 3) return array;
+            if (this.filterBell){
+                console.log('filterBell: ', this.filterBell);
+                console.log('mostVotedSongsPerBell: ', this.mostVotedSongsPerBell);
+                let bell = this.mostVotedSongsPerBell.find(bell => bell.id === this.filterBell);
+                if(bell){
+                    filtered = bell.songs;
+                } else {
+                    filtered = [];
+                }
+            }
 
-            let filtered = array.filter(song => {
-                let songName = song.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                let filterText = this.filter.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-                return songName.includes(filterText) ||
-                    song.artists.some(artist => {
-                        let artistName = artist.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                        return artistName.includes(filterText);
-                    });
-            });
+            if(!this.filterBell && !this.filterGroup){
+                filtered = array.filter(song => {
+                    let songName = song.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                    let filterText = this.filter.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    
+                    return songName.includes(filterText) ||
+                        song.artists.some(artist => {
+                            let artistName = artist.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                            return artistName.includes(filterText);
+                        });
+                });
+            }
 
             switch (this.orderBy) {
                 case '':
@@ -537,26 +654,6 @@ export default {
                     break;
                 case 'votes-asc':
                     filtered.sort((a, b) => a.totalVotes - b.totalVotes);
-                    break;
-                case 'title-desc':
-                    filtered.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'title-asc':
-                    filtered.sort((a, b) => b.name.localeCompare(a.name));
-                    break;
-                case 'artist-desc':
-                    filtered.sort((a, b) => {
-                        let aArtistNames = a.artists.map(artist => artist.name);
-                        let bArtistNames = b.artists.map(artist => artist.name);
-                        return bArtistNames[0].localeCompare(aArtistNames[0]);
-                    });
-                    break;
-                case 'artist-asc':
-                    filtered.sort((a, b) => {
-                        let aArtistNames = a.artists.map(artist => artist.name);
-                        let bArtistNames = b.artists.map(artist => artist.name);
-                        return aArtistNames[0].localeCompare(bArtistNames[0]);
-                    });
                     break;
                 default:
                     break;
@@ -638,7 +735,7 @@ export default {
     opacity: 0;
 }
 
-.smallCaps{
+.smallCaps {
     font-variant: small-caps;
 }
 </style>
