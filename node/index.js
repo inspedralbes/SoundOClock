@@ -947,7 +947,7 @@ io.on("connection", (socket) => {
       console.log("response", response);
       settings = await comManager.getPublicSettings();
       configuration = settings;
-      socket.emit("settingsUpdated", response);
+      io.emit("settingsUpdated", response);
     } catch (err) {
       socket.emit("setSettingsError", {
         status: "error",
