@@ -78,10 +78,47 @@
             </div>
         </div>
         <div v-if="!isLoading" class="flex align-center w-4/5 mx-auto basis-1/3">
-            <UButton @click="postConf()" class="w-1/4 flex justify-center align-center ml-auto" color="green" size="xl">
-                Guardar configuracio
+            <UButton @click="modals.showSave = true" :disabled="isWaiting"
+                class="w-1/4 flex justify-center align-center ml-auto" color="green" size="xl">
+                <p v-if="!isWaiting">
+                    Guardar configuracio
+                </p>
+                <Loader v-else />
             </UButton>
         </div>
+        <UModal v-model="modals.showSave" class="z-[9999]">
+            <UCard>
+                <template #header>
+                    <div class="flex flex-row items-center justify-between rounded-lg">
+                        <div class="flex flex-row items-center">
+                            <span class="material-symbols-rounded text-[2rem] text-yellow-500 mr-4">
+                                warning
+                            </span>
+                            <h2 class="text-xl font-bold">Vols guardar la configuració?</h2>
+                        </div>
+                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                            @click="modals.showSave = false" />
+                    </div>
+                </template>
+                Al guardar la configuració, vols que reiniciar les votacions i moderacions actuals?
+
+                <template #footer>
+                    <div class="flex flex-row justify-between">
+                        <div>
+                            <UButton variant="ghost" color="gray" @click="modals.showSave = false">Cancel·lar</UButton>
+                        </div>
+                        <div class="flex flex-row">
+                            <div class="mr-2">
+                                <UButton color="red" @click="postConf(1)">Guardar i eliminar</UButton>
+                            </div>
+                            <div>
+                                <UButton @click="postConf(0)">Guardar</UButton>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </UCard>
+        </UModal>
     </div>
 </template>
 
@@ -93,6 +130,10 @@ export default {
     data() {
         return {
             isLoading: true,
+            isWaiting: false,
+            modals: {
+                showSave: false,
+            },
             settings: {
                 voteDuration: 0,
                 start_vote: null,
@@ -159,7 +200,7 @@ export default {
             return `${year}-${month}-${day}`;
         },
 
-        postConf() {
+        postConf(event) {
             let setVoteDate = {};
             let setModDate = {};
             if (this.settings.voteDuration != 0) {
@@ -174,7 +215,14 @@ export default {
                     this.settings.end_moderation = setModDate.endDate;
                 }
             }
+            this.isWaiting = true;
+            this.modals.showSave = false;
             socket.emit('setSettings', this.store.getUser().token, this.settings);
+
+            if (event === 1) {
+                socket.emit('deleteVotes');
+                // socket.emit('deleteModerations', this.store.getUser().token);
+            }
         },
 
     },
@@ -183,16 +231,31 @@ export default {
         socket.emit('getSettings', this.store.getUser().token);
 
         socket.on('sendSettings', (settings) => {
-            console.log("settings", settings);
+            this.isLoading = false;
             if (settings && !settings.message) {
                 this.settings = settings;
             }
+        });
+
+        socket.on('getSettingsError', (error) => {
+            console.log("error", error);
             this.isLoading = false;
+        });
+
+        socket.on('settingsUpdated', (message) => {
+            this.isWaiting = false;
+        });
+
+        socket.on('settingsUpdateError', (error) => {
+            this.isWaiting = false;
         });
     },
 
     beforeUnmount() {
         socket.off('sendSettings');
+        socket.off('getSettingsError');
+        socket.off('settingsUpdated');
+        socket.off('settingsUpdateError');
     },
 
     setup() {
