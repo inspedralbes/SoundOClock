@@ -1,17 +1,18 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-export const useAppStore = defineStore('app', {
+export const useAppStore = defineStore("app", {
   state: () => ({
-
-    user: typeof window !== 'undefined' && window.localStorage.getItem('user')
-      ? JSON.parse(localStorage.getItem('user')) : {
-        id: 0,
-        email: "",
-        name: "",
-        groups: [],
-        token: null,
-        role_id: null
-      },
+    user:
+      typeof window !== "undefined" && window.localStorage.getItem("user")
+        ? JSON.parse(localStorage.getItem("user"))
+        : {
+            id: 0,
+            email: "",
+            name: "",
+            groups: [],
+            token: null,
+            role_id: null,
+          },
 
     userSelectedSongs: [],
     proposedSongs: [],
@@ -32,80 +33,80 @@ export const useAppStore = defineStore('app', {
       currentTrackId: null,
       isPlaying: false,
     },
-    admin:{
-      selected_screen:0
+    admin: {
+      selected_screen: 0,
     },
     roles: [],
     serverResponse: null,
     loadingAdminComponent: null,
     blacklist: [],
-    settings:{}
+    settings: {},
   }),
   persist: {
     storage: persistedState.localStorage,
-    paths: ['user','admin']
+    paths: ["user", "admin"],
   },
   actions: {
     //getters
     getUser() {
-      return this.user
+      return this.user;
     },
     getUserSelectedSongs() {
-      return this.userSelectedSongs
+      return this.userSelectedSongs;
     },
     getProposedSongs() {
-      return this.proposedSongs
+      return this.proposedSongs;
     },
     getProposedSongsAdminView() {
-      return this.proposedSongsAdminView
+      return this.proposedSongsAdminView;
     },
     getUsersAdminView() {
-      return this.usersAdminView
+      return this.usersAdminView;
     },
     getFilter() {
-      return this.filter
+      return this.filter;
     },
     getSearchEngineFilter() {
-      return this.searchEngineFilter
+      return this.searchEngineFilter;
     },
     getIsLoadingVote() {
-      return this.isLoadingVote
+      return this.isLoadingVote;
     },
     getClassGroups() {
-      return this.classGroups
+      return this.classGroups;
     },
     getOpenMenu() {
-      return this.openMenu
+      return this.openMenu;
     },
     getAdminSelectedUser() {
-      return this.adminSelectedUser
+      return this.adminSelectedUser;
     },
     getCurrentTrackPlaying() {
-      return this.currentTrackPlaying
+      return this.currentTrackPlaying;
     },
     getBells() {
-      return this.bells
+      return this.bells;
     },
     getPostedSongStatus() {
-      return this.postedSongStatus
+      return this.postedSongStatus;
     },
     getSortedVotedSongs() {
-      return this.sortedVotedSongs
+      return this.sortedVotedSongs;
     },
     getSongStatus() {
-      return this.songStatus
+      return this.songStatus;
     },
     getRoles() {
-      return this.roles
+      return this.roles;
     },
     getServerResponse() {
-      return this.serverResponse
+      return this.serverResponse;
     },
     getLoadingAdminComponent() {
-      return this.loadingAdminComponent
+      return this.loadingAdminComponent;
     },
     getBlacklist() {
-      return this.blacklist
+      return this.blacklist;
     },
 
     //setters
@@ -125,66 +126,66 @@ export const useAppStore = defineStore('app', {
       localStorage.setItem("user", JSON.stringify(this.user));
     },
     setUserSelectedSongs(userSelectedSongs) {
-      this.userSelectedSongs = userSelectedSongs
+      this.userSelectedSongs = userSelectedSongs;
     },
     setProposedSongs(proposedSongs) {
-      this.proposedSongs = proposedSongs
+      this.proposedSongs = proposedSongs;
     },
     setUsersAdminView(usersAdminView) {
-      this.usersAdminView = usersAdminView
+      this.usersAdminView = usersAdminView;
     },
     setProposedSongsAdminView(proposedSongsAdminView) {
-      this.proposedSongsAdminView = proposedSongsAdminView
+      this.proposedSongsAdminView = proposedSongsAdminView;
     },
     setFilter(filter) {
-      this.filter = filter
+      this.filter = filter;
     },
     setSearchEngineFilter(searchEngineFilter) {
-      this.searchEngineFilter = searchEngineFilter
+      this.searchEngineFilter = searchEngineFilter;
     },
     setIsLoadingVote(isLoadingVote) {
-      this.isLoadingVote = isLoadingVote
+      this.isLoadingVote = isLoadingVote;
     },
     setClassGroups(classGroups) {
-      this.classGroups = classGroups
+      this.classGroups = classGroups;
     },
     setOpenMenu(menuState) {
-      this.openMenu = menuState
+      this.openMenu = menuState;
     },
     setCurrentTrackPlaying(currentTrackPlaying) {
-      this.currentTrackPlaying = currentTrackPlaying
+      this.currentTrackPlaying = currentTrackPlaying;
     },
     setBells(bells) {
-      this.bells = bells
+      this.bells = bells;
     },
     setPostedSongStatus(postedSongStatus) {
-      this.postedSongStatus = postedSongStatus
+      this.postedSongStatus = postedSongStatus;
     },
     setSortedVotedSongs(sortedVotedSongs) {
-      this.sortedVotedSongs = sortedVotedSongs
+      this.sortedVotedSongs = sortedVotedSongs;
     },
     setSongStatus(currentTrack, currentTrackId, isPlaying) {
-      this.songStatus.currentTrack = currentTrack
-      this.songStatus.currentTrackId = currentTrackId
-      this.songStatus.isPlaying = isPlaying
+      this.songStatus.currentTrack = currentTrack;
+      this.songStatus.currentTrackId = currentTrackId;
+      this.songStatus.isPlaying = isPlaying;
     },
     setRoles(roles) {
-      this.roles = roles
+      this.roles = roles;
     },
     setServerResponse(serverResponse) {
-      this.serverResponse = serverResponse
+      this.serverResponse = serverResponse;
     },
     setLoadingAdminComponent(loadingAdminComponent) {
-      this.loadingAdminComponent = loadingAdminComponent
+      this.loadingAdminComponent = loadingAdminComponent;
     },
     setBlacklist(blacklist) {
-      this.blacklist = blacklist
+      this.blacklist = blacklist;
     },
     setAdminSelectedScreen(screen) {
-      this.admin.selected_screen = screen
+      this.admin.selected_screen = screen;
     },
     setSettings(settings) {
-      this.settings = settings
+      this.settings = settings;
     },
 
     ///Deletes
@@ -195,25 +196,28 @@ export const useAppStore = defineStore('app', {
         name: "",
         groups: [],
         token: null,
-        role_id: null
-      }
+        role_id: null,
+      };
     },
     deleteGroup(id) {
       id = parseInt(id);
-      this.classGroups = this.classGroups.filter(group => group.id !== id);
+      this.classGroups = this.classGroups.filter((group) => group.id !== id);
     },
     deleteCurrentTrackPlaying() {
-      this.currentTrackPlaying = null
+      this.currentTrackPlaying = null;
     },
     deletePostedSongStatus() {
-      this.postedSongStatus = null
+      this.postedSongStatus = null;
+    },
+    deleteProposedSongs() {
+      this.proposedSongs = [];
     },
     setAdminSelectedUser(adminSelectedUser) {
-      this.adminSelectedUser = adminSelectedUser
+      this.adminSelectedUser = adminSelectedUser;
     },
 
-    // Other 
-    
+    // Other
+
     playTrack(track) {
       const status = this.songStatus;
       if (status.currentTrackId == track.id) {
@@ -239,4 +243,4 @@ export const useAppStore = defineStore('app', {
       return this.songStatus;
     },
   },
-})
+});
