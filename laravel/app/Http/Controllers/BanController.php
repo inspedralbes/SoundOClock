@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Ban;
 use App\Models\User;
+use App\Models\Bell;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
