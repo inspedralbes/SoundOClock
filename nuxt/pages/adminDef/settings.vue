@@ -183,7 +183,8 @@ export default {
         socket.emit('getSettings', this.store.getUser().token);
 
         socket.on('sendSettings', (settings) => {
-            if (settings) {
+            console.log("settings", settings);
+            if (settings && !settings.message) {
                 this.settings = settings;
             }
             this.isLoading = false;

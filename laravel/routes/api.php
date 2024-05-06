@@ -9,6 +9,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\BellController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\GroupCategoryController;
+use App\Http\Controllers\UserGroupsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,4 +86,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/settings', [SettingController::class, 'show']);
     Route::put('/settings', [SettingController::class, 'update']);
     Route::delete('/settings/{id}', [SettingController::class, 'destroy']);
+
+    // User groups
+    Route::get('/userGroups', [UserGroupsController::class, 'index']);
 });

@@ -36,17 +36,14 @@ class SettingController extends Controller
 
         $request->validate([
             'voteDuration' => 'integer',
-            'start_vote' => 'date',
-            'end_vote' => 'date',
+            'start_vote' => 'date|nullable',
+            'end_vote' => 'date|nullable',
             'moderationDuration' => 'integer',
-            'start_moderation' => 'date',
-            'end_moderation' => 'date',
+            'start_moderation' => 'date|nullable',
+            'end_moderation' => 'date|nullable',
             'showExplicit' => 'boolean',
             'letProposeExplicit' => 'boolean',
             'alertExplicit' => 'boolean',
-            'theme' => 'string',
-            'teacher_email_key' => 'string',
-            'student_email_key' => 'string',
         ]);
 
         return Setting::create($request->all());

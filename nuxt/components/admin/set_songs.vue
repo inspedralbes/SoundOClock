@@ -97,7 +97,7 @@ export default {
         return {
             store: useAppStore(),
             loading: true,
-            groupedSongs: [],
+            groupedSongs: null,
             mostVotedSongs: [],
             isSelected: {},
             selectedSongs: [],
@@ -125,9 +125,15 @@ export default {
         if (this.store.getClassGroups().length === 0) {
             socket.emit("getGroups");
         }
+        // Get provisional selected songs
+        socket.emit('updateProvisionalSelectedSongs', null, null);
 
         socket.on('searchResult', (results) => {
             this.spotifySongs = results;
+        });
+
+        socket.on('provisionalSelectedSongsUpdated', (selectedSongs) => {
+            this.isSelected = selectedSongs;
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -167,12 +173,12 @@ export default {
     methods: {
         handleResults() {
             // Check if sortedVoted songs is loaded and set the groupedSongs
-            if (this.sortedVotedSongs.length > 0 && this.groupedSongs.length === 0 && this.classGroups.length > 0) {
+            if (this.sortedVotedSongs.length > 0 && !this.groupedSongs && this.classGroups.length > 0) {
                 let result = this.fillMissingGroups(this.sortedVotedSongs);
                 this.groupedSongs = result;
             }
             // Check if bells is loaded and set the mostVotedSongs
-            if (this.bells.length > 0 && this.groupedSongs.length > 0) {
+            if (this.bells.length > 0 && this.groupedSongs && this.groupedSongs.length > 0) {
                 this.loading = false;
                 this.getMostVotedSongs(this.bells);
             }
@@ -239,12 +245,8 @@ export default {
             //     }
             // }
 
-            // If the song is not selected on another bell, set it as selected
-            if (this.isSelected[bell] === songId) {
-                this.isSelected[bell] = null;
-            } else {
-                this.isSelected[bell] = songId;
-            }
+            // Update the selected song
+            socket.emit('updateProvisionalSelectedSongs', bell, songId)
         },
         openModal() {
             // Check that each bell has a song selected
@@ -267,6 +269,7 @@ export default {
         },
         storeSongs() {
             this.modals.confirmationModal = false;
+            const token = this.store.getUser().token;
 
             let songs = [];
             for (const key in this.isSelected) {
@@ -278,11 +281,10 @@ export default {
                         break;
                     }
                 }
-                songs.push({ bellId: key, songId: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url });
-                // songs.push({ bellId: key, songId: this.isSelected[key] });
+                songs.push({ bellId: key, id: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url });
             }
 
-            comManager.downloadSongs(songs).then(() => {
+            comManager.storeSelectedSongs(token, songs).then(() => {
                 this.toast.add({
                     title: 'Cançons guardades',
                     description: 'Les cançons s\'han guardat correctament.',
