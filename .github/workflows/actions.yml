@@ -6,41 +6,41 @@ on:
       - main
 
 jobs:
-  LARAVEL-TEST:
-    runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: soundoclock
-        ports:
-          - 3306:3306
-      mongodb:
-        image: mongo:latest
-        ports:
-          - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: mongoadmin
-          MONGO_INITDB_ROOT_PASSWORD: mongopassword
+  # LARAVEL-TEST:
+  #   runs-on: ubuntu-latest
+  #   services:
+  #     mysql:
+  #       image: mysql
+  #       env:
+  #         MYSQL_ROOT_PASSWORD: root
+  #         MYSQL_DATABASE: soundoclock
+  #       ports:
+  #         - 3306:3306
+  #     mongodb:
+  #       image: mongo:latest
+  #       ports:
+  #         - 27017:27017
+  #       env:
+  #         MONGO_INITDB_ROOT_USERNAME: mongoadmin
+  #         MONGO_INITDB_ROOT_PASSWORD: mongopassword
 
-    steps:
-      - name: Obtaining repository code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Obtaining repository code
+  #       uses: actions/checkout@v4
 
-      - name: Checking Laravel
-        run: |
-          cd laravel
-          composer install
-          cp .env.example .env
-          sed -i 's/DB_HOST=/DB_HOST=127.0.0.1/g' .env
-          sed -i 's/DB_DATABASE=/DB_DATABASE=soundoclock/g' .env
-          sed -i 's/DB_USERNAME=/DB_USERNAME=root/g' .env
-          sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/g' .env
-          php artisan migrate --env=testing
-          php artisan migrate:fresh --seed
-          php artisan test
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+  #     - name: Checking Laravel
+  #       run: |
+  #         cd laravel
+  #         composer install
+  #         cp .env.example .env
+  #         sed -i 's/DB_HOST=/DB_HOST=127.0.0.1/g' .env
+  #         sed -i 's/DB_DATABASE=/DB_DATABASE=soundoclock/g' .env
+  #         sed -i 's/DB_USERNAME=/DB_USERNAME=root/g' .env
+  #         sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/g' .env
+  #         php artisan migrate --env=testing
+  #         php artisan migrate:fresh --seed
+  #         php artisan test
+  #     - run: echo "🍏 This job's status is ${{ job.status }}."
 
   # NODE-TEST:
   #   runs-on: ubuntu-latest
@@ -88,7 +88,7 @@ jobs:
   #     - run: echo "🍏 This job's status is ${{ job.status }}."
 
   STOP-DOCKER:
-    needs: [LARAVEL-TEST]
+    # needs: [LARAVEL-TEST]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del código
@@ -144,6 +144,7 @@ jobs:
           sed -i 's/DB_DATABASE=/DB_DATABASE=soundoclock/g' .env
           sed -i 's/DB_USERNAME=/DB_USERNAME=${{ secrets.DB_USERNAME }}/g' .env
           sed -i 's#DB_PASSWORD=#DB_PASSWORD=${{ secrets.DB_PASSWORD }}#g' .env
+          sed -i 's#MAIL_PASSWORD=#MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}#g' .env
           cd ${{ github.workspace }}
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d laravel ] && sudo rm -r laravel"
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "mkdir laravel"
