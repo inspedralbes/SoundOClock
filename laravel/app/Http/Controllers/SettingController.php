@@ -105,7 +105,7 @@ class SettingController extends Controller
         }
 
         if ($settingArray[0]->theme !== $request->theme) {
-            
+            $emails = User::pluck('email')->toArray();
         }
 
         $setting = Setting::find($settingArray[0]->id);
