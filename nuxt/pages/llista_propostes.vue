@@ -1,21 +1,14 @@
 <template>
-    <!-- <div :class="{ 'overflow-hidden max-h-dvh': (modals.alreadyVotedModal || modals.reportModal) }"> -->
-    <!-- Reproductor -->
-    <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
-        @report="report($event)" @propose="proposeSong($event)" />
+    <div v-if="checkVotingState === 'vote'">
+        <!-- Reproductor -->
+        <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
+            @report="report($event)" @propose="proposeSong($event)" />
 
-    <!-- Titulo -->
-    <!-- <h1 :class="{ 'w-full text-center text-5xl font-bold m-2': true, '!text-2xl !mr-1 !ml-1': $device.isMobile }">
-            Vota
-            la teva
-            cançó
-            preferida</h1> -->
 
-    <!-- Barra de busqueda -->
-    <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
-        settings.theme }}</h1>
-    <div class="w-full flex flex-col justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
-        <div class="w-full flex flex-row justify-center items-center">
+        <!-- Barra de busqueda -->
+        <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
+            settings.theme }}</h1>
+        <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text"
                     :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
@@ -96,29 +89,34 @@
         </div>
 
 
-    </div>
+        <!-- Listado canciones propuestas -->
+        <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
+        <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
+        <div v-if="songs.length === 0" class="mt-4 w-full">
+            <p class="text-center text-xl">Encara no s'ha proposat cap cançó.</p>
+            <p class="text-center mx-4">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile">
+                cercant a
+                la barra de búsqueda.</p>
+        </div>
 
-    <!-- Listado canciones propuestas -->
-    <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
-    <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
-    <div v-if="songs.length === 0" class="mt-4 w-full">
-        <p class="text-center text-xl">Encara no s'ha proposat cap cançó.</p>
-        <p class="text-center mx-4">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile">
-            cercant a
-            la barra de búsqueda.</p>
+        <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4  w-full">
+            <p class="text-center text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
+            <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
+        </div>
+        <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
+        <TransitionGroup name="song-slide" mode="out-in">
+            <component :is="activeSong" v-for=" track in filteredSongs " :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
+                @report="report($event)" :type="getType(track.id)" />
+        </TransitionGroup>
     </div>
-
-    <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4  w-full">
-        <p class="text-center text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
-        <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
+    <div v-else>
+        <div>
+            <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}" finalitzada
+            </h2>
+            <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
+        </div>
     </div>
-    <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
-    <TransitionGroup name="song-slide" mode="out-in">
-        <component :is="activeSong" v-for=" track in filteredSongs " :key="track.id" :track="track"
-            :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
-            @report="report($event)" :type="getType(track.id)" />
-    </TransitionGroup>
-    <!-- </div> -->
     <!-- </TransitionGroup> -->
 
 
@@ -135,7 +133,7 @@
 
     <!-- Modales -->
     <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
-    <UModal v-model="modals.alreadyVotedModal" class="z-[9999] text-black">
+    <UModal v-model="modals.alreadyVotedModal" class="z-[9999]">
         <UCard>
             <template #header>
                 <div class="flex flex-row items-center justify-between rounded-lg">
@@ -154,7 +152,7 @@
     </UModal>
 
     <!-- Modal de los reportes -->
-    <UModal v-model="modals.reportModal" class="z-[9999] text-black">
+    <UModal v-model="modals.reportModal" class="z-[9999]">
         <UCard>
             <template #header>
                 <div class="flex flex-row items-center justify-between">
@@ -198,7 +196,7 @@
     </UModal>
 
     <!-- Modal de error al proponer mas de una cancion -->
-    <UModal v-model="modals.proposeSongError" class="z-[9999] text-black">
+    <UModal v-model="modals.proposeSongError" class="z-[9999]">
         <UCard>
             <template #header>
                 <div class="flex flex-row items-center justify-between">
@@ -226,7 +224,7 @@ import comManager from '../communicationManager';
 export default {
     data() {
         return {
-            settings: {},
+            settings: computed(() => this.store.settings),
             filter: '',
             modals: {
                 alreadyVotedModal: false,
@@ -294,12 +292,7 @@ export default {
             }
         });
 
-        socket.on('sendSettings', (settings) => {
-            console.log("settings", settings);
-            if (settings != null) {
-                this.settings = settings;
-            }
-        });
+        socket.emit('getSettings', this.store.getUser().token);
 
         socket.on('songReported', (data) => {
             this.modals.reportModal = false;
@@ -582,6 +575,7 @@ export default {
         searchBySongId(id) {
             return this.spotifySongs.find(item => item.id == id);
         },
+
     },
     watch: {
         songs: { // Each time songs change execute search() method
@@ -679,6 +673,20 @@ export default {
         categories() {
             return this.store.getCategories();
         },
+        checkVotingState() {
+            let today = new Date();
+            let startVote = new Date(this.settings.start_vote);
+            let endVote = new Date(this.settings.end_vote);
+            let startMod = new Date(this.settings.start_moderation);
+            let endMod = new Date(this.settings.end_moderation);
+            if (today <= endVote) {
+                return "vote";
+            } else if (today > startMod && today <= endMod) {
+                return "mod";
+            } else {
+                return "none";
+            }
+        }
     },
 }
 

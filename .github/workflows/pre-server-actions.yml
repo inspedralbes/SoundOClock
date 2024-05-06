@@ -1,9 +1,9 @@
 name: Sound O'Clock Deploy Actions
-run-name: ${{ github.actor }} is deploying Sound O'Clock 🌯
+run-name: ${{ github.actor }} is deploying Sound O'Clock on pre-production server 🌯
 on:
   push:
     branches:
-      - main
+      - pre-main
 
 jobs:
   LARAVEL-TEST:
@@ -96,9 +96,9 @@ jobs:
 
       - name: Conexión al servidor y stop de docker-compose
         run: |
-          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          echo "${{ secrets.PRE_SECRET_KEY }}" > ~/prod_key.pem
           chmod 600 ~/prod_key.pem
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "docker compose down"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "docker compose down"
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
   FILL-DOCKER-COMPOSE:
@@ -111,11 +111,11 @@ jobs:
       - name: Update Docker Compose
         run: |
           echo "Connecting to the server and running docker-compose commands"
-          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          echo "${{ secrets.PRE_SECRET_KEY }}" > ~/prod_key.pem
           chmod 600 ~/prod_key.pem
 
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "rm -f docker-compose.yml"
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./docker-compose.yml ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:docker-compose.yml
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "rm -f docker-compose.yml"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./docker-compose.yml ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }}:docker-compose.yml
 
           sed -i 's#MYSQL_ROOT_PASSWORD:#MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}#g' docker-compose.yml
           sed -i 's#MONGO_INITDB_ROOT_USERNAME:#MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}#g' docker-compose.yml
@@ -124,7 +124,7 @@ jobs:
           sed -i 's#ME_CONFIG_MONGODB_ADMINPASSWORD:#ME_CONFIG_MONGODB_ADMINPASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}#g' docker-compose.yml
           sed -i 's#ME_CONFIG_BASICAUTH_USERNAME:#ME_CONFIG_BASICAUTH_USERNAME: ${{ secrets.MONGO_USER }}#g' docker-compose.yml
           sed -i 's#ME_CONFIG_BASICAUTH_PASSWORD:#ME_CONFIG_BASICAUTH_PASSWORD: ${{ secrets.MONGO_PASSWORD }}#g' docker-compose.yml
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./docker-compose.yml ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:docker-compose.yml
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./docker-compose.yml ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }}:docker-compose.yml
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
   LARAVEL-DEPLOY:
@@ -136,7 +136,7 @@ jobs:
 
       - name: Laravel Deploy
         run: |
-          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          echo "${{ secrets.PRE_SECRET_KEY }}" > ~/prod_key.pem
           chmod 600 ~/prod_key.pem
           cd laravel
           cp .env.example .env
@@ -145,11 +145,11 @@ jobs:
           sed -i 's/DB_USERNAME=/DB_USERNAME=${{ secrets.DB_USERNAME }}/g' .env
           sed -i 's#DB_PASSWORD=#DB_PASSWORD=${{ secrets.DB_PASSWORD }}#g' .env
           cd ${{ github.workspace }}
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d laravel ] && sudo rm -r laravel"
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "mkdir laravel"
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:laravel
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/.env ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:laravel
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "chmod -R 775 laravel/"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "[ -d laravel ] && sudo rm -r laravel"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "mkdir laravel"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/* ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }}:laravel
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/.env ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }}:laravel
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "chmod -R 775 laravel/"
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
   NODE-DEPLOY:
@@ -161,23 +161,23 @@ jobs:
 
       - name: Node Deploy
         run: |
-          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          echo "${{ secrets.PRE_SECRET_KEY }}" > ~/prod_key.pem
           chmod 600 ~/prod_key.pem
           cd node
           cp .env.example .env
           sed -i 's#NODE_ENV=#NODE_ENV=production#g' .env
           sed -i "s#SPOTIFY_CLIENT_ID=#SPOTIFY_CLIENT_ID=$(echo "${{ secrets.SPOTIFY_CLIENT_ID }}")#g" .env
           sed -i "s#SPOTIFY_CLIENT_SECRET=#SPOTIFY_CLIENT_SECRET=$(echo "${{ secrets.SPOTIFY_CLIENT_SECRET }}")#g" .env
-          sed -i "s#PRODUCTION_API_URL=#PRODUCTION_API_URL=$(echo "${{ secrets.PRODUCTION_API_URL }}")#g" .env
+          sed -i "s#PRODUCTION_API_URL=#PRODUCTION_API_URL=$(echo "${{ secrets.PREPRODUCTION_API_URI }}")#g" .env
           sed -i "s#MONGO_USER=#MONGO_USER=$(echo "${{ secrets.MONGO_INITDB_ROOT_USERNAME }}")#g" .env
           sed -i "s#MONGO_PASSWORD=#MONGO_PASSWORD=$(echo "${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}")#g" .env
 
           cd ${{ github.workspace }}
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d node ] && sudo rm -r node"
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "mkdir node"
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./node/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:node
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./node/.env ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:node
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "chmod -R 775 node/"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "[ -d node ] && sudo rm -r node"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "mkdir node"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./node/* ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }}:node
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./node/.env ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }}:node
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "chmod -R 775 node/"
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
   NUXT-DEPLOY:
@@ -189,7 +189,7 @@ jobs:
 
       - name: Front Deploy
         run: |
-          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          echo "${{ secrets.PRE_SECRET_KEY }}" > ~/prod_key.pem
           chmod 600 ~/prod_key.pem
           cd ${{ github.workspace }}
           cd nuxt
@@ -198,11 +198,11 @@ jobs:
           npm install -D sass
           sed -i 's/GOOGLE_CLIENT_ID=/GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}/g' .env
           sed -i 's/GOOGLE_CLIENT_SECRET=/GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}/g' .env
-          sed -i 's#GOOGLE_REDIRECT_URI=#GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}#g' .env
-          sed -i 's#VITE_APP_SOCKET_URI=#VITE_APP_SOCKET_URI=${{ secrets.PRODUCTION_SOCKET_URI }}#g' .env
+          sed -i 's#GOOGLE_REDIRECT_URI=#GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_PRE_REDIRECT_URI }}#g' .env
+          sed -i 's#VITE_APP_SOCKET_URI=#VITE_APP_SOCKET_URI=${{ secrets.PREPRODUCTION_SOCKET_URI }}#g' .env
           npm run build
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d nuxt ] && sudo rm -r nuxt"
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r .output ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:nuxt
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "[ -d nuxt ] && sudo rm -r nuxt"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r .output ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }}:nuxt
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
   START-DOCKER:
@@ -211,10 +211,10 @@ jobs:
     steps:
       - name: Start Docker
         run: |
-          echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
+          echo "${{ secrets.PRE_SECRET_KEY }}" > ~/prod_key.pem
           chmod 600 ~/prod_key.pem
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "docker compose up -d"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "docker compose up -d"
       - name: Iniciar Portainer
         run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "docker start portainer"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "docker start portainer"
       - run: echo "🍏 This job's status is ${{ job.status }}."

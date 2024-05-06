@@ -33,17 +33,20 @@ export const useAppStore = defineStore('app', {
       currentTrackId: null,
       isPlaying: false,
     },
+    admin:{
+      selected_screen:0
+    },
     roles: [],
     serverResponse: null,
     loadingAdminComponent: null,
     blacklist: [],
+    settings:{}
   }),
   persist: {
     storage: persistedState.localStorage,
-    paths: ['user']
+    paths: ['user','admin']
   },
   actions: {
-
     //getters
     getUser() {
       return this.user
@@ -184,6 +187,12 @@ export const useAppStore = defineStore('app', {
     setBlacklist(blacklist) {
       this.blacklist = blacklist
     },
+    setAdminSelectedScreen(screen) {
+      this.admin.selected_screen = screen
+    },
+    setSettings(settings) {
+      this.settings = settings
+    },
 
     ///Deletes
     deleteUser() {
@@ -234,7 +243,7 @@ export const useAppStore = defineStore('app', {
         this.songStatus.currentTrack.play();
         this.songStatus.isPlaying = true;
       }
-      // return this.songStatus;
+      return this.songStatus;
     },
   },
 })
