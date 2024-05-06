@@ -46,6 +46,9 @@ export default {
             this.pcStatus = data;
         });
 
+        socket.on('sendPcDirLogs', (data) => {
+            this.pcLogs = data;
+        });
     },
     methods: {
         executeScript() {
