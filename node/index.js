@@ -277,26 +277,22 @@ app.post("/storeSelectedSongs", async (req, res) => {
     });
 
     res.json({ status: "success" });
-
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-app.get('/selectedSongs', async (req, res) => {
+app.get("/selectedSongs", async (req, res) => {
   try {
-
     const selectedSongs = await SelectedSong.find({});
     await downloadsManager.downloadSongs(selectedSongs);
 
     const handleRequest = downloadsManager.getDownloadedSongs();
     handleRequest(req, res); // Pass the req, res to the handler function
-
   } catch (err) {
     res.status(500).send(err);
   }
 });
-
 
 app.get("/roles/:userToken", async (req, res) => {
   try {
@@ -387,7 +383,7 @@ io.on("connection", (socket) => {
       });
   });
 
-  socket.on('updateProvisionalSelectedSongs', (bellId, songId) => {
+  socket.on("updateProvisionalSelectedSongs", (bellId, songId) => {
     if (bellId && songId) {
       // If the song is already selected, unselect it
       if (provisionalSelectedSongs[bellId] === songId) {
@@ -397,8 +393,8 @@ io.on("connection", (socket) => {
       }
     }
 
-    io.emit('provisionalSelectedSongsUpdated', provisionalSelectedSongs);
-  })
+    io.emit("provisionalSelectedSongsUpdated", provisionalSelectedSongs);
+  });
 
   // Post song checking for duplicates first
   socket.on("postSong", async (userToken, songData) => {
@@ -977,6 +973,20 @@ io.on("connection", (socket) => {
         status: "error",
         message: err.message,
       });
+    }
+  });
+
+  socket.on("deleteVotes", async (token) => {
+    try {
+      await ReportSong.deleteMany({});
+      console.log("ReportSong collection cleared");
+      await Song.deleteMany({});
+      console.log("Song collection cleared");
+      await VotingRecord.deleteMany({});
+      console.log("VotingRecord collection cleared");
+      socket.emit("votesDeleted", { status: "success" });
+    } catch (err) {
+      console.error(err);
     }
   });
 
