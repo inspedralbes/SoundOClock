@@ -125,9 +125,15 @@ export default {
         if (this.store.getClassGroups().length === 0) {
             socket.emit("getGroups");
         }
+        // Get provisional selected songs
+        socket.emit('updateProvisionalSelectedSongs', null, null);
 
         socket.on('searchResult', (results) => {
             this.spotifySongs = results;
+        });
+
+        socket.on('provisionalSelectedSongsUpdated', (selectedSongs) => {
+            this.isSelected = selectedSongs;
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -239,12 +245,8 @@ export default {
             //     }
             // }
 
-            // If the song is not selected on another bell, set it as selected
-            if (this.isSelected[bell] === songId) {
-                this.isSelected[bell] = null;
-            } else {
-                this.isSelected[bell] = songId;
-            }
+            // Update the selected song
+            socket.emit('updateProvisionalSelectedSongs', bell, songId)
         },
         openModal() {
             // Check that each bell has a song selected

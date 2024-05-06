@@ -40,6 +40,8 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
+const provisionalSelectedSongs = {};
+
 // API routes
 app.get("/songs", async (req, res) => {
   try {
@@ -384,6 +386,19 @@ io.on("connection", (socket) => {
         console.error(err);
       });
   });
+
+  socket.on('updateProvisionalSelectedSongs', (bellId, songId) => {
+    if (bellId && songId) {
+      // If the song is already selected, unselect it
+      if (provisionalSelectedSongs[bellId] === songId) {
+        provisionalSelectedSongs[bellId] = null;
+      } else {
+        provisionalSelectedSongs[bellId] = songId;
+      }
+    }
+
+    io.emit('provisionalSelectedSongsUpdated', provisionalSelectedSongs);
+  })
 
   // Post song checking for duplicates first
   socket.on("postSong", async (userToken, songData) => {
