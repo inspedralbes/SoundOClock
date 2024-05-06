@@ -305,6 +305,15 @@ app.get("/roles/:userToken", async (req, res) => {
   }
 });
 
+app.get("/userGroups/:userToken", async (req, res) => {
+  try {
+    let userGroups = await comManager.getUserGroups(req.params.userToken);
+    res.json(userGroups);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {
