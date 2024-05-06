@@ -7,7 +7,7 @@
     <title>Nuevo tema</title>
 </head>
 <body>
-    <h1>Hola, {{$usuario->name}}</h1>
+    <h1>Hola, {{$user->name}}</h1>
     <p>Se ha creado un nuevo tema en el foro</p>
 </body>
 </html>

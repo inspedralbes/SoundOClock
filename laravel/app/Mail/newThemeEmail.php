@@ -35,7 +35,7 @@ class newThemeEmail extends Mailable
     }
 
     public function build(){
-        return $this->view('emails.newThemeEmail')->with(['user' => $this->user]);
+        return $this->view('emails.newTheme')->with(['user' => $this->user]);
     }
 
 }
