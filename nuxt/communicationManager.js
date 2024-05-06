@@ -205,6 +205,14 @@ export function getRoles() {
         });
 }
 
+async function getUserGroups() {
+    const store = useAppStore();
+    const response = await fetch(`${url}/userGroups/${store.getUser().token}`);
+    const data = await response.json();
+    console.log("USER GROUPS", data);
+    return data;
+}
+
 const comManager = {
     getUserSelectedSongs,
     getSongs,
@@ -221,6 +229,7 @@ const comManager = {
     createGroupCategory,
     createGroup,
     getRoles,
+    getUserGroups,
 };
 
 export default comManager;
