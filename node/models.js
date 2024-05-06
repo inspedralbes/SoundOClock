@@ -29,8 +29,19 @@ const reportSongSchema = new mongoose.Schema({
   isRead: Boolean,
 });
 
+const selectedSongSchema = new mongoose.Schema({
+  id: String,
+  bellId: Number,
+  name: String,
+  artists: [Object],
+  img: String,
+  preview_url: String,
+  selectedDate: Date,
+});
+
 const VotingRecord = mongoose.model('VotingRecord', votingRecordSchema);
 const Song = mongoose.model('Song', songSchema);
 const ReportSong = mongoose.model('ReportSong', reportSongSchema);
+const SelectedSong = mongoose.model('SelectedSong', selectedSongSchema);
 
-export { Song, VotingRecord, ReportSong }
+export { Song, VotingRecord, ReportSong, SelectedSong }
