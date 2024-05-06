@@ -173,12 +173,12 @@ export default {
     methods: {
         handleResults() {
             // Check if sortedVoted songs is loaded and set the groupedSongs
-            if (this.sortedVotedSongs.length > 0 && this.groupedSongs.length === 0 && this.classGroups.length > 0) {
+            if (this.sortedVotedSongs.length > 0 && !this.groupedSongs && this.classGroups.length > 0) {
                 let result = this.fillMissingGroups(this.sortedVotedSongs);
                 this.groupedSongs = result;
             }
             // Check if bells is loaded and set the mostVotedSongs
-            if (this.bells.length > 0 && this.groupedSongs.length > 0) {
+            if (this.bells.length > 0 && this.groupedSongs && this.groupedSongs.length > 0) {
                 this.loading = false;
                 this.getMostVotedSongs(this.bells);
             }
