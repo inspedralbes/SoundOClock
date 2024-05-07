@@ -101,6 +101,18 @@ socket.on("connect", () => {
     }
   });
 
+  socket.on("settingsUpdated", (settings) => {
+    if (settings != null) {
+      pinia.setSettings(settings);
+    }
+  });
+
+  socket.on("votesDeleted", (data) => {
+    console.log("socket votesDeleted data received", data);
+    pinia.deleteCurrentTrackPlaying();
+    pinia.deleteProposedSongs();
+  });
+
   socket.on("disconnect", () => {});
 
   // FUNCTIONS START

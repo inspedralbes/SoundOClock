@@ -411,6 +411,19 @@ async function getPublicSettings() {
   return response.data[0];
 }
 
+async function getUserGroups(token) {
+  const response = await fetch(apiURL + `userGroups`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -443,6 +456,7 @@ const comManager = {
   getAllGroupsAndCategories,
   createGroupCategory,
   createGroup,
+  getUserGroups,
 };
 
 export default comManager;

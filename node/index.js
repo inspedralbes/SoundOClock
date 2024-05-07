@@ -40,6 +40,8 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
+const provisionalSelectedSongs = {};
+
 // API routes
 app.get("/songs", async (req, res) => {
   try {
@@ -275,31 +277,36 @@ app.post("/storeSelectedSongs", async (req, res) => {
     });
 
     res.json({ status: "success" });
-
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-app.get('/selectedSongs', async (req, res) => {
+app.get("/selectedSongs", async (req, res) => {
   try {
-
     const selectedSongs = await SelectedSong.find({});
     await downloadsManager.downloadSongs(selectedSongs);
 
     const handleRequest = downloadsManager.getDownloadedSongs();
     handleRequest(req, res); // Pass the req, res to the handler function
-
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-
 app.get("/roles/:userToken", async (req, res) => {
   try {
     let roles = await comManager.getRoles(req.params.userToken);
     res.json(roles);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/userGroups/:userToken", async (req, res) => {
+  try {
+    let userGroups = await comManager.getUserGroups(req.params.userToken);
+    res.json(userGroups);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -374,6 +381,19 @@ io.on("connection", (socket) => {
       .catch((err) => {
         console.error(err);
       });
+  });
+
+  socket.on("updateProvisionalSelectedSongs", (bellId, songId) => {
+    if (bellId && songId) {
+      // If the song is already selected, unselect it
+      if (provisionalSelectedSongs[bellId] === songId) {
+        provisionalSelectedSongs[bellId] = null;
+      } else {
+        provisionalSelectedSongs[bellId] = songId;
+      }
+    }
+
+    io.emit("provisionalSelectedSongsUpdated", provisionalSelectedSongs);
   });
 
   // Post song checking for duplicates first
@@ -890,6 +910,11 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("getPcDirLogs", (logs) => {
+    console.log("logs", logs);
+    socket.emit("sendPcDirLogs", logs);
+  });
+
   // socket.on('getRoles', (token) => {
   //   comManager.getRoles(token)
   //     .then((roles) => {
@@ -924,7 +949,7 @@ io.on("connection", (socket) => {
       console.log("response", response);
       settings = await comManager.getPublicSettings();
       configuration = settings;
-      socket.emit("settingsUpdated", response);
+      io.emit("settingsUpdated", response);
     } catch (err) {
       socket.emit("setSettingsError", {
         status: "error",
@@ -948,6 +973,20 @@ io.on("connection", (socket) => {
         status: "error",
         message: err.message,
       });
+    }
+  });
+
+  socket.on("deleteVotes", async (token) => {
+    try {
+      await ReportSong.deleteMany({});
+      console.log("ReportSong collection cleared");
+      await Song.deleteMany({});
+      console.log("Song collection cleared");
+      await VotingRecord.deleteMany({});
+      console.log("VotingRecord collection cleared");
+      socket.emit("votesDeleted", { status: "success" });
+    } catch (err) {
+      console.error(err);
     }
   });
 
