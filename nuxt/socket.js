@@ -5,7 +5,7 @@ import comManager from "./communicationManager";
 let url;
 
 url = import.meta.env.VITE_APP_SOCKET_URI;
-url = "http://presound.daw.inspedralbes.cat:8080";
+url = "http://presound.daw.inspedralbes.cat/node/";
 console.log("url", url);
 
 export const socket = io(url);
