@@ -20,7 +20,6 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.set("trust proxy", true);
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -28,9 +27,12 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"],
   },
+  path: "/node/",
 });
 console.log(server);
 console.log(io);
+
+app.set("trust proxy", 1);
 
 const port = 8080;
 const mongoUser = process.env.MONGO_USER;
