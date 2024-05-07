@@ -27,12 +27,7 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"],
   },
-  path: "/socket.io",
 });
-console.log(server);
-console.log(io);
-
-app.set("trust proxy", 1);
 
 const port = 8080;
 const mongoUser = process.env.MONGO_USER;
