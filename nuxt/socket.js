@@ -7,7 +7,9 @@ let url;
 url = import.meta.env.VITE_APP_SOCKET_URI;
 console.log("url", url);
 
-export const socket = io(url);
+export const socket = io({
+  path: "/socket",
+});
 
 socket.on("connect", () => {
   const pinia = useAppStore();

@@ -27,6 +27,7 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"],
   },
+  path: "/socket",
 });
 
 const port = 8080;
