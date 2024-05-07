@@ -27,7 +27,7 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"],
   },
-  path: "/node/",
+  path: "/socket.io",
 });
 console.log(server);
 console.log(io);
