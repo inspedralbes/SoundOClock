@@ -11,7 +11,7 @@ class GroupCategoryController extends Controller
      * Display a listing of the resource.
      */
     public function index() {
-        return GroupCategory::where('is_public', '<>', 0)->get();
+        return GroupCategory::with('groups')->where('is_public', '<>', 0)->get();
     }
 
     /**
