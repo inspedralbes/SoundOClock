@@ -3,12 +3,14 @@ import { exec, execFile } from "child_process";
 import fs from "fs";
 import yauzl from "yauzl"
 
-let url = "http://192.168.220.11:8080";
+let url = "http://localhost:8080";
 // let url = "http://timbre.inspedralbes.cat:8080";
 
 const socket = io(url);
-const Script = `C:\\Users\\SoundO'Clock\\Desktop\\script\\ScriptLaunch.bat`;
-const apiUrl = "http://192.168.220.11:8080/selectedSongs";
+// const Script = `C:\\Users\\SoundO'Clock\\Desktop\\script\\ScriptLaunch.bat`;
+
+const Script = `C:\\Users\\a20miqmorcho_insped2\\Downloads\\repo\\tr3-soundoclock\\PCDireccio\\script\\ScriptLaunch.bat`;
+const apiUrl = "http://localhost:8080/selectedSongs";
 // const apiUrl = "http://timbre.inspedralbes.cat:8080/selectedSongs";
 socket.on("connect", () => {
     console.log("Connected to the server");
