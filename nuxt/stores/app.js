@@ -117,6 +117,7 @@ export const useAppStore = defineStore("app", {
       this.user.groups = groups;
       this.user.token = token;
       this.user.role_id = role_id;
+      console.log(this.user);
 
       localStorage.setItem("user", JSON.stringify(this.user));
     },
