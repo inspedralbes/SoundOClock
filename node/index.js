@@ -28,6 +28,9 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+console.log(server);
+console.log(io);
+
 const port = 8080;
 const mongoUser = process.env.MONGO_USER;
 const mongoPassword = process.env.MONGO_PASSWORD;
