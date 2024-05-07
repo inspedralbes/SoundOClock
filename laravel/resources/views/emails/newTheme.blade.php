@@ -68,6 +68,24 @@
             font-size: 16px;
             line-height: 1.5;
         }
+
+        button{
+            width: 50%; 
+            display: block; 
+            margin: 0 auto; 
+            background-color: #af4261; 
+            color: #fff; 
+            padding: 10px; 
+            border: none; 
+            border-radius: 5px; 
+            font-size: 18px; 
+        }
+
+        button a{
+            text-decoration: none; 
+            color: #fff;
+        }
+
     </style>
 </head>
 <body>
@@ -83,6 +101,8 @@
         <p>T'animem a votar i a compartir les teves idees sobre aquest tema emocionant! No deixis passar aquesta oportunitat. La votació acaba el proper dia {{ date('d/m/Y', strtotime($endingTime)) }}.</p>
 
         <p>Gràcies per ser part de la nostra comunitat!</p>
+
+        <button><a href="http://timbre.inspedralbes.cat">Vota aquí!</a></button>
 
     </section>
 </body>
