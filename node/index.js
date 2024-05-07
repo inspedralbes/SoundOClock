@@ -878,7 +878,7 @@ io.on("connection", (socket) => {
 
   socket.on("dirPC", () => {
     dirPC = socket.id;
-    socket.emit("dirPCStatus", true);
+    socket.broadcast.emit("dirPCStatus", true);
   });
 
   socket.on("sendBells", () => {
@@ -912,7 +912,7 @@ io.on("connection", (socket) => {
 
   socket.on("getPcDirLogs", (logs) => {
     console.log("logs", logs);
-    socket.emit("sendPcDirLogs", logs);
+    socket.broadcast.emit("sendPcDirLogs", logs);
   });
 
   // socket.on('getRoles', (token) => {
@@ -994,8 +994,9 @@ io.on("connection", (socket) => {
     amountUsers--;
     console.log("User disconnected. Total users:", amountUsers);
     if (socket.id === dirPC) {
+      console.log("dirPC disconnected");
       dirPC = null;
-      socket.emit("dirPCStatus", false);
+      socket.broadcast.emit("dirPCStatus", false);
     }
   });
 

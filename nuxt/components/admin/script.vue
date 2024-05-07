@@ -11,7 +11,9 @@
         </div>
         <div class="mt-20 mx-auto bg-black h-96 w-2/4 rounded-xl">
             <span class="w-full h-full flex flex-col justify-end">
-                {{ logs }}
+                <span v-for="log in logs" class="ml-2">
+                    {{ log }}
+                </span>
             </span>
 
         </div>
@@ -35,7 +37,7 @@ export default {
     data() {
         return {
             pcStatus: false,
-            pcLogs: ''
+            pcLogs: []
         }
     },
     mounted() {
@@ -44,10 +46,11 @@ export default {
 
         socket.on('dirPCStatus', (data) => {
             this.pcStatus = data;
+            console.log(this.pcStatus);
         });
 
         socket.on('sendPcDirLogs', (data) => {
-            this.pcLogs = data;
+            this.pcLogs = data.split('\n');
         });
     },
     computed: {
@@ -59,8 +62,10 @@ export default {
         executeScript() {
             socket.emit('sendBells');
         }
+    },
+    beforeDestroy() {
+        socket.off('dirPCStatus');
+        socket.off('sendPcDirLogs');
     }
 }
 </script>
-
-<style scoped></style>
