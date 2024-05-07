@@ -11,7 +11,7 @@
         </div>
         <div class="mt-20 mx-auto bg-black h-96 w-2/4 rounded-xl">
             <span class="w-full h-full flex flex-col justify-end">
-                {{ pcLogs }}
+                {{ logs }}
             </span>
 
         </div>
@@ -46,6 +46,11 @@ export default {
             this.pcStatus = data;
         });
 
+    },
+    computed: {
+        logs() {
+            return this.pcLogs;
+        }
     },
     methods: {
         executeScript() {
