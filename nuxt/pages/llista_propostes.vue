@@ -69,17 +69,41 @@
             </div>
         </div>
         <div class="w-full flex flex-col items-center overflow-x-auto min-h-20">
-            <div id="buttonsFilterGroup" class="overflow-x-auto whitespace-nowrap flex flex-row pt-2 pb-2 gap-2">
-                <button :class="filterGroup === null ? 'bg-neutral-800' : ''"
-                    class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-700 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    @click="selectGroup(null)">
-                    Tots els grups
-                </button>
-                <button v-for="(group, index) in groupsAvailable" @click="selectGroup(group.id)"
-                    :class="filterGroup === group.id ? 'bg-neutral-800' : ''"
-                    class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-700 text-center disabled:opacity-50 disabled:cursor-not-allowed">
-                    {{ group.abbreviation }}
-                </button>
+            <div v-if="classGroups.length > 0" id="buttonsFilterGroup">
+                <div v-if="groupsAvailable.length > 0" id="buttonsFilterGroupAvailable" class="overflow-x-auto whitespace-nowrap flex flex-row pt-2 pb-2 gap-2">
+                    <button :class="filterGroup === null ? 'bg-neutral-800' : ''"
+                        class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-700 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        @click="selectGroup(null)">
+                        Tots els grups
+                    </button>
+                    <button v-for="(group, index) in groupsAvailable" @click="selectGroup(group.id)"
+                        :class="filterGroup === group.id ? 'bg-neutral-800' : ''"
+                        class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-700 text-center disabled:opacity-50 disabled:cursor-not-allowed">
+                        {{ group.abbreviation }}
+                    </button>
+                </div>
+                <div v-else
+                    class="appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                        No hi ha cap grup en aquesta franja horària
+                    
+                </div>
+                
+
+            </div>
+            <div v-else class="loader">
+                <div class="bar1"></div>
+                <div class="bar2"></div>
+                <div class="bar3"></div>
+                <div class="bar4"></div>
+                <div class="bar5"></div>
+                <div class="bar6"></div>
+                <div class="bar7"></div>
+                <div class="bar8"></div>
+                <div class="bar9"></div>
+                <div class="bar10"></div>
+                <div class="bar11"></div>
+                <div class="bar12"></div>
             </div>
         </div>
 
@@ -683,7 +707,7 @@ export default {
             return this.store.getClassGroups();
         },
         groupsAvailable() {
-            let groupsAvailable
+            let groupsAvailable = [];
 
             if (this.filterBell === null) {
                 return this.classGroups;
@@ -691,7 +715,10 @@ export default {
 
             if (this.filterBell) {
                 // get groups from bell
-                groupsAvailable = this.mostVotedSongsPerBell.find(bell => bell.id === this.filterBell).groups;
+                let b = this.bells.find(bell => bell.id === this.filterBell)
+                if(b){
+                    groupsAvailable = b.groups;
+                }
             }
 
             return groupsAvailable;
@@ -719,33 +746,123 @@ export default {
 </script>
 
 <style scoped>
+.loader {
+    position: relative;
+    width: 54px;
+    height: 54px;
+    border-radius: 10px;
+}
+
+.loader div {
+    width: 8%;
+    height: 24%;
+    background: rgb(128, 128, 128);
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    opacity: 0;
+    border-radius: 50px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    animation: fade458 1s linear infinite;
+}
+
+@keyframes fade458 {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0.25;
+    }
+}
+
+.loader .bar1 {
+    transform: rotate(0deg) translate(0, -130%);
+    animation-delay: 0s;
+}
+
+.loader .bar2 {
+    transform: rotate(30deg) translate(0, -130%);
+    animation-delay: -1.1s;
+}
+
+.loader .bar3 {
+    transform: rotate(60deg) translate(0, -130%);
+    animation-delay: -1s;
+}
+
+.loader .bar4 {
+    transform: rotate(90deg) translate(0, -130%);
+    animation-delay: -0.9s;
+}
+
+.loader .bar5 {
+    transform: rotate(120deg) translate(0, -130%);
+    animation-delay: -0.8s;
+}
+
+.loader .bar6 {
+    transform: rotate(150deg) translate(0, -130%);
+    animation-delay: -0.7s;
+}
+
+.loader .bar7 {
+    transform: rotate(180deg) translate(0, -130%);
+    animation-delay: -0.6s;
+}
+
+.loader .bar8 {
+    transform: rotate(210deg) translate(0, -130%);
+    animation-delay: -0.5s;
+}
+
+.loader .bar9 {
+    transform: rotate(240deg) translate(0, -130%);
+    animation-delay: -0.4s;
+}
+
+.loader .bar10 {
+    transform: rotate(270deg) translate(0, -130%);
+    animation-delay: -0.3s;
+}
+
+.loader .bar11 {
+    transform: rotate(300deg) translate(0, -130%);
+    animation-delay: -0.2s;
+}
+
+.loader .bar12 {
+    transform: rotate(330deg) translate(0, -130%);
+    animation-delay: -0.1s;
+}
+
 #buttonsFilterGroup {
     width: calc(60% + 150px);
 }
 
-#buttonsFilterGroup::-webkit-scrollbar {
+#buttonsFilterGroupAvailable::-webkit-scrollbar {
     height: 12px;
     /* Altura de la barra de desplazamiento */
 }
 
-#buttonsFilterGroup::-webkit-scrollbar-track {
+#buttonsFilterGroupAvailable::-webkit-scrollbar-track {
     background-color: transparent;
 }
 
-#buttonsFilterGroup::-webkit-scrollbar-thumb {
+#buttonsFilterGroupAvailable::-webkit-scrollbar-thumb {
     background-color: #888;
     /* Color del botón de la barra de desplazamiento */
     border-radius: 5px;
     /* Radio de borde del botón de la barra de desplazamiento */
 }
 
-#buttonsFilterGroup::-webkit-scrollbar-thumb:hover {
+#buttonsFilterGroupAvailable::-webkit-scrollbar-thumb:hover {
     background-color: #555;
     /* Color del botón de la barra de desplazamiento al pasar el mouse */
     cursor: grab;
 }
 
-#buttonsFilterGroup::-webkit-scrollbar-thumb:active {
+#buttonsFilterGroupAvailable::-webkit-scrollbar-thumb:active {
     background-color: #333;
     /* Color del botón de la barra de desplazamiento cuando está siendo activo */
     cursor: grabbing;
