@@ -22,7 +22,10 @@ socket.on("connect", () => {
     pinia.setIsLoadingVote({ state: false, selectedSong: null });
   });
 
-  socket.on("songReported", (data) => {});
+  socket.on("reportError", (data) => {
+    console.log("socket reportError data received", data);
+    pinia.setServerResponse(data);
+  });
 
   socket.on("notifyServerResponse", (data) => {
     console.log("socket notifyServerResponse data received", data);
@@ -59,7 +62,7 @@ socket.on("connect", () => {
     pinia.deleteGroup(data.group_id);
   });
 
-  socket.on("groupUpdated", (data) => {});
+  socket.on("groupUpdated", (data) => { });
 
   socket.on("songPosted", (data) => {
     console.log("socket songPosted data", data);
@@ -113,7 +116,7 @@ socket.on("connect", () => {
     pinia.deleteProposedSongs();
   });
 
-  socket.on("disconnect", () => {});
+  socket.on("disconnect", () => { });
 
   // FUNCTIONS START
   function getUserSelectedSongs(id) {

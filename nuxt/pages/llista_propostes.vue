@@ -1,5 +1,5 @@
 <template>
-    <div v-if="checkVotingState === 'vote'">
+    <div v-if="checkVotingState === 'vote' || checkVotingState === 'none'">
         <!-- Reproductor -->
         <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
             @report="report($event)" @propose="proposeSong($event)" />
@@ -7,7 +7,7 @@
 
         <!-- Barra de busqueda -->
         <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
-            settings.theme }}</h1>
+        settings.theme }}</h1>
         <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text"
@@ -242,6 +242,22 @@ export default {
 
         socket.emit('getSettings', this.store.getUser().token);
 
+    },
+    mounted() {
+        comManager.getSongs();
+        comManager.getUserSelectedSongs(this.store.getUser().id);
+
+        socket.on('reportError', (data) => {
+            this.modals.reportModal = false;
+            this.isReportLoading = false;
+
+            this.toast.add({
+                title: 'Error',
+                description: `${data.message}`,
+                color: 'red',
+            });
+        });
+
         socket.on('songReported', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
@@ -256,21 +272,7 @@ export default {
         socket.on('reportError', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
-
-            this.toast.add({
-                title: 'Error',
-                description: `${data.message}`,
-                color: 'red',
-            });
         });
-    },
-    mounted() {
-        comManager.getSongs();
-        comManager.getUserSelectedSongs(this.store.getUser().id);
-
-
-
-
 
         socket.on("voteError", (data) => {
             this.serverResponse = data;

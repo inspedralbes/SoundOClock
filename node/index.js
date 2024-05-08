@@ -698,7 +698,7 @@ io.on("connection", (socket) => {
         isRead: false,
       }).save();
 
-      io.emit("songReported", {
+      socket.emit("songReported", {
         status: "success",
         message: `La cançó ${song.name} ha sigut reportada`,
       });
