@@ -23,6 +23,7 @@ export const useAppStore = defineStore("app", {
     searchEngineFilter: "",
     isLoadingVote: false,
     classGroups: [],
+    categories: [],
     openMenu: false,
     adminSelectedUser: null,
     bells: [],
@@ -74,6 +75,9 @@ export const useAppStore = defineStore("app", {
     },
     getClassGroups() {
       return this.classGroups;
+    },
+    getCategories() {
+      return this.categories
     },
     getOpenMenu() {
       return this.openMenu;
@@ -149,6 +153,9 @@ export const useAppStore = defineStore("app", {
     },
     setClassGroups(classGroups) {
       this.classGroups = classGroups;
+    },
+    setCategories(categories) {
+      this.categories = categories
     },
     setOpenMenu(menuState) {
       this.openMenu = menuState;

@@ -89,4 +89,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // User groups
     Route::get('/userGroups', [UserGroupsController::class, 'index']);
+    Route::delete('/group/{group_id}/user/{user_id}', [UserGroupsController::class, 'delete']);
 });

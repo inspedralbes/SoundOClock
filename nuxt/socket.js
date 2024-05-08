@@ -18,11 +18,15 @@ socket.on("connect", () => {
 
   socket.on("voteCasted", (data) => {
     comManager.getSongs();
+    comManager.getSortedVotedSongs();
     comManager.getUserSelectedSongs(pinia.getUser().id);
     pinia.setIsLoadingVote({ state: false, selectedSong: null });
   });
 
-  socket.on("songReported", (data) => {});
+  socket.on("reportError", (data) => {
+    console.log("socket reportError data received", data);
+    pinia.setServerResponse(data);
+  });
 
   socket.on("notifyServerResponse", (data) => {
     console.log("socket notifyServerResponse data received", data);
@@ -32,6 +36,7 @@ socket.on("connect", () => {
   socket.on("songDeleted", (data) => {
     console.log("socket songDeleted data received", data);
     comManager.getSongs();
+    comManager.getSortedVotedSongs();
     // comManager.getAdminSongs();
     refreshAdminSongsView(data.song);
   });
@@ -60,11 +65,12 @@ socket.on("connect", () => {
     pinia.deleteGroup(data.group_id);
   });
 
-  socket.on("groupUpdated", (data) => {});
+  socket.on("groupUpdated", (data) => { });
 
   socket.on("songPosted", (data) => {
     console.log("socket songPosted data", data);
     comManager.getSongs();
+    comManager.getSortedVotedSongs();
     comManager.getAdminSongs();
     pinia.setPostedSongStatus(data);
   });
@@ -112,6 +118,10 @@ socket.on("connect", () => {
     console.log("socket votesDeleted data received", data);
     pinia.deleteCurrentTrackPlaying();
     pinia.deleteProposedSongs();
+  });
+
+  socket.on("userDeletedFromGroup", (data) => {
+    console.log("socket userDeletedFromGroup data received", data);
   });
 
   socket.on("disconnect", () => {});
