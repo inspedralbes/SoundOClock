@@ -5,7 +5,6 @@ import comManager from "./communicationManager";
 let url;
 
 url = import.meta.env.VITE_APP_SOCKET_URI;
-console.log("url", url);
 
 export const socket = io({
   path: "/socket",
