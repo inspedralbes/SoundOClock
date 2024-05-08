@@ -247,17 +247,6 @@ export default {
         comManager.getSongs();
         comManager.getUserSelectedSongs(this.store.getUser().id);
 
-        socket.on('reportError', (data) => {
-            this.modals.reportModal = false;
-            this.isReportLoading = false;
-
-            this.toast.add({
-                title: 'Error',
-                description: `${data.message}`,
-                color: 'red',
-            });
-        });
-
         socket.on('songReported', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
