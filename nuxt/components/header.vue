@@ -9,6 +9,11 @@
             <!--MOBILE AND TABLET DESIGN-->
             <div v-if="$device.isMobileOrTablet" class="flex flex-row items-center gap-3 relative">
                 <!--NAVBAR BURGER BUTTON-->
+                <button v-if="user.role_id <= 3" class="flex flex-row items-center" @click="goToAdmin">
+                    <span class="material-symbols-outlined text-black text-[2rem]">
+                        admin_panel_settings
+                    </span>
+                </button>
                 <button class="flex flex-row items-center" @click="feedback()">
                     <span class="material-symbols-outlined text-black text-[2rem]">
                         unknown_document
@@ -36,6 +41,7 @@
             </div>
             <!--DESKTOP DESIGN-->
             <div v-else class="flex flex-row justify-center gap-8 text-black text-lg">
+                <button v-if="user.role_id <= 3" @click="goToAdmin">Administració</button>
                 <button @click="feedback()">Feedback</button>
                 <button @click="logout()">Tancar Sessió</button>
             </div>
@@ -50,7 +56,9 @@ import comManager from '../communicationManager';
 export default {
     data() {
         return {
-            showDropdown: false
+            store: useAppStore(),
+            showDropdown: false,
+            user: computed(() => this.store.getUser()),
         }
     },
     methods: {
@@ -64,10 +72,17 @@ export default {
         },
         logout() {
             navigateTo({ path: '/logout' });
+        },
+        goToAdmin() {
+            console.log('goToAdmin');
+            this.$router.push('/admin');
+            navigateTo({ path: '/admin' });
         }
     },
     created() {
 
+    },
+    mounted() {
     },
     computed: {
 

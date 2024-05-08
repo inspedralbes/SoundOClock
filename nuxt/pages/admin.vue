@@ -95,6 +95,14 @@
                 <span
                     :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Configuració</span>
             </button>
+            <button @click="$router.push('/llista_propostes')"
+                :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 3 }">
+                <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
+                    keyboard_return
+                </span>
+                <span
+                    :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Configuració</span>
+            </button>
         </template>
     </SideBarMenu>
     <!-- </div> -->
