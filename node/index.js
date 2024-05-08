@@ -973,26 +973,73 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Report a user
+  // Report a user does not belong to a group
   socket.on("reportUser", async (userToken, userId, groupId) => {
     // Check that the user is authenticated with Laravel Sanctum
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
 
     try {
-      // Add a register in ReportUser table
-      await new ReportUser({
-        userId: userId,
-        groupId: groupId,
-        isRead: false,
-      }).save();
 
-      io.emit("userReported", {
+      // Check if a user in a group has already been reported
+      const alreadyReported = await ReportUser.findOne({ userId: userId, groupId: groupId });
+
+      // If it has not been reported yet add a register in ReportUser table
+      if (!alreadyReported) {
+        await new ReportUser({
+          userId: userId,
+          groupId: groupId,
+        }).save();
+      }
+
+      // Notify the user that has made the report
+      socket.emit("notifyServerResponse", {
         status: "success",
         message: `L'usuari ha sigut reportat.`,
       });
+
     } catch (err) {
       socket.emit("reportError", { status: "error", message: err.message });
+    }
+  });
+
+  // Delete a user does not belong to a group report
+  socket.on("userReportChecked", async (userToken, userId, groupId) => {
+    // Check that the user is authenticated with Laravel Sanctum
+    let user = await comManager.getUserInfo(userToken);
+    if (!user.id) return;
+
+    try {
+
+      // Check if the song exists and delete it
+      await ReportUser.findOneAndDelete({ userId: userId, groupId: groupId });
+
+    } catch (err) {
+      socket.emit("reportError", { status: "error", message: err.message });
+    }
+  });
+
+  // Delete a user from a group
+  socket.on("deleteUserFromGroup", async (userToken, userId, groupId) => {
+    // Check that the user is authenticated with Laravel Sanctum
+    let user = await comManager.getUserInfo(userToken);
+    if (!user.id) return;
+
+    try {
+      const response = await comManager.deleteUserFromGroup(userToken, groupId, userId);
+      console.log("resposta", response);
+
+      // Notify the user that has deleted the user from the group
+      socket.emit("notifyServerResponse", {
+        status: "success",
+        message: `L'usuari ${response.user.name} ha sigut eliminat del grup ${response.group.abbreviation}.`,
+      });
+
+    } catch (err) {
+      socket.emit("notifyServerResponse", {
+        status: "error",
+        message: `No s'ha pogut eliminar l'usuari.`,
+      });
     }
   });
 
