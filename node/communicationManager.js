@@ -424,6 +424,19 @@ async function getUserGroups(token) {
   return jsonResponse;
 }
 
+async function deleteUserFromGroup(token, group_id, user_id) {
+  const response = await fetch(apiURL + `group/${group_id}/user/${user_id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -457,6 +470,7 @@ const comManager = {
   createGroupCategory,
   createGroup,
   getUserGroups,
+  deleteUserFromGroup,
 };
 
 export default comManager;
