@@ -493,13 +493,6 @@ export default {
             const song = { songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
             socket.emit('reportSong', this.store.getUser().token, song);
         },
-        goToProposar() {
-            if (this.currentTrack != null) {
-                this.currentTrack.pause();
-            }
-            this.store.deleteCurrentTrackPlaying();
-            this.$router.push('/llistatPerProposar');
-        },
         vote(songId) {
             if (!this.isLoadingVote.state) {
                 // if (this.userSelectedSongsvotedSongs && this.userSelectedSongs.votedSongs.length == 2 && !this.userSelectedSongs.votedSongs.includes(songId)) {

@@ -469,12 +469,36 @@ io.on("connection", (socket) => {
 
       if (!votingRecord) {
         let userGroups = user.groups.map((group) => group.id);
-        await new VotingRecord({
+        let votingRecord = new VotingRecord({
           userId: user.id,
           submitted: true,
           votedSongs: [],
           groups: userGroups,
-        }).save();
+        });
+
+        // Process to ADD a vote to the newSong
+        // Check if the user can vote a song
+        if (user.vote_banned_until < new Date().toISOString().substring(0, 10) || user.vote_banned_until == null) {
+          // Añadir un voto a la canción
+          newSong.totalVotes += 1;
+          // Actualizar el recuento de votos por grupo de la newSong
+          user.groups.forEach((group) => {
+            let votes = newSong.votesPerGroup.get(group.id.toString());
+            if (votes > 0) {
+              newSong.votesPerGroup.set(group.id.toString(), votes + 1);
+            } else {
+              newSong.votesPerGroup.set(group.id.toString(), 1);
+            }
+          });
+          
+          // Añadir la canción a la lista de canciones votadas del usuario
+          votingRecord.votedSongs.push(songData.id);
+
+          // Guardar la canción y actualizar el registro de votación
+          await newSong.save();
+          await votingRecord.save();
+        }
+        await votingRecord.save();
         // await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [], groups: userGroups }).save();
       } else {
         votingRecord.submitted = true;
