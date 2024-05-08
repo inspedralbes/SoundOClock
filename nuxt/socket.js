@@ -18,6 +18,7 @@ socket.on("connect", () => {
 
   socket.on("voteCasted", (data) => {
     comManager.getSongs();
+    comManager.getSortedVotedSongs();
     comManager.getUserSelectedSongs(pinia.getUser().id);
     pinia.setIsLoadingVote({ state: false, selectedSong: null });
   });
@@ -35,6 +36,7 @@ socket.on("connect", () => {
   socket.on("songDeleted", (data) => {
     console.log("socket songDeleted data received", data);
     comManager.getSongs();
+    comManager.getSortedVotedSongs();
     // comManager.getAdminSongs();
     refreshAdminSongsView(data.song);
   });
@@ -67,6 +69,7 @@ socket.on("connect", () => {
   socket.on("songPosted", (data) => {
     console.log("socket songPosted data", data);
     comManager.getSongs();
+    comManager.getSortedVotedSongs();
     comManager.getAdminSongs();
     pinia.setPostedSongStatus(data);
   });

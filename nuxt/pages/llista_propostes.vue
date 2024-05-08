@@ -28,19 +28,61 @@
                     </button>
                 </Transition>
             </div>
-            <select v-model.lazy="orderBy"
-                class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                :class="{ 'text-sm !p-2': $device.isMobile }" :disabled="songs.length == 0">
-                <option value="" disabled selected>Filtre</option>
-                <option value="votes-desc">Més vots</option>
-                <option value="votes-asc">Menys vots</option>
-                <option value="title-desc">Títol (A-Z)</option>
-                <option value="title-asc">Títol (Z-A)</option>
-                <option value="artist-desc">Artista (A-Z)</option>
-                <option value="artist-asc">Artista (Z-A)</option>
-            </select>
+            <div class="dropdown relative z-50">
+                <button
+                    class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    id="buttonFilters" @click="isFiltersOpen = !isFiltersOpen">
+                    {{ this.filterBell ? formatTime(bells.find((bell) => bell.id === this.filterBell).hour) : 'Filtres'
+                    }}
+                </button>
+                <div v-if="isFiltersOpen" id="contentDropDownFilters"
+                    class="absolute bg-neutral-700 overflow-auto h-96 w-40">
 
+                    <!-- FILTRES PER ORDRE -->
+                    <div id="filterOrderby" class="flex flex-col">
+                        <button class="hover:bg-neutral-600 pt-[7px]" @click="orderBy = ''">
+                            <strong>Ordenar per</strong>
+                        </button>
+                        <button :class="orderBy === 'votes-desc' ? 'bg-neutral-600' : 'hover:bg-neutral-600'"
+                            @click="orderBy = 'votes-desc'">
+                            Més votades
+                        </button>
+                        <button :class="orderBy === 'votes-asc' ? 'bg-neutral-600' : 'hover:bg-neutral-600'"
+                            @click="orderBy = 'votes-asc'">
+                            Menys votades
+                        </button>
+                    </div>
+
+                    <!-- FILTRES PER HORA -->
+                    <div id="filterBell" class="flex flex-col">
+                        <button class="hover:bg-neutral-600 pt-[7px]" @click="selectBell(null)">
+                            <strong>Tots els horaris</strong>
+                        </button>
+                        <button class="pb-[3px]"
+                            :class="filterBell === bell.id ? 'bg-neutral-600' : 'hover:bg-neutral-600'"
+                            v-for="bell in bells" @click="selectBell(bell.id)" :key="'bell' + bell.hour">
+                            {{ formatTime(bell.hour) }}
+                        </button>
+                    </div>
+
+                </div>
+            </div>
         </div>
+        <div class="w-full flex flex-col items-center overflow-x-auto min-h-20">
+            <div id="buttonsFilterGroup" class="overflow-x-auto whitespace-nowrap flex flex-row pt-2 pb-2 gap-2">
+                <button :class="filterGroup === null ? 'bg-neutral-800' : ''"
+                    class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-700 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    @click="selectGroup(null)">
+                    Tots els grups
+                </button>
+                <button v-for="(group, index) in groupsAvailable" @click="selectGroup(group.id)"
+                    :class="filterGroup === group.id ? 'bg-neutral-800' : ''"
+                    class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-700 text-center disabled:opacity-50 disabled:cursor-not-allowed">
+                    {{ group.abbreviation }}
+                </button>
+            </div>
+        </div>
+
 
         <!-- Listado canciones propuestas -->
         <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
@@ -193,7 +235,12 @@ export default {
                 options: ["La cançó té contingut inadequat", "La cançó no s'adequa a la temàtica"],
                 selectedOption: "La cançó té contingut inadequat"
             },
+            isFiltersOpen: false,
             orderBy: '',
+            filterBell: null,
+            filterGroup: null,
+            groupedSongs: [],
+            mostVotedSongsPerBell: [],
             userSelectedSongs: computed(() => this.store.userSelectedSongs),
             store: useAppStore(),
             currentTrack: null,
@@ -273,6 +320,20 @@ export default {
             this.modals.reportModal = false;
             this.isReportLoading = false;
         });
+    },
+    mounted() {
+        comManager.getSongs();
+        comManager.getBells();
+        comManager.getUserSelectedSongs(this.store.getUser().id);
+
+        comManager.getSortedVotedSongs();
+        comManager.getPublicGroupsAndCategories().then((data) => {
+            this.store.setClassGroups(data.publicGroups);
+            this.store.setCategories(data.publicCategories);
+        });
+        socket.emit('getSettings', this.store.getUser().token);
+
+
 
         socket.on("voteError", (data) => {
             this.serverResponse = data;
@@ -293,6 +354,89 @@ export default {
         socket.off("sendSettings");
     },
     methods: {
+        handleResults() {
+            // Check if sortedVoted songs is loaded and set the groupedSongs
+            if (this.sortedVotedSongsByGroups.length > 0 && this.groupedSongs.length === 0) {
+                let result = this.fillMissingGroups(this.sortedVotedSongsByGroups);
+                this.groupedSongs = result;
+            }
+            // Check if bells is loaded and set the mostVotedSongs
+            if (this.bells.length > 0 && this.groupedSongs.length > 0) {
+                this.loading = false;
+                this.mostVotedSongsPerBell = this.getMostVotedSongs(this.bells);
+            }
+        },
+        fillMissingGroups(array) {
+            let result = []
+            let expectedGroup = 1
+            let totalGroups = this.classGroups.length
+
+            // Fill in the groups that are missing
+            for (let i = 0; i < array.length; i++) {
+                while (expectedGroup < parseInt(array[i].group)) {
+                    result.push({ group: expectedGroup, songs: [] });
+                    expectedGroup++;
+                }
+                result.push({ group: parseInt(array[i].group), songs: array[i].songs })
+                expectedGroup = parseInt(array[i].group) + 1;
+            }
+
+            // If last group in the array isn't 11, fill in the remaining groups
+            while (expectedGroup <= totalGroups) {
+                result.push({ group: expectedGroup, songs: [] });
+                expectedGroup++;
+            }
+
+            return result;
+        },
+        getMostVotedSongs(bells) {
+
+            let mostVotedSongsPerBell = bells.map(bell => {
+                let groups = bell.groups;
+                let result = []
+                for (let i = 0; i < groups.length; i++) {
+                    let groupId = groups[i].id;
+                    let groupSongs = this.sortedVotedSongsByGroups.find(group => parseInt(group.group) === groupId);
+                    if (groupSongs) {
+                        result.push(...groupSongs.songs);
+                    }
+                }
+
+                // Group by song id
+                const groupedData = {};
+                result.forEach(song => {
+                    if (groupedData[song.id]) {
+                        groupedData[song.id].totalVotes += song.votes;
+                    } else {
+                        groupedData[song.id] = { id: song.id, totalVotes: song.votes, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
+                    }
+                });
+                const resultArray = Object.values(groupedData);
+
+                // Sort by votes
+                resultArray.sort((a, b) => b.totalVotes - a.totalVotes);
+
+                // Return an object with the bell name and the most voted songs
+                return { ...bell, songs: resultArray.slice(0, 5) };
+            })
+            return mostVotedSongsPerBell;
+        },
+        formatTime(hourString) {
+            // Parseamos la cadena de tiempo en un objeto Date
+            let parsedTime = new Date("2000-01-01T" + hourString);
+
+            // Obtenemos las horas y minutos del objeto Date
+            let hours = parsedTime.getHours();
+            let minutes = parsedTime.getMinutes().toString().padStart(2, '0'); // Siempre queremos que los minutos tengan dos dígitos
+
+            // Formateamos la hora en el formato deseado
+            let formattedHour = hours.toString();
+            if (hours < 10) {
+                formattedHour = "" + formattedHour; // Agregamos un 0 si las horas son menores que 10
+            }
+
+            return formattedHour + ":" + minutes;
+        },
         getSongs() {
             if (this.filter != '') {
                 socket.emit('searchSong', this.filter);
@@ -430,6 +574,13 @@ export default {
         searchBySongId(id) {
             return this.spotifySongs.find(item => item.id == id);
         },
+        selectBell(bellId) {
+            this.filterBell = bellId;
+            this.filterGroup = null
+        },
+        selectGroup(groupId) {
+            this.filterGroup = groupId;
+        },
 
     },
     watch: {
@@ -457,14 +608,20 @@ export default {
                 }
             }
         },
+        bells: {
+            handler: 'handleResults',
+        },
+        sortedVotedSongsByGroups: {
+            handler: 'handleResults',
+        },
     },
     computed: {
         filteredSongs() {
             let array = this.songs;
+            let filtered = [];
 
-            // if (this.filter.length < 3) return array;
 
-            let filtered = array.filter(song => {
+            filtered = array.filter(song => {
                 let songName = song.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
                 let filterText = this.filter.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -475,6 +632,31 @@ export default {
                     });
             });
 
+            if (this.filterBell) {
+                let bell = this.mostVotedSongsPerBell.find(bell => bell.id === this.filterBell);
+                if (bell) {
+                    filtered = bell.songs;
+
+                } else {
+                    filtered = [];
+                }
+            }
+            if (this.filterGroup) {
+                let filteredByGroup = this.sortedVotedSongsByGroups.find(group => parseInt(group.group) === this.filterGroup);
+
+                if (!filteredByGroup) {
+                    filtered = [];
+                } else {
+                    // forEach song in songs of filteredByGroup, add the attribute totalVotes with the same value of votes
+                    filteredByGroup.songs.forEach(song => {
+                        song.totalVotes = song.votes;
+                    });
+
+                    filtered = filteredByGroup.songs;
+                }
+            }
+
+
             switch (this.orderBy) {
                 case '':
                     filtered.sort((a, b) => b.totalVotes - a.totalVotes);
@@ -484,26 +666,6 @@ export default {
                     break;
                 case 'votes-asc':
                     filtered.sort((a, b) => a.totalVotes - b.totalVotes);
-                    break;
-                case 'title-desc':
-                    filtered.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'title-asc':
-                    filtered.sort((a, b) => b.name.localeCompare(a.name));
-                    break;
-                case 'artist-desc':
-                    filtered.sort((a, b) => {
-                        let aArtistNames = a.artists.map(artist => artist.name);
-                        let bArtistNames = b.artists.map(artist => artist.name);
-                        return bArtistNames[0].localeCompare(aArtistNames[0]);
-                    });
-                    break;
-                case 'artist-asc':
-                    filtered.sort((a, b) => {
-                        let aArtistNames = a.artists.map(artist => artist.name);
-                        let bArtistNames = b.artists.map(artist => artist.name);
-                        return aArtistNames[0].localeCompare(bArtistNames[0]);
-                    });
                     break;
                 default:
                     break;
@@ -516,6 +678,32 @@ export default {
         },
         activePlayer() {
             return this.activePlayer[this.mobileDetector];
+        },
+        bells() {
+            return this.store.getBells();
+        },
+        sortedVotedSongsByGroups() {
+            return this.store.getSortedVotedSongs();
+        },
+        classGroups() {
+            return this.store.getClassGroups();
+        },
+        groupsAvailable() {
+            let groupsAvailable
+
+            if (this.filterBell === null) {
+                return this.classGroups;
+            }
+
+            if (this.filterBell) {
+                // get groups from bell
+                groupsAvailable = this.mostVotedSongsPerBell.find(bell => bell.id === this.filterBell).groups;
+            }
+
+            return groupsAvailable;
+        },
+        categories() {
+            return this.store.getCategories();
         },
         checkVotingState() {
             let today = new Date();
@@ -537,6 +725,77 @@ export default {
 </script>
 
 <style scoped>
+#buttonsFilterGroup {
+    width: calc(60% + 150px);
+}
+
+#buttonsFilterGroup::-webkit-scrollbar {
+    height: 12px;
+    /* Altura de la barra de desplazamiento */
+}
+
+#buttonsFilterGroup::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+#buttonsFilterGroup::-webkit-scrollbar-thumb {
+    background-color: #888;
+    /* Color del botón de la barra de desplazamiento */
+    border-radius: 5px;
+    /* Radio de borde del botón de la barra de desplazamiento */
+}
+
+#buttonsFilterGroup::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+    /* Color del botón de la barra de desplazamiento al pasar el mouse */
+    cursor: grab;
+}
+
+#buttonsFilterGroup::-webkit-scrollbar-thumb:active {
+    background-color: #333;
+    /* Color del botón de la barra de desplazamiento cuando está siendo activo */
+    cursor: grabbing;
+}
+
+
+#contentDropDownFilters {
+    border-radius: 10px;
+}
+
+#contentDropDownFilters::-webkit-scrollbar {
+    width: 10px;
+    /* Ancho de la barra de desplazamiento */
+}
+
+#contentDropDownFilters::-webkit-scrollbar-track {
+    background: none;
+    /* Hacemos transparente el fondo del riel */
+}
+
+#contentDropDownFilters::-webkit-scrollbar-thumb {
+    background-color: #999;
+    /* Color del pulgar */
+    border-radius: 10px;
+    /* Bordes redondos */
+}
+
+#contentDropDownFilters::-webkit-scrollbar-thumb:hover {
+    background-color: #666;
+    /* Color del pulgar al pasar el mouse */
+    cursor: grab;
+}
+
+#contentDropDownFilters::-webkit-scrollbar-thumb:active {
+    background-color: #333;
+    /* Color del pulgar cuando está siendo activo */
+    cursor: grabbing;
+}
+
+#contentDropDownFilters::-webkit-scrollbar-button {
+    display: none;
+    /* Ocultamos los botones de la barra de desplazamiento */
+}
+
 .song-slide-enter-active,
 .song-slide-leave-active,
 .song-slide-move {
