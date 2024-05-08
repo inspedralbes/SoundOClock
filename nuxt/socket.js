@@ -119,7 +119,11 @@ socket.on("connect", () => {
     pinia.deleteProposedSongs();
   });
 
-  socket.on("disconnect", () => { });
+  socket.on("userDeletedFromGroup", (data) => {
+    console.log("socket userDeletedFromGroup data received", data);
+  });
+
+  socket.on("disconnect", () => {});
 
   // FUNCTIONS START
   function getUserSelectedSongs(id) {
