@@ -292,7 +292,14 @@ export default {
     },
     mounted() {
         comManager.getSongs();
+        comManager.getBells();
         comManager.getUserSelectedSongs(this.store.getUser().id);
+
+        comManager.getSortedVotedSongs();
+        comManager.getPublicGroupsAndCategories().then((data) => {
+            this.store.setClassGroups(data.publicGroups);
+            this.store.setCategories(data.publicCategories);
+        });
 
         socket.on('reportError', (data) => {
             this.modals.reportModal = false;
@@ -320,20 +327,8 @@ export default {
             this.modals.reportModal = false;
             this.isReportLoading = false;
         });
-    },
-    mounted() {
-        comManager.getSongs();
-        comManager.getBells();
-        comManager.getUserSelectedSongs(this.store.getUser().id);
-
-        comManager.getSortedVotedSongs();
-        comManager.getPublicGroupsAndCategories().then((data) => {
-            this.store.setClassGroups(data.publicGroups);
-            this.store.setCategories(data.publicCategories);
-        });
+        
         socket.emit('getSettings', this.store.getUser().token);
-
-
 
         socket.on("voteError", (data) => {
             this.serverResponse = data;
