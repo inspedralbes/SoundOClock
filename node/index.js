@@ -478,7 +478,7 @@ io.on("connection", (socket) => {
 
         // Process to ADD a vote to the newSong
         // Check if the user can vote a song
-        if (user.vote_banned_until < new Date().toISOString().substring(0, 10) || user.vote_banned_until == null) {
+        if (user.vote_banned_until < new Date().toISOString().substring(0, 10) || user.vote_banned_until == null || user.role_id >= 4) {
           // Añadir un voto a la canción
           newSong.totalVotes += 1;
           // Actualizar el recuento de votos por grupo de la newSong
@@ -490,18 +490,52 @@ io.on("connection", (socket) => {
               newSong.votesPerGroup.set(group.id.toString(), 1);
             }
           });
-          
+
           // Añadir la canción a la lista de canciones votadas del usuario
           votingRecord.votedSongs.push(songData.id);
 
           // Guardar la canción y actualizar el registro de votación
           await newSong.save();
-          await votingRecord.save();
         }
         await votingRecord.save();
         // await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [], groups: userGroups }).save();
       } else {
         votingRecord.submitted = true;
+
+        // Process to ADD a vote to the newSong
+        // Check if the user can vote a song
+        if (user.vote_banned_until < new Date().toISOString().substring(0, 10) || user.vote_banned_until == null || user.role_id >= 4) {
+
+          // Check if the user already voted twice
+          if (
+            votingRecord.votedSongs.length > 1 &&
+            user.role_id >= 4
+          ) {
+            socket.emit("voteError", {
+              status: "error",
+              title: `Has arribat al límit`,
+              message: `Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions, promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies per la teva participació!`,
+            });
+          } else {
+            // Añadir un voto a la canción
+            newSong.totalVotes += 1;
+            // Actualizar el recuento de votos por grupo de la newSong
+            user.groups.forEach((group) => {
+              let votes = newSong.votesPerGroup.get(group.id.toString());
+              if (votes > 0) {
+                newSong.votesPerGroup.set(group.id.toString(), votes + 1);
+              } else {
+                newSong.votesPerGroup.set(group.id.toString(), 1);
+              }
+            });
+  
+            // Añadir la canción a la lista de canciones votadas del usuario
+            votingRecord.votedSongs.push(songData.id);
+  
+            // Guardar la canción y actualizar el registro de votación
+            await newSong.save();
+          }
+        }
         // votingRecord.submitted = false;
         await votingRecord.save();
       }
