@@ -71,6 +71,7 @@ socket.on("connect", () => {
     comManager.getSongs();
     comManager.getSortedVotedSongs();
     comManager.getAdminSongs();
+    comManager.getUserSelectedSongs(pinia.getUser().id);
     pinia.setPostedSongStatus(data);
   });
 
