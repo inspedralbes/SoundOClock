@@ -101,7 +101,7 @@
                     keyboard_return
                 </span>
                 <span
-                    :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Configuració</span>
+                    :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Tornar a Inici</span>
             </button>
         </template>
     </SideBarMenu>
@@ -112,7 +112,6 @@
 <script>
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
-import comManager from '@/communicationManager';
 
 export default {
     data() {
