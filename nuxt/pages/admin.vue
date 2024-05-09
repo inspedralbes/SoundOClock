@@ -60,8 +60,9 @@
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 lyrics
             </span>
-            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Set
-                songs</span>
+            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">
+                Megafonia
+            </span>
         </button>
         <!-- --------- -->
         <button @click="changeScreen(6)"
