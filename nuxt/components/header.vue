@@ -47,11 +47,13 @@
             </div>
         </div>
     </div>
+    <div  v-if="isLoading" class="loader">
+        <Loader />
+    </div>
 </template>
 
 <script>
 import { useAppStore } from '@/stores/app';
-import comManager from '../communicationManager';
 
 export default {
     data() {
@@ -59,6 +61,7 @@ export default {
             store: useAppStore(),
             showDropdown: false,
             user: computed(() => this.store.getUser()),
+            isLoading: false,
         }
     },
     methods: {
@@ -74,22 +77,9 @@ export default {
             navigateTo({ path: '/logout' });
         },
         goToAdmin() {
-            console.log('goToAdmin');
-            this.$router.push('/admin');
-            navigateTo({ path: '/admin' });
+            this.isLoading = true;
+            return navigateTo('/admin');
         }
-    },
-    created() {
-
-    },
-    mounted() {
-    },
-    computed: {
-
-    },
-    setup() {
-        const store = useAppStore();
-        return { store };
     },
 }
 </script>
@@ -122,5 +112,16 @@ div>button:active {
 
 .dropdown--displayed {
     transform: scaleY(1);
+}
+
+.loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0.5);
+    transform: translate(-50%, -50%);
+    z-index: 100;
 }
 </style>
