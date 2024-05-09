@@ -1,6 +1,6 @@
 <template>
     <div class="sticky top-0 left-0 right-0 z-[100] h-fit bg-slate-200 px-8 py-4">
-        <div class="flex flex-row justify-between h-14 md:h-20">
+        <div class="flex flex-row-reverse md:flex-row justify-between h-14 md:h-20">
             <!--LOGO AND BRANDNAME-->
             <div class="flex flex-row  items-center gap-4">
                 <img v-if="$device.isDesktopOrTablet" src="/img/soundoclock-logo.svg" alt="" class="h-full">
@@ -9,12 +9,13 @@
             <!--MOBILE AND TABLET DESIGN-->
             <div v-if="$device.isMobileOrTablet" class="flex flex-row items-center gap-3 relative">
                 <!--NAVBAR BURGER BUTTON-->
-                <button v-if="user.role_id <= 3" class="flex flex-row items-center" @click="goToAdmin">
+                <button class="flex flex-row items-center" @click="isSlideoverOpen = !isSlideoverOpen">
                     <span class="material-symbols-outlined text-black text-[2rem]">
-                        admin_panel_settings
+                        menu
                     </span>
                 </button>
-                <button class="flex flex-row items-center" @click="feedback()">
+                <!-- <button class="flex flex-row items-center" @click="feedback()">
+>>>>>>> mobile-navbar
                     <span class="material-symbols-outlined text-black text-[2rem]">
                         unknown_document
                     </span>
@@ -23,7 +24,7 @@
                     <span class="material-symbols-outlined text-black text-[2rem]">
                         logout
                     </span>
-                </button>
+                </button> -->
                 <!-- <button @click="toggleDropdown()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -41,15 +42,45 @@
             </div>
             <!--DESKTOP DESIGN-->
             <div v-else class="flex flex-row justify-center gap-8 text-black text-lg">
-                <button v-if="user.role_id <= 3" @click="goToAdmin">Administració</button>
-                <button @click="feedback()">Feedback</button>
-                <button @click="logout()">Tancar Sessió</button>
+                <NuxtLink v-if="user.role_id <= 3" class="leading-[5rem]" to="/admin" @click="isLoading = true">
+                    Administració
+                </NuxtLink>
+                <NuxtLink class="leading-[5rem]" to="/llista_propostes">
+                    Votacions
+                </NuxtLink>
+                <NuxtLink class="leading-[5rem]" to="/els_meus_grups">
+                    Els meus grups
+                </NuxtLink>
+                <NuxtLink class="leading-[5rem]" to="/ranking">
+                    Ranking provisional
+                </NuxtLink>
+                <NuxtLink class="leading-[5rem]" to="https://forms.gle/qKtFKNCgtQjXmpyNA">
+                    Feedback
+                </NuxtLink>
+                <NuxtLink class="leading-[5rem]" to="/logout">
+                    Tancar sessió
+                </NuxtLink>
             </div>
         </div>
     </div>
+
     <div  v-if="isLoading" class="loader">
         <Loader />
     </div>
+
+    <USlideover v-model="isSlideoverOpen" side="left" :ui="{ width: 'max-w-[75%]' }" class="z-[101]">
+        <div class="p-4">
+            <button class="float-right" @click="closeSlideover()">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+            </button>
+        </div>
+        <div class="px-0 flex-1">
+            <navbar @close="closeSlideover()"/>
+        </div>
+    </USlideover>
+
 </template>
 
 <script>
@@ -59,28 +90,23 @@ export default {
     data() {
         return {
             store: useAppStore(),
-            showDropdown: false,
             user: computed(() => this.store.getUser()),
             isLoading: false,
+            isSlideoverOpen: false
         }
+    },
+    unmounted() {
+        this.isLoading = false;
     },
     methods: {
-        toggleDropdown() {
-            this.showDropdown = !this.showDropdown;
-        },
-        feedback() {
-            navigateTo('https://forms.gle/qKtFKNCgtQjXmpyNA', {
-                external: true
-            })
-        },
-        logout() {
-            navigateTo({ path: '/logout' });
-        },
-        goToAdmin() {
-            this.isLoading = true;
-            return navigateTo('/admin');
+        closeSlideover() {
+            this.isSlideoverOpen = false;
         }
     },
+    setup() {
+        const store = useAppStore();
+        return { store };
+    }
 }
 </script>
 
@@ -95,7 +121,9 @@ export default {
 
 .brand-name>span,
 div>button:hover,
-div>button:active {
+div>button:active,
+div>a:hover,
+div>a:active {
     background-color: var(--pedralbes-blue);
     background-image: linear-gradient(90deg, var(--pedralbes-blue), #af4261);
     background-size: 100%;
