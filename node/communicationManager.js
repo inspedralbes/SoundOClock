@@ -88,7 +88,8 @@ async function getBlackList(token) {
       Authorization: "Bearer " + token,
     },
   });
-  return response;
+  const songs = await response.json();
+  return songs;
 }
 
 async function removeSongFromBlacklist(token, songSpotifyId) {

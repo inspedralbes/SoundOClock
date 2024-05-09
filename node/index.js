@@ -10,7 +10,7 @@ import { Song, VotingRecord, ReportSong, SelectedSong, ReportUser } from "./mode
 import axios from "axios";
 import minimist from "minimist";
 import dotenv from "dotenv";
-import { remove } from "fs-extra";
+import NodeCache from "node-cache";
 
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || "mongodb";
@@ -20,6 +20,9 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const myCache = new NodeCache();
+const DEFAULT_CACHE_TTL = 7200; // 2 hours
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -159,7 +162,15 @@ app.get("/adminSongs/:userToken", async (req, res) => {
 
 app.get("/users/:userToken", async (req, res) => {
   try {
-    let users = await comManager.getUsers(req.params.userToken);
+    let users;
+
+    if (myCache.get("users")) {
+      users = myCache.get("users");
+    } else {
+      users = await comManager.getUsers(req.params.userToken);
+      myCache.set("users", users, DEFAULT_CACHE_TTL);
+    }
+
     res.json(users);
   } catch (err) {
     res.status(500).send(err);
@@ -168,7 +179,15 @@ app.get("/users/:userToken", async (req, res) => {
 
 app.get("/publicGroups", async (req, res) => {
   try {
-    const groups = await comManager.getPublicGroups();
+    let groups;
+
+    if (myCache.get("groups")) {
+      groups = myCache.get("groups");
+    } else {
+      groups = await comManager.getPublicGroups();
+      myCache.set("groups", groups, DEFAULT_CACHE_TTL);
+    }
+
     res.json(groups);
   } catch (err) {
     res.status(500).send(err);
@@ -177,7 +196,15 @@ app.get("/publicGroups", async (req, res) => {
 
 app.get("/publicCategories", async (req, res) => {
   try {
-    const categories = await comManager.getPublicCategories();
+    let categories;
+
+    if (myCache.get("categories")) {
+      categories = myCache.get("categories");
+    } else {
+      categories = await comManager.getPublicCategories();
+      myCache.set("categories", categories, DEFAULT_CACHE_TTL);
+    }
+
     res.json(categories);
   } catch (err) {
     res.status(500).send(err);
@@ -186,8 +213,16 @@ app.get("/publicCategories", async (req, res) => {
 
 app.get("/allGroupsAndCategories", async (req, res) => {
   try {
-    const data = await comManager.getAllGroupsAndCategories();
-    res.json(data);
+    let groupsAndCategories;
+
+    if (myCache.get("allGroupsAndCategories")) {
+      groupsAndCategories = myCache.get("allGroupsAndCategories");
+    } else {
+      groupsAndCategories = await comManager.getAllGroupsAndCategories();
+      myCache.set("allGroupsAndCategories", groupsAndCategories, DEFAULT_CACHE_TTL);
+    }
+
+    res.json(groupsAndCategories);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -195,6 +230,7 @@ app.get("/allGroupsAndCategories", async (req, res) => {
 
 app.post("/addGroupsToUser", async (req, res) => {
   try {
+    myCache.del("users");
     const response = await comManager.setUserGroups(
       req.body.userId,
       req.body.token,
@@ -207,7 +243,15 @@ app.post("/addGroupsToUser", async (req, res) => {
 });
 app.get("/bells/:userToken", async (req, res) => {
   try {
-    let bells = await comManager.getBells(req.params.userToken);
+    let bells;
+
+    if (myCache.get("bells")) {
+      bells = myCache.get("bells");
+    } else {
+      bells = await comManager.getBells(req.params.userToken);
+      myCache.set("bells", bells, DEFAULT_CACHE_TTL);
+    }
+
     res.json(bells);
   } catch (err) {
     res.status(500).send(err);
@@ -234,6 +278,8 @@ app.post("/userInfo", async (req, res) => {
 
 app.post("/createGroupCategory", async (req, res) => {
   try {
+    myCache.flushAll();
+
     let response = await comManager.createGroupCategory(
       req.body.token,
       req.body.category
@@ -245,7 +291,10 @@ app.post("/createGroupCategory", async (req, res) => {
 });
 
 app.post("/createGroup", async (req, res) => {
+  
   try {
+    myCache.flushAll();
+
     let response = await comManager.createGroup(req.body.token, req.body.group);
     res.json(response);
   } catch (err) {
@@ -434,8 +483,7 @@ io.on("connection", (socket) => {
       }
 
       // Check if the song is in the blacklist
-      const response = await comManager.getBlackList(userToken);
-      const blacklistSongs = await response.json();
+      const blacklistSongs = await comManager.getBlackList(userToken);
 
       for (let i = 0; i < blacklistSongs.length; i++) {
         if (blacklistSongs[i].spotify_id == songData.id) {
@@ -605,12 +653,18 @@ io.on("connection", (socket) => {
   socket.on("getBlacklist", async (userToken) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
-    if (!user.id || user.is_admin === 0) return;
+    if (!user.id) return;
 
     try {
-      // Get songs from database
-      const response = await comManager.getBlackList(userToken);
-      const songs = await response.json();
+      let songs;
+
+      if (myCache.get("blacklist")) {
+        songs = myCache.get("blacklist");
+      } else {
+        songs = await comManager.getBlackList(userToken);
+        myCache.set("blacklist", songs, DEFAULT_CACHE_TTL);
+      }
+
       socket.emit("sendBlacklist", songs);
     } catch (err) {
       socket.emit("getBlacklistError", {
@@ -624,9 +678,10 @@ io.on("connection", (socket) => {
   socket.on("removeFromBlacklist", async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
-    if (!user.id || user.is_admin === 0) return;
+    if (!user.id) return;
 
     try {
+      myCache.del("blacklist");
       // Check if the song exists and delete it
       await Song.findOneAndDelete({ id: songId });
 
@@ -761,6 +816,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("deleteGroup", (token, groupId) => {
+    myCache.flushAll();
+
     comManager
       .deleteGroup(token, groupId)
       .then((response) => {
@@ -772,6 +829,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("updateGroup", (token, group) => {
+    myCache.flushAll();
+
     comManager
       .updateGroup(token, group)
       .then((response) => {
@@ -816,6 +875,8 @@ io.on("connection", (socket) => {
     try {
       // Find the user that proposed the song
       const user = await comManager.showUser(userToken, bannedUser.id);
+
+      myCache.del("users");
 
       // Update user
       const updatedUser = await comManager.updateUser(userToken, bannedUser);
@@ -865,6 +926,7 @@ io.on("connection", (socket) => {
 
   socket.on("updateBellsGroupsRelations", async (userToken, bells) => {
     try {
+      myCache.del("bells");
       let response = await comManager.setBellsGroupsConfiguration(
         userToken,
         bells
@@ -942,6 +1004,8 @@ io.on("connection", (socket) => {
     try {
       // Update user
       comManager.updateUser(userToken, modifiedUser);
+
+      myCache.del("users");
 
       // Notify the user that made the modification
       socket.emit("notifyServerResponse", {
@@ -1054,6 +1118,8 @@ io.on("connection", (socket) => {
     // Check that the user is authenticated with Laravel Sanctum
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
+
+    myCache.del("users");
 
     try {
       const response = await comManager.deleteUserFromGroup(userToken, groupId, userId);
