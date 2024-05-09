@@ -757,12 +757,25 @@ io.on("connection", (socket) => {
         return;
       }
 
+      // Check if the user already reported that song
+      const existingReport = await ReportSong.findOne({
+        userId: user.id,
+        songId: song.id,
+      });
+      if (existingReport) {
+        socket.emit("reportError", {
+          status: "error",
+          message: "Ja has reportat aquesta cançó!",
+        });
+        return;
+      }
+
       // Add a register in ReportSong table
       await new ReportSong({
         userId: user.id,
         userName: user.name,
         songId: song.id,
-        reason: reportedSong.option,
+        reasons: reportedSong.options,
         isRead: false,
       }).save();
 
