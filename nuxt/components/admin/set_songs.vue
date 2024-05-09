@@ -11,6 +11,7 @@
                         <div class="text-lg p-3 rounded-lg hour-item mb-2 flex items-center justify-between">
                             <div>
                                 {{ bell.hour.substring(0, 5) }}
+                                <p v-for="group in bells.groups">{{ group.abbreviation }}</p>
                             </div>
                             <span class="material-symbols-rounded text-4xl cursor-pointer" @click="openAddModal(index)">
                                 add_circle
