@@ -18,34 +18,6 @@
                                 :isPlaying="songStatus.isPlaying" class="w-full justify-around" @play="playSong"
                                 :type="'admin'" :isSelected="selectedSong.id === song.id"
                                 :isReported="!areAllReportsRead(song)" />
-                            <!-- <div class="flex flex-row items-center gap-2">
-                                <div class="contenidor-img">
-                                    <img :src="song.img" alt="Song img" class="rounded-lg">
-                                    <button @click="playSong(song)">
-                                        <span v-if="songStatus.currentTrackId === song.id && songStatus.isPlaying"
-                                            class="material-symbols-rounded text-4xl">
-                                            pause
-                                        </span>
-                                        <span v-else class="material-symbols-rounded text-4xl">
-                                            play_arrow
-                                        </span>
-                                    </button>
-                                </div>
-                                <div class="song-data text-start truncate">
-                                    <p class="font-black basis-1/3">{{ song.name }}</p>
-                                    <p class="basis-1/3">{{ song.artists.map(artist => artist.name).join(', ') }}</p>
-                                    <p class="basis-1/3">{{ song.totalVotes }} vots</p>
-                                </div>
-                            </div>
-                            <div v-if=!areAllReportsRead(song)>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
-                                    fill="rgb(239 68 68)"
-                                    class="icon icon-tabler icons-tabler-filled icon-tabler-alert-circle">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path
-                                        d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" />
-                                </svg>
-                            </div> -->
                         </button>
 
                     </div>
