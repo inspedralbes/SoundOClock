@@ -20,8 +20,8 @@
                     search
                 </span>
                 <Transition name="delete-fade">
-                    <button v-if="filter" @click="deleteSearch">
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                    <button v-if="filter" @click="deleteSearch" class="absolute h-full inset-y-0 right-0 flex items-center justify-center mr-3">
+                        <span class="material-symbols-rounded p-1 hover:bg-gray-400/[.25] rounded-full"
                             :class="{ 'text-base': $device.isMobile }">
                             Close
                         </span>
@@ -71,14 +71,14 @@
         <div class="w-full flex flex-col items-center overflow-x-auto min-h-20">
             <div v-if="classGroups.length > 0" id="buttonsFilterGroup">
                 <div v-if="groupsAvailable.length > 0" id="buttonsFilterGroupAvailable" class="overflow-x-auto whitespace-nowrap flex flex-row pt-2 pb-2 gap-2">
-                    <button :class="filterGroup === null ? 'bg-neutral-800' : ''"
-                        class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-700 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    <button :class="filterGroup === null ? 'border-blue-500 text-blue-500' : ''"
+                        class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
                         @click="selectGroup(null)">
                         Tots els grups
                     </button>
                     <button v-for="(group, index) in groupsAvailable" @click="selectGroup(group.id)"
-                        :class="filterGroup === group.id ? 'bg-neutral-800' : ''"
-                        class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-700 text-center disabled:opacity-50 disabled:cursor-not-allowed">
+                        :class="filterGroup === group.id ? 'border-blue-500 text-blue-500' : ''"
+                        class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
                         {{ group.abbreviation }}
                     </button>
                 </div>
