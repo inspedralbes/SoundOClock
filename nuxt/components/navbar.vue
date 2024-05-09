@@ -7,7 +7,7 @@
             <span>Administració</span>
         </NuxtLink>
         <NuxtLink class="px-4 py-4 flex align-center gap-3" to="/llista_propostes" @click="close()">
-            <UIcon name="i-heroicons-musical-note-16-solid text-[2rem]" />
+            <UIcon name="i-heroicons-hand-thumb-up-16-solid text-[2rem]" />
             <span>Votacions</span>
         </NuxtLink>
         <NuxtLink class="px-4 py-4 flex align-center gap-3" to="/els_meus_grups" @click="close()">
@@ -15,7 +15,7 @@
             <span>Els meus grups</span>
         </NuxtLink>
         <NuxtLink class="px-4 py-4 flex align-center gap-3" to="/ranking" @click="close()">
-            <UIcon name="i-heroicons-hand-thumb-up-16-solid text-[2rem]" />
+            <UIcon name="i-heroicons-musical-note-16-solid text-[2rem]" />
             <span>Ranking provisional</span>
         </NuxtLink>
         <NuxtLink class="px-4 py-4 flex align-center gap-3" to="https://forms.gle/qKtFKNCgtQjXmpyNA">
