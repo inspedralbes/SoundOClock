@@ -64,7 +64,7 @@
         </div>
     </div>
 
-    <div  v-if="isLoading" class="loader">
+    <div v-if="isLoading" class="loader fixed">
         <Loader />
     </div>
 
@@ -77,7 +77,7 @@
             </button>
         </div>
         <div class="px-0 flex-1">
-            <navbar @close="closeSlideover()"/>
+            <navbar @close="closeSlideover()" />
         </div>
     </USlideover>
 
