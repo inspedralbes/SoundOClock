@@ -990,16 +990,6 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("sendPcDirLogs", logs);
   });
 
-  // socket.on('getRoles', (token) => {
-  //   comManager.getRoles(token)
-  //     .then((roles) => {
-  //       socket.emit('sendRoles', roles);
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //     });
-  // });
-
   socket.on("updateUserRole", async (userToken, modifiedUser) => {
     try {
       // Update user
