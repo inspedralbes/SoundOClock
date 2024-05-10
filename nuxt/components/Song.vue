@@ -33,7 +33,7 @@
             <div class="flex flex-col w-[70%] items-start">
                 <p class="font-bold text-base uppercase">{{ track.name }}</p>
                 <div class="flex flex-row items-center text-sm py-1">
-                    <UBadge v-if="track.explicit" color="white" class="mr-2">E</UBadge>
+                    <UBadge v-if="track.explicit" color="black" class="mr-2">E</UBadge>
                     <p class="whitespace-nowrap overflow-hidden">
                         <span v-for="(artist, index) in track.artists" :key="index">
                             <span v-if="index !== 0">, </span>
@@ -53,15 +53,15 @@
                     play_arrow
                 </span>
             </button>
-            <div v-if="songWaitingToPlay == track.id"
-                class="loader-track">
+            <div v-if="songWaitingToPlay == track.id" class="loader-track">
             </div>
             <button v-if="type === 'vote'" @click="report(track)">
-                <span class="material-symbols-rounded text-4xl" :class="{ 'text-red-400': isSongReported(track.id)}">
+                <span class="material-symbols-rounded text-4xl" :class="{ 'text-red-400': isSongReported(track.id) }">
                     report
                 </span>
             </button>
-            <button @click="proposeSong(track)" v-if="(type === 'propose' || type === 'admin_set_song') && (!track.loading && !track.proposed)">
+            <button @click="proposeSong(track)"
+                v-if="(type === 'propose' || type === 'admin_set_song') && (!track.loading && !track.proposed)">
                 <span class="material-symbols-rounded text-4xl">
                     add_circle
                 </span>

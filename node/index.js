@@ -112,6 +112,7 @@ app.get("/sortedVotedSongs", async (req, res) => {
               name: "$name",
               artists: "$artists",
               img: "$img",
+              explicit: "$explicit",
               preview_url: "$preview_url",
               votes: "$votesPerGroupArray.v",
             },
@@ -271,6 +272,7 @@ app.get("/bells/:userToken", async (req, res) => {
       bells = myCache.get("bells");
     } else {
       bells = await comManager.getBells(req.params.userToken);
+      console.log("bells", bells);
       myCache.set("bells", bells, DEFAULT_CACHE_TTL);
     }
 
@@ -1117,7 +1119,6 @@ io.on("connection", (socket) => {
   socket.on("setSettings", async (userToken, settings) => {
     try {
       let response = await comManager.setSettings(userToken, settings);
-      console.log("response", response);
       settings = await comManager.getPublicSettings();
       myCache.set("settings", settings, DEFAULT_CACHE_TTL);
       io.emit("settingsUpdated", response);
