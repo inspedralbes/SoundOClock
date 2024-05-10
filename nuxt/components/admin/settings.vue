@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col justify-center !h-4/5 !grow-0">
-        <div v-if="isLoading">
+        <div class="h-screen flex justify-center" v-if="isLoading">
             <Loader />
         </div>
         <div v-else
