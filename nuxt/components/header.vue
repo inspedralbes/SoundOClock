@@ -52,7 +52,7 @@
                     Ranking provisional
                 </NuxtLink>
                 <NuxtLink class="leading-[5rem]" to="/el_meu_perfil">
-                    Els meu perfil
+                    El meu perfil
                 </NuxtLink>
                 <NuxtLink class="leading-[5rem]" to="/els_meus_grups">
                     Els meus grups
