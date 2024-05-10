@@ -353,6 +353,15 @@ app.get("/selectedSongs", async (req, res) => {
   }
 });
 
+app.get('/getSelectedSongs', async (req, res) => {
+  try {
+    const selectedSongs = await SelectedSong.find({});
+    res.json(selectedSongs);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 app.get("/roles/:userToken", async (req, res) => {
   try {
     let roles = await comManager.getRoles(req.params.userToken);

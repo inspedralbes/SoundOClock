@@ -121,11 +121,15 @@
             <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
         </div>
     </div>
-    <div  v-else>
+    <div v-if="checkVotingState === 'none'" class="m-3">
         <div>
-            <h2 class="text-center text-3xl font-bold mt-4">La temàtica actual és: "{{ settings.theme }}"
-            </h2>
+            <h2 class="text-center text-3xl font-bold mt-4">Cançons "{{ settings.theme }}"</h2>
             <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
+        </div>
+        <div>
+            <Song  :is="activeSong" v-for=" track in selectedSongs " :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" :type="'selected'" 
+                :bellId="track.bellId"/>
         </div>
     </div>
     <!-- </TransitionGroup> -->
@@ -283,6 +287,7 @@ export default {
             serverResponse: null,
             toast: null,
             isReportLoading: false,
+            selectedSongs: [],
         }
     },
     created() {
@@ -322,6 +327,9 @@ export default {
         comManager.getPublicGroupsAndCategories().then((data) => {
             this.store.setClassGroups(data.publicGroups);
             this.store.setCategories(data.publicCategories);
+        });
+        comManager.getSelectedSongs().then((data) => {
+            this.selectedSongs = data;
         });
 
         socket.on('reportError', (data) => {

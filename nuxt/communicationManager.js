@@ -232,6 +232,12 @@ async function getUserGroups() {
     return data;
 }
 
+async function getSelectedSongs() {
+  const response = await fetch(`${url}/getSelectedSongs`);
+  const data = await response.json();
+  return data;
+}
+
 const comManager = {
   getUserSelectedSongs,
   getSongs,
@@ -250,6 +256,7 @@ const comManager = {
   storeSelectedSongs,
   getUserGroups,
   getUserReportedSongs,
+  getSelectedSongs,
 };
 
 export default comManager;

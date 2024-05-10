@@ -43,6 +43,7 @@
                 </div>
                 <p v-if="type === 'vote' || type === 'admin'" class="text-sm">Vots: {{ track.totalVotes }}</p>
                 <p v-if="type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
+                <UBadge color="indigo" variant="soft" v-if="type === 'selected'">{{ getBellHour(bellId) }}</UBadge>
             </div>
             <button @click="playTrack(track)" v-if="!songWaitingToPlay || songWaitingToPlay != track.id">
                 <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
@@ -126,6 +127,10 @@ export default {
         songWaitingToPlay: {
             type: String,
             default: null
+        },
+        bellId: {
+            type: String,
+            default: null
         }
     },
     data() {
@@ -134,6 +139,7 @@ export default {
             isLoadingVote: computed(() => this.store.isLoadingVote),
             userSelectedSongs: computed(() => this.store.userSelectedSongs),
             userReportedSongs: computed(() => this.store.userReportedSongs),
+            bells: computed(() => this.store.bells),
         }
     },
     methods: {
@@ -161,6 +167,28 @@ export default {
         },
         isSongReported(songId) {
             return this.userReportedSongs.some(song => song.songId === songId);
+        },
+        getBellHour(bellId) {
+            const bell = this.bells.find(bell => bell.id === bellId);
+
+            // Assuming the time is in HH:MM:SS format and for today's date
+            const [hours, minutes, seconds] = bell.hour.split(':');
+            const date = new Date();
+            date.setHours(parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10));
+
+            // Determine whether to show minutes based on their value
+            const options = {
+                hour: 'numeric',
+                hour12: true
+            };
+            if (parseInt(minutes, 10) !== 0) {
+                options.minute = '2-digit';  // Include minutes if they are non-zero
+            }
+
+            // Format the time in AM/PM format, possibly including minutes
+            const formattedTime = date.toLocaleTimeString('en-US', options);
+
+            return formattedTime;
         }
     },
     computed: {
