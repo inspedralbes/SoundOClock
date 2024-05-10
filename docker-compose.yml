@@ -3,6 +3,8 @@ services:
     container_name: phpmyadmin
     image: arm64v8/phpmyadmin
     restart: always
+    environment:
+      PMA_ABSOLUTE_URI: https://timbre.inspedralbes.cat/pma/
     ports:
       - 9090:80
     depends_on:
