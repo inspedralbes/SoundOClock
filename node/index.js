@@ -455,7 +455,8 @@ io.on("connection", (socket) => {
           userData.user.name,
           userData.token,
           groups,
-          userData.user.role_id
+          userData.user.role_id,
+          userData.user.role_name
         );
       })
       .catch((err) => {
