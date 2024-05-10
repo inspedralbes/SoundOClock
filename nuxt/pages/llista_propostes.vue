@@ -324,6 +324,7 @@ export default {
         comManager.getSongs();
         comManager.getBells();
         comManager.getUserSelectedSongs(this.store.getUser().id);
+        comManager.getUserReportedSongs(this.store.getUser().id);
         comManager.getSortedVotedSongs();
         comManager.getPublicGroupsAndCategories().then((data) => {
             this.store.setClassGroups(data.publicGroups);
