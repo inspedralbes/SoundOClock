@@ -140,17 +140,6 @@ import comManager from '../communicationManager';
 export default {
     data() {
         return {
-            items: [{
-                label: 'Getting Started',
-                icon: 'i-heroicons-information-circle',
-                defaultOpen: true,
-                content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-            }, {
-                label: 'Installation',
-                icon: 'i-heroicons-arrow-down-tray',
-                disabled: true,
-                content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-            }],
             store: useAppStore(),
             loading: true,
             selectGroups: {
@@ -166,15 +155,12 @@ export default {
     },
     methods: {
         addIsOpen() {
-            console.log(this.selectGroups.groups);
             for (let i = 0; i < this.selectGroups.groups.length; i++) {
 
                 for (let j = 0; j < this.selectGroups.groups[i].usuaris.length; j++) {
                     this.selectGroups.groups[i].usuaris[j].isOpen = false;
                 }
             }
-
-            console.log(this.selectGroups.groups);
         },
         reportUser(user) {
             this.selectedUser = user;
@@ -183,7 +169,6 @@ export default {
         userReportChecked(user) {
             this.selectedUser = user;
             socket.emit('userReportChecked', this.store.getUser().token, this.selectedUser.id, this.selectGroups.selected.id);
-            console.log(this.selectGroups)
             const i = this.selectGroups.selected.reports.findIndex((user) => user.userId == this.selectedUser.id);
             this.selectGroups.selected.reports.splice(i, 1);
         },
