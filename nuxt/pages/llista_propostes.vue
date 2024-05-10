@@ -1,5 +1,5 @@
 <template>
-    <div v-if="checkVotingState === 'vote' || checkVotingState === 'none'">
+    <div v-if="checkVotingState === 'vote'">
         <!-- Reproductor -->
         <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
             @report="report($event)" @propose="proposeSong($event)" />
@@ -7,9 +7,9 @@
 
         <!-- Barra de busqueda -->
         <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
-            settings.theme }}</h1>
-        <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
-            <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
+        settings.theme }}</h1>
+        <div class="w-full flex justify-center items-center px-2 gap-2">
+            <div class="relative w-[60%] text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text"
                     :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
@@ -30,43 +30,33 @@
                 </Transition>
             </div>
             <div class="dropdown relative z-50">
-                <button
-                    class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    id="buttonFilters" @click="isFiltersOpen = !isFiltersOpen">
-                    {{ this.filterBell ? formatTime(bells.find((bell) => bell.id === this.filterBell).hour) : 'Filtres'
-                    }}
-                </button>
-                <div v-if="isFiltersOpen" id="contentDropDownFilters"
-                    class="absolute bg-neutral-700 overflow-auto h-96 w-40">
 
-                    <!-- FILTRES PER ORDRE -->
-                    <div id="filterOrderby" class="flex flex-col">
-                        <button class="hover:bg-neutral-600 pt-[7px]" @click="orderBy = ''">
-                            <strong>Ordenar per</strong>
-                        </button>
-                        <button :class="orderBy === 'votes-desc' ? 'bg-neutral-600' : 'hover:bg-neutral-600'"
-                            @click="orderBy = 'votes-desc'">
-                            Més votades
-                        </button>
-                        <button :class="orderBy === 'votes-asc' ? 'bg-neutral-600' : 'hover:bg-neutral-600'"
-                            @click="orderBy = 'votes-asc'">
-                            Menys votades
-                        </button>
-                    </div>
+                <UDropdown :items="getItems()" :ui="{height: 'h-96'}" class="scrollBar">
+                    <button
+                        class="px-2 h-[38px] appearance-none flex items-center justify-center rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        id="buttonFilters" @click="isFiltersOpen = !isFiltersOpen" :class="{'w-[150px]': !$device.isMobile}">
+                        <span class="material-symbols-outlined text-white" v-if="$device.isMobile">
+                            tune
+                        </span>
+                        <div v-else>
+                            {{ this.filterBell ? formatTime(bells.find((bell) => bell.id === this.filterBell).hour) : 'Filtres' }}
+                        </div> 
+                    </button>
 
-                    <!-- FILTRES PER HORA -->
-                    <div id="filterBell" class="flex flex-col">
-                        <button class="hover:bg-neutral-600 pt-[7px]" @click="selectBell(null)">
-                            <strong>Tots els horaris</strong>
-                        </button>
-                        <button class="pb-[3px]"
-                            :class="filterBell === bell.id ? 'bg-neutral-600' : 'hover:bg-neutral-600'"
-                            v-for="bell in bells" @click="selectBell(bell.id)" :key="'bell' + bell.hour">
-                            {{ formatTime(bell.hour) }}
-                        </button>
-                    </div>
+                    <template #clean="{ item }">
+                        <div class="flex items-center justify-center w-full">
+                            <span class="truncate text-xsm text-gray-400">{{ item.label }}</span>
+                        </div>
+                    </template>
 
-                </div>
+                    <template #item="{ item }">
+                        <div class="flex items-center justify-between w-full">
+                            <span class="truncate">{{ item.label }}</span>
+                            <UIcon :name="item.icon" class="text-xl"/>
+                        </div>
+                    </template>
+
+                </UDropdown>
             </div>
         </div>
         <div class="w-full flex flex-col items-center overflow-x-auto min-h-20">
@@ -133,11 +123,18 @@
                 @report="report($event)" :type="getType(track.id)" />
         </TransitionGroup>
     </div>
-    <div v-else>
+    <div  v-if="checkVotingState === 'mod'">
         <div>
             <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}" finalitzada
             </h2>
             <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
+        </div>
+    </div>
+    <div  v-else>
+        <div>
+            <h2 class="text-center text-3xl font-bold mt-4">La temàtica actual és: "{{ settings.theme }}"
+            </h2>
+            <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
         </div>
     </div>
     <!-- </TransitionGroup> -->
@@ -260,7 +257,6 @@ export default {
             },
             songs: computed(() => this.store.proposedSongs),
             spotifySongs: [],
-            loading: false,
             isLoadingVote: computed(() => this.store.isLoadingVote),
             reportSongData: {
                 reportedSong: null,
@@ -393,7 +389,6 @@ export default {
             }
             // Check if bells is loaded and set the mostVotedSongs
             if (this.bells.length > 0 && this.groupedSongs.length > 0) {
-                this.loading = false;
                 this.mostVotedSongsPerBell = this.getMostVotedSongs(this.bells);
             }
         },
@@ -618,6 +613,31 @@ export default {
                 return false;
             }
         },
+        cleanFilters() {
+            this.filterBell = null;
+            this.filterGroup = null;
+            this.orderBy = '';
+        },
+        getItems() {
+            let filterVotes = [
+                [{ label: "Natejar filters", slot: "clean", icon: 'i-heroicons-tune-solid', click: this.cleanFilters, id: '' }],
+                [{ label: "Més votades", icon: 'i-heroicons-chevron-double-up-solid', click: () => this.orderBy = 'votes-desc', id: 'votes-desc'}],
+                [{ label: "Menys votades", icon: 'i-heroicons-chevron-double-down-solid',  click: () => this.orderBy = 'votes-asc', id: 'votes-asc' }]
+            ]
+
+            let bells = this.bells.map(bell => {
+                return [{
+                    label: this.formatTime(bell.hour),
+                    icon: 'i-heroicons-clock-solid',
+                    click: () => this.selectBell(bell.id),
+                    id: bell.id
+                }]
+            });
+
+            // Return the two arrays concatenated
+            return filterVotes.concat(bells);
+        }
+
 
     },
     watch: {
