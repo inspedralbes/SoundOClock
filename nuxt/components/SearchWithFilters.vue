@@ -13,9 +13,9 @@
 
         </div>
         <!-- FILTERS -->
-        <div v-if="filters" class="sticky top-0 w-full left-0">
+        <div v-if="filters" class="relative top-0 w-full left-0">
             <div id="dropdown-menu" :class="{ 'hidden': !isDropdownMenuOpen, 'block': isDropdownMenuOpen }"
-                class="bg-[#383838] border-2 border-white rounded-lg shadow-lg">
+                class="absolute h-96 w-full overflow-auto bg-[#383838] border-2 border-white rounded-lg shadow-lg">
                 <ul class="bg-[#383838] rounded-lg">
                     <li class="hover:bg-black rounded-lg w-full p-1"><button
                             class="rounded-lg w-full p-1 hover:bg-black text-left"
@@ -74,4 +74,42 @@ export default {
 
 <style scoped>
 
+/* Estilos para la barra de desplazamiento en navegadores webkit (Chrome, Safari, etc.) dentro del contenedor #dropdown-menu */
+/* Estilos para la barra de desplazamiento vertical */
+#dropdown-menu::-webkit-scrollbar {
+    width: 10px;
+    /* Grosor de la barra de desplazamiento vertical */
+}
+
+#dropdown-menu::-webkit-scrollbar-thumb {
+    background-color: #888;
+    /* Color del "pulgar" de la barra de desplazamiento */
+    border-radius: 5px;
+    /* Bordes redondeados del "pulgar" */
+}
+
+/* Estilos para el fondo de la barra de desplazamiento */
+#dropdown-menu::-webkit-scrollbar-track {
+    background-color: transparent;
+    /* Color del fondo de la barra de desplazamiento (transparente) */
+}
+
+/* Estilos para la barra de desplazamiento horizontal */
+#dropdown-menu::-webkit-scrollbar-horizontal {
+    height: 10px;
+    /* Grosor de la barra de desplazamiento horizontal */
+}
+
+/* Pseudo-clase hover para el "pulgar" */
+#dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+    /* Cambiar el color del "raton" al pasar el mouse sobre él */
+    cursor: grab;
+}
+
+#dropdown-menu::-webkit-scrollbar-thumb:active {
+    background-color: #111;
+    /* Color del botón de la barra de desplazamiento cuando está siendo activo */
+    cursor: grabbing;
+}
 </style>

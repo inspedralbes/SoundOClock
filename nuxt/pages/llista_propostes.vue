@@ -80,7 +80,7 @@
                     </button>
                     <div v-for="(group, index) in groupsAvailable">
                         <button :disabled="!hasPropose(group.id)" @click="selectGroup(group.id)"
-                            :title="hasPropose(group.id)?`Fes clic per veure les cançons proposades d'aquest grup`:`No hi ha cap cançó proposada en aquest grup`"
+                            :title="hasPropose(group.id) ? `Fes clic per veure les cançons proposades d'aquest grup` : `No hi ha cap cançó proposada en aquest grup`"
                             :class="filterGroup === group.id ? 'border-blue-500 text-blue-500' : ''"
                             class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
                             {{ group.abbreviation }}
@@ -96,18 +96,9 @@
 
             </div>
             <div v-else class="loader">
-                <div class="bar1"></div>
-                <div class="bar2"></div>
-                <div class="bar3"></div>
-                <div class="bar4"></div>
-                <div class="bar5"></div>
-                <div class="bar6"></div>
-                <div class="bar7"></div>
-                <div class="bar8"></div>
-                <div class="bar9"></div>
-                <div class="bar10"></div>
-                <div class="bar11"></div>
-                <div class="bar12"></div>
+                <svg viewBox="25 25 50 50">
+                    <circle r="20" cy="50" cx="50"></circle>
+                </svg>
             </div>
         </div>
 
@@ -195,7 +186,7 @@
                 <div v-for="option in reportSongData.options " class="flex flex-row mb-2">
                     <UCheckbox v-model="option.value">
                         <template #label>
-                        <span>{{ option.label }}</span>
+                            <span>{{ option.label }}</span>
                         </template>
                     </UCheckbox>
                 </div>
@@ -207,10 +198,12 @@
                         <UButton @click="modals.reportModal = false" variant="outline" class="px-4 py-2 text-sm">
                             Cancel·la
                         </UButton>
-                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive" disabled>
+                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive"
+                            disabled>
                             Reporta
                         </UButton>
-                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && reportActive">
+                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm"
+                            v-if="!isReportLoading && reportActive">
                             Reporta
                         </UButton>
                         <UButton color="red" class="px-4 py-2 text-sm" v-if="isReportLoading" loading>
@@ -768,95 +761,48 @@ export default {
 </script>
 
 <style scoped>
-.loader {
-    position: relative;
-    width: 54px;
-    height: 54px;
-    border-radius: 10px;
+.loader{
+    max-height: 54px;
+    max-width: 54px;
+}
+.loader > svg {
+    width: 3.25em;
+    transform-origin: center;
+    animation: loader-rotate4 2s linear infinite;
 }
 
-.loader div {
-    width: 8%;
-    height: 24%;
-    background: rgb(128, 128, 128);
-    position: absolute;
-    left: 50%;
-    top: 30%;
-    opacity: 0;
-    border-radius: 50px;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
-    animation: fade458 1s linear infinite;
+.loader > circle {
+    fill: none;
+    stroke: hsl(214, 97%, 59%);
+    stroke-width: 2;
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    animation: loader-dash4 1.5s ease-in-out infinite;
 }
 
-@keyframes fade458 {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0.25;
+@keyframes loader-rotate4 {
+    100% {
+        transform: rotate(360deg);
     }
 }
 
-.loader .bar1 {
-    transform: rotate(0deg) translate(0, -130%);
-    animation-delay: 0s;
+@keyframes loader-dash4 {
+    0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+    }
+
+    50% {
+        stroke-dasharray: 90, 200;
+        stroke-dashoffset: -35px;
+    }
+
+    100% {
+        stroke-dashoffset: -125px;
+    }
 }
 
-.loader .bar2 {
-    transform: rotate(30deg) translate(0, -130%);
-    animation-delay: -1.1s;
-}
-
-.loader .bar3 {
-    transform: rotate(60deg) translate(0, -130%);
-    animation-delay: -1s;
-}
-
-.loader .bar4 {
-    transform: rotate(90deg) translate(0, -130%);
-    animation-delay: -0.9s;
-}
-
-.loader .bar5 {
-    transform: rotate(120deg) translate(0, -130%);
-    animation-delay: -0.8s;
-}
-
-.loader .bar6 {
-    transform: rotate(150deg) translate(0, -130%);
-    animation-delay: -0.7s;
-}
-
-.loader .bar7 {
-    transform: rotate(180deg) translate(0, -130%);
-    animation-delay: -0.6s;
-}
-
-.loader .bar8 {
-    transform: rotate(210deg) translate(0, -130%);
-    animation-delay: -0.5s;
-}
-
-.loader .bar9 {
-    transform: rotate(240deg) translate(0, -130%);
-    animation-delay: -0.4s;
-}
-
-.loader .bar10 {
-    transform: rotate(270deg) translate(0, -130%);
-    animation-delay: -0.3s;
-}
-
-.loader .bar11 {
-    transform: rotate(300deg) translate(0, -130%);
-    animation-delay: -0.2s;
-}
-
-.loader .bar12 {
-    transform: rotate(330deg) translate(0, -130%);
-    animation-delay: -0.1s;
-}
 
 #buttonsFilterGroup {
     width: calc(60% + 150px);
