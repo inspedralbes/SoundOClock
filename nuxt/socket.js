@@ -45,8 +45,8 @@ socket.on("connect", () => {
     refreshAdminUsersView(data);
   });
 
-  socket.on("loginData", (id, mail, name, token, groups, roleId) => {
-    pinia.setUser(id, mail, name, token, groups, roleId);
+  socket.on("loginData", (id, mail, name, token, groups, roleId, roleName) => {
+    pinia.setUser(id, mail, name, token, groups, roleId, roleName);
     if (pinia.getUser().groups.length > 0) {
       navigateTo({ path: "/llista_propostes" });
     } else {

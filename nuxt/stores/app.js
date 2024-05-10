@@ -12,6 +12,7 @@ export const useAppStore = defineStore("app", {
             groups: [],
             token: null,
             role_id: null,
+            role_name: null,
           },
 
     userSelectedSongs: [],
@@ -118,13 +119,14 @@ export const useAppStore = defineStore("app", {
     },
 
     //setters
-    setUser(id, email, name, token, groups, role_id) {
+    setUser(id, email, name, token, groups, role_id, role_name) {
       this.user.id = id;
       this.user.email = email;
       this.user.name = name;
       this.user.groups = groups;
       this.user.token = token;
       this.user.role_id = role_id;
+      this.user.role_name = role_name;
 
       localStorage.setItem("user", JSON.stringify(this.user));
     },
