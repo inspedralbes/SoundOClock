@@ -7,7 +7,7 @@
 
         <!-- Barra de busqueda -->
         <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
-        settings.theme }}</h1>
+            settings.theme }}</h1>
         <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
             <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text"
@@ -20,7 +20,8 @@
                     search
                 </span>
                 <Transition name="delete-fade">
-                    <button v-if="filter" @click="deleteSearch" class="absolute h-full inset-y-0 right-0 flex items-center justify-center mr-3">
+                    <button v-if="filter" @click="deleteSearch"
+                        class="absolute h-full inset-y-0 right-0 flex items-center justify-center mr-3">
                         <span class="material-symbols-rounded p-1 hover:bg-gray-400/[.25] rounded-full"
                             :class="{ 'text-base': $device.isMobile }">
                             Close
@@ -70,25 +71,28 @@
         </div>
         <div class="w-full flex flex-col items-center overflow-x-auto min-h-20">
             <div v-if="classGroups.length > 0" id="buttonsFilterGroup">
-                <div v-if="groupsAvailable.length > 0" id="buttonsFilterGroupAvailable" class="overflow-x-auto whitespace-nowrap flex flex-row pt-2 pb-2 gap-2">
+                <div v-if="groupsAvailable.length > 0" id="buttonsFilterGroupAvailable"
+                    class="overflow-x-auto whitespace-nowrap flex flex-row pt-2 pb-2 gap-2">
                     <button :class="filterGroup === null ? 'border-blue-500 text-blue-500' : ''"
                         class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
                         @click="selectGroup(null)">
                         Tots els grups
                     </button>
-                    <button v-for="(group, index) in groupsAvailable" @click="selectGroup(group.id)"
-                        :class="filterGroup === group.id ? 'border-blue-500 text-blue-500' : ''"
-                        class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
-                        {{ group.abbreviation }}
-                    </button>
+                    <div v-for="(group, index) in groupsAvailable">
+                        <button :disabled="!hasPropose(group.id)" @click="selectGroup(group.id)"
+                            :title="hasPropose(group.id)?`Fes clic per veure les cançons proposades d'aquest grup`:`No hi ha cap cançó proposada en aquest grup`"
+                            :class="filterGroup === group.id ? 'border-blue-500 text-blue-500' : ''"
+                            class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
+                            {{ group.abbreviation }}
+                        </button>
+                    </div>
                 </div>
                 <div v-else
-                    class="appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                        No hi ha cap grup en aquesta franja horària
-                    
+                    class="appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                    No hi ha cap grup en aquesta franja horària
+
                 </div>
-                
+
 
             </div>
             <div v-else class="loader">
@@ -354,7 +358,12 @@ export default {
                 color: 'green',
             });
         });
-        
+
+        socket.on('reportError', (data) => {
+            this.modals.reportModal = false;
+            this.isReportLoading = false;
+        });
+
         socket.emit('getSettings', this.store.getUser().token);
 
         socket.on("voteError", (data) => {
@@ -598,6 +607,17 @@ export default {
         selectGroup(groupId) {
             this.filterGroup = groupId;
         },
+        hasPropose(groupId) {
+            let searchedGroup = this.sortedVotedSongsByGroups.find(group => parseInt(group.group) === groupId);
+            if (searchedGroup === undefined) {
+                return false;
+            }
+            if (searchedGroup.songs.length > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        },
 
     },
     watch: {
@@ -715,7 +735,7 @@ export default {
             if (this.filterBell) {
                 // get groups from bell
                 let b = this.bells.find(bell => bell.id === this.filterBell)
-                if(b){
+                if (b) {
                     groupsAvailable = b.groups;
                 }
             }
