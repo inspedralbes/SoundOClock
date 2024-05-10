@@ -53,8 +53,6 @@ async function googleLogin(userToken) {
 
   userData.user.role_name = roleNameData.name;
 
-  console.log(userData);
-
   return userData;
 }
 
