@@ -252,7 +252,6 @@ app.post("/addGroupsToUser", async (req, res) => {
   }
 });
 app.get("/bells/:userToken", async (req, res) => {
-  console.log(req.params.userToken)
   try {
     let bells;
 
@@ -421,7 +420,6 @@ setInterval(obtenerActualizarTokenSpotify, 59 * 60 * 1000);
 obtenerActualizarTokenSpotify();
 
 let dirPC = null;
-let configuration = null;
 let amountUsers = 0;
 
 // Sockets
@@ -1097,7 +1095,7 @@ io.on("connection", (socket) => {
       let response = await comManager.setSettings(userToken, settings);
       console.log("response", response);
       settings = await comManager.getPublicSettings();
-      configuration = settings;
+      myCache.set("settings", settings, DEFAULT_CACHE_TTL);
       io.emit("settingsUpdated", response);
     } catch (err) {
       socket.emit("setSettingsError", {
@@ -1110,11 +1108,12 @@ io.on("connection", (socket) => {
   socket.on("getSettings", async (userToken) => {
     try {
       let settings;
-      if (configuration != null) {
-        settings = configuration;
+
+      if (myCache.get("settings")) {
+        settings = myCache.get("settings");
       } else {
         settings = await comManager.getPublicSettings();
-        configuration = settings;
+        myCache.set("settings", settings, DEFAULT_CACHE_TTL);
       }
       socket.emit("sendSettings", settings);
     } catch (err) {
