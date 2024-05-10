@@ -225,11 +225,10 @@ export function getRoles() {
 }
 
 async function getUserGroups() {
-    const store = useAppStore();
-    const response = await fetch(`${url}/userGroups/${store.getUser().token}`);
-    const data = await response.json();
-    console.log("USER GROUPS", data);
-    return data;
+  const store = useAppStore();
+  const response = await fetch(`${url}/userGroups/${store.getUser().token}`);
+  const data = await response.json();
+  return data;
 }
 
 async function getSelectedSongs() {

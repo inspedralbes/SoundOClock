@@ -6,7 +6,13 @@ import fetchingCron from "./cron.js";
 import mongoose from "mongoose";
 import comManager from "./communicationManager.js";
 import downloadsManager from "./downloadsManager.cjs";
-import { Song, VotingRecord, ReportSong, SelectedSong, ReportUser } from "./models.js";
+import {
+  Song,
+  VotingRecord,
+  ReportSong,
+  SelectedSong,
+  ReportUser,
+} from "./models.js";
 import axios from "axios";
 import minimist from "minimist";
 import dotenv from "dotenv";
@@ -229,7 +235,11 @@ app.get("/allGroupsAndCategories", async (req, res) => {
       groupsAndCategories = myCache.get("allGroupsAndCategories");
     } else {
       groupsAndCategories = await comManager.getAllGroupsAndCategories();
-      myCache.set("allGroupsAndCategories", groupsAndCategories, DEFAULT_CACHE_TTL);
+      myCache.set(
+        "allGroupsAndCategories",
+        groupsAndCategories,
+        DEFAULT_CACHE_TTL
+      );
     }
 
     res.json(groupsAndCategories);
@@ -301,7 +311,6 @@ app.post("/createGroupCategory", async (req, res) => {
 });
 
 app.post("/createGroup", async (req, res) => {
-  
   try {
     myCache.flushAll();
 
@@ -353,7 +362,7 @@ app.get("/selectedSongs", async (req, res) => {
   }
 });
 
-app.get('/getSelectedSongs', async (req, res) => {
+app.get("/getSelectedSongs", async (req, res) => {
   try {
     const selectedSongs = await SelectedSong.find({});
     res.json(selectedSongs);
@@ -558,7 +567,11 @@ io.on("connection", (socket) => {
 
         // Process to ADD a vote to the newSong
         // Check if the user can vote a song
-        if (user.vote_banned_until < new Date().toISOString().substring(0, 10) || user.vote_banned_until == null || user.role_id >= 4) {
+        if (
+          user.vote_banned_until < new Date().toISOString().substring(0, 10) ||
+          user.vote_banned_until == null ||
+          user.role_id >= 4
+        ) {
           // Añadir un voto a la canción
           newSong.totalVotes += 1;
           // Actualizar el recuento de votos por grupo de la newSong
@@ -584,13 +597,13 @@ io.on("connection", (socket) => {
 
         // Process to ADD a vote to the newSong
         // Check if the user can vote a song
-        if (user.vote_banned_until < new Date().toISOString().substring(0, 10) || user.vote_banned_until == null || user.role_id >= 4) {
-
+        if (
+          user.vote_banned_until < new Date().toISOString().substring(0, 10) ||
+          user.vote_banned_until == null ||
+          user.role_id >= 4
+        ) {
           // Check if the user already voted twice
-          if (
-            votingRecord.votedSongs.length > 1 &&
-            user.role_id >= 4
-          ) {
+          if (votingRecord.votedSongs.length > 1 && user.role_id >= 4) {
             socket.emit("voteError", {
               status: "error",
               title: `Has arribat al límit`,
@@ -608,10 +621,10 @@ io.on("connection", (socket) => {
                 newSong.votesPerGroup.set(group.id.toString(), 1);
               }
             });
-  
+
             // Añadir la canción a la lista de canciones votadas del usuario
             votingRecord.votedSongs.push(songData.id);
-  
+
             // Guardar la canción y actualizar el registro de votación
             await newSong.save();
           }
@@ -685,7 +698,6 @@ io.on("connection", (socket) => {
         votingRecord.votedSongs.length > 1 &&
         user.role_id >= 4
       ) {
-        console.log(user);
         socket.emit("voteError", {
           status: "error",
           title: `Has arribat al límit`,
@@ -1155,9 +1167,11 @@ io.on("connection", (socket) => {
     if (!user.id) return;
 
     try {
-
       // Check if a user in a group has already been reported
-      const alreadyReported = await ReportUser.findOne({ userId: userId, groupId: groupId });
+      const alreadyReported = await ReportUser.findOne({
+        userId: userId,
+        groupId: groupId,
+      });
 
       // If it has not been reported yet add a register in ReportUser table
       if (!alreadyReported) {
@@ -1172,7 +1186,6 @@ io.on("connection", (socket) => {
         status: "success",
         message: `L'usuari ha sigut reportat.`,
       });
-
     } catch (err) {
       socket.emit("reportError", { status: "error", message: err.message });
     }
@@ -1185,10 +1198,8 @@ io.on("connection", (socket) => {
     if (!user.id) return;
 
     try {
-
       // Check if the song exists and delete it
       await ReportUser.findOneAndDelete({ userId: userId, groupId: groupId });
-
     } catch (err) {
       socket.emit("reportError", { status: "error", message: err.message });
     }
@@ -1203,7 +1214,11 @@ io.on("connection", (socket) => {
     myCache.del("users");
 
     try {
-      const response = await comManager.deleteUserFromGroup(userToken, groupId, userId);
+      const response = await comManager.deleteUserFromGroup(
+        userToken,
+        groupId,
+        userId
+      );
       console.log("resposta", response);
 
       // Notify the user that has deleted the user from the group
@@ -1211,7 +1226,6 @@ io.on("connection", (socket) => {
         status: "success",
         message: `L'usuari ${response.user.name} ha sigut eliminat del grup ${response.group.abbreviation}.`,
       });
-
     } catch (err) {
       socket.emit("notifyServerResponse", {
         status: "error",
