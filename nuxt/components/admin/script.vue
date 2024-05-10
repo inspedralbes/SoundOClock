@@ -52,12 +52,10 @@ export default {
 
         socket.on('dirPCStatus', (data) => {
             this.pcStatus = data;
-            console.log(this.pcStatus);
         });
 
         socket.on('sendPcDirLogs', (data) => {
             let array = data.split('\n');
-            console.log(array);
             this.pcLogs.push(array);
 
             // Mover el scroll al final del contenedor de logs

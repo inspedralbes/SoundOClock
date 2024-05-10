@@ -700,7 +700,6 @@ io.on("connection", (socket) => {
         votingRecord.votedSongs.length > 1 &&
         user.role_id >= 4
       ) {
-        console.log(user);
         socket.emit("voteError", {
           status: "error",
           title: `Has arribat al límit`,

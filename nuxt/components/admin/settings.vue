@@ -260,7 +260,6 @@ export default {
         });
 
         socket.on('getSettingsError', (error) => {
-            console.log("error", error);
             this.isLoading = false;
         });
 

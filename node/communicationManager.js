@@ -48,7 +48,7 @@ async function googleLogin(userToken) {
         Authorization: `Bearer ${userData.token}`,
       },
     }
-  )
+  );
   const roleNameData = await roleNameResponse.json();
 
   userData.user.role_name = roleNameData.name;
@@ -119,7 +119,6 @@ async function removeSongFromBlacklist(token, songSpotifyId) {
 }
 
 async function addSongToBlackList(token, song) {
-  console.log(song);
   const response = await fetch(apiURL + "blacklist", {
     method: "POST",
     headers: {
