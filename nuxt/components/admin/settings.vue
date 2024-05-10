@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col justify-center !h-4/5 !grow-0">
-        <div v-if="isLoading">
+        <div class="h-screen flex justify-center" v-if="isLoading">
             <Loader />
         </div>
         <div v-else
@@ -21,8 +21,6 @@
                 </label>
                 <UToggle v-model="settings.showExplicit" on-icon="i-heroicons-check-20-solid"
                     off-icon="i-heroicons-x-mark-20-solid" color="sky" />
-                <!-- <ModularSwitch :value="settings.showExplicit" :canSwitch=true
-                    @input="handleSwitch('showExplicit', $event)" class="w-16" /> -->
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label class="text-lg" for="letProposeExplicit">
@@ -30,8 +28,6 @@
                 </label>
                 <UToggle v-model="settings.letProposeExplicit" on-icon="i-heroicons-check-20-solid"
                     off-icon="i-heroicons-x-mark-20-solid" color="sky" />
-                <!-- <ModularSwitch :value="settings.letProposeExplicit" :canSwitch=true
-                    @input="handleSwitch('letProposeExplicit', $event)" class="w-16" /> -->
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label class="text-lg" for="alertExplicit">
@@ -48,32 +44,36 @@
                 </label>
                 <span class="grow flex items-center justify-center">
                     <UButtonGroup class="w-1/4" orientation="horizontal">
-                        <UButton @click="handleSwitch('isVoteInDays', true)" class="w-1/2 *:mx-auto"
-                            :class="[isVoteInDays ? 'bg-blue-700' : '']" label="Dies" color="blue" />
-                        <UButton @click="handleSwitch('isVoteInDays', false)" class="w-1/2 *:mx-auto"
-                            :class="[!isVoteInDays ? 'bg-blue-700' : '']" label="Setmanes" color="blue" />
+                        <UButton @click="handleSwitch('isVoteInDays', true)" class="w-1/2 *:mx-auto" label="Dies"
+                            color="blue" :variant="isVoteInDays ? 'solid' : 'soft'" />
+                        <UButton @click="handleSwitch('isVoteInDays', false)" class="w-1/2 *:mx-auto" label="Setmanes"
+                            color="blue" :variant="!isVoteInDays ? 'solid' : 'soft'" />
                     </UButtonGroup>
                 </span>
-                <span class="basis-1/5 flex">
-                    <UInput class="ml-auto w-4/5 *:text-white" color="blue" type="number" name="theme"
+                <span class="basis-1/4 flex items-center">
+                    <p class="text-lg w-6/12">Fins al: </p>
+                    <UInput class="text-white" color="blue" type="number" name="theme"
                         v-model="settings.voteDuration" />
+                    <p class="ml-2 text-lg">{{ showVoteDayExpected }}</p>
                 </span>
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label for="theme" class="text-lg basis-1/5">
-                    Duracio de la moderacio
+                    Duracio de la moderació
                 </label>
                 <span class="grow flex items-center justify-center">
                     <UButtonGroup class="w-1/4" orientation="horizontal">
-                        <UButton @click="handleSwitch('isModInDays', true)" class="w-1/2 *:mx-auto"
-                            :class="[isModInDays ? 'bg-blue-700' : '']" label=" Dies" color="blue" />
-                        <UButton @click="handleSwitch('isModInDays', false)" class="w-1/2 *:mx-auto"
-                            :class="[!isModInDays ? 'bg-blue-700' : '']" label="Setmanes" color="blue" />
+                        <UButton @click="handleSwitch('isModInDays', true)" class="w-1/2 *:mx-auto" label="Dies"
+                            color="blue" :variant="isModInDays ? 'solid' : 'soft'" />
+                        <UButton @click="handleSwitch('isModInDays', false)" class="w-1/2 *:mx-auto" label="Setmanes"
+                            color="blue" :variant="!isModInDays ? 'solid' : 'soft'" />
                     </UButtonGroup>
                 </span>
-                <span class="basis-1/5 flex">
-                    <UInput class="ml-auto w-4/5 *:text-white" color="blue" type="number" name="theme"
+                <span class="basis-1/4 flex items-center">
+                    <p class="text-lg w-6/12">Fins al: </p>
+                    <UInput class="text-white" color="blue" type="number" name="theme"
                         v-model="settings.moderationDuration" />
+                    <p class="ml-2 text-lg">{{ showModDayExpected }}</p>
                 </span>
             </div>
         </div>
@@ -151,6 +151,8 @@ export default {
             minDate: null,
             isVoteInDays: true,
             isModInDays: true,
+            showVoteDayExpected: this.formatDate(new Date()),
+            showModDayExpected: this.formatDate(new Date()),
         };
     },
 
@@ -199,7 +201,13 @@ export default {
 
             return `${year}-${month}-${day}`;
         },
+        formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Sumamos 1 porque los meses van de 0 a 11
+            const day = String(date.getDate()).padStart(2, '0');
 
+            return `${day}-${month}-${year}`;
+        },
         postConf(event) {
             let setVoteDate = {};
             let setModDate = {};
@@ -224,6 +232,20 @@ export default {
                 // socket.emit('deleteModerations', this.store.getUser().token);
             }
         },
+        updateExpectedDayVote() {
+            const endDay = new Date();
+            let duration = this.isVoteInDays ? this.settings.voteDuration : this.settings.voteDuration * 7;
+            endDay.setDate(new Date().getDate() + duration);
+            const result = this.formatDate(endDay);
+            this.showVoteDayExpected = result;
+        },
+        updateExpectedDayMod() {
+            const endDay = new Date();
+            let duration = this.isModInDays ? this.settings.moderationDuration : this.settings.moderationDuration * 7;
+            endDay.setDate(new Date().getDate() + duration);
+            const result = this.formatDate(endDay);
+            this.showModDayExpected = result;
+        }
 
     },
 
@@ -262,6 +284,20 @@ export default {
         const store = useAppStore();
         return { store };
     },
+    watch: {
+        'settings.voteDuration'() {
+            this.updateExpectedDayVote();
+        },
+        isVoteInDays() {
+            this.updateExpectedDayVote();
+        },
+        'settings.moderationDuration'() {
+            this.updateExpectedDayMod();
+        },
+        isModInDays() {
+            this.updateExpectedDayMod();
+        }
+    }
 }
 
 </script>

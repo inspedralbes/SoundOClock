@@ -6,11 +6,17 @@ import fetchingCron from "./cron.js";
 import mongoose from "mongoose";
 import comManager from "./communicationManager.js";
 import downloadsManager from "./downloadsManager.cjs";
-import { Song, VotingRecord, ReportSong, SelectedSong, ReportUser } from "./models.js";
+import {
+  Song,
+  VotingRecord,
+  ReportSong,
+  SelectedSong,
+  ReportUser,
+} from "./models.js";
 import axios from "axios";
 import minimist from "minimist";
 import dotenv from "dotenv";
-import { remove } from "fs-extra";
+import NodeCache from "node-cache";
 
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || "mongodb";
@@ -20,6 +26,9 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const myCache = new NodeCache();
+const DEFAULT_CACHE_TTL = 7200; // 2 hours
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -61,6 +70,16 @@ app.get("/votingRecords/:userId", async (req, res) => {
       userId: req.params.userId,
     });
     res.json(votingRecord);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// Get reports per user id
+app.get("/reportSongs/:userId", async (req, res) => {
+  try {
+    const reports = await ReportSong.find({ userId: req.params.userId });
+    res.json(reports);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -161,7 +180,15 @@ app.get("/adminSongs/:userToken", async (req, res) => {
 
 app.get("/users/:userToken", async (req, res) => {
   try {
-    let users = await comManager.getUsers(req.params.userToken);
+    let users;
+
+    if (myCache.get("users")) {
+      users = myCache.get("users");
+    } else {
+      users = await comManager.getUsers(req.params.userToken);
+      myCache.set("users", users, DEFAULT_CACHE_TTL);
+    }
+
     res.json(users);
   } catch (err) {
     res.status(500).send(err);
@@ -170,7 +197,15 @@ app.get("/users/:userToken", async (req, res) => {
 
 app.get("/publicGroups", async (req, res) => {
   try {
-    const groups = await comManager.getPublicGroups();
+    let groups;
+
+    if (myCache.get("groups")) {
+      groups = myCache.get("groups");
+    } else {
+      groups = await comManager.getPublicGroups();
+      myCache.set("groups", groups, DEFAULT_CACHE_TTL);
+    }
+
     res.json(groups);
   } catch (err) {
     res.status(500).send(err);
@@ -179,7 +214,15 @@ app.get("/publicGroups", async (req, res) => {
 
 app.get("/publicCategories", async (req, res) => {
   try {
-    const categories = await comManager.getPublicCategories();
+    let categories;
+
+    if (myCache.get("categories")) {
+      categories = myCache.get("categories");
+    } else {
+      categories = await comManager.getPublicCategories();
+      myCache.set("categories", categories, DEFAULT_CACHE_TTL);
+    }
+
     res.json(categories);
   } catch (err) {
     res.status(500).send(err);
@@ -188,8 +231,20 @@ app.get("/publicCategories", async (req, res) => {
 
 app.get("/allGroupsAndCategories", async (req, res) => {
   try {
-    const data = await comManager.getAllGroupsAndCategories();
-    res.json(data);
+    let groupsAndCategories;
+
+    if (myCache.get("allGroupsAndCategories")) {
+      groupsAndCategories = myCache.get("allGroupsAndCategories");
+    } else {
+      groupsAndCategories = await comManager.getAllGroupsAndCategories();
+      myCache.set(
+        "allGroupsAndCategories",
+        groupsAndCategories,
+        DEFAULT_CACHE_TTL
+      );
+    }
+
+    res.json(groupsAndCategories);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -197,6 +252,7 @@ app.get("/allGroupsAndCategories", async (req, res) => {
 
 app.post("/addGroupsToUser", async (req, res) => {
   try {
+    myCache.del("users");
     const response = await comManager.setUserGroups(
       req.body.userId,
       req.body.token,
@@ -209,7 +265,15 @@ app.post("/addGroupsToUser", async (req, res) => {
 });
 app.get("/bells/:userToken", async (req, res) => {
   try {
-    let bells = await comManager.getBells(req.params.userToken);
+    let bells;
+
+    if (myCache.get("bells")) {
+      bells = myCache.get("bells");
+    } else {
+      bells = await comManager.getBells(req.params.userToken);
+      myCache.set("bells", bells, DEFAULT_CACHE_TTL);
+    }
+
     res.json(bells);
   } catch (err) {
     res.status(500).send(err);
@@ -236,6 +300,8 @@ app.post("/userInfo", async (req, res) => {
 
 app.post("/createGroupCategory", async (req, res) => {
   try {
+    myCache.flushAll();
+
     let response = await comManager.createGroupCategory(
       req.body.token,
       req.body.category
@@ -248,6 +314,8 @@ app.post("/createGroupCategory", async (req, res) => {
 
 app.post("/createGroup", async (req, res) => {
   try {
+    myCache.flushAll();
+
     let response = await comManager.createGroup(req.body.token, req.body.group);
     res.json(response);
   } catch (err) {
@@ -291,6 +359,15 @@ app.get("/selectedSongs", async (req, res) => {
 
     const handleRequest = downloadsManager.getDownloadedSongs();
     handleRequest(req, res); // Pass the req, res to the handler function
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/getSelectedSongs", async (req, res) => {
+  try {
+    const selectedSongs = await SelectedSong.find({});
+    res.json(selectedSongs);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -363,7 +440,6 @@ setInterval(obtenerActualizarTokenSpotify, 59 * 60 * 1000);
 obtenerActualizarTokenSpotify();
 
 let dirPC = null;
-let configuration = null;
 let amountUsers = 0;
 
 // Sockets
@@ -390,7 +466,8 @@ io.on("connection", (socket) => {
           userData.user.name,
           userData.token,
           groups,
-          userData.user.role_id
+          userData.user.role_id,
+          userData.user.role_name
         );
       })
       .catch((err) => {
@@ -436,8 +513,7 @@ io.on("connection", (socket) => {
       }
 
       // Check if the song is in the blacklist
-      const response = await comManager.getBlackList(userToken);
-      const blacklistSongs = await response.json();
+      const blacklistSongs = await comManager.getBlackList(userToken);
 
       for (let i = 0; i < blacklistSongs.length; i++) {
         if (blacklistSongs[i].spotify_id == songData.id) {
@@ -484,14 +560,78 @@ io.on("connection", (socket) => {
 
       if (!votingRecord) {
         let userGroups = user.groups.map((group) => group.id);
-        await new VotingRecord({
+        let votingRecord = new VotingRecord({
           userId: user.id,
           submitted: true,
           votedSongs: [],
           groups: userGroups,
-        }).save();
+        });
+
+        // Process to ADD a vote to the newSong
+        // Check if the user can vote a song
+        if (
+          user.vote_banned_until < new Date().toISOString().substring(0, 10) ||
+          user.vote_banned_until == null ||
+          user.role_id >= 4
+        ) {
+          // Añadir un voto a la canción
+          newSong.totalVotes += 1;
+          // Actualizar el recuento de votos por grupo de la newSong
+          user.groups.forEach((group) => {
+            let votes = newSong.votesPerGroup.get(group.id.toString());
+            if (votes > 0) {
+              newSong.votesPerGroup.set(group.id.toString(), votes + 1);
+            } else {
+              newSong.votesPerGroup.set(group.id.toString(), 1);
+            }
+          });
+
+          // Añadir la canción a la lista de canciones votadas del usuario
+          votingRecord.votedSongs.push(songData.id);
+
+          // Guardar la canción y actualizar el registro de votación
+          await newSong.save();
+        }
+        await votingRecord.save();
+        // await new VotingRecord({ userId: user.id, submitted: false, votedSongs: [], groups: userGroups }).save();
       } else {
         votingRecord.submitted = true;
+
+        // Process to ADD a vote to the newSong
+        // Check if the user can vote a song
+        if (
+          user.vote_banned_until < new Date().toISOString().substring(0, 10) ||
+          user.vote_banned_until == null ||
+          user.role_id >= 4
+        ) {
+          // Check if the user already voted twice
+          if (votingRecord.votedSongs.length > 1 && user.role_id >= 4) {
+            socket.emit("voteError", {
+              status: "error",
+              title: `Has arribat al límit`,
+              message: `Atenció! En aquesta votació, cada persona disposa d'un màxim de dos vots. Aquesta mesura s'implementa per equilibrar la representació individual amb la capacitat d'influir en múltiples opcions, promovent així la diversitat d'opinions i una participació més àmplia en el procés democràtic. Gràcies per la teva participació!`,
+            });
+          } else {
+            // Añadir un voto a la canción
+            newSong.totalVotes += 1;
+            // Actualizar el recuento de votos por grupo de la newSong
+            user.groups.forEach((group) => {
+              let votes = newSong.votesPerGroup.get(group.id.toString());
+              if (votes > 0) {
+                newSong.votesPerGroup.set(group.id.toString(), votes + 1);
+              } else {
+                newSong.votesPerGroup.set(group.id.toString(), 1);
+              }
+            });
+
+            // Añadir la canción a la lista de canciones votadas del usuario
+            votingRecord.votedSongs.push(songData.id);
+
+            // Guardar la canción y actualizar el registro de votación
+            await newSong.save();
+          }
+        }
+        // votingRecord.submitted = false;
         await votingRecord.save();
       }
 
@@ -605,12 +745,18 @@ io.on("connection", (socket) => {
   socket.on("getBlacklist", async (userToken) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
-    if (!user.id || user.is_admin === 0) return;
+    if (!user.id) return;
 
     try {
-      // Get songs from database
-      const response = await comManager.getBlackList(userToken);
-      const songs = await response.json();
+      let songs;
+
+      if (myCache.get("blacklist")) {
+        songs = myCache.get("blacklist");
+      } else {
+        songs = await comManager.getBlackList(userToken);
+        myCache.set("blacklist", songs, DEFAULT_CACHE_TTL);
+      }
+
       socket.emit("sendBlacklist", songs);
     } catch (err) {
       socket.emit("getBlacklistError", {
@@ -624,9 +770,10 @@ io.on("connection", (socket) => {
   socket.on("removeFromBlacklist", async (userToken, songId) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
-    if (!user.id || user.is_admin === 0) return;
+    if (!user.id) return;
 
     try {
+      myCache.del("blacklist");
       // Check if the song exists and delete it
       await Song.findOneAndDelete({ id: songId });
 
@@ -702,12 +849,25 @@ io.on("connection", (socket) => {
         return;
       }
 
+      // Check if the user already reported that song
+      const existingReport = await ReportSong.findOne({
+        userId: user.id,
+        songId: song.id,
+      });
+      if (existingReport) {
+        socket.emit("reportError", {
+          status: "error",
+          message: "Ja has reportat aquesta cançó!",
+        });
+        return;
+      }
+
       // Add a register in ReportSong table
       await new ReportSong({
         userId: user.id,
         userName: user.name,
         songId: song.id,
-        reason: reportedSong.option,
+        reasons: reportedSong.options,
         isRead: false,
       }).save();
 
@@ -761,6 +921,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("deleteGroup", (token, groupId) => {
+    myCache.flushAll();
+
     comManager
       .deleteGroup(token, groupId)
       .then((response) => {
@@ -772,6 +934,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("updateGroup", (token, group) => {
+    myCache.flushAll();
+
     comManager
       .updateGroup(token, group)
       .then((response) => {
@@ -816,6 +980,8 @@ io.on("connection", (socket) => {
     try {
       // Find the user that proposed the song
       const user = await comManager.showUser(userToken, bannedUser.id);
+
+      myCache.del("users");
 
       // Update user
       const updatedUser = await comManager.updateUser(userToken, bannedUser);
@@ -865,6 +1031,7 @@ io.on("connection", (socket) => {
 
   socket.on("updateBellsGroupsRelations", async (userToken, bells) => {
     try {
+      myCache.del("bells");
       let response = await comManager.setBellsGroupsConfiguration(
         userToken,
         bells
@@ -928,20 +1095,12 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("sendPcDirLogs", logs);
   });
 
-  // socket.on('getRoles', (token) => {
-  //   comManager.getRoles(token)
-  //     .then((roles) => {
-  //       socket.emit('sendRoles', roles);
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //     });
-  // });
-
   socket.on("updateUserRole", async (userToken, modifiedUser) => {
     try {
       // Update user
       comManager.updateUser(userToken, modifiedUser);
+
+      myCache.del("users");
 
       // Notify the user that made the modification
       socket.emit("notifyServerResponse", {
@@ -961,7 +1120,7 @@ io.on("connection", (socket) => {
       let response = await comManager.setSettings(userToken, settings);
       console.log("response", response);
       settings = await comManager.getPublicSettings();
-      configuration = settings;
+      myCache.set("settings", settings, DEFAULT_CACHE_TTL);
       io.emit("settingsUpdated", response);
     } catch (err) {
       socket.emit("setSettingsError", {
@@ -974,11 +1133,12 @@ io.on("connection", (socket) => {
   socket.on("getSettings", async (userToken) => {
     try {
       let settings;
-      if (configuration != null) {
-        settings = configuration;
+
+      if (myCache.get("settings")) {
+        settings = myCache.get("settings");
       } else {
         settings = await comManager.getPublicSettings();
-        configuration = settings;
+        myCache.set("settings", settings, DEFAULT_CACHE_TTL);
       }
       socket.emit("sendSettings", settings);
     } catch (err) {
@@ -1010,9 +1170,11 @@ io.on("connection", (socket) => {
     if (!user.id) return;
 
     try {
-
       // Check if a user in a group has already been reported
-      const alreadyReported = await ReportUser.findOne({ userId: userId, groupId: groupId });
+      const alreadyReported = await ReportUser.findOne({
+        userId: userId,
+        groupId: groupId,
+      });
 
       // If it has not been reported yet add a register in ReportUser table
       if (!alreadyReported) {
@@ -1027,7 +1189,6 @@ io.on("connection", (socket) => {
         status: "success",
         message: `L'usuari ha sigut reportat.`,
       });
-
     } catch (err) {
       socket.emit("reportError", { status: "error", message: err.message });
     }
@@ -1040,10 +1201,8 @@ io.on("connection", (socket) => {
     if (!user.id) return;
 
     try {
-
       // Check if the song exists and delete it
       await ReportUser.findOneAndDelete({ userId: userId, groupId: groupId });
-
     } catch (err) {
       socket.emit("reportError", { status: "error", message: err.message });
     }
@@ -1055,8 +1214,14 @@ io.on("connection", (socket) => {
     let user = await comManager.getUserInfo(userToken);
     if (!user.id) return;
 
+    myCache.del("users");
+
     try {
-      const response = await comManager.deleteUserFromGroup(userToken, groupId, userId);
+      const response = await comManager.deleteUserFromGroup(
+        userToken,
+        groupId,
+        userId
+      );
       console.log("resposta", response);
 
       // Notify the user that has deleted the user from the group
@@ -1064,7 +1229,6 @@ io.on("connection", (socket) => {
         status: "success",
         message: `L'usuari ${response.user.name} ha sigut eliminat del grup ${response.group.abbreviation}.`,
       });
-
     } catch (err) {
       socket.emit("notifyServerResponse", {
         status: "error",

@@ -12,9 +12,11 @@ export const useAppStore = defineStore("app", {
             groups: [],
             token: null,
             role_id: null,
+            role_name: null,
           },
 
     userSelectedSongs: [],
+    userReportedSongs: [],
     proposedSongs: [],
     sortedVotedSongs: [],
     proposedSongsAdminView: [],
@@ -77,7 +79,7 @@ export const useAppStore = defineStore("app", {
       return this.classGroups;
     },
     getCategories() {
-      return this.categories
+      return this.categories;
     },
     getOpenMenu() {
       return this.openMenu;
@@ -112,16 +114,19 @@ export const useAppStore = defineStore("app", {
     getBlacklist() {
       return this.blacklist;
     },
+    getUserReportedSongs() {
+      return this.userReportedSongs;
+    },
 
     //setters
-    setUser(id, email, name, token, groups, role_id) {
+    setUser(id, email, name, token, groups, role_id, role_name) {
       this.user.id = id;
       this.user.email = email;
       this.user.name = name;
       this.user.groups = groups;
       this.user.token = token;
       this.user.role_id = role_id;
-      console.log(this.user);
+      this.user.role_name = role_name;
 
       localStorage.setItem("user", JSON.stringify(this.user));
     },
@@ -155,7 +160,7 @@ export const useAppStore = defineStore("app", {
       this.classGroups = classGroups;
     },
     setCategories(categories) {
-      this.categories = categories
+      this.categories = categories;
     },
     setOpenMenu(menuState) {
       this.openMenu = menuState;
@@ -194,6 +199,9 @@ export const useAppStore = defineStore("app", {
     },
     setSettings(settings) {
       this.settings = settings;
+    },
+    setUserReportedSongs(userReportedSongs) {
+      this.userReportedSongs = userReportedSongs;
     },
 
     ///Deletes

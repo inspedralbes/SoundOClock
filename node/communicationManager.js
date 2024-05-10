@@ -38,7 +38,21 @@ async function googleLogin(userToken) {
   const data = await response.json();
 
   // Send user info to the server
-  const userData = await login(data.name, data.email);
+  let userData = await login(data.name, data.email);
+
+  const roleNameResponse = await fetch(
+    apiURL + "roles/" + userData.user.role_id,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userData.token}`,
+      },
+    }
+  )
+  const roleNameData = await roleNameResponse.json();
+
+  userData.user.role_name = roleNameData.name;
+
   return userData;
 }
 
@@ -88,7 +102,8 @@ async function getBlackList(token) {
       Authorization: "Bearer " + token,
     },
   });
-  return response;
+  const songs = await response.json();
+  return songs;
 }
 
 async function removeSongFromBlacklist(token, songSpotifyId) {

@@ -60,8 +60,9 @@
             <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                 lyrics
             </span>
-            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Set
-                songs</span>
+            <span :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">
+                Megafonia
+            </span>
         </button>
         <!-- --------- -->
         <button @click="changeScreen(6)"
@@ -87,13 +88,22 @@
             El contenido que vaya dentro del template v-slot:footer se mostrará al final del sidebar-menu.
          -->
         <template v-slot:footer>
-            <button @click="changeScreen(7)"
-                :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 3 }">
+            <button @click="changeScreen(8)"
+                :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true, 'isActive': selected_screen === 8 }">
                 <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
                     settings
                 </span>
                 <span
                     :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Configuració</span>
+            </button>
+            <button @click="$router.push('/llista_propostes')"
+                :class="{ 'button flex items-center text-decoration-none bg-transparent border-none w-full cursor-pointer transition duration-200 ease-in-out py-2 px-4': true }">
+                <span class="material-symbols-rounded text-white text-[2rem] transition duration-200 ease-in-out mr-4">
+                    keyboard_return
+                </span>
+                <span
+                    :class="{ 'text text-white transition duration-200 ease-in-out': true, 'opacity-0': !isOpen }">Tornar
+                    a Inici</span>
             </button>
         </template>
     </SideBarMenu>
@@ -104,7 +114,6 @@
 <script>
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
-import comManager from '@/communicationManager';
 
 export default {
     data() {
@@ -120,6 +129,7 @@ export default {
                 5: resolveComponent('AdminScript'),
                 6: resolveComponent('AdminSetSongs'),
                 7: resolveComponent('AdminManageRoles'),
+                8: resolveComponent('AdminSettings'),
             },
             loading: false,
         }

@@ -23,7 +23,6 @@ socket.on("connect", () => {
   });
 
   socket.on("reportError", (data) => {
-    console.log("socket reportError data received", data);
     pinia.setServerResponse(data);
   });
 
@@ -45,9 +44,8 @@ socket.on("connect", () => {
     refreshAdminUsersView(data);
   });
 
-  socket.on("loginData", (id, mail, name, token, groups, roleId) => {
-    pinia.setUser(id, mail, name, token, groups, roleId);
-    console.log("loginData", id, mail, name, token, groups, roleId);
+  socket.on("loginData", (id, mail, name, token, groups, roleId, roleName) => {
+    pinia.setUser(id, mail, name, token, groups, roleId, roleName);
     if (pinia.getUser().groups.length > 0) {
       navigateTo({ path: "/llista_propostes" });
     } else {
@@ -64,13 +62,14 @@ socket.on("connect", () => {
     pinia.deleteGroup(data.group_id);
   });
 
-  socket.on("groupUpdated", (data) => { });
+  socket.on("groupUpdated", (data) => {});
 
   socket.on("songPosted", (data) => {
     console.log("socket songPosted data", data);
     comManager.getSongs();
     comManager.getSortedVotedSongs();
     comManager.getAdminSongs();
+    comManager.getUserSelectedSongs(pinia.getUser().id);
     pinia.setPostedSongStatus(data);
   });
 
