@@ -37,7 +37,7 @@
                         </span>
                     </button>
                     <button v-if="type === 'vote'" @click="report(track)">
-                        <span class="material-symbols-rounded text-4xl">
+                        <span class="material-symbols-rounded text-4xl" :class="{ 'text-red-400': isSongReported(track.id)}">
                             report
                         </span>
                     </button>
@@ -103,7 +103,8 @@ export default {
         return {
             store: useAppStore(),
             isLoadingVote: computed(() => this.store.isLoadingVote),
-            userSelectedSongs: computed(() => this.store.userSelectedSongs)
+            userSelectedSongs: computed(() => this.store.userSelectedSongs),
+            userReportedSongs: computed(() => this.store.userReportedSongs),
         }
     },
     methods: {
@@ -125,6 +126,10 @@ export default {
             } else {
                 return false;
             }
+        },
+        isSongReported(songId) {
+            // Check if the songId is in userReportedSongs.songId
+            return this.userReportedSongs.some(song => song.songId === songId);
         },
         setSelected(e, bellId, songId) {
             // Prevent the checkbox from being checked

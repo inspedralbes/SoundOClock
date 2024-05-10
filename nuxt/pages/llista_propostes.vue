@@ -1,5 +1,5 @@
 <template>
-    <div v-if="checkVotingState === 'vote' || checkVotingState === 'none'">
+    <div v-if="checkVotingState === 'vote'">
         <!-- Reproductor -->
         <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
             @report="report($event)" @propose="proposeSong($event)" />
@@ -8,8 +8,8 @@
         <!-- Barra de busqueda -->
         <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
         settings.theme }}</h1>
-        <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
-            <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
+        <div class="w-full flex justify-center items-center px-2 gap-2">
+            <div class="relative w-[60%] text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text"
                     :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
@@ -20,7 +20,8 @@
                     search
                 </span>
                 <Transition name="delete-fade">
-                    <button v-if="filter" @click="deleteSearch" class="absolute h-full inset-y-0 right-0 flex items-center justify-center mr-3">
+                    <button v-if="filter" @click="deleteSearch"
+                        class="absolute h-full inset-y-0 right-0 flex items-center justify-center mr-3">
                         <span class="material-symbols-rounded p-1 hover:bg-gray-400/[.25] rounded-full"
                             :class="{ 'text-base': $device.isMobile }">
                             Close
@@ -29,81 +30,65 @@
                 </Transition>
             </div>
             <div class="dropdown relative z-50">
-                <button
-                    class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    id="buttonFilters" @click="isFiltersOpen = !isFiltersOpen">
-                    {{ this.filterBell ? formatTime(bells.find((bell) => bell.id === this.filterBell).hour) : 'Filtres'
-                    }}
-                </button>
-                <div v-if="isFiltersOpen" id="contentDropDownFilters"
-                    class="absolute bg-neutral-700 overflow-auto h-96 w-40">
 
-                    <!-- FILTRES PER ORDRE -->
-                    <div id="filterOrderby" class="flex flex-col">
-                        <button class="hover:bg-neutral-600 pt-[7px]" @click="orderBy = ''">
-                            <strong>Ordenar per</strong>
-                        </button>
-                        <button :class="orderBy === 'votes-desc' ? 'bg-neutral-600' : 'hover:bg-neutral-600'"
-                            @click="orderBy = 'votes-desc'">
-                            Més votades
-                        </button>
-                        <button :class="orderBy === 'votes-asc' ? 'bg-neutral-600' : 'hover:bg-neutral-600'"
-                            @click="orderBy = 'votes-asc'">
-                            Menys votades
-                        </button>
-                    </div>
+                <UDropdown :items="getItems()" :ui="{height: 'h-96'}" class="scrollBar">
+                    <button
+                        class="px-2 h-[38px] appearance-none flex items-center justify-center rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        id="buttonFilters" @click="isFiltersOpen = !isFiltersOpen" :class="{'w-[150px]': !$device.isMobile}">
+                        <span class="material-symbols-outlined text-white" v-if="$device.isMobile">
+                            tune
+                        </span>
+                        <div v-else>
+                            {{ this.filterBell ? formatTime(bells.find((bell) => bell.id === this.filterBell).hour) : 'Filtres' }}
+                        </div> 
+                    </button>
 
-                    <!-- FILTRES PER HORA -->
-                    <div id="filterBell" class="flex flex-col">
-                        <button class="hover:bg-neutral-600 pt-[7px]" @click="selectBell(null)">
-                            <strong>Tots els horaris</strong>
-                        </button>
-                        <button class="pb-[3px]"
-                            :class="filterBell === bell.id ? 'bg-neutral-600' : 'hover:bg-neutral-600'"
-                            v-for="bell in bells" @click="selectBell(bell.id)" :key="'bell' + bell.hour">
-                            {{ formatTime(bell.hour) }}
-                        </button>
-                    </div>
+                    <template #clean="{ item }">
+                        <div class="flex items-center justify-center w-full">
+                            <span class="truncate text-xsm text-gray-400">{{ item.label }}</span>
+                        </div>
+                    </template>
 
-                </div>
+                    <template #item="{ item }">
+                        <div class="flex items-center justify-between w-full">
+                            <span class="truncate">{{ item.label }}</span>
+                            <UIcon :name="item.icon" class="text-xl"/>
+                        </div>
+                    </template>
+
+                </UDropdown>
             </div>
         </div>
         <div class="w-full flex flex-col items-center overflow-x-auto min-h-20">
             <div v-if="classGroups.length > 0" id="buttonsFilterGroup">
-                <div v-if="groupsAvailable.length > 0" id="buttonsFilterGroupAvailable" class="overflow-x-auto whitespace-nowrap flex flex-row pt-2 pb-2 gap-2">
+                <div v-if="groupsAvailable.length > 0" id="buttonsFilterGroupAvailable"
+                    class="overflow-x-auto whitespace-nowrap flex flex-row pt-2 pb-2 gap-2">
                     <button :class="filterGroup === null ? 'border-blue-500 text-blue-500' : ''"
                         class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
                         @click="selectGroup(null)">
                         Tots els grups
                     </button>
-                    <button v-for="(group, index) in groupsAvailable" @click="selectGroup(group.id)"
-                        :class="filterGroup === group.id ? 'border-blue-500 text-blue-500' : ''"
-                        class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
-                        {{ group.abbreviation }}
-                    </button>
+                    <div v-for="(group, index) in groupsAvailable">
+                        <button :disabled="!hasPropose(group.id)" @click="selectGroup(group.id)"
+                            :title="hasPropose(group.id) ? `Fes clic per veure les cançons proposades d'aquest grup` : `No hi ha cap cançó proposada en aquest grup`"
+                            :class="filterGroup === group.id ? 'border-blue-500 text-blue-500' : ''"
+                            class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
+                            {{ group.abbreviation }}
+                        </button>
+                    </div>
                 </div>
                 <div v-else
-                    class="appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                        No hi ha cap grup en aquesta franja horària
-                    
+                    class="appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                    No hi ha cap grup en aquesta franja horària
+
                 </div>
-                
+
 
             </div>
             <div v-else class="loader">
-                <div class="bar1"></div>
-                <div class="bar2"></div>
-                <div class="bar3"></div>
-                <div class="bar4"></div>
-                <div class="bar5"></div>
-                <div class="bar6"></div>
-                <div class="bar7"></div>
-                <div class="bar8"></div>
-                <div class="bar9"></div>
-                <div class="bar10"></div>
-                <div class="bar11"></div>
-                <div class="bar12"></div>
+                <svg viewBox="25 25 50 50">
+                    <circle r="20" cy="50" cx="50"></circle>
+                </svg>
             </div>
         </div>
 
@@ -129,11 +114,22 @@
                 @report="report($event)" :type="getType(track.id)" />
         </TransitionGroup>
     </div>
-    <div v-else>
+    <div  v-if="checkVotingState === 'mod'">
         <div>
             <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}" finalitzada
             </h2>
             <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
+        </div>
+    </div>
+    <div v-if="checkVotingState === 'none'" class="m-3">
+        <div>
+            <h2 class="text-center text-3xl font-bold mt-4">Cançons "{{ settings.theme }}"</h2>
+            <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
+        </div>
+        <div>
+            <Song  :is="activeSong" v-for=" track in selectedSongs " :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" :type="'selected'" 
+                :bellId="track.bellId"/>
         </div>
     </div>
     <!-- </TransitionGroup> -->
@@ -187,13 +183,14 @@
             </template>
 
             <p>Per quin motiu vols reportar la cançó <b>'{{ reportSongData.reportedSong.name }}'</b>?</p>
-            <!-- <URadioGroup v-model="reportSongData.selectedOption" :options="reportSongData.options" class="mt-4">
-            </URadioGroup> -->
             <div class="flex flex-col mt-4">
-                <label v-for="( option, index ) in reportSongData.options " class="flex flex-row">
-                    <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
-                    <span class="ml-2">{{ option }}</span>
-                </label>
+                <div v-for="option in reportSongData.options " class="flex flex-row mb-2">
+                    <UCheckbox v-model="option.value">
+                        <template #label>
+                            <span>{{ option.label }}</span>
+                        </template>
+                    </UCheckbox>
+                </div>
             </div>
 
             <template #footer>
@@ -202,10 +199,15 @@
                         <UButton @click="modals.reportModal = false" variant="outline" class="px-4 py-2 text-sm">
                             Cancel·la
                         </UButton>
-                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading">
+                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive"
+                            disabled>
                             Reporta
                         </UButton>
-                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm" v-else loading>
+                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm"
+                            v-if="!isReportLoading && reportActive">
+                            Reporta
+                        </UButton>
+                        <UButton color="red" class="px-4 py-2 text-sm" v-if="isReportLoading" loading>
                             Reporta
                         </UButton>
                     </div>
@@ -252,12 +254,13 @@ export default {
             },
             songs: computed(() => this.store.proposedSongs),
             spotifySongs: [],
-            loading: false,
             isLoadingVote: computed(() => this.store.isLoadingVote),
             reportSongData: {
                 reportedSong: null,
-                options: ["La cançó té contingut inadequat", "La cançó no s'adequa a la temàtica"],
-                selectedOption: "La cançó té contingut inadequat"
+                options: [
+                    { label: "La cançó té contingut inadequat", value: false },
+                    { label: "La cançó no s'adequa a la temàtica", value: false },
+                ]
             },
             isFiltersOpen: false,
             orderBy: '',
@@ -284,6 +287,7 @@ export default {
             serverResponse: null,
             toast: null,
             isReportLoading: false,
+            selectedSongs: [],
         }
     },
     created() {
@@ -318,15 +322,20 @@ export default {
         comManager.getSongs();
         comManager.getBells();
         comManager.getUserSelectedSongs(this.store.getUser().id);
+        comManager.getUserReportedSongs(this.store.getUser().id);
         comManager.getSortedVotedSongs();
         comManager.getPublicGroupsAndCategories().then((data) => {
             this.store.setClassGroups(data.publicGroups);
             this.store.setCategories(data.publicCategories);
         });
+        comManager.getSelectedSongs().then((data) => {
+            this.selectedSongs = data;
+        });
 
         socket.on('reportError', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
+            this.reportSongData.options.forEach(option => option.value = false);
 
             this.toast.add({
                 title: 'Error',
@@ -338,6 +347,7 @@ export default {
         socket.on('songReported', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
+            this.reportSongData.options.forEach(option => option.value = false);
 
             this.toast.add({
                 title: 'Cançó reportada!',
@@ -350,7 +360,7 @@ export default {
             this.modals.reportModal = false;
             this.isReportLoading = false;
         });
-        
+
         socket.emit('getSettings', this.store.getUser().token);
 
         socket.on("voteError", (data) => {
@@ -380,7 +390,6 @@ export default {
             }
             // Check if bells is loaded and set the mostVotedSongs
             if (this.bells.length > 0 && this.groupedSongs.length > 0) {
-                this.loading = false;
                 this.mostVotedSongsPerBell = this.getMostVotedSongs(this.bells);
             }
         },
@@ -490,7 +499,9 @@ export default {
         },
         reportTrack() {
             this.isReportLoading = true;
-            const song = { songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
+
+            const options = this.reportSongData.options.filter(option => option.value).map(option => option.label);
+            const song = { songId: this.reportSongData.reportedSong.id, options: options };
             socket.emit('reportSong', this.store.getUser().token, song);
         },
         vote(songId) {
@@ -592,6 +603,42 @@ export default {
         selectGroup(groupId) {
             this.filterGroup = groupId;
         },
+        hasPropose(groupId) {
+            let searchedGroup = this.sortedVotedSongsByGroups.find(group => parseInt(group.group) === groupId);
+            if (searchedGroup === undefined) {
+                return false;
+            }
+            if (searchedGroup.songs.length > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        cleanFilters() {
+            this.filterBell = null;
+            this.filterGroup = null;
+            this.orderBy = '';
+        },
+        getItems() {
+            let filterVotes = [
+                [{ label: "Natejar filters", slot: "clean", icon: 'i-heroicons-tune-solid', click: this.cleanFilters, id: '' }],
+                [{ label: "Més votades", icon: 'i-heroicons-chevron-double-up-solid', click: () => this.orderBy = 'votes-desc', id: 'votes-desc'}],
+                [{ label: "Menys votades", icon: 'i-heroicons-chevron-double-down-solid',  click: () => this.orderBy = 'votes-asc', id: 'votes-asc' }]
+            ]
+
+            let bells = this.bells.map(bell => {
+                return [{
+                    label: this.formatTime(bell.hour),
+                    icon: 'i-heroicons-clock-solid',
+                    click: () => this.selectBell(bell.id),
+                    id: bell.id
+                }]
+            });
+
+            // Return the two arrays concatenated
+            return filterVotes.concat(bells);
+        }
+
 
     },
     watch: {
@@ -709,7 +756,7 @@ export default {
             if (this.filterBell) {
                 // get groups from bell
                 let b = this.bells.find(bell => bell.id === this.filterBell)
-                if(b){
+                if (b) {
                     groupsAvailable = b.groups;
                 }
             }
@@ -732,6 +779,9 @@ export default {
             } else {
                 return "none";
             }
+        },
+        reportActive() {
+            return this.reportSongData.options.some(option => option.value);
         }
     },
 }
@@ -739,95 +789,48 @@ export default {
 </script>
 
 <style scoped>
-.loader {
-    position: relative;
-    width: 54px;
-    height: 54px;
-    border-radius: 10px;
+.loader{
+    max-height: 54px;
+    max-width: 54px;
+}
+.loader > svg {
+    width: 3.25em;
+    transform-origin: center;
+    animation: loader-rotate4 2s linear infinite;
 }
 
-.loader div {
-    width: 8%;
-    height: 24%;
-    background: rgb(128, 128, 128);
-    position: absolute;
-    left: 50%;
-    top: 30%;
-    opacity: 0;
-    border-radius: 50px;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
-    animation: fade458 1s linear infinite;
+.loader > circle {
+    fill: none;
+    stroke: hsl(214, 97%, 59%);
+    stroke-width: 2;
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    animation: loader-dash4 1.5s ease-in-out infinite;
 }
 
-@keyframes fade458 {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0.25;
+@keyframes loader-rotate4 {
+    100% {
+        transform: rotate(360deg);
     }
 }
 
-.loader .bar1 {
-    transform: rotate(0deg) translate(0, -130%);
-    animation-delay: 0s;
+@keyframes loader-dash4 {
+    0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+    }
+
+    50% {
+        stroke-dasharray: 90, 200;
+        stroke-dashoffset: -35px;
+    }
+
+    100% {
+        stroke-dashoffset: -125px;
+    }
 }
 
-.loader .bar2 {
-    transform: rotate(30deg) translate(0, -130%);
-    animation-delay: -1.1s;
-}
-
-.loader .bar3 {
-    transform: rotate(60deg) translate(0, -130%);
-    animation-delay: -1s;
-}
-
-.loader .bar4 {
-    transform: rotate(90deg) translate(0, -130%);
-    animation-delay: -0.9s;
-}
-
-.loader .bar5 {
-    transform: rotate(120deg) translate(0, -130%);
-    animation-delay: -0.8s;
-}
-
-.loader .bar6 {
-    transform: rotate(150deg) translate(0, -130%);
-    animation-delay: -0.7s;
-}
-
-.loader .bar7 {
-    transform: rotate(180deg) translate(0, -130%);
-    animation-delay: -0.6s;
-}
-
-.loader .bar8 {
-    transform: rotate(210deg) translate(0, -130%);
-    animation-delay: -0.5s;
-}
-
-.loader .bar9 {
-    transform: rotate(240deg) translate(0, -130%);
-    animation-delay: -0.4s;
-}
-
-.loader .bar10 {
-    transform: rotate(270deg) translate(0, -130%);
-    animation-delay: -0.3s;
-}
-
-.loader .bar11 {
-    transform: rotate(300deg) translate(0, -130%);
-    animation-delay: -0.2s;
-}
-
-.loader .bar12 {
-    transform: rotate(330deg) translate(0, -130%);
-    animation-delay: -0.1s;
-}
 
 #buttonsFilterGroup {
     width: calc(60% + 150px);

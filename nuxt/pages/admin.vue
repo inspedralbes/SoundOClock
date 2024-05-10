@@ -129,6 +129,7 @@ export default {
                 5: resolveComponent('AdminScript'),
                 6: resolveComponent('AdminSetSongs'),
                 7: resolveComponent('AdminManageRoles'),
+                8: resolveComponent('AdminSettings'),
             },
             loading: false,
         }

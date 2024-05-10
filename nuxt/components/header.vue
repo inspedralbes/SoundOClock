@@ -41,18 +41,21 @@
                 </div> -->
             </div>
             <!--DESKTOP DESIGN-->
-            <div v-else class="flex flex-row justify-center gap-8 text-black text-lg">
+            <div v-else class="flex flex-row justify-center gap-5 text-black text-lg">
                 <NuxtLink v-if="user.role_id <= 3" class="leading-[5rem]" to="/admin" @click="isLoading = true">
                     Administració
                 </NuxtLink>
                 <NuxtLink class="leading-[5rem]" to="/llista_propostes">
                     Votacions
                 </NuxtLink>
-                <NuxtLink class="leading-[5rem]" to="/els_meus_grups">
-                    Els meus grups
-                </NuxtLink>
                 <NuxtLink class="leading-[5rem]" to="/ranking">
                     Ranking provisional
+                </NuxtLink>
+                <NuxtLink class="leading-[5rem]" to="/el_meu_perfil">
+                    Els meu perfil
+                </NuxtLink>
+                <NuxtLink class="leading-[5rem]" to="/els_meus_grups">
+                    Els meus grups
                 </NuxtLink>
                 <NuxtLink class="leading-[5rem]" to="https://forms.gle/qKtFKNCgtQjXmpyNA">
                     Feedback
@@ -80,7 +83,6 @@
             <navbar @close="closeSlideover()" />
         </div>
     </USlideover>
-
 </template>
 
 <script>
