@@ -187,13 +187,14 @@
             </template>
 
             <p>Per quin motiu vols reportar la cançó <b>'{{ reportSongData.reportedSong.name }}'</b>?</p>
-            <!-- <URadioGroup v-model="reportSongData.selectedOption" :options="reportSongData.options" class="mt-4">
-            </URadioGroup> -->
             <div class="flex flex-col mt-4">
-                <label v-for="( option, index ) in reportSongData.options " class="flex flex-row">
-                    <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
-                    <span class="ml-2">{{ option }}</span>
-                </label>
+                <div v-for="option in reportSongData.options " class="flex flex-row mb-2">
+                    <UCheckbox v-model="option.value">
+                        <template #label>
+                        <span>{{ option.label }}</span>
+                        </template>
+                    </UCheckbox>
+                </div>
             </div>
 
             <template #footer>
@@ -202,10 +203,13 @@
                         <UButton @click="modals.reportModal = false" variant="outline" class="px-4 py-2 text-sm">
                             Cancel·la
                         </UButton>
-                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading">
+                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive" disabled>
                             Reporta
                         </UButton>
-                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm" v-else loading>
+                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && reportActive">
+                            Reporta
+                        </UButton>
+                        <UButton color="red" class="px-4 py-2 text-sm" v-if="isReportLoading" loading>
                             Reporta
                         </UButton>
                     </div>
@@ -256,8 +260,10 @@ export default {
             isLoadingVote: computed(() => this.store.isLoadingVote),
             reportSongData: {
                 reportedSong: null,
-                options: ["La cançó té contingut inadequat", "La cançó no s'adequa a la temàtica"],
-                selectedOption: "La cançó té contingut inadequat"
+                options: [
+                    { label: "La cançó té contingut inadequat", value: false },
+                    { label: "La cançó no s'adequa a la temàtica", value: false },
+                ]
             },
             isFiltersOpen: false,
             orderBy: '',
@@ -318,6 +324,7 @@ export default {
         comManager.getSongs();
         comManager.getBells();
         comManager.getUserSelectedSongs(this.store.getUser().id);
+        comManager.getUserReportedSongs(this.store.getUser().id);
         comManager.getSortedVotedSongs();
         comManager.getPublicGroupsAndCategories().then((data) => {
             this.store.setClassGroups(data.publicGroups);
@@ -327,6 +334,7 @@ export default {
         socket.on('reportError', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
+            this.reportSongData.options.forEach(option => option.value = false);
 
             this.toast.add({
                 title: 'Error',
@@ -338,17 +346,13 @@ export default {
         socket.on('songReported', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
+            this.reportSongData.options.forEach(option => option.value = false);
 
             this.toast.add({
                 title: 'Cançó reportada!',
                 description: `${data.message}`,
                 color: 'green',
             });
-        });
-
-        socket.on('reportError', (data) => {
-            this.modals.reportModal = false;
-            this.isReportLoading = false;
         });
         
         socket.emit('getSettings', this.store.getUser().token);
@@ -490,7 +494,9 @@ export default {
         },
         reportTrack() {
             this.isReportLoading = true;
-            const song = { songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
+
+            const options = this.reportSongData.options.filter(option => option.value).map(option => option.label);
+            const song = { songId: this.reportSongData.reportedSong.id, options: options };
             socket.emit('reportSong', this.store.getUser().token, song);
         },
         vote(songId) {
@@ -732,6 +738,9 @@ export default {
             } else {
                 return "none";
             }
+        },
+        reportActive() {
+            return this.reportSongData.options.some(option => option.value);
         }
     },
 }

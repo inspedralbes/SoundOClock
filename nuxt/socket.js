@@ -24,7 +24,6 @@ socket.on("connect", () => {
   });
 
   socket.on("reportError", (data) => {
-    console.log("socket reportError data received", data);
     pinia.setServerResponse(data);
   });
 

@@ -25,7 +25,7 @@ const reportSongSchema = new mongoose.Schema({
   userId: Number,
   userName: String,
   songId: String,
-  reason: String,
+  reasons: [String],
   isRead: Boolean,
 });
 
