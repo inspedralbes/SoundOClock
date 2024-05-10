@@ -122,13 +122,12 @@ export default {
             this.storeGroupsLoading = true;
             let groups;
 
-            console.log(typeof this.selectedGroups)
             if (typeof this.selectedGroups === "number") {
                 groups = [this.selectedGroups]
             } else {
                 groups = this.formatGroupsId();
             }
-            console.log("printing groups", groups);
+        
             let userId = this.store.getUser().id;
             let userToken = this.store.getUser().token;
             comManager.setUserGroups(userId, groups, userToken).then((data) => {
