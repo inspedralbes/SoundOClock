@@ -67,6 +67,16 @@ app.get("/votingRecords/:userId", async (req, res) => {
   }
 });
 
+// Get reports per user id
+app.get("/reportSongs/:userId", async (req, res) => {
+  try {
+    const reports = await ReportSong.find({ userId: req.params.userId });
+    res.json(reports);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 app.get("/sortedVotedSongs", async (req, res) => {
   try {
     const songs = await Song.aggregate([
@@ -242,6 +252,7 @@ app.post("/addGroupsToUser", async (req, res) => {
   }
 });
 app.get("/bells/:userToken", async (req, res) => {
+  console.log(req.params.userToken)
   try {
     let bells;
 

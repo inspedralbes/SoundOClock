@@ -15,6 +15,7 @@ export const useAppStore = defineStore("app", {
           },
 
     userSelectedSongs: [],
+    userReportedSongs: [],
     proposedSongs: [],
     sortedVotedSongs: [],
     proposedSongsAdminView: [],
@@ -112,6 +113,9 @@ export const useAppStore = defineStore("app", {
     getBlacklist() {
       return this.blacklist;
     },
+    getUserReportedSongs() {
+      return this.userReportedSongs;
+    },
 
     //setters
     setUser(id, email, name, token, groups, role_id) {
@@ -193,6 +197,9 @@ export const useAppStore = defineStore("app", {
     },
     setSettings(settings) {
       this.settings = settings;
+    },
+    setUserReportedSongs(userReportedSongs) {
+      this.userReportedSongs = userReportedSongs;
     },
 
     ///Deletes

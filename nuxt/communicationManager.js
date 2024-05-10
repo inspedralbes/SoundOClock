@@ -17,6 +17,18 @@ function getUserSelectedSongs(id) {
     });
 }
 
+function getUserReportedSongs(id) {
+  const store = useAppStore();
+  fetch(`${url}/reportSongs/${id}`)
+    .then((response) => response.json())
+    .then((data) => {
+      store.setUserReportedSongs(data);
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+    });
+}
+
 function getSortedVotedSongs() {
   const store = useAppStore();
   fetch(`${url}/sortedVotedSongs`)
@@ -237,6 +249,7 @@ const comManager = {
   getRoles,
   storeSelectedSongs,
   getUserGroups,
+  getUserReportedSongs,
 };
 
 export default comManager;
