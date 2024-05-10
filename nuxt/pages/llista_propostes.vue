@@ -7,7 +7,7 @@
 
         <!-- Barra de busqueda -->
         <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
-        settings.theme }}</h1>
+            settings.theme }}</h1>
         <div class="w-full flex justify-center items-center px-2 gap-2">
             <div class="relative w-[60%] text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text"
@@ -31,16 +31,18 @@
             </div>
             <div class="dropdown relative z-50">
 
-                <UDropdown :items="getItems()" :ui="{height: 'h-96'}" class="scrollBar">
+                <UDropdown :items="getItems()" :ui="{ height: 'h-96' }" class="scrollBar">
                     <button
                         class="px-2 h-[38px] appearance-none flex items-center justify-center rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                        id="buttonFilters" @click="isFiltersOpen = !isFiltersOpen" :class="{'w-[150px]': !$device.isMobile}">
+                        id="buttonFilters" @click="isFiltersOpen = !isFiltersOpen"
+                        :class="{ 'w-[150px]': !$device.isMobile }">
                         <span class="material-symbols-outlined text-white" v-if="$device.isMobile">
                             tune
                         </span>
                         <div v-else>
-                            {{ this.filterBell ? formatTime(bells.find((bell) => bell.id === this.filterBell).hour) : 'Filtres' }}
-                        </div> 
+                            {{ this.filterBell ? formatTime(bells.find((bell) => bell.id === this.filterBell).hour) :
+                                'Filtres' }}
+                        </div>
                     </button>
 
                     <template #clean="{ item }">
@@ -52,7 +54,7 @@
                     <template #item="{ item }">
                         <div class="flex items-center justify-between w-full">
                             <span class="truncate">{{ item.label }}</span>
-                            <UIcon :name="item.icon" class="text-xl"/>
+                            <UIcon :name="item.icon" class="text-xl" />
                         </div>
                     </template>
 
@@ -114,7 +116,7 @@
                 @report="report($event)" :type="getType(track.id)" />
         </TransitionGroup>
     </div>
-    <div  v-if="checkVotingState === 'mod'">
+    <div v-if="checkVotingState === 'mod'">
         <div>
             <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}" finalitzada
             </h2>
@@ -127,9 +129,9 @@
             <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
         </div>
         <div>
-            <Song  :is="activeSong" v-for=" track in selectedSongs " :key="track.id" :track="track"
-                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" :type="'selected'" 
-                :bellId="track.bellId"/>
+            <Song :is="activeSong" v-for=" track in selectedSongs " :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" :type="'selected'"
+                :bellId="track.bellId" />
         </div>
     </div>
     <!-- </TransitionGroup> -->
@@ -429,6 +431,7 @@ export default {
                     }
                 }
 
+
                 // Group by song id
                 const groupedData = {};
                 result.forEach(song => {
@@ -622,8 +625,8 @@ export default {
         getItems() {
             let filterVotes = [
                 [{ label: "Natejar filters", slot: "clean", icon: 'i-heroicons-tune-solid', click: this.cleanFilters, id: '' }],
-                [{ label: "Més votades", icon: 'i-heroicons-chevron-double-up-solid', click: () => this.orderBy = 'votes-desc', id: 'votes-desc'}],
-                [{ label: "Menys votades", icon: 'i-heroicons-chevron-double-down-solid',  click: () => this.orderBy = 'votes-asc', id: 'votes-asc' }]
+                [{ label: "Més votades", icon: 'i-heroicons-chevron-double-up-solid', click: () => this.orderBy = 'votes-desc', id: 'votes-desc' }],
+                [{ label: "Menys votades", icon: 'i-heroicons-chevron-double-down-solid', click: () => this.orderBy = 'votes-asc', id: 'votes-asc' }]
             ]
 
             let bells = this.bells.map(bell => {
@@ -690,8 +693,10 @@ export default {
                     });
             });
 
+
             if (this.filterBell) {
                 let bell = this.mostVotedSongsPerBell.find(bell => bell.id === this.filterBell);
+
                 if (bell) {
                     filtered = bell.songs;
 
@@ -789,17 +794,18 @@ export default {
 </script>
 
 <style scoped>
-.loader{
+.loader {
     max-height: 54px;
     max-width: 54px;
 }
-.loader > svg {
+
+.loader>svg {
     width: 3.25em;
     transform-origin: center;
     animation: loader-rotate4 2s linear infinite;
 }
 
-.loader > circle {
+.loader>circle {
     fill: none;
     stroke: hsl(214, 97%, 59%);
     stroke-width: 2;

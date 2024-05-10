@@ -22,7 +22,6 @@
                                     {{ artist.name }}
                                 </span>
                             </p>
-
                         </div>
                         <p v-if="type === 'vote'" class="bg-black bg-opacity-60 text-sm">Vots: {{ track.totalVotes }}
                         </p>
@@ -37,7 +36,8 @@
                         </span>
                     </button>
                     <button v-if="type === 'vote'" @click="report(track)">
-                        <span class="material-symbols-rounded text-4xl" :class="{ 'text-red-400': isSongReported(track.id)}">
+                        <span class="material-symbols-rounded text-4xl"
+                            :class="{ 'text-red-400': isSongReported(track.id) }">
                             report
                         </span>
                     </button>
