@@ -1115,8 +1115,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("setSettings", async (userToken, settings) => {
+    const selectedSongs = await SelectedSong.find({});
     try {
-      let response = await comManager.setSettings(userToken, settings);
+      let response = await comManager.setSettings(
+        userToken,
+        settings,
+        selectedSongs
+      );
       settings = await comManager.getPublicSettings();
       myCache.set("settings", settings, DEFAULT_CACHE_TTL);
       io.emit("settingsUpdated", response);

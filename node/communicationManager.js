@@ -388,7 +388,7 @@ async function getRoles(token) {
   return jsonResponse;
 }
 
-async function setSettings(token, settings) {
+async function setSettings(token, settings, selectedSongs) {
   const response = await fetch(apiURL + `settings`, {
     method: "PUT",
     headers: {
@@ -396,7 +396,10 @@ async function setSettings(token, settings) {
       Accept: "application/json",
       authorization: "Bearer " + token,
     },
-    body: JSON.stringify(settings),
+    body: JSON.stringify({
+      settings: settings,
+      selectedSongs: selectedSongs,
+    }),
   });
   const jsonResponse = await response.json();
   return jsonResponse;

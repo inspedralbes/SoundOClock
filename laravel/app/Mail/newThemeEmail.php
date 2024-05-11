@@ -18,14 +18,16 @@ class newThemeEmail extends Mailable
     public $user;
     public $endingTime;
     public $theme;
+    public $selectedSongs;
     /**
      * Create a new message instance.
      */
-    public function __construct(User $user, $endingTime, $theme)
+    public function __construct(User $user, $endingTime, $theme, $selectedSongs)
     {
         $this->user = $user;
         $this->endingTime = $endingTime;
         $this->theme = $theme;
+        $this->selectedSongs = $selectedSongs;
     }
 
 
@@ -40,7 +42,7 @@ class newThemeEmail extends Mailable
     }
 
     public function build(){
-        return $this->view('emails.newTheme')->with(['user' => $this->user, 'endingTime' => $this->endingTime,'theme' => $this->theme]);
+        return $this->view('emails.newTheme')->with(['user' => $this->user, 'endingTime' => $this->endingTime,'theme' => $this->theme, 'selectedSongs' => $this->selectedSongs]);
     }
 
 }

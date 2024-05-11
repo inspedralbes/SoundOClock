@@ -125,6 +125,7 @@
 <script>
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
+import comManager from '@/communicationManager.js';
 export default {
 
     data() {
@@ -225,6 +226,8 @@ export default {
             }
             this.isWaiting = true;
             this.modals.showSave = false;
+
+
             socket.emit('setSettings', this.store.getUser().token, this.settings);
 
             if (event === 1) {
