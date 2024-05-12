@@ -270,7 +270,7 @@ app.get("/bells/:userToken", async (req, res) => {
       bells = myCache.get("bells");
     } else {
       bells = await comManager.getBells(req.params.userToken);
-      console.log("bells", bells);
+      // console.log("bells", bells);
       myCache.set("bells", bells, DEFAULT_CACHE_TTL);
     }
 
