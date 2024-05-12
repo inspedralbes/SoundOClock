@@ -109,7 +109,7 @@ class SettingController extends Controller
         if ($settingArray[0]->theme !== $request->theme) {
             $users = User::all();
             foreach ($users as $user) {
-                Mail::to($user->email)->send(new newThemeEmail($user,$request->end_vote, $request->theme,$request->selectedSongs));
+                Mail::to($user->email)->send(new newThemeEmail($user,$request->start_vote,$request->end_vote, $request->theme,$request->selectedSongs));
             }
         }
 

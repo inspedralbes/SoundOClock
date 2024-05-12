@@ -91,15 +91,26 @@
 <body>
     <header>
       <div class="header-container">
-        <img src="https://lh3.googleusercontent.com/drive-viewer/AKGpihaUIklAnlRSAyy1Z7wuVVdCWDVnwv3HMkPeNh0gmtlhpX_smBW7w3GJmO9X4XFCeg_Z6ISQGg_woxMFwp1kp3fw8eFk7AI0Fi0=s2560" />
-        <p class="brand-name">Sound<span>O'</span><span>Clock</span></p>
+        <div class="logo">
+            <img src="https://lh3.googleusercontent.com/drive-viewer/AKGpihaUIklAnlRSAyy1Z7wuVVdCWDVnwv3HMkPeNh0gmtlhpX_smBW7w3GJmO9X4XFCeg_Z6ISQGg_woxMFwp1kp3fw8eFk7AI0Fi0=s2560" />
+            <p class="brand-name">Sound<span>O'</span><span>Clock</span></p>
+        </div>
+        <button><a href="http://timbre.inspedralbes.cat">Vota aquí!</a></button>
       </div>
     </header>
     <section>
         <h1>Hola, {{$user->name}}</h1>
         <h2>S'ha escollit una nova temàtica: {{$theme}}!</h2>
-        <p>T'animem a votar i a compartir les teves idees sobre aquest tema emocionant! No deixis passar aquesta oportunitat. La votació acaba el proper dia {{ date('d/m/Y', strtotime($endingTime)) }}.</p>
+        <p>T'animem a votar i a compartir les teves idees sobre aquest tema emocionant! No deixis passar aquesta oportunitat. La votació comença el dia {{ date('d/m/Y', strtotime($startingTime)) }} i acaba el proper dia {{ date('d/m/Y', strtotime($endingTime)) }}.</p>
 
+        Les cançons escollides per aquesta setmana son:
+
+        <ul>
+            @foreach($songs as $song)
+                <li>{{$song->title}} - {{$song->artist}}</li>
+            @endforeach
+        </ul>
+        
         <p>Gràcies per ser part de la nostra comunitat!</p>
 
         <button><a href="http://timbre.inspedralbes.cat">Vota aquí!</a></button>
