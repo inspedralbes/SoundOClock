@@ -962,6 +962,7 @@ io.on("connection", (socket) => {
     let limit = 15;
     comManager.searchSong(search, limit, spotifyToken).then((data) => {
       if (data) {
+        console.log("searchResult", data.tracks);
         socket.emit("searchResult", data.tracks.items);
       }
     });
