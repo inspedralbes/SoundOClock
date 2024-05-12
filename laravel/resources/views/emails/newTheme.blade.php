@@ -33,7 +33,7 @@
           color: cyan;
         }
 
-        .branc-name>.clock {
+        .brand-name > .clock {
           color: #af4261;
         }
 
@@ -69,20 +69,30 @@
             line-height: 1.5;
         }
 
-        button{
-            width: 50%; 
-            display: block; 
-            margin: 0 auto; 
-            background-color: #af4261; 
-            color: #fff; 
-            padding: 10px; 
-            border: none; 
-            border-radius: 5px; 
-            font-size: 18px; 
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
         }
 
-        button a{
-            text-decoration: none; 
+        li {
+            margin-bottom: 5px;
+        }
+
+        button {
+            width: 50%;
+            display: block;
+            margin: 0 auto;
+            background-color: #af4261;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+
+        button a {
+            text-decoration: none;
             color: #fff;
         }
 
@@ -110,7 +120,7 @@
                 <li>{{$song->title}} - {{$song->artist}}</li>
             @endforeach
         </ul>
-        
+
         <p>Gràcies per ser part de la nostra comunitat!</p>
 
         <button><a href="http://timbre.inspedralbes.cat">Vota aquí!</a></button>
