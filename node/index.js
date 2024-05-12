@@ -53,6 +53,14 @@ mongoose
 
 const provisionalSelectedSongs = {};
 
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
+
+app.get("/hola", (req, res) => {
+  res.send("Hola Mundo");
+});
+
 // API routes
 app.get("/songs", async (req, res) => {
   try {
