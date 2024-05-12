@@ -103,9 +103,14 @@ class SettingController extends Controller
         $settingArray = DB::select('SELECT * FROM settings LIMIT 1');
 
         if (empty($settingArray)) {
+            $users = User::all();
+            $bells = Bell::all();
+            foreach ($users as $user) {
+                Mail::to($user->email)->send(new newThemeEmail($user, $request->settings['start_vote'], $request->settings['end_vote'], $request->settings['theme'], $request->selectedSongs, $bells));
+            }
             return Setting::create($request->settings);
         }
-
+        
         if ($settingArray[0]->theme !== $request->settings['theme']) {
             $users = User::all();
             $bells = Bell::all();

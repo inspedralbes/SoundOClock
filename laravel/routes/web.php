@@ -13,6 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/mail', function () {
-    return view('emails.newTheme');
-});
+// Route::get('/mail', function () {
+//     return view('emails.newTheme');
+// });
