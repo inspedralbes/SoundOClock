@@ -86,7 +86,6 @@ class SettingController extends Controller
      */
     public function update(Request $request)
     {
-
         // Validar los datos de entrada
         $request->validate([
             'voteDuration' => 'integer',
@@ -109,7 +108,7 @@ class SettingController extends Controller
         if ($settingArray[0]->theme !== $request->theme) {
             $users = User::all();
             foreach ($users as $user) {
-                Mail::to($user->email)->send(new newThemeEmail($user,$request->end_vote, $request->theme));
+                Mail::to($user->email)->send(new newThemeEmail($user,$request->start_vote,$request->end_vote, $request->theme,$request->selectedSongs));
             }
         }
 

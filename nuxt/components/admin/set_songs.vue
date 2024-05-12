@@ -224,7 +224,7 @@ export default {
                     if (groupedData[song.id]) {
                         groupedData[song.id].votes += song.votes;
                     } else {
-                        groupedData[song.id] = { id: song.id, votes: song.votes, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
+                        groupedData[song.id] = { id: song.id, votes: song.votes, explicit: song.explicit, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
                     }
                 });
                 const resultArray = Object.values(groupedData);

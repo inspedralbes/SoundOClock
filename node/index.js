@@ -964,7 +964,6 @@ io.on("connection", (socket) => {
     let limit = 15;
     comManager.searchSong(search, limit, spotifyToken).then((data) => {
       if (data) {
-        console.log("searchResult", data.tracks);
         socket.emit("searchResult", data.tracks.items);
       }
     });
@@ -1118,8 +1117,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("setSettings", async (userToken, settings) => {
+    const selectedSongs = await SelectedSong.find({});
     try {
-      let response = await comManager.setSettings(userToken, settings);
+      let response = await comManager.setSettings(
+        userToken,
+        settings,
+        selectedSongs
+      );
       settings = await comManager.getPublicSettings();
       myCache.set("settings", settings, DEFAULT_CACHE_TTL);
       io.emit("settingsUpdated", response);

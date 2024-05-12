@@ -125,6 +125,7 @@
 <script>
 import { socket } from '@/socket';
 import { useAppStore } from '@/stores/app';
+import comManager from '@/communicationManager.js';
 export default {
 
     data() {
@@ -225,6 +226,8 @@ export default {
             }
             this.isWaiting = true;
             this.modals.showSave = false;
+
+
             socket.emit('setSettings', this.store.getUser().token, this.settings);
 
             if (event === 1) {
@@ -234,19 +237,16 @@ export default {
         },
         updateExpectedDayVote() {
             const endDay = new Date();
+            const endModDay = new Date();
             let duration = this.isVoteInDays ? this.settings.voteDuration : this.settings.voteDuration * 7;
+            let durationMod = this.isModInDays ? this.settings.moderationDuration : this.settings.moderationDuration * 7;
             endDay.setDate(new Date().getDate() + duration);
+            endModDay.setDate(endDay.getDate() + durationMod);
             const result = this.formatDate(endDay);
+            const resultMod = this.formatDate(endModDay);
             this.showVoteDayExpected = result;
-        },
-        updateExpectedDayMod() {
-            const endDay = new Date();
-            let duration = this.isModInDays ? this.settings.moderationDuration : this.settings.moderationDuration * 7;
-            endDay.setDate(new Date().getDate() + duration);
-            const result = this.formatDate(endDay);
-            this.showModDayExpected = result;
+            this.showModDayExpected = resultMod;
         }
-
     },
 
     mounted() {
@@ -291,10 +291,10 @@ export default {
             this.updateExpectedDayVote();
         },
         'settings.moderationDuration'() {
-            this.updateExpectedDayMod();
+            this.updateExpectedDayVote();
         },
         isModInDays() {
-            this.updateExpectedDayMod();
+            this.updateExpectedDayVote();
         }
     }
 }
