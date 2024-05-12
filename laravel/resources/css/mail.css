@@ -1,0 +1,153 @@
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+    }
+
+    .card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .card>*:not(header){
+        margin-left: 20px;
+    }
+
+    p {
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    h1{
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    h2{
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    header {
+        margin-bottom: 20px;
+        background-color: #333; 
+    }
+
+    .header-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .brand-name {
+        font-size: 48px;
+        font-weight: bold;
+        color: #fff;
+    }
+
+    .brand-name span {
+        color: #00adef;
+    }
+
+
+    .song-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .song-info img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-right: 20px;
+    }
+
+    .song-hour {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .song-details {
+        flex: 1;
+        padding-left: 10px;
+    }
+
+    .song-name {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .artists {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .artist-name {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 5px;
+        margin-right: 5px;
+    }
+
+    hr {
+        border: none;
+        border-top: 1px solid #ccc;
+        margin: 20px 0;
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .vote-button {
+        background-color: #00adef;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .vote-button a{
+        color: #fff;
+        text-decoration: none;
+    }
