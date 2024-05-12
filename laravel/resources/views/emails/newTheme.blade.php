@@ -4,10 +4,10 @@
     <title>Nova temàtica</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
-</head>
+    {{-- <link rel="stylesheet" href="./resources/css/mail.css"> --}}
 
-<style>
-    * {
+    <style>
+            * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
@@ -57,16 +57,27 @@
     }
 
     .header-container {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto;
         align-items: center;
-        justify-content: space-between;
+        width: 100%;
         padding: 20px;
+    }
+
+    .header-container button{
+        margin-left: auto;
     }
 
     .logo {
         display: flex;
         align-items: center;
+        width: 90%;
     }
+
+    .logo.pedralbes {
+        justify-content: flex-end;
+    }
+
 
     .logo img {
         width: 100px;
@@ -154,13 +165,24 @@
         border-radius: 5px;
         text-decoration: none;
         transition: background-color 0.3s ease;
+        height: fit-content;
+        margin-bottom: 15px;
     }
 
     .vote-button a{
         color: #fff;
         text-decoration: none;
     }
-</style>
+
+    @media (max-width: 768px) {
+        .brand-name {
+            font-size: 24px;
+        }
+    }
+
+    </style>
+
+</head>
 
 <body>
     <div class="card">
@@ -170,13 +192,17 @@
                     <img src="https://lh3.googleusercontent.com/drive-viewer/AKGpihaUIklAnlRSAyy1Z7wuVVdCWDVnwv3HMkPeNh0gmtlhpX_smBW7w3GJmO9X4XFCeg_Z6ISQGg_woxMFwp1kp3fw8eFk7AI0Fi0=s2560" />
                     <p class="brand-name">Sound<span>O'Clock</span></p>
                 </div>
-                <button class="vote-button"><a href="https://timbre.inspedralbes.cat">Vota aquí!</a></button>
+                {{-- <div class="logo pedralbes">
+                    <img src="https://campus.institutpedralbes.cat/pluginfile.php/1/core_admin/logocompact/300x300/1682674448/LogoPedralbes%20Mosca.png" alt="Logo Pedralbes">
+                </div> --}}
             </div>
         </header>
         <section>
         <h1>Hola, {{$user->name}}</h1>
         <h2>S'ha escollit una nova temàtica: {{$theme}}!</h2>
         <p>T'animem a votar i a compartir les teves idees sobre aquest tant tema emocionant! No deixis passar aquesta oportunitat. La votació comença el dia {{ date('d/m/Y', strtotime($startingTime)) }} i acaba el proper dia {{ date('d/m/Y', strtotime($endingTime)) }}.</p>
+        <button class="vote-button"><a href="https://timbre.inspedralbes.cat">Click aquí per votar!</a></button> 
+        </p>
 
         {{-- @php
         $selectedSongs='[{"_id":"6640a4243dbce3526dc79191","id":"7CSmXJNeArnwDfUmtP4Gve","bellId":1,"name":"8 AM","artists":[{"name":"Nicki Nicole"},{"name":"Young Miko"}],"img":"https://i.scdn.co/image/ab67616d00001e02e0be70cad39065d97afde883","preview_url":"https://p.scdn.co/mp3-preview/de8a2f96bbfc4ddc752928bef1922595c7f39dad?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.380Z","__v":0},{"_id":"6640a4243dbce3526dc79192","id":"0d28khcov6AiegSCpG5TuT","bellId":2,"name":"Feel Good Inc.","artists":[{"name":"Gorillaz"}],"img":"https://i.scdn.co/image/ab67616d00001e0219d85a472f328a6ed9b704cf","preview_url":"https://p.scdn.co/mp3-preview/b13a1bb2d8a04132982a49b6efee933cc9d67c7e?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.468Z","__v":0},{"_id":"6640a4243dbce3526dc79193","id":"0i8JFpqe9cKwnrcvoNgl1L","bellId":3,"name":"Feel Invincible","artists":[{"name":"Skillet"}],"img":"https://i.scdn.co/image/ab67616d00001e023387bacdfd59f32e14dbe17a","preview_url":"https://p.scdn.co/mp3-preview/405bd22441e5c13a677a5e0ac351aeffbc6b8255?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.469Z","__v":0},{"_id":"6640a4243dbce3526dc79194","id":"0k8LXt5uJ5O07BhSvnvjkY","bellId":4,"name":"Moskau","artists":[{"name":"Rammstein"}],"img":"https://i.scdn.co/image/ab67616d00001e02136f94926d47c4986e50c877","preview_url":"https://p.scdn.co/mp3-preview/1c3fff921976e381940fecaeb0479037f2c928b0","selectedDate":"2024-05-12T11:12:36.470Z","__v":0},{"_id":"6640a4243dbce3526dc79195","id":"2Wz2AERjiO6XKrLvOptvXa","bellId":5,"name":"The Wave","artists":[{"name":"Las Ninyas del Corro"}],"img":"https://i.scdn.co/image/ab67616d00001e021baa99267d22f9f6382a1017","preview_url":"https://p.scdn.co/mp3-preview/199810c127b1199930c9e814c1a709849b61db96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.475Z","__v":0},{"_id":"6640a4243dbce3526dc79198","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":8,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.478Z","__v":0},{"_id":"6640a4243dbce3526dc79199","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":9,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.482Z","__v":0},{"_id":"6640a4243dbce3526dc7919a","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":10,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.486Z","__v":0},{"_id":"6640a4243dbce3526dc7919b","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":11,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.487Z","__v":0},{"_id":"6640a4243dbce3526dc7919c","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":12,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.488Z","__v":0},{"_id":"6640a4243dbce3526dc7919d","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":13,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.489Z","__v":0},{"_id":"6640a4243dbce3526dc7919e","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":14,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.490Z","__v":0},{"_id":"6640a4243dbce3526dc7919f","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":15,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.491Z","__v":0},{"_id":"6640a4243dbce3526dc791a0","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":16,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.492Z","__v":0},{"_id":"6640a4243dbce3526dc791a1","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":17,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.494Z","__v":0},{"_id":"6640a4243dbce3526dc791a2","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":18,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.495Z","__v":0},{"_id":"6640a4243dbce3526dc79196","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":6,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.476Z","__v":0},{"_id":"6640a4243dbce3526dc79197","id":"5m5uvPjQT3Md5GKK3qyaXy","bellId":7,"name":"Pokémon Theme","artists":[{"name":"Pokémon"}],"img":"https://i.scdn.co/image/ab67616d00001e028ac4b43e4fa9484a8c3aca48","preview_url":"https://p.scdn.co/mp3-preview/c411b7f0b8970a68daf59702a7e9bfefc85e6f96?cid=b7f796f4ded84814a46be8b07ad4c4da","selectedDate":"2024-05-12T11:12:36.477Z","__v":0}]';
