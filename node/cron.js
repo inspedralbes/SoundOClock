@@ -7,7 +7,7 @@ async function task(socket) {
     async () => {
       console.log("Fetching settings from server");
       const response = await comManager.getPublicSettings();
-      socket.emit("sendSettings", response);
+      io.emit("sendSettings", response);
     },
     {
       timezone: "Europe/Madrid",
