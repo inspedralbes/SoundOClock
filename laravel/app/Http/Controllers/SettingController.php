@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\newThemeEmail;
+use App\Models\Bell;
 
 class SettingController extends Controller
 {
@@ -88,27 +89,28 @@ class SettingController extends Controller
     {
         // Validar los datos de entrada
         $request->validate([
-            'voteDuration' => 'integer',
-            'start_vote' => 'date|nullable',
-            'end_vote' => 'date|nullable',
-            'moderationDuration' => 'integer',
-            'start_moderation' => 'date|nullable',
-            'end_moderation' => 'date|nullable',
-            'showExplicit' => 'boolean',
-            'letProposeExplicit' => 'boolean',
-            'alertExplicit' => 'boolean',
+            'settings.voteDuration' => 'integer',
+            'settings.start_vote' => 'date|nullable',
+            'settings.end_vote' => 'date|nullable',
+            'settings.moderationDuration' => 'integer',
+            'settings.start_moderation' => 'date|nullable',
+            'settings.end_moderation' => 'date|nullable',
+            'settings.showExplicit' => 'boolean',
+            'settings.letProposeExplicit' => 'boolean',
+            'settings.alertExplicit' => 'boolean',
         ]);
 
         $settingArray = DB::select('SELECT * FROM settings LIMIT 1');
 
         if (empty($settingArray)) {
-            return Setting::create($request->all());
+            return Setting::create($request->settings);
         }
 
-        if ($settingArray[0]->theme !== $request->theme) {
+        if ($settingArray[0]->theme !== $request->settings['theme']) {
             $users = User::all();
+            $bells = Bell::all();
             foreach ($users as $user) {
-                Mail::to($user->email)->send(new newThemeEmail($user,$request->start_vote,$request->end_vote, $request->theme,$request->selectedSongs));
+            Mail::to($user->email)->send(new newThemeEmail($user, $request->settings['start_vote'], $request->settings['end_vote'], $request->settings['theme'], $request->selectedSongs, $bells));
             }
         }
 
@@ -116,10 +118,10 @@ class SettingController extends Controller
 
 
         // Actualizar la configuración existente
-        $setting->update($request->all());
+        $setting->update($request->settings);
 
         // Devolver la configuración actualizada como respuesta
-        return response()->json($setting);
+        return response()->json($setting, 200);
 
     }
 

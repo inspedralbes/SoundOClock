@@ -2,128 +2,169 @@
 <html lang="en">
 <head>
     <title>Nova temàtica</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <style>
+        /* Styles for the email */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
         }
 
-        header {
+        .header-container {
             background-color: #333;
-            color: #fff;
             padding: 20px;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header-container {
+        .logo {
             display: flex;
             align-items: center;
-            justify-content: center;
         }
 
-        .header-container p {
+        .logo img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .brand-name {
+            font-size: 24px;
             color: #fff;
-            font-size: 42px;
             font-weight: bold;
         }
-        
-        .brand-name > .o {
-          color: cyan;
+
+        .brand-name span {
+            color: #00ADEF;
         }
 
-        .brand-name > .clock {
-          color: #af4261;
+        .vote-button {
+            background-color: #00ADEF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            text-decoration: none;
         }
 
-        .header-container img {
-            width: 100px;
-            height: 100px;
-            margin-right: 10px;
+        .vote-button a {
+            color: #fff;
+            text-decoration: none;
         }
 
         section {
             background-color: #fff;
             padding: 20px;
-            margin: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
         h1 {
-            color: #333;
             font-size: 24px;
             margin-bottom: 10px;
         }
 
         h2 {
-            color: #333;
             font-size: 20px;
             margin-bottom: 10px;
         }
 
         p {
-            color: #666;
             font-size: 16px;
-            line-height: 1.5;
+            margin-bottom: 10px;
         }
 
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
+        .song-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
-        li {
+        .song-info img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .song-hour {
+            font-size: 16px;
+            margin-right: 10px;
+            margin-left: 10px;
+            padding-left: 10px;
+            border-left: 2px solid #00ADEF;
+            height: 50px; /* Add this line */
+            display: flex; /* Add this line */
+            align-items: center; /* Add this line */
+        }
+        
+        .song-details {
+            display: flex;
+            flex-direction: column;
+            margin-left: 10px;
+            padding-left: 10px;
+            border-left: 2px solid #00ADEF;
+            height: 50px; /* Add this line */
+            display: flex; /* Add this line */
+        }
+
+        .song-name {
+            font-size: 18px;
+            font-weight: bold;
             margin-bottom: 5px;
         }
 
-        button {
-            width: 50%;
-            display: block;
-            margin: 0 auto;
-            background-color: #af4261;
-            color: #fff;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
+        .artists {
+            font-size: 12px;
         }
 
-        button a {
-            text-decoration: none;
-            color: #fff;
+        .artist-name {
+            display: inline;
+            font-weight: normal;
+            margin-right: 5px;
         }
 
+        .vote-button {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <header>
-      <div class="header-container">
-        <div class="logo">
-            <img src="https://lh3.googleusercontent.com/drive-viewer/AKGpihaUIklAnlRSAyy1Z7wuVVdCWDVnwv3HMkPeNh0gmtlhpX_smBW7w3GJmO9X4XFCeg_Z6ISQGg_woxMFwp1kp3fw8eFk7AI0Fi0=s2560" />
-            <p class="brand-name">Sound<span>O'</span><span>Clock</span></p>
+        <div class="header-container">
+            <div class="logo">
+                <img src="https://lh3.googleusercontent.com/drive-viewer/AKGpihaUIklAnlRSAyy1Z7wuVVdCWDVnwv3HMkPeNh0gmtlhpX_smBW7w3GJmO9X4XFCeg_Z6ISQGg_woxMFwp1kp3fw8eFk7AI0Fi0=s2560" />
+                <p class="brand-name">Sound<span>O'</span><span>Clock</span></p>
+            </div>
+            <button class="vote-button"><a href="http://timbre.inspedralbes.cat">Vota aquí!</a></button>
         </div>
-        <button><a href="http://timbre.inspedralbes.cat">Vota aquí!</a></button>
-      </div>
     </header>
     <section>
         <h1>Hola, {{$user->name}}</h1>
         <h2>S'ha escollit una nova temàtica: {{$theme}}!</h2>
-        <p>T'animem a votar i a compartir les teves idees sobre aquest tema emocionant! No deixis passar aquesta oportunitat. La votació comença el dia {{ date('d/m/Y', strtotime($startingTime)) }} i acaba el proper dia {{ date('d/m/Y', strtotime($endingTime)) }}.</p>
+        <p>T'animem a votar i a compartir les teves idees sobre aquest tant tema emocionant! No deixis passar aquesta oportunitat. La votació comença el dia {{ date('d/m/Y', strtotime($startingTime)) }} i acaba el proper dia {{ date('d/m/Y', strtotime($endingTime)) }}.</p>
 
-        Les cançons escollides per aquesta setmana son:
-
-        <ul>
-            @foreach($songs as $song)
-                <li>{{$song->title}} - {{$song->artist}}</li>
+        <p>Les cançons escollides per aquesta setmana son:</p>
+            @foreach($selectedSongs as $index => $song)
+                <div class="song-info">
+                    <img src="{{ $song['img'] }}" alt="{{ $song['name'] }}" />
+                    <p class="song-hour">{{$bells[$index]['hour']}}</p>
+                    <div class="song-details">
+                        <div class="song-name">{{ $song['name'] }}</div>
+                        <div class="artists">
+                            @foreach($song['artists'] as $index => $artist)
+                            <p class="artist-name">{{ $artist['name'] }}@if($index != count($song['artists']) - 1),@endif</p>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
             @endforeach
-        </ul>
-
+        
         <p>Gràcies per ser part de la nostra comunitat!</p>
 
-        <button><a href="http://timbre.inspedralbes.cat">Vota aquí!</a></button>
+        <button class="vote-button"><a href="http://timbre.inspedralbes.cat">Vota aquí!</a></button>
 
     </section>
 </body>
