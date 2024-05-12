@@ -9,8 +9,14 @@
                 <div class="schedule-container text-white text-center gap-2 p-2">
                     <div v-for="(bell, index) in bells" class="item bg-gray-400 rounded-lg p-2 h-96 flex flex-col">
                         <div class="text-lg p-3 rounded-lg hour-item mb-2 flex items-center justify-between">
-                            <div>
+                            <div class="w-full flex flex-col items-start">
                                 {{ bell.hour.substring(0, 5) }}
+                                <div class="flex flex-row text-sm">
+                                    <p v-for="group, index in bell.groups">
+                                        <span v-if="index !== 0">, </span>
+                                        {{ group.abbreviation }}
+                                    </p>
+                                </div>
                             </div>
                             <span class="material-symbols-rounded text-4xl cursor-pointer" @click="openAddModal(index)">
                                 add_circle
@@ -218,7 +224,7 @@ export default {
                     if (groupedData[song.id]) {
                         groupedData[song.id].votes += song.votes;
                     } else {
-                        groupedData[song.id] = { id: song.id, votes: song.votes, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
+                        groupedData[song.id] = { id: song.id, votes: song.votes, explicit: song.explicit, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
                     }
                 });
                 const resultArray = Object.values(groupedData);

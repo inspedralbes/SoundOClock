@@ -33,7 +33,7 @@
             <div class="flex flex-col w-[70%] items-start">
                 <p class="font-bold text-base uppercase">{{ track.name }}</p>
                 <div class="flex flex-row items-center text-sm py-1">
-                    <UBadge v-if="track.explicit" color="white" class="mr-2">E</UBadge>
+                    <UBadge v-if="track.explicit" color="black" class="mr-2">E</UBadge>
                     <p class="whitespace-nowrap overflow-hidden">
                         <span v-for="(artist, index) in track.artists" :key="index">
                             <span v-if="index !== 0">, </span>
@@ -43,6 +43,7 @@
                 </div>
                 <p v-if="type === 'vote' || type === 'admin'" class="text-sm">Vots: {{ track.totalVotes }}</p>
                 <p v-if="type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
+                <UBadge color="indigo" variant="soft" v-if="type === 'selected'">{{ getBellHour(bellId) }}</UBadge>
             </div>
             <button @click="playTrack(track)" v-if="!songWaitingToPlay || songWaitingToPlay != track.id">
                 <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
@@ -52,15 +53,15 @@
                     play_arrow
                 </span>
             </button>
-            <div v-if="songWaitingToPlay == track.id"
-                class="loader-track">
+            <div v-if="songWaitingToPlay == track.id" class="loader-track">
             </div>
             <button v-if="type === 'vote'" @click="report(track)">
-                <span class="material-symbols-rounded text-4xl">
+                <span class="material-symbols-rounded text-4xl" :class="{ 'text-red-400': isSongReported(track.id) }">
                     report
                 </span>
             </button>
-            <button @click="proposeSong(track)" v-if="(type === 'propose' || type === 'admin_set_song') && (!track.loading && !track.proposed)">
+            <button @click="proposeSong(track)"
+                v-if="(type === 'propose' || type === 'admin_set_song') && (!track.loading && !track.proposed)">
                 <span class="material-symbols-rounded text-4xl">
                     add_circle
                 </span>
@@ -126,13 +127,19 @@ export default {
         songWaitingToPlay: {
             type: String,
             default: null
+        },
+        bellId: {
+            type: String,
+            default: null
         }
     },
     data() {
         return {
             store: useAppStore(),
             isLoadingVote: computed(() => this.store.isLoadingVote),
-            userSelectedSongs: computed(() => this.store.userSelectedSongs)
+            userSelectedSongs: computed(() => this.store.userSelectedSongs),
+            userReportedSongs: computed(() => this.store.userReportedSongs),
+            bells: computed(() => this.store.bells),
         }
     },
     methods: {
@@ -158,6 +165,31 @@ export default {
                 return false;
             }
         },
+        isSongReported(songId) {
+            return this.userReportedSongs.some(song => song.songId === songId);
+        },
+        getBellHour(bellId) {
+            const bell = this.bells.find(bell => bell.id === bellId);
+
+            // Assuming the time is in HH:MM:SS format and for today's date
+            const [hours, minutes, seconds] = bell.hour.split(':');
+            const date = new Date();
+            date.setHours(parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10));
+
+            // Determine whether to show minutes based on their value
+            const options = {
+                hour: 'numeric',
+                hour12: true
+            };
+            if (parseInt(minutes, 10) !== 0) {
+                options.minute = '2-digit';  // Include minutes if they are non-zero
+            }
+
+            // Format the time in AM/PM format, possibly including minutes
+            const formattedTime = date.toLocaleTimeString('en-US', options);
+
+            return formattedTime;
+        }
     },
     computed: {
         numReports() {

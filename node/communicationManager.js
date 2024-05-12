@@ -38,7 +38,21 @@ async function googleLogin(userToken) {
   const data = await response.json();
 
   // Send user info to the server
-  const userData = await login(data.name, data.email);
+  let userData = await login(data.name, data.email);
+
+  const roleNameResponse = await fetch(
+    apiURL + "roles/" + userData.user.role_id,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userData.token}`,
+      },
+    }
+  );
+  const roleNameData = await roleNameResponse.json();
+
+  userData.user.role_name = roleNameData.name;
+
   return userData;
 }
 
@@ -88,7 +102,8 @@ async function getBlackList(token) {
       Authorization: "Bearer " + token,
     },
   });
-  return response;
+  const songs = await response.json();
+  return songs;
 }
 
 async function removeSongFromBlacklist(token, songSpotifyId) {
@@ -104,7 +119,6 @@ async function removeSongFromBlacklist(token, songSpotifyId) {
 }
 
 async function addSongToBlackList(token, song) {
-  console.log(song);
   const response = await fetch(apiURL + "blacklist", {
     method: "POST",
     headers: {
@@ -374,7 +388,7 @@ async function getRoles(token) {
   return jsonResponse;
 }
 
-async function setSettings(token, settings) {
+async function setSettings(token, settings, selectedSongs) {
   const response = await fetch(apiURL + `settings`, {
     method: "PUT",
     headers: {
@@ -382,9 +396,13 @@ async function setSettings(token, settings) {
       Accept: "application/json",
       authorization: "Bearer " + token,
     },
-    body: JSON.stringify(settings),
+    body: JSON.stringify({
+      settings: settings,
+      selectedSongs: selectedSongs,
+    }),
   });
   const jsonResponse = await response.json();
+  console.log("Settings updated", jsonResponse);
   return jsonResponse;
 }
 
@@ -414,6 +432,19 @@ async function getPublicSettings() {
 async function getUserGroups(token) {
   const response = await fetch(apiURL + `userGroups`, {
     method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "Bearer " + token,
+    },
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
+async function deleteUserFromGroup(token, group_id, user_id) {
+  const response = await fetch(apiURL + `group/${group_id}/user/${user_id}`, {
+    method: "DELETE",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
@@ -457,6 +488,7 @@ const comManager = {
   createGroupCategory,
   createGroup,
   getUserGroups,
+  deleteUserFromGroup,
 };
 
 export default comManager;

@@ -25,7 +25,7 @@ const reportSongSchema = new mongoose.Schema({
   userId: Number,
   userName: String,
   songId: String,
-  reason: String,
+  reasons: [String],
   isRead: Boolean,
 });
 
@@ -39,9 +39,16 @@ const selectedSongSchema = new mongoose.Schema({
   selectedDate: Date,
 });
 
+const reportUserSchema = new mongoose.Schema({
+  userId: String,
+  groupId: Number,
+  isRead: Boolean,
+});
+
 const VotingRecord = mongoose.model('VotingRecord', votingRecordSchema);
 const Song = mongoose.model('Song', songSchema);
 const ReportSong = mongoose.model('ReportSong', reportSongSchema);
 const SelectedSong = mongoose.model('SelectedSong', selectedSongSchema);
+const ReportUser = mongoose.model('ReportUser', reportUserSchema);
 
-export { Song, VotingRecord, ReportSong, SelectedSong }
+export { Song, VotingRecord, ReportSong, SelectedSong, ReportUser }

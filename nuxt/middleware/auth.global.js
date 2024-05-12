@@ -7,6 +7,13 @@ export default async function defineNuxtRouteMiddleware(to, from) {
     const userData = JSON.parse(window.localStorage.getItem('user'));
     const isAuthenticated = userData && userData.token;
 
+    // Remove localStorage entry of theme mode
+    const storedTheme = window.localStorage.getItem('nuxt-color-mode');
+    if (storedTheme && storedTheme === 'light') {
+        window.localStorage.removeItem('nuxt-color-mode');
+        window.localStorage.setItem('nuxt-color-mode', 'dark');
+    }
+
     if (!isAuthenticated && to.path !== '/' && to.path !== '/auth/callback/google') {
         // Redirect to login page if not authenticated
         return navigateTo('/')

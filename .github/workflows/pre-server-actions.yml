@@ -1,4 +1,4 @@
-name: Sound O'Clock Deploy Actions
+name: Sound O'Clock Deploy Actions on Pre-Production Server
 run-name: ${{ github.actor }} is deploying Sound O'Clock on pre-production server 🌯
 on:
   push:

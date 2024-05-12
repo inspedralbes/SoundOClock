@@ -118,7 +118,12 @@ export default {
       </div>
       <div class="h-48 flex flex-col gap-2 overflow-y-auto grow">
         <div v-for="report in song.reports" class="report-container p-4 grid grid-cols-12 gap-3 rounded-lg items-center">
-          <p class="col-span-6">{{ report.reason }}</p>
+          <div class="col-span-6 flex flex-col">
+            <p v-for="reason in report.reasons" class="flex items-center gap-2">
+              <UIcon name="i-heroicons-exclamation-circle-16-solid" />
+              {{ reason }}
+            </p>
+          </div>
           <p class="col-span-5 text-right">{{ report.userName }}</p>
           <ModularSwitch :value="report.isRead" :canSwitch=true @input="handleSwitch(report._id, $event)"
             class="col-span-1" />

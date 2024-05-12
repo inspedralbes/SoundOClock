@@ -9,13 +9,19 @@
                     :class="[pcStatus ? 'bg-green-500' : 'bg-red-500']"></span>
             </div>
         </div>
-        <div class="mt-20 mx-auto bg-black h-96 w-2/4 rounded-xl">
-            <span class="w-full h-full flex flex-col justify-end">
-                <span v-for="log in logs" class="ml-2">
-                    {{ log }}
+        <div class="mt-20 mx-auto bg-black h-96 w-2/4 rounded-xl relative" ref="logContainer">
+            <div v-if="logs.length > 0" @click="cleanLogs" class="absolute top-2 right-6 cursor-pointer">
+                <span class="material-symbols-rounded">
+                    delete
                 </span>
-            </span>
-
+            </div>
+            <div class="h-full w-full overflow-y-auto flex flex-col-reverse">
+                <div class="flex flex-col justify-end">
+                    <div v-for="log in logs" class="ml-2">
+                        {{ log }}
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="mt-20 w-2/4 mx-auto flex justify-between">
             <button class="rounded border-2 p-2 bg-green-500 hover:bg-green-700 w-1/4" @click="executeScript()">
@@ -46,11 +52,16 @@ export default {
 
         socket.on('dirPCStatus', (data) => {
             this.pcStatus = data;
-            console.log(this.pcStatus);
         });
 
         socket.on('sendPcDirLogs', (data) => {
-            this.pcLogs = data.split('\n');
+            let array = data.split('\n');
+            this.pcLogs.push(array);
+
+            // Mover el scroll al final del contenedor de logs
+            this.$nextTick(() => {
+                this.$refs.logContainer.scrollTop = this.$refs.logContainer.scrollHeight;
+            });
         });
     },
     computed: {
@@ -61,6 +72,9 @@ export default {
     methods: {
         executeScript() {
             socket.emit('sendBells');
+        },
+        cleanLogs() {
+            this.pcLogs = [];
         }
     },
     beforeDestroy() {

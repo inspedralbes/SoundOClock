@@ -34,6 +34,7 @@ Route::get('/users', [AuthController::class, 'index']);
 Route::get('/groupCategories', [GroupCategoryController::class, 'index']);
 Route::get('/groupCategoriesAll', [GroupCategoryController::class, 'indexAll']);
 Route::get('/allSettings', [SettingController::class, 'index']);
+Route::get('/bells', [BellController::class, 'index']);
 
 Route::get('/', function () {
     return response()->json(['message' => 'API Laravel 8'], 200);
@@ -77,7 +78,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/roles/{id}', [RolesController::class, 'destroy']);
 
     // Bells routes
-    Route::get('/bells', [BellController::class, 'index']);
+    // Route::get('/bells', [BellController::class, 'index']);
     Route::post('/bells', [BellController::class, 'store']);
     Route::put('/updateBells', [BellController::class, 'update']);
 
@@ -89,4 +90,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // User groups
     Route::get('/userGroups', [UserGroupsController::class, 'index']);
+    Route::delete('/group/{group_id}/user/{user_id}', [UserGroupsController::class, 'delete']);
 });

@@ -8,8 +8,8 @@
         <!-- Barra de busqueda -->
         <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
             settings.theme }}</h1>
-        <div class="w-full flex flex-row justify-center items-center" :class="{ 'flex-col': $device.isMobile }">
-            <div class="relative w-[60%] m-2 text-center" :class="{ 'w-[90%]': $device.isMobile }">
+        <div class="w-full flex justify-center items-center px-2 gap-2">
+            <div class="relative w-[60%] text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text"
                     :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
                     class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
@@ -20,27 +20,80 @@
                     search
                 </span>
                 <Transition name="delete-fade">
-                    <button v-if="filter" @click="deleteSearch">
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 material-symbols-rounded"
+                    <button v-if="filter" @click="deleteSearch"
+                        class="absolute h-full inset-y-0 right-0 flex items-center justify-center mr-3">
+                        <span class="material-symbols-rounded p-1 hover:bg-gray-400/[.25] rounded-full"
                             :class="{ 'text-base': $device.isMobile }">
                             Close
                         </span>
                     </button>
                 </Transition>
             </div>
-            <select v-model.lazy="orderBy"
-                class="w-[150px] appearance-none p-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                :class="{ 'text-sm !p-2': $device.isMobile }" :disabled="songs.length == 0">
-                <option value="" disabled selected>Filtre</option>
-                <option value="votes-desc">Més vots</option>
-                <option value="votes-asc">Menys vots</option>
-                <option value="title-desc">Títol (A-Z)</option>
-                <option value="title-asc">Títol (Z-A)</option>
-                <option value="artist-desc">Artista (A-Z)</option>
-                <option value="artist-asc">Artista (Z-A)</option>
-            </select>
+            <div class="dropdown relative z-50">
 
+                <UDropdown :items="getItems()" :ui="{ height: 'h-96' }" class="scrollBar">
+                    <button
+                        class="px-2 h-[38px] appearance-none flex items-center justify-center rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        id="buttonFilters" @click="isFiltersOpen = !isFiltersOpen"
+                        :class="{ 'w-[150px]': !$device.isMobile }">
+                        <span class="material-symbols-outlined text-white" v-if="$device.isMobile">
+                            tune
+                        </span>
+                        <div v-else>
+                            {{ this.filterBell ? formatTime(bells.find((bell) => bell.id === this.filterBell).hour) :
+                                'Filtres' }}
+                        </div>
+                    </button>
+
+                    <template #clean="{ item }">
+                        <div class="flex items-center justify-center w-full">
+                            <span class="truncate text-xsm text-gray-400">{{ item.label }}</span>
+                        </div>
+                    </template>
+
+                    <template #item="{ item }">
+                        <div class="flex items-center justify-between w-full">
+                            <span class="truncate">{{ item.label }}</span>
+                            <UIcon :name="item.icon" class="text-xl" />
+                        </div>
+                    </template>
+
+                </UDropdown>
+            </div>
         </div>
+        <div class="w-full flex flex-col items-center overflow-x-auto min-h-20">
+            <div v-if="classGroups.length > 0" id="buttonsFilterGroup">
+                <div v-if="groupsAvailable.length > 0" id="buttonsFilterGroupAvailable"
+                    class="overflow-x-auto whitespace-nowrap flex flex-row pt-2 pb-2 gap-2">
+                    <button :class="filterGroup === null ? 'border-blue-500 text-blue-500' : ''"
+                        class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        @click="selectGroup(null)">
+                        Tots els grups
+                    </button>
+                    <div v-for="(group, index) in groupsAvailable">
+                        <button :disabled="!hasPropose(group.id)" @click="selectGroup(group.id)"
+                            :title="hasPropose(group.id) ? `Fes clic per veure les cançons proposades d'aquest grup` : `No hi ha cap cançó proposada en aquest grup`"
+                            :class="filterGroup === group.id ? 'border-blue-500 text-blue-500' : ''"
+                            class="appearance-none pl-4 pr-4 p-2 rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
+                            {{ group.abbreviation }}
+                        </button>
+                    </div>
+                </div>
+                <div v-else
+                    class="appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                    No hi ha cap grup en aquesta franja horària
+
+                </div>
+
+
+            </div>
+            <div v-else class="loader">
+                <svg viewBox="25 25 50 50">
+                    <circle r="20" cy="50" cx="50"></circle>
+                </svg>
+            </div>
+        </div>
+
 
         <!-- Listado canciones propuestas -->
         <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
@@ -63,11 +116,22 @@
                 @report="report($event)" :type="getType(track.id)" />
         </TransitionGroup>
     </div>
-    <div v-else>
+    <div v-if="checkVotingState === 'mod'">
         <div>
             <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}" finalitzada
             </h2>
             <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
+        </div>
+    </div>
+    <div v-if="checkVotingState === 'none'" class="m-3">
+        <div>
+            <h2 class="text-center text-3xl font-bold mt-4">Cançons "{{ settings.theme }}"</h2>
+            <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
+        </div>
+        <div>
+            <Song :is="activeSong" v-for=" track in selectedSongs " :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" :type="'selected'"
+                :bellId="track.bellId" />
         </div>
     </div>
     <!-- </TransitionGroup> -->
@@ -121,13 +185,14 @@
             </template>
 
             <p>Per quin motiu vols reportar la cançó <b>'{{ reportSongData.reportedSong.name }}'</b>?</p>
-            <!-- <URadioGroup v-model="reportSongData.selectedOption" :options="reportSongData.options" class="mt-4">
-            </URadioGroup> -->
             <div class="flex flex-col mt-4">
-                <label v-for="( option, index ) in reportSongData.options " class="flex flex-row">
-                    <input type="radio" v-model="reportSongData.selectedOption" :value="option" name="report-option">
-                    <span class="ml-2">{{ option }}</span>
-                </label>
+                <div v-for="option in reportSongData.options " class="flex flex-row mb-2">
+                    <UCheckbox v-model="option.value">
+                        <template #label>
+                            <span>{{ option.label }}</span>
+                        </template>
+                    </UCheckbox>
+                </div>
             </div>
 
             <template #footer>
@@ -136,10 +201,15 @@
                         <UButton @click="modals.reportModal = false" variant="outline" class="px-4 py-2 text-sm">
                             Cancel·la
                         </UButton>
-                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading">
+                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive"
+                            disabled>
                             Reporta
                         </UButton>
-                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm" v-else loading>
+                        <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm"
+                            v-if="!isReportLoading && reportActive">
+                            Reporta
+                        </UButton>
+                        <UButton color="red" class="px-4 py-2 text-sm" v-if="isReportLoading" loading>
                             Reporta
                         </UButton>
                     </div>
@@ -186,14 +256,20 @@ export default {
             },
             songs: computed(() => this.store.proposedSongs),
             spotifySongs: [],
-            loading: false,
             isLoadingVote: computed(() => this.store.isLoadingVote),
             reportSongData: {
                 reportedSong: null,
-                options: ["La cançó té contingut inadequat", "La cançó no s'adequa a la temàtica"],
-                selectedOption: "La cançó té contingut inadequat"
+                options: [
+                    { label: "La cançó té contingut inadequat", value: false },
+                    { label: "La cançó no s'adequa a la temàtica", value: false },
+                ]
             },
+            isFiltersOpen: false,
             orderBy: '',
+            filterBell: null,
+            filterGroup: null,
+            groupedSongs: [],
+            mostVotedSongsPerBell: [],
             userSelectedSongs: computed(() => this.store.userSelectedSongs),
             store: useAppStore(),
             currentTrack: null,
@@ -213,6 +289,7 @@ export default {
             serverResponse: null,
             toast: null,
             isReportLoading: false,
+            selectedSongs: [],
         }
     },
     created() {
@@ -242,9 +319,37 @@ export default {
 
         socket.emit('getSettings', this.store.getUser().token);
 
+    },
+    mounted() {
+        comManager.getSongs();
+        comManager.getBells();
+        comManager.getUserSelectedSongs(this.store.getUser().id);
+        comManager.getUserReportedSongs(this.store.getUser().id);
+        comManager.getSortedVotedSongs();
+        comManager.getPublicGroupsAndCategories().then((data) => {
+            this.store.setClassGroups(data.publicGroups);
+            this.store.setCategories(data.publicCategories);
+        });
+        comManager.getSelectedSongs().then((data) => {
+            this.selectedSongs = data;
+        });
+
+        socket.on('reportError', (data) => {
+            this.modals.reportModal = false;
+            this.isReportLoading = false;
+            this.reportSongData.options.forEach(option => option.value = false);
+
+            this.toast.add({
+                title: 'Error',
+                description: `${data.message}`,
+                color: 'red',
+            });
+        });
+
         socket.on('songReported', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
+            this.reportSongData.options.forEach(option => option.value = false);
 
             this.toast.add({
                 title: 'Cançó reportada!',
@@ -256,21 +361,9 @@ export default {
         socket.on('reportError', (data) => {
             this.modals.reportModal = false;
             this.isReportLoading = false;
-
-            this.toast.add({
-                title: 'Error',
-                description: `${data.message}`,
-                color: 'red',
-            });
         });
-    },
-    mounted() {
-        comManager.getSongs();
-        comManager.getUserSelectedSongs(this.store.getUser().id);
 
-
-
-
+        socket.emit('getSettings', this.store.getUser().token);
 
         socket.on("voteError", (data) => {
             this.serverResponse = data;
@@ -291,6 +384,89 @@ export default {
         socket.off("sendSettings");
     },
     methods: {
+        handleResults() {
+            // Check if sortedVoted songs is loaded and set the groupedSongs
+            if (this.sortedVotedSongsByGroups.length > 0 && this.groupedSongs.length === 0) {
+                let result = this.fillMissingGroups(this.sortedVotedSongsByGroups);
+                this.groupedSongs = result;
+            }
+            // Check if bells is loaded and set the mostVotedSongs
+            if (this.bells.length > 0 && this.groupedSongs.length > 0) {
+                this.mostVotedSongsPerBell = this.getMostVotedSongs(this.bells);
+            }
+        },
+        fillMissingGroups(array) {
+            let result = []
+            let expectedGroup = 1
+            let totalGroups = this.classGroups.length
+
+            // Fill in the groups that are missing
+            for (let i = 0; i < array.length; i++) {
+                while (expectedGroup < parseInt(array[i].group)) {
+                    result.push({ group: expectedGroup, songs: [] });
+                    expectedGroup++;
+                }
+                result.push({ group: parseInt(array[i].group), songs: array[i].songs })
+                expectedGroup = parseInt(array[i].group) + 1;
+            }
+
+            // If last group in the array isn't 11, fill in the remaining groups
+            while (expectedGroup <= totalGroups) {
+                result.push({ group: expectedGroup, songs: [] });
+                expectedGroup++;
+            }
+
+            return result;
+        },
+        getMostVotedSongs(bells) {
+
+            let mostVotedSongsPerBell = bells.map(bell => {
+                let groups = bell.groups;
+                let result = []
+                for (let i = 0; i < groups.length; i++) {
+                    let groupId = groups[i].id;
+                    let groupSongs = this.sortedVotedSongsByGroups.find(group => parseInt(group.group) === groupId);
+                    if (groupSongs) {
+                        result.push(...groupSongs.songs);
+                    }
+                }
+
+
+                // Group by song id
+                const groupedData = {};
+                result.forEach(song => {
+                    if (groupedData[song.id]) {
+                        groupedData[song.id].totalVotes += song.votes;
+                    } else {
+                        groupedData[song.id] = { id: song.id, totalVotes: song.votes, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
+                    }
+                });
+                const resultArray = Object.values(groupedData);
+
+                // Sort by votes
+                resultArray.sort((a, b) => b.totalVotes - a.totalVotes);
+
+                // Return an object with the bell name and the most voted songs
+                return { ...bell, songs: resultArray.slice(0, 5) };
+            })
+            return mostVotedSongsPerBell;
+        },
+        formatTime(hourString) {
+            // Parseamos la cadena de tiempo en un objeto Date
+            let parsedTime = new Date("2000-01-01T" + hourString);
+
+            // Obtenemos las horas y minutos del objeto Date
+            let hours = parsedTime.getHours();
+            let minutes = parsedTime.getMinutes().toString().padStart(2, '0'); // Siempre queremos que los minutos tengan dos dígitos
+
+            // Formateamos la hora en el formato deseado
+            let formattedHour = hours.toString();
+            if (hours < 10) {
+                formattedHour = "" + formattedHour; // Agregamos un 0 si las horas son menores que 10
+            }
+
+            return formattedHour + ":" + minutes;
+        },
         getSongs() {
             if (this.filter != '') {
                 socket.emit('searchSong', this.filter);
@@ -326,15 +502,10 @@ export default {
         },
         reportTrack() {
             this.isReportLoading = true;
-            const song = { songId: this.reportSongData.reportedSong.id, option: this.reportSongData.selectedOption };
+
+            const options = this.reportSongData.options.filter(option => option.value).map(option => option.label);
+            const song = { songId: this.reportSongData.reportedSong.id, options: options };
             socket.emit('reportSong', this.store.getUser().token, song);
-        },
-        goToProposar() {
-            if (this.currentTrack != null) {
-                this.currentTrack.pause();
-            }
-            this.store.deleteCurrentTrackPlaying();
-            this.$router.push('/llistatPerProposar');
         },
         vote(songId) {
             if (!this.isLoadingVote.state) {
@@ -428,6 +599,49 @@ export default {
         searchBySongId(id) {
             return this.spotifySongs.find(item => item.id == id);
         },
+        selectBell(bellId) {
+            this.filterBell = bellId;
+            this.filterGroup = null
+        },
+        selectGroup(groupId) {
+            this.filterGroup = groupId;
+        },
+        hasPropose(groupId) {
+            let searchedGroup = this.sortedVotedSongsByGroups.find(group => parseInt(group.group) === groupId);
+            if (searchedGroup === undefined) {
+                return false;
+            }
+            if (searchedGroup.songs.length > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        cleanFilters() {
+            this.filterBell = null;
+            this.filterGroup = null;
+            this.orderBy = '';
+        },
+        getItems() {
+            let filterVotes = [
+                [{ label: "Natejar filters", slot: "clean", icon: 'i-heroicons-tune-solid', click: this.cleanFilters, id: '' }],
+                [{ label: "Més votades", icon: 'i-heroicons-chevron-double-up-solid', click: () => this.orderBy = 'votes-desc', id: 'votes-desc' }],
+                [{ label: "Menys votades", icon: 'i-heroicons-chevron-double-down-solid', click: () => this.orderBy = 'votes-asc', id: 'votes-asc' }]
+            ]
+
+            let bells = this.bells.map(bell => {
+                return [{
+                    label: this.formatTime(bell.hour),
+                    icon: 'i-heroicons-clock-solid',
+                    click: () => this.selectBell(bell.id),
+                    id: bell.id
+                }]
+            });
+
+            // Return the two arrays concatenated
+            return filterVotes.concat(bells);
+        }
+
 
     },
     watch: {
@@ -455,14 +669,20 @@ export default {
                 }
             }
         },
+        bells: {
+            handler: 'handleResults',
+        },
+        sortedVotedSongsByGroups: {
+            handler: 'handleResults',
+        },
     },
     computed: {
         filteredSongs() {
             let array = this.songs;
+            let filtered = [];
 
-            // if (this.filter.length < 3) return array;
 
-            let filtered = array.filter(song => {
+            filtered = array.filter(song => {
                 let songName = song.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
                 let filterText = this.filter.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -473,6 +693,33 @@ export default {
                     });
             });
 
+
+            if (this.filterBell) {
+                let bell = this.mostVotedSongsPerBell.find(bell => bell.id === this.filterBell);
+
+                if (bell) {
+                    filtered = bell.songs;
+
+                } else {
+                    filtered = [];
+                }
+            }
+            if (this.filterGroup) {
+                let filteredByGroup = this.sortedVotedSongsByGroups.find(group => parseInt(group.group) === this.filterGroup);
+
+                if (!filteredByGroup) {
+                    filtered = [];
+                } else {
+                    // forEach song in songs of filteredByGroup, add the attribute totalVotes with the same value of votes
+                    filteredByGroup.songs.forEach(song => {
+                        song.totalVotes = song.votes;
+                    });
+
+                    filtered = filteredByGroup.songs;
+                }
+            }
+
+
             switch (this.orderBy) {
                 case '':
                     filtered.sort((a, b) => b.totalVotes - a.totalVotes);
@@ -482,26 +729,6 @@ export default {
                     break;
                 case 'votes-asc':
                     filtered.sort((a, b) => a.totalVotes - b.totalVotes);
-                    break;
-                case 'title-desc':
-                    filtered.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'title-asc':
-                    filtered.sort((a, b) => b.name.localeCompare(a.name));
-                    break;
-                case 'artist-desc':
-                    filtered.sort((a, b) => {
-                        let aArtistNames = a.artists.map(artist => artist.name);
-                        let bArtistNames = b.artists.map(artist => artist.name);
-                        return bArtistNames[0].localeCompare(aArtistNames[0]);
-                    });
-                    break;
-                case 'artist-asc':
-                    filtered.sort((a, b) => {
-                        let aArtistNames = a.artists.map(artist => artist.name);
-                        let bArtistNames = b.artists.map(artist => artist.name);
-                        return aArtistNames[0].localeCompare(bArtistNames[0]);
-                    });
                     break;
                 default:
                     break;
@@ -514,6 +741,35 @@ export default {
         },
         activePlayer() {
             return this.activePlayer[this.mobileDetector];
+        },
+        bells() {
+            return this.store.getBells();
+        },
+        sortedVotedSongsByGroups() {
+            return this.store.getSortedVotedSongs();
+        },
+        classGroups() {
+            return this.store.getClassGroups();
+        },
+        groupsAvailable() {
+            let groupsAvailable = [];
+
+            if (this.filterBell === null) {
+                return this.classGroups;
+            }
+
+            if (this.filterBell) {
+                // get groups from bell
+                let b = this.bells.find(bell => bell.id === this.filterBell)
+                if (b) {
+                    groupsAvailable = b.groups;
+                }
+            }
+
+            return groupsAvailable;
+        },
+        categories() {
+            return this.store.getCategories();
         },
         checkVotingState() {
             let today = new Date();
@@ -528,6 +784,9 @@ export default {
             } else {
                 return "none";
             }
+        },
+        reportActive() {
+            return this.reportSongData.options.some(option => option.value);
         }
     },
 }
@@ -535,6 +794,121 @@ export default {
 </script>
 
 <style scoped>
+.loader {
+    max-height: 54px;
+    max-width: 54px;
+}
+
+.loader>svg {
+    width: 3.25em;
+    transform-origin: center;
+    animation: loader-rotate4 2s linear infinite;
+}
+
+.loader>circle {
+    fill: none;
+    stroke: hsl(214, 97%, 59%);
+    stroke-width: 2;
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    animation: loader-dash4 1.5s ease-in-out infinite;
+}
+
+@keyframes loader-rotate4 {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes loader-dash4 {
+    0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+    }
+
+    50% {
+        stroke-dasharray: 90, 200;
+        stroke-dashoffset: -35px;
+    }
+
+    100% {
+        stroke-dashoffset: -125px;
+    }
+}
+
+
+#buttonsFilterGroup {
+    width: calc(60% + 150px);
+}
+
+#buttonsFilterGroupAvailable::-webkit-scrollbar {
+    height: 12px;
+    /* Altura de la barra de desplazamiento */
+}
+
+#buttonsFilterGroupAvailable::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+#buttonsFilterGroupAvailable::-webkit-scrollbar-thumb {
+    background-color: #888;
+    /* Color del botón de la barra de desplazamiento */
+    border-radius: 5px;
+    /* Radio de borde del botón de la barra de desplazamiento */
+}
+
+#buttonsFilterGroupAvailable::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+    /* Color del botón de la barra de desplazamiento al pasar el mouse */
+    cursor: grab;
+}
+
+#buttonsFilterGroupAvailable::-webkit-scrollbar-thumb:active {
+    background-color: #333;
+    /* Color del botón de la barra de desplazamiento cuando está siendo activo */
+    cursor: grabbing;
+}
+
+
+#contentDropDownFilters {
+    border-radius: 10px;
+}
+
+#contentDropDownFilters::-webkit-scrollbar {
+    width: 10px;
+    /* Ancho de la barra de desplazamiento */
+}
+
+#contentDropDownFilters::-webkit-scrollbar-track {
+    background: none;
+    /* Hacemos transparente el fondo del riel */
+}
+
+#contentDropDownFilters::-webkit-scrollbar-thumb {
+    background-color: #999;
+    /* Color del pulgar */
+    border-radius: 10px;
+    /* Bordes redondos */
+}
+
+#contentDropDownFilters::-webkit-scrollbar-thumb:hover {
+    background-color: #666;
+    /* Color del pulgar al pasar el mouse */
+    cursor: grab;
+}
+
+#contentDropDownFilters::-webkit-scrollbar-thumb:active {
+    background-color: #333;
+    /* Color del pulgar cuando está siendo activo */
+    cursor: grabbing;
+}
+
+#contentDropDownFilters::-webkit-scrollbar-button {
+    display: none;
+    /* Ocultamos los botones de la barra de desplazamiento */
+}
+
 .song-slide-enter-active,
 .song-slide-leave-active,
 .song-slide-move {
