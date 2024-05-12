@@ -402,6 +402,7 @@ async function setSettings(token, settings, selectedSongs) {
     }),
   });
   const jsonResponse = await response.json();
+  console.log("Settings updated", jsonResponse);
   return jsonResponse;
 }
 

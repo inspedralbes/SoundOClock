@@ -86,7 +86,6 @@ class SettingController extends Controller
      */
     public function update(Request $request)
     {
-
         // Validar los datos de entrada
         $request->validate([
             'voteDuration' => 'integer',
