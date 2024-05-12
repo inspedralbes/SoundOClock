@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Public routes
-Route::post('/login', [AuthController::class,'login']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::get('/groups', [GroupsController::class, 'index']);
 Route::get('/groupsAll', [GroupsController::class, 'indexAll']);
 Route::get('/users', [AuthController::class, 'index']);
@@ -36,19 +36,16 @@ Route::get('/groupCategoriesAll', [GroupCategoryController::class, 'indexAll']);
 Route::get('/allSettings', [SettingController::class, 'index']);
 Route::get('/bells', [BellController::class, 'index']);
 
-Route::get('/', function () {
-    return response()->json(['message' => 'API Laravel 8'], 200);
-});
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     // Auth routes
-    Route::post('/logout', [AuthController::class,'logout']);
-    Route::get('/getUser', [AuthController::class,'getUser']);
-    Route::get('/blacklist', [BlacklistController::class,'index']);
-    Route::get('/blacklist/{id}', [BlacklistController::class,'show']);
-    Route::post('/blacklist', [BlacklistController::class,'store']);
-    Route::delete('/blacklist/{id}', [BlacklistController::class,'destroy']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/getUser', [AuthController::class, 'getUser']);
+    Route::get('/blacklist', [BlacklistController::class, 'index']);
+    Route::get('/blacklist/{id}', [BlacklistController::class, 'show']);
+    Route::post('/blacklist', [BlacklistController::class, 'store']);
+    Route::delete('/blacklist/{id}', [BlacklistController::class, 'destroy']);
     Route::get('/user/{id}', [AuthController::class, 'show']);
     Route::put('/user/{id}', [AuthController::class, 'update']);
 
@@ -63,7 +60,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/groupCategories/{id}', [GroupCategoryController::class, 'show']);
     Route::put('/groupCategories/{id}', [GroupCategoryController::class, 'update']);
     Route::delete('/groupCategories/{id}', [GroupCategoryController::class, 'destroy']);
-    
+
     // Groups & Users routes
     Route::post('/groupsUser', [GroupsController::class, 'addGroupsToUser']);
     Route::get('/groupsUser/{user_id}', [GroupsController::class, 'getGroupsFromUser']);
