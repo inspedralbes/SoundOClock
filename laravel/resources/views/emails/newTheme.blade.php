@@ -4,20 +4,19 @@
     <title>Nova temàtica</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <style>
-        /* Styles for the email */
+        /* Add your custom styles here */
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
         .header-container {
-            background-color: #333;
-            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 20px;
+            background-color: #1C1B22;
         }
 
         .logo {
@@ -33,22 +32,24 @@
 
         .brand-name {
             font-size: 24px;
-            color: #fff;
             font-weight: bold;
+            color: #fff;
         }
 
         .brand-name span {
-            color: #00ADEF;
+            color: #00adef;
         }
 
         .vote-button {
-            background-color: #00ADEF;
+            background-color: #00adef;
             color: #fff;
             border: none;
             padding: 10px 20px;
             font-size: 16px;
             border-radius: 5px;
             text-decoration: none;
+            cursor: pointer;
+            margin-left: auto;
         }
 
         .vote-button a {
@@ -57,77 +58,77 @@
         }
 
         section {
-            background-color: #fff;
             padding: 20px;
-            margin-top: 20px;
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 28px;
+            color: #333;
             margin-bottom: 10px;
         }
 
         h2 {
-            font-size: 20px;
+            font-size: 24px;
+            color: #333;
             margin-bottom: 10px;
         }
 
         p {
             font-size: 16px;
-            margin-bottom: 10px;
+            color: #666;
         }
 
         .song-info {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
         }
 
         .song-info img {
-            width: 50px;
-            height: 50px;
+            width: 80px;
+            height: 80px;
             margin-right: 10px;
         }
 
         .song-hour {
-            font-size: 16px;
+            font-size: 18px;
+            color: #333;
             margin-right: 10px;
-            margin-left: 10px;
-            padding-left: 10px;
-            border-left: 2px solid #00ADEF;
-            height: 50px; /* Add this line */
-            display: flex; /* Add this line */
-            align-items: center; /* Add this line */
         }
-        
+
         .song-details {
-            display: flex;
-            flex-direction: column;
-            margin-left: 10px;
-            padding-left: 10px;
-            border-left: 2px solid #00ADEF;
-            height: 50px; /* Add this line */
-            display: flex; /* Add this line */
+            flex-grow: 1;
         }
 
         .song-name {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-size: 20px;
+            color: #333;
+            display: inline-block;
         }
 
         .artists {
-            font-size: 12px;
+            display: flex;
+            flex-wrap: wrap;
         }
 
         .artist-name {
-            display: inline;
-            font-weight: normal;
+            font-size: 16px;
+            color: #666;
             margin-right: 5px;
         }
 
-        .vote-button {
-            margin-top: 20px;
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .logo {
+                margin-bottom: 10px;
+            }
+
+            .vote-button {
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
@@ -152,7 +153,7 @@
                     <img src="{{ $song['img'] }}" alt="{{ $song['name'] }}" />
                     <p class="song-hour">{{$bells[$index]['hour']}}</p>
                     <div class="song-details">
-                        <div class="song-name">{{ $song['name'] }}</div>
+                        <p class="song-name">{{ $song['name'] }}</p>
                         <div class="artists">
                             @foreach($song['artists'] as $index => $artist)
                             <p class="artist-name">{{ $artist['name'] }}@if($index != count($song['artists']) - 1),@endif</p>
@@ -160,6 +161,7 @@
                         </div>
                     </div>
                 </div>
+                <hr>
             @endforeach
         
         <p>Gràcies per ser part de la nostra comunitat!</p>
