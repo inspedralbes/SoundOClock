@@ -272,7 +272,7 @@ app.get("/bells/:userToken", async (req, res) => {
       bells = myCache.get("bells");
     } else {
       bells = await comManager.getBells(req.params.userToken);
-      console.log("bells", bells);
+      // console.log("bells", bells);
       myCache.set("bells", bells, DEFAULT_CACHE_TTL);
     }
 
@@ -964,6 +964,7 @@ io.on("connection", (socket) => {
     let limit = 15;
     comManager.searchSong(search, limit, spotifyToken).then((data) => {
       if (data) {
+        console.log("searchResult", data.tracks);
         socket.emit("searchResult", data.tracks.items);
       }
     });
