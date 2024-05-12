@@ -72,9 +72,7 @@ export default {
 
         socket.on('sendBlacklist', (blacklist) => {
             this.tracks = blacklist;
-            console.log(this.tracks);
             this.filteredTracks = blacklist;
-            console.log(this.filteredTracks);
             this.loading = false;
         });
 
