@@ -34,6 +34,7 @@ Route::get('/users', [AuthController::class, 'index']);
 Route::get('/groupCategories', [GroupCategoryController::class, 'index']);
 Route::get('/groupCategoriesAll', [GroupCategoryController::class, 'indexAll']);
 Route::get('/allSettings', [SettingController::class, 'index']);
+Route::get('/bells', [BellController::class, 'index']);
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -73,7 +74,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/roles/{id}', [RolesController::class, 'destroy']);
 
     // Bells routes
-    Route::get('/bells', [BellController::class, 'index']);
+    // Route::get('/bells', [BellController::class, 'index']);
     Route::post('/bells', [BellController::class, 'store']);
     Route::put('/updateBells', [BellController::class, 'update']);
 
