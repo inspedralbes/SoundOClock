@@ -816,6 +816,10 @@ io.on("connection", (socket) => {
         return;
       }
       console.log("in index", song);
+
+      // Delete the reports associated to the song
+      await ReportSong.deleteMany({ songId: songId });
+
       const bannedSong = await comManager.addSongToBlackList(userToken, song);
 
       // Notify the user that banned the song
