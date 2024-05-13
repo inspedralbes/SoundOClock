@@ -5,13 +5,31 @@
             <Loader />
         </div>
         <div v-else>
-            <div v-if="songs.length === 0" class="mt-4  w-full">
+            <div v-if="reportedSongs.length === 0 && nonReportedSongs.length === 0" class="mt-4  w-full">
                 <p class="text-center text-xl">No hi ha cap cançó proposada.</p>
             </div>
             <div v-else class="flex flex-row mt-8">
                 <div class="songs-container w-1/3 ml-20 overflow-x-hidden overflow-y-auto">
                     <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
-                        <button v-for="song in songs" @click="selectSong(song)"
+                        <UAlert v-if="reportedSongs.length === 0" color="orange"
+                            variant="subtle" title="Actualment no hi ha cap cançó reportada"/>
+
+                        <UAlert v-if="reportedSongs.length > 0" color="orange"
+                            variant="subtle" title="Cançons reportades:"/>
+
+                        <button v-for="song in reportedSongs" @click="selectSong(song)"
+                            class="flex flex-row justify-between items-center rounded-lg" :class="isSelected(song)">
+
+                            <Song :track="song" :currentTrackId="songStatus.currentTrackId"
+                                :isPlaying="songStatus.isPlaying" class="w-full justify-around" @play="playSong"
+                                :type="'admin'" :isSelected="selectedSong.id === song.id"
+                                :isReported="!areAllReportsRead(song)" />
+                        </button>
+
+                        <UAlert v-if="nonReportedSongs.length > 0" color="primary"
+                            variant="subtle" title="Cançons NO reportades:"/>
+
+                        <button v-for="song in nonReportedSongs" @click="selectSong(song)"
                             class="flex flex-row justify-between items-center rounded-lg" :class="isSelected(song)">
 
                             <Song :track="song" :currentTrackId="songStatus.currentTrackId"
@@ -39,6 +57,7 @@ export default {
         return {
             store: useAppStore(),
             selectedSong: null,
+            areReportedSongs: false,
         }
     },
     created() {
@@ -81,13 +100,31 @@ export default {
         loading() {
             return this.store.getLoadingAdminComponent();
         },
-        songs() {
-            // Sort songs by the number of reports
+        reportedSongs() {
+            // Select only the songs that have reports
             const songs = this.store.getProposedSongsAdminView();
-            songs.sort((a, b) => b.reports.length - a.reports.length);
+            const reportedSongs = songs.filter(song => song.reports.length > 0);
 
-            this.selectedSong = songs[0];
-            return songs;
+            // Sort the songs by the number of reports
+            reportedSongs.sort((a, b) => b.reports.length - a.reports.length);
+
+            if (reportedSongs.length > 0) {
+                this.selectedSong = reportedSongs[0];
+                this.areReportedSongs = true;
+            }
+
+            return reportedSongs;
+        },
+        nonReportedSongs() {
+            // Select only the songs that have no reports
+            const songs = this.store.getProposedSongsAdminView();
+            const nonReportedSongs = songs.filter(song => song.reports.length === 0);
+
+            if (nonReportedSongs.length > 0 && !this.areReportedSongs) {
+                this.selectedSong = nonReportedSongs[0];
+            }
+
+            return nonReportedSongs;
         },
         songStatus() {
             return this.store.getSongStatus();
