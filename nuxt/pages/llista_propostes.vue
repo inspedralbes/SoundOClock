@@ -31,34 +31,36 @@
             </div>
             <div class="dropdown relative z-50">
 
-                <UDropdown :items="getItems()" :ui="{ height: 'h-96' }" class="scrollBar">
-                    <button
-                        class="px-2 h-[38px] appearance-none flex items-center justify-center rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                        id="buttonFilters" @click="isFiltersOpen = !isFiltersOpen"
-                        :class="{ 'w-[150px]': !$device.isMobile }">
-                        <span class="material-symbols-outlined text-white" v-if="$device.isMobile">
-                            tune
-                        </span>
-                        <div v-else>
-                            {{ this.filterBell ? formatTime(bells.find((bell) => bell.id === this.filterBell).hour) :
-                                'Filtres' }}
-                        </div>
-                    </button>
+                <button
+                    class="px-2 h-[38px] appearance-none flex items-center justify-center rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    id="buttonFilters" @click="isFiltersSlideOpen = !isFiltersSlideOpen"
+                    :class="{ 'w-[150px]': !$device.isMobile }">
+                    <span class="material-symbols-outlined text-white" v-if="$device.isMobile">
+                        tune
+                    </span>
+                    <div v-else>
+                        {{ this.filterBell ? formatTime(bells.find((bell) => bell.id === this.filterBell).hour) :
+                            'Filtres' }}
+                    </div>
+                </button>
 
-                    <template #clean="{ item }">
-                        <div class="flex items-center justify-center w-full">
-                            <span class="truncate text-xsm text-gray-400">{{ item.label }}</span>
-                        </div>
-                    </template>
 
-                    <template #item="{ item }">
-                        <div class="flex items-center justify-between w-full">
-                            <span class="truncate">{{ item.label }}</span>
-                            <UIcon :name="item.icon" class="text-xl" />
+                <USlideover v-model="isFiltersSlideOpen" class="z-[9999]" :transition="false">
+                    <UCard class="flex flex-col flex-1"
+                        :ui="{ body: { base: 'flex-1', background: 'bg-stone-800', }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                        <Placeholder class="h-full" />
+                        <div class="flex items-center justify-between bg-stone-800">
+                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                                Filtres
+                            </h3>
+                            <button @click="isFiltersSlideOpen = false" class="h-8 w-8 flex items-center justify-center hover:bg-stone-600 rounded-full p-2">
+                                <span class="i-heroicons-x-mark-20-solid flex-shrink-0 h-5 w-5" aria-hidden="true"></span>
+                            </button>
                         </div>
-                    </template>
 
-                </UDropdown>
+                    </UCard>
+                </USlideover>
+
             </div>
         </div>
         <div class="w-full flex flex-col items-center overflow-x-auto min-h-20">
@@ -264,6 +266,7 @@ export default {
                     { label: "La cançó no s'adequa a la temàtica", value: false },
                 ]
             },
+            isFiltersSlideOpen: false,
             isFiltersOpen: false,
             orderBy: '',
             filterBell: null,
