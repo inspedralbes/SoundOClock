@@ -805,6 +805,7 @@ io.on("connection", (socket) => {
     let user = await comManager.getUserInfo(userToken);
     if (!user.id || user.is_admin === 0) return;
     console.log("song id", songId);
+    myCache.del("blacklist");
     try {
       // Check if the song exists and delete it
       const song = await Song.findOneAndDelete({ id: songId });

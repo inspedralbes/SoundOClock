@@ -39,7 +39,7 @@
         </div>
     </div>
     <div class="btn-container fixed bottom-0 w-full flex justify-center items-center">
-        <UButton size="xl" class="px-48" @click="openModal">Guardar</UButton>
+        <UButton size="xl" class="w-96 flex justify-center" @click="openModal">Guardar</UButton>
     </div>
     <UModal v-model="modals.errorModal">
         <UAlert icon="i-heroicons-x-circle-16-solid" color="red" variant="subtle" title="ERROR!"

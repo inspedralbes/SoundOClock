@@ -4,6 +4,7 @@
             <Loader />
         </div>
         <div v-else>
+            <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">LLISTA NEGRA</h2>
             <div class="width mx-auto my-5 flex flex-row justify-center">
                 <input class="cercador w-full ps-4" type="text" id="cercador" name="cercador" placeholder="Buscar..."
                     v-model="query" @keyup.enter="getSongs()" />
@@ -17,19 +18,29 @@
                     :currentTrackId="status.currentTrackId" :isPlaying="status.isPlaying" @play="playSong"
                     @unBan="setSongToUnBan(track), modalActual = true" :type="'unBan'" />
             </TransitionGroup>
-            <ModularModal :open="modalActual" :msg="'Confirmar'" @close="modalActual = null"
-                @confirm="removeFromBlacklist(songToUnBan.spotify_id)">
-                <template v-slot:title>
-                    <h2>Segur que vols treure aquesta cançó de la blacklist?</h2>
-                </template>
-                <template v-slot:content>
-                    <p>
-                        Si treus {{ songToUnBan.name }} de
-                        {{ songToUnBan.artists.map(artist => artist.name).join(', ') }}
-                        els usuaris podran tornar a votar-la.
-                    </p>
-                </template>
-            </ModularModal>
+
+            <UModal v-model="modalActual">
+                <div>
+                    <UAlert title="Estàs segur/a de treure aquesta cançó de la blacklist?"
+                        icon="i-heroicons-exclamation-triangle-16-solid" color="orange" variant="subtle" class="p-6">
+                        <template #title="{ title }">
+                            <span v-html="title" />
+                        </template>
+                        <template #description>
+                            <div>
+                                Els usuaris podran tornar a proposar i votar la cançó.
+                            </div>
+                            <div class="mt-2 flex gap-2">
+                                <UButton size="md" color="red" @click="modalActual = false">Enrere</UButton>
+                                <UButton size="md" color="primary" @click="removeFromBlacklist(songToUnBan.spotify_id)">
+                                    Continuar</UButton>
+                            </div>
+                        </template>
+                    </UAlert>
+                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid"
+                        class="absolute right-0 top-0" @click="modalActual = false" />
+                </div>
+            </UModal>
 
             <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
         </div>
@@ -44,13 +55,14 @@ import { useAppStore } from '../../stores/app';
 export default {
     data() {
         return {
+            store: useAppStore(),
             loading: true,
             songFile: null,
             query: '',
             tracks: [],
             songToUnBan: null,
             filteredTracks: [],
-            modalActual: null,
+            modalActual: false,
             status: {
                 isPlaying: false,
                 currentTrackId: null,
@@ -114,13 +126,10 @@ export default {
 
         removeFromBlacklist(spotify_id) {
             // Remove track from blacklist
+            this.modalActual = false;
             let token = this.store.getUser().token;
             socket.emit('removeFromBlacklist', token, spotify_id);
         },
-    },
-    setup() {
-        const store = useAppStore();
-        return { store };
     },
 }
 </script>
