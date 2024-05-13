@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">ADMINISTRAR PERMISOS D'USUARI</h2>
+        <h2 class="text-4xl text-white text-center font-black mt-4 mb-8">PERMISOS D'USUARI</h2>
         <div class="m-8" v-if="loading">
             <Loader />
         </div>

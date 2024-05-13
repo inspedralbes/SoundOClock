@@ -27,6 +27,7 @@ export default {
       this.modals.addSongToBlacklist = true;
     },
     submitData() {
+      this.modals.addSongToBlacklist = false
       socket.emit('deleteSong', this.store.getUser().token, this.song.id);
     },
     handleSwitch(reportId, value) {
@@ -117,7 +118,8 @@ export default {
           @click="markAllReportsAsRead()">MARCAR TOTS ELS REPORTS</button>
       </div>
       <div class="h-48 flex flex-col gap-2 overflow-y-auto grow">
-        <div v-for="report in song.reports" class="report-container p-4 grid grid-cols-12 gap-3 rounded-lg items-center">
+        <div v-for="report in song.reports"
+          class="report-container p-4 grid grid-cols-12 gap-3 rounded-lg items-center">
           <div class="col-span-6 flex flex-col">
             <p v-for="reason in report.reasons" class="flex items-center gap-2">
               <UIcon name="i-heroicons-exclamation-circle-16-solid" />
@@ -132,16 +134,24 @@ export default {
     </div>
   </div>
 
-  <ModularModal :open="modals.addSongToBlacklist" type="error" msg="Afegir" title="Afegir cançó a la llista negra"
-    @confirm="submitData()" @close="modals.addSongToBlacklist = false">
-    <template #title>
-      <h2>Afegir cançó a la llista negra</h2>
-    </template>
-    <template #content>
-      <p>Segur que vols afegir <span class="font-bold">{{ song.title }}</span> de <span class="font-bold">{{
-        song.artists.map(artist => artist.name).join(', ') }}</span> a la llista negra?</p>
-    </template>
-  </ModularModal>
+  <UModal v-model="modals.addSongToBlacklist">
+    <div>
+      <UAlert title="Estàs segur/a de banejar aquesta cançó?" icon="i-heroicons-exclamation-triangle-16-solid"
+        color="orange" variant="subtle" class="p-6">
+        <template #title="{ title }">
+          <span v-html="title" />
+        </template>
+        <template #description>
+          <div class="mt-2 flex gap-2">
+            <UButton size="md" color="red" @click="modals.addSongToBlacklist = false">Enrere</UButton>
+            <UButton size="md" color="primary" @click="submitData">Continuar</UButton>
+          </div>
+        </template>
+      </UAlert>
+      <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="absolute right-0 top-0"
+        @click="modals.addSongToBlacklist = false" />
+    </div>
+  </UModal>
 
   <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
 </template>

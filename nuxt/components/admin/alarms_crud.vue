@@ -17,9 +17,6 @@
                     </div>
                 </div>
                 <div class="groups-bells-container rounded-lg">
-                    <button class="pedralbes-button w-fit text-white font-bold mt-4 ml-4 py-2 px-4 rounded"
-                        @click="saveBellsGroupsRelation()">DESAR TIMBRES</button>
-
                     <div class="text-white text-center flex flex-row gap-4 p-4 overflow-x-auto">
                         <div v-for="bell in bells" class="bg-gray-400 rounded-lg p-4 flex flex-col gap-4 min-h-96"
                             @drop="onDrop($event, bell)" @dragenter.prevent @dragover.prevent>
@@ -49,25 +46,33 @@
             </div>
         </div>
     </div>
-    <ModularModal :open="modals.submitRelations" type="warning" msg="Desar" title="Desar configuració timbres"
-        @confirm="submitData()" @close="modals.submitRelations = false">
-        <template #title>
-            <h2>Desar configuració timbres</h2>
-        </template>
-        <template #content>
-            <p>Estàs segur que vols desar la configuració dels timbres?</p>
-        </template>
-    </ModularModal>
+    <div class="btn-container fixed bottom-0 w-full flex justify-center items-center">
+        <UButton size="xl" class="w-96 flex justify-center" @click="saveBellsGroupsRelation">Desar Timbres</UButton>
+    </div>
 
-    <ModularModal :open="modals.bellsWithoutGroups" type="error" title="Hi ha timbres sense grup assignat"
-        @close="modals.bellsWithoutGroups = false">
-        <template #title>
-            <h2>Hi ha timbres sense grup assignat</h2>
-        </template>
-        <template #content>
-            <p>Totes les franges horàries han de tenir com a mínim un grup assignat.</p>
-        </template>
-    </ModularModal>
+    <UModal v-model="modals.bellsWithoutGroups">
+        <UAlert icon="i-heroicons-x-circle-16-solid" color="red" variant="subtle" title="ERROR"
+            description="Totes les franges horàries han de tenir com a mínim un grup assignat." class="p-6" />
+    </UModal>
+
+    <UModal v-model="modals.submitRelations">
+        <div>
+            <UAlert title="Estàs segur/a que vols desar la configuració dels timbres?" icon="i-heroicons-exclamation-triangle-16-solid"
+                color="orange" variant="subtle" class="p-6">
+                <template #title="{ title }">
+                    <span v-html="title" />
+                </template>
+                <template #description>
+                    <div class="mt-2 flex gap-2">
+                        <UButton size="md" color="red" @click="closeConfirmationModal">Enrere</UButton>
+                        <UButton size="md" color="primary" @click="submitData">Continuar</UButton>
+                    </div>
+                </template>
+            </UAlert>
+            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="absolute right-0 top-0"
+                @click="closeConfirmationModal" />
+        </div>
+    </UModal>
 
     <ModularToast v-bind:serverResponse="serverResponse" time="10000"/>
 </template>
@@ -138,8 +143,12 @@ export default {
         },
         submitData() {
             const bells = { bells: this.bells };
+            this.closeConfirmationModal();
             socket.emit('updateBellsGroupsRelations', this.store.getUser().token, bells);
-        }
+        },
+        closeConfirmationModal() {
+            this.modals.submitRelations = false;
+        },
     },
     computed: {
         loading() {
@@ -184,17 +193,17 @@ export default {
     width: 150px;
 }
 
-/* .group-item:hover,
-.group-item:active {
-    background-color: white;
-    color: rgb(56, 56, 56);
-} */
-
 .groups-bells-container {
     background-color: rgb(56, 56, 56);
 }
 
 .pedralbes-button {
     background-color: var(--pedralbes-blue);
+}
+
+.btn-container {
+    background-color: rgba(0, 0, 0, 0.5);
+    height: 5rem;
+    box-shadow: 0px -5px 10px 0px rgba(0, 0, 0, 0.5);
 }
 </style>

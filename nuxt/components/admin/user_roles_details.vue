@@ -7,37 +7,44 @@
         </div>
         <div class="flex flex-col gap-3">
             <div v-for="role in roles">
-                <div v-if="role.id !=1" class="radio-card p-4 rounded-lg text-left text-xl" :class="backgroundColor(role.id)">
-                <input type="radio" :id="'option-' + role.id" name="role-options" :value="role.id" v-model="selectedRole"
-                    @change="" />
-                <label :for="'option-' + role.id" class="flex flex-row items-center gap-4">
-                    <div class="w-fit h-fit" v-html="icon(role.id)"></div>
-                    <div class="flex flex-col">
-                        <p class="uppercase font-black">{{ role.name }}</p>
-                        <p>{{ role.description }}</p>
-                    </div>
-                </label>
-            </div>
+                <div v-if="role.id != 1" class="radio-card p-4 rounded-lg text-left text-xl"
+                    :class="backgroundColor(role.id)">
+                    <input type="radio" :id="'option-' + role.id" name="role-options" :value="role.id"
+                        v-model="selectedRole" @change="" />
+                    <label :for="'option-' + role.id" class="flex flex-row items-center gap-4">
+                        <div class="w-fit h-fit" v-html="icon(role.id)"></div>
+                        <div class="flex flex-col">
+                            <p class="uppercase font-black">{{ role.name }}</p>
+                            <p>{{ role.description }}</p>
+                        </div>
+                    </label>
+                </div>
             </div>
         </div>
         <button class="pedralbes-button w-fit text-white font-bold mt-4 py-2 px-4 rounded" @click="saveUserRole()">DESAR
             ROL</button>
     </div>
 
-    <ModularModal :open="modals.changeUserRole" type="warning" msg="Desar" title="Canviar rol d'usuari"
-        @confirm="submitData()" @close="modals.changeUserRole = false">
-        <template #title>
-            <h2>Ets a punt de canviar el rol d'un usuari!</h2>
+    <UModal v-model="modals.changeUserRole">
+        <div>
+            <UAlert title="Estàs segur/a de canviar el rol de l'usuari?" icon="i-heroicons-exclamation-triangle-16-solid"
+                color="orange" variant="subtle" class="p-6">
+                <template #title="{ title }">
+                    <span v-html="title" />
+                </template>
+                <template #description>
+                    <div class="mt-2 flex gap-2">
+                        <UButton size="md" color="red" @click="modals.changeUserRole = false">Enrere</UButton>
+                        <UButton size="md" color="primary" @click="submitData()">Continuar</UButton>
+                    </div>
+                </template>
+            </UAlert>
+            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="absolute right-0 top-0"
+                @click="modals.changeUserRole = false" />
+        </div>
+    </UModal>
 
-        </template>
-        <template #content>
-            <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> tingui permisos de
-                <span class="font-bold">{{ roleName(selectedRole) }}?</span>
-            </p>
-        </template>
-    </ModularModal>
-
-    <ModularToast v-bind:serverResponse="serverResponse" time="10000"/>
+    <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
 </template>
 
 <script>
@@ -126,6 +133,7 @@ export default {
             this.modals.changeUserRole = true;
         },
         submitData() {
+            this.modals.changeUserRole = false
             // Object.assign() method copies all properties of a source object into a target object ==> Object.assign(target, source)
             let auxUser = Object.assign({}, this.user);
             auxUser.role_id = this.selectedRole;
