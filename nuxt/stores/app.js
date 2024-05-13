@@ -258,5 +258,14 @@ export const useAppStore = defineStore("app", {
       }
       return this.songStatus;
     },
+
+    pauseTrack() {
+      if (this.songStatus.isPlaying) {
+        this.songStatus.currentTrack.pause();
+        this.songStatus.isPlaying = false;
+      }
+
+      return this.songStatus;
+    },
   },
 });
