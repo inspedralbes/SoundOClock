@@ -30,7 +30,7 @@ export default async function defineNuxtRouteMiddleware(to, from) {
         return navigateTo('/llista_propostes')
     } else if (isAuthenticated && to.path === '/admin') {
         const response = await comManager.getUserInfo(userData.token)
-        if(response.role_id !== 1) {
+        if(response.role_id > 3) {
             // Redirect to home page if user is not admin
             return navigateTo('/llista_propostes')
         }
