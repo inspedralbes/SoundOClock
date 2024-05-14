@@ -5,14 +5,22 @@
             <Loader />
         </div>
         <div v-else>
+
             <div class="flex flex-col gap-3 mt-8 ml-20 mr-8">
                 <div class="bg-gray-400 rounded-lg users-container p-4">
-                    <span class="text-lg font-bold">GRUPS DISPONIBLES</span>
+                    <div class="grid grid-cols-12">
+                        <span class="text-lg font-bold col-span-8">GRUPS DISPONIBLES</span>
+                        <input type="text" placeholder="Busca un grup..." :value="search" @input="search = $event.target.value;"
+                            class="col-span-4 h-full w-full items-center rounded-lg p-3 border-2 border-white">
+                    </div>
                     <div class="flex flex-row gap-3 py-4 overflow-x-auto">
-                        <div v-for="group in classGroups"
+                        <div v-if="filteredClassGroups().length > 0" v-for="group in filteredClassGroups()"
                             class="group-item min-w-40 h-20 flex flex-row justify-center items-center rounded-lg p-4"
                             draggable="true" @dragstart="startDrag($event, group)">
                             {{ group.abbreviation }}
+                        </div>
+                        <div v-else class="w-full h-20 flex flex-row justify-center items-center rounded-lg p-4">
+                            NO HI HA GRUPS QUE COINCIDEIXEN AMB LA CERCA
                         </div>
                     </div>
                 </div>
@@ -57,8 +65,8 @@
 
     <UModal v-model="modals.submitRelations">
         <div>
-            <UAlert title="Estàs segur/a que vols desar la configuració dels timbres?" icon="i-heroicons-exclamation-triangle-16-solid"
-                color="orange" variant="subtle" class="p-6">
+            <UAlert title="Estàs segur/a que vols desar la configuració dels timbres?"
+                icon="i-heroicons-exclamation-triangle-16-solid" color="orange" variant="subtle" class="p-6">
                 <template #title="{ title }">
                     <span v-html="title" />
                 </template>
@@ -74,7 +82,7 @@
         </div>
     </UModal>
 
-    <ModularToast v-bind:serverResponse="serverResponse" time="10000"/>
+    <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
 </template>
 
 <script>
@@ -92,6 +100,7 @@ export default {
                 submitRelations: false,
                 bellsWithoutGroups: false,
             },
+            search: "",
         }
     },
     created() {
@@ -148,6 +157,18 @@ export default {
         },
         closeConfirmationModal() {
             this.modals.submitRelations = false;
+        },
+        filteredClassGroups() {
+            let filteredClassGroups = this.classGroups;
+
+            if (this.search.trim() !== '') {
+                filteredClassGroups = filteredClassGroups.filter((group) => {
+                    return group.abbreviation.toLowerCase().includes(this.search.toLowerCase());
+                });
+            } else {
+                filteredClassGroups = this.classGroups;
+            }
+            return filteredClassGroups;
         },
     },
     computed: {
