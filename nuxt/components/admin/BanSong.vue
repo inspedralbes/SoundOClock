@@ -9,8 +9,8 @@
                 <p class="text-center text-xl">No hi ha cap cançó proposada.</p>
             </div>
             <div v-else class="flex flex-row mt-8">
-                <div class="songs-container w-1/3 ml-20 overflow-x-hidden overflow-y-auto">
-                    <div class="width mb-8 flex flex-col justify-center ml-auto mr-auto gap-3">
+                <div class="songs-container w-1/3 ml-24 overflow-x-hidden overflow-y-auto">
+                    <div class="width mb-8 mr-4 flex flex-col justify-center ml-auto gap-3">
                         <UAlert v-if="reportedSongs.length === 0" color="orange"
                             variant="subtle" title="Actualment no hi ha cap cançó reportada"/>
 
@@ -33,7 +33,7 @@
                             class="flex flex-row justify-between items-center rounded-lg" :class="isSelected(song)">
 
                             <Song :track="song" :currentTrackId="songStatus.currentTrackId"
-                                :isPlaying="songStatus.isPlaying" class="w-full justify-around" @play="playSong"
+                                :isPlaying="songStatus.isPlaying" class="w-full" @play="playSong"
                                 :type="'admin'" :isSelected="selectedSong.id === song.id"
                                 :isReported="!areAllReportsRead(song)" />
                         </button>
@@ -119,6 +119,9 @@ export default {
             // Select only the songs that have no reports
             const songs = this.store.getProposedSongsAdminView();
             const nonReportedSongs = songs.filter(song => song.reports.length === 0);
+
+            // Sort the songs by the number of votes
+            nonReportedSongs.sort((a, b) => b.totalVotes - a.totalVotes);
 
             if (nonReportedSongs.length > 0 && !this.areReportedSongs) {
                 this.selectedSong = nonReportedSongs[0];
