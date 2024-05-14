@@ -800,7 +800,7 @@ io.on("connection", (socket) => {
   });
 
   // Delete a song
-  socket.on("deleteSong", async (userToken, songId) => {
+  socket.on("deleteSong", async (userToken, songId, isAddedToBlacklist) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
     if (!user.id || user.is_admin === 0) return;
@@ -816,18 +816,26 @@ io.on("connection", (socket) => {
         });
         return;
       }
-      console.log("in index", song);
 
       // Delete the reports associated to the song
       await ReportSong.deleteMany({ songId: songId });
 
-      const bannedSong = await comManager.addSongToBlackList(userToken, song);
+      if (isAddedToBlacklist) {
+        // Add song to blacklist
+        const bannedSong = await comManager.addSongToBlackList(userToken, song);
 
-      // Notify the user that banned the song
-      socket.emit("notifyServerResponse", {
-        status: "success",
-        message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.`,
-      });
+        // Notify the user that banned the song
+        socket.emit("notifyServerResponse", {
+          status: "success",
+          message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.`,
+        });
+      } else {
+        // Notify the user that erased the song
+        socket.emit("notifyServerResponse", {
+          status: "success",
+          message: `La cançó ${song.name} ha sigut eliminada de la llista de cançons proposades.`,
+        });
+      }
 
       // Update the proposed songs list to everybody
       io.emit("songDeleted", { status: "success", song: song });

@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row justify-center gap-3 m-2 p-2 rounded text-gray-200"
-        :class="{ 'bg-yellow-200 text-gray-800': isFirstPlace, 'text-gray-800': isSelected, 'justify-between': type === 'admin_set_song' }">
+        :class="{ 'bg-yellow-200 text-gray-800': isFirstPlace, 'text-gray-800': isSelected, 'justify-between': type === 'admin_set_song', 'justify-stretch gap-5 m-0': type === 'admin' }">
         <UChip size="3xl" color="red" v-if="numReports > 0 && type === 'admin'">
             <template #content>
                 <div>{{ numReports }}</div>
@@ -29,18 +29,18 @@
             </Transition>
         </div>
         <div class="flex-row w-3/5 flex justify-between items-center"
-            :class="{ 'border-gray-800': isFirstPlace, 'border-b border-solid border-gray-300 px-2 pb-2': type !== 'admin', 'w-9/12': type === 'admin_set_song' }">
-            <div class="flex flex-col w-[70%] items-start">
-                <p class="font-bold text-base uppercase">{{ track.name }}</p>
+            :class="{ 'border-gray-800': isFirstPlace, 'border-b border-solid border-gray-300 px-2 pb-2': type !== 'admin', 'w-9/12': type === 'admin_set_song', 'w-9/12': type === 'admin' }">
+            <div class="flex flex-col w-[80%] items-start marquee-container">
+                <p class="font-bold text-base uppercase" :class="{ 'text-marquee': isOverflowing('title') && type === 'admin' }">
+                    {{ track.name }}
+                </p>
                 <div class="flex flex-row items-center text-sm py-1">
                     <UBadge v-if="track.explicit && !isSelected" color="black" class="mr-2">E</UBadge>
                     <UBadge v-if="track.explicit && isSelected" color="white" class="mr-2">E</UBadge>
-                    <p class="whitespace-nowrap overflow-hidden">
-                        <span v-for="(artist, index) in track.artists" :key="index">
-                            <span v-if="index !== 0">, </span>
-                            {{ artist.name }}
-                        </span>
-                    </p>
+                    <span class="overflow-hidden whitespace-nowrap" v-if="artistList"
+                        :class="{ 'text-marquee': isOverflowing('artist') && type === 'admin' }">
+                        {{ artistList }}
+                    </span>
                 </div>
                 <p v-if="type === 'vote' || type === 'admin'" class="text-sm">Vots: {{ track.totalVotes }}</p>
                 <p v-if="type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
@@ -190,6 +190,13 @@ export default {
             const formattedTime = date.toLocaleTimeString('en-US', options);
 
             return formattedTime;
+        },
+        isOverflowing(type) {
+            if (type === 'title') {
+                return this.track.name.length > 20;
+            } else if (type === 'artist') {
+                return this.artistList.length > 30;
+            }
         }
     },
     computed: {
@@ -198,6 +205,19 @@ export default {
                 return 0;
             }
             return this.track.reports.length;
+        },
+        artistList() {
+            // Get the list of artists in a string
+            if (this.track.artists) {
+                let artistList = "";
+                this.track.artists.forEach((artist, index) => {
+                    if (index !== 0) {
+                        artistList += ", ";
+                    }
+                    artistList += artist.name;
+                });
+                return artistList;
+            }
         }
     }
 }
@@ -269,5 +289,30 @@ export default {
 .playingFade-enter-from,
 .playingFade-leave-to {
     opacity: 0;
+}
+
+.marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+}
+
+.text-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scroll-text 10s linear infinite;
+}
+
+/* Keyframes for the scrolling animation using translateX */
+@keyframes scroll-text {
+    from {
+        transform: translateX(60%);
+        /* Start by moving from the right */
+    }
+
+    to {
+        transform: translateX(-100%);
+        /* Move all the way to the left */
+    }
 }
 </style>

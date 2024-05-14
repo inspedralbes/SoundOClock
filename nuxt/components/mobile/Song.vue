@@ -1,31 +1,28 @@
 <template>
-    <div class="w-full flex justify-center">
-        <div class="relative flex w-[95%] h-[100px] bg-gray-200 overflow-hidden rounded-lg"
-            :class="{ 'mt-4': type !== 'admin' }">
+    <div class="w-full flex justify-center text-white">
+        <div class="relative flex w-[95%] h-[100px] bg-gray-200 overflow-hidden rounded-lg border"
+            :class="{ 'mt-4': type !== 'admin', 'border-yellow-300': isFirstPlace }">
             <img class="w-full h-auto object-cover object-center brightness-50"
                 :class="{ 'opacity-100': type === 'admin' && isSelected, 'opacity-75': type === 'admin' && !isSelected }"
                 :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'">
 
-            <div class="absolute inset-0 flex flex-row justify-center">
+            <div class="absolute inset-0 flex flex-row justify-center faded-background">
                 <div class="flex flex-row w-full justify-between p-2 items-center">
-                    <div class="flex flex-col w-[70%] overflow-hidden items-start">
-                        <p
-                            class="font-bold text-base bg-black bg-opacity-60 text-ellipsis uppercase max-w-[200px] overflow-hidden whitespace-nowrap">
+                    <div class="flex flex-col w-[70%] overflow-hidden items-start marquee-container">
+                        <p class="font-bold text-base bg-opacity-60 uppercase overflow-hidden whitespace-nowrap"
+                            :class="{ 'text-marquee': isOverflowing('title') }">
                             {{ track.name }}
                         </p>
-                        <div class="flex flex-row text-sm">
-                            <p class="text-ellipsis bg-black bg-opacity-60">
-                                <UBadge v-if="track.explicit" color="gray">E</UBadge>
-                                <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="track.artists"
-                                    v-for="(artist, index) in track.artists" :key="index">
-                                    <span v-if="index !== 0">, </span>
-                                    {{ artist.name }}
-                                </span>
-                            </p>
+                        <div class="flex items-center gap-2 text-sm marquee-container">
+                            <UBadge v-if="track.explicit" color="gray">E</UBadge>
+                            <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="artistList"
+                                :class="{ 'text-marquee': isOverflowing('artist') }">
+                                {{ artistList }}
+                            </span>
                         </div>
-                        <p v-if="type === 'vote'" class="bg-black bg-opacity-60 text-sm">Vots: {{ track.totalVotes }}
+                        <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.totalVotes }}
                         </p>
-                        <p v-if="type === 'admin'" class="bg-black bg-opacity-60 text-sm">Vots: {{ track.votes }}</p>
+                        <p v-if="type === 'admin' || type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
                     </div>
                     <button @click="playTrack(track)">
                         <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
@@ -97,7 +94,11 @@ export default {
         isSelected: {
             type: Boolean,
             default: false
-        }
+        },
+        isFirstPlace: {
+            type: Boolean,
+            default: false
+        },
     },
     data() {
         return {
@@ -137,10 +138,29 @@ export default {
             // Then emit the event
             this.$emit('setSelected', bellId, songId);
         },
+        isOverflowing(type) {
+            if (type === 'title') {
+                return this.track.name.length > 25;
+            } else if (type === 'artist') {
+                return this.artistList.length > 30;
+            }
+        }
     },
-    watch: {
-
-    },
+    computed: {
+        artistList() {
+            // Get the list of artists in a string
+            if (this.track.artists) {
+                let artistList = "";
+                this.track.artists.forEach((artist, index) => {
+                    if (index !== 0) {
+                        artistList += ", ";
+                    }
+                    artistList += artist.name;
+                });
+                return artistList;
+            }
+        }
+    }
 }
 </script>
 
@@ -210,5 +230,35 @@ export default {
 .playingFade-enter-from,
 .playingFade-leave-to {
     opacity: 0;
+}
+
+.faded-background {
+    /** Black background and fades from left to right */
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.1));
+}
+
+.marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+}
+
+.text-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scroll-text 10s linear infinite;
+}
+
+/* Keyframes for the scrolling animation using translateX */
+@keyframes scroll-text {
+    from {
+        transform: translateX(60%);
+        /* Start by moving from the right */
+    }
+
+    to {
+        transform: translateX(-100%);
+        /* Move all the way to the left */
+    }
 }
 </style>
