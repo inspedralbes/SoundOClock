@@ -389,18 +389,20 @@ async function getRoles(token) {
 }
 
 async function setSettings(token, settings, selectedSongs) {
-  const response = await fetch(apiURL + `settings`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      authorization: "Bearer " + token,
-    },
-    body: JSON.stringify({
+  const response = await axios.put(
+    apiURL + `settings`,
+    {
       settings: settings,
       selectedSongs: selectedSongs,
-    }),
-  });
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: "Bearer " + token,
+      },
+    }
+  );
   const jsonResponse = await response.json();
   console.log("Settings updated", jsonResponse);
   return jsonResponse;
