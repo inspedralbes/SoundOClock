@@ -169,7 +169,7 @@ export default {
   <div v-if="user == null">
   </div>
   <div v-else class="user-details-container rounded-lg text-left p-4">
-    <div class="mb-10">
+    <div class="mb-8">
       <p class="text-5xl font-black">{{ user.name }}</p>
       <span class="text-lg" >Mail: {{ user.email }}</span>
       <div>
