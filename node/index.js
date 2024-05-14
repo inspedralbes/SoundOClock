@@ -301,7 +301,7 @@ app.post("/createGroupCategory", async (req, res) => {
 });
 
 app.post("/createGroup", async (req, res) => {
-  
+
   try {
     myCache.flushAll();
 
@@ -608,10 +608,10 @@ io.on("connection", (socket) => {
                 newSong.votesPerGroup.set(group.id.toString(), 1);
               }
             });
-  
+
             // Añadir la canción a la lista de canciones votadas del usuario
             votingRecord.votedSongs.push(songData.id);
-  
+
             // Guardar la canción y actualizar el registro de votación
             await newSong.save();
           }
@@ -786,7 +786,7 @@ io.on("connection", (socket) => {
   });
 
   // Delete a song
-  socket.on("deleteSong", async (userToken, songId) => {
+  socket.on("deleteSong", async (userToken, songId, isAddedToBlacklist) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
     if (!user.id || user.is_admin === 0) return;
@@ -801,14 +801,23 @@ io.on("connection", (socket) => {
         });
         return;
       }
-      console.log("in index", song);
-      const bannedSong = await comManager.addSongToBlackList(userToken, song);
 
-      // Notify the user that banned the song
-      socket.emit("notifyServerResponse", {
-        status: "success",
-        message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.`,
-      });
+      if (isAddedToBlacklist) {
+        // Add song to blacklist
+        const bannedSong = await comManager.addSongToBlackList(userToken, song);
+
+        // Notify the user that banned the song
+        socket.emit("notifyServerResponse", {
+          status: "success",
+          message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.`,
+        });
+      } else {
+        // Notify the user that erased the song
+        socket.emit("notifyServerResponse", {
+          status: "success",
+          message: `La cançó ${song.name} ha sigut eliminada de la llista de cançons proposades.`,
+        });
+      }
 
       // Update the proposed songs list to everybody
       io.emit("songDeleted", { status: "success", song: song });

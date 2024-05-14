@@ -11,6 +11,7 @@ export default {
       notReadReports: 0,
       modals: {
         addSongToBlacklist: false,
+        eraseSong: false,
       },
     }
   },
@@ -23,11 +24,17 @@ export default {
     },
   },
   methods: {
-    deleteSong() {
+    eraseSong() {
+      this.modals.eraseSong = true;
+    },
+    submitEraseSongData() {
+      socket.emit('deleteSong', this.store.getUser().token, this.song.id, false);
+    },
+    banSong() {
       this.modals.addSongToBlacklist = true;
     },
-    submitData() {
-      socket.emit('deleteSong', this.store.getUser().token, this.song.id);
+    submitBanSongData() {
+      socket.emit('deleteSong', this.store.getUser().token, this.song.id, true);
     },
     handleSwitch(reportId, value) {
 
@@ -97,8 +104,12 @@ export default {
           <p class="text-5xl font-black">{{ song.name }}</p>
           <p class="text-3xl">{{ song.artists.map(artist => artist.name).join(', ') }}</p>
         </div>
-        <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          @click="deleteSong(song)">AFEGIR A LA LLISTA NEGRA</button>
+        <div class="flex flex-row gap-3">
+          <button class="w-fit bg-red-200 hover:bg-red-400 text-black  font-bold py-2 px-4 rounded"
+            @click="eraseSong(song)">ELIMINAR DE CANÇONS PROPOSADES</button>
+          <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            @click="banSong(song)">AFEGIR A LA LLISTA NEGRA</button>
+        </div>
       </div>
     </div>
     <p class="mb-4 text-xl">CANÇÓ PROPOSADA PER: {{ song.user.name }}</p>
@@ -133,13 +144,24 @@ export default {
   </div>
 
   <ModularModal :open="modals.addSongToBlacklist" type="error" msg="Afegir" title="Afegir cançó a la llista negra"
-    @confirm="submitData()" @close="modals.addSongToBlacklist = false">
+    @confirm="submitBanSongData()" @close="modals.addSongToBlacklist = false">
     <template #title>
       <h2>Afegir cançó a la llista negra</h2>
     </template>
     <template #content>
-      <p>Segur que vols afegir <span class="font-bold">{{ song.title }}</span> de <span class="font-bold">{{
+      <p>Segur que vols afegir <span class="font-bold">{{ song.name }}</span> de <span class="font-bold">{{
         song.artists.map(artist => artist.name).join(', ') }}</span> a la llista negra?</p>
+    </template>
+  </ModularModal>
+
+  <ModularModal :open="modals.eraseSong" type="error" msg="Eliminar" title="Eliminar de la llista de cançons proposades"
+    @confirm="submitEraseSongData()" @close="modals.eraseSong = false">
+    <template #title>
+      <h2>Eliminar de la llista de cançons proposades</h2>
+    </template>
+    <template #content>
+      <p>Segur que vols eliminar <span class="font-bold">{{ song.name }}</span> de <span class="font-bold">{{
+        song.artists.map(artist => artist.name).join(', ') }}</span> de la llista de cançons proposades?</p>
     </template>
   </ModularModal>
 
