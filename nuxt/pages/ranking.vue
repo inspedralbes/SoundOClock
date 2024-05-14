@@ -12,10 +12,13 @@
                     <UAlert title="No hi han cançons!" variant="outline" color="white" class="text-center" />
                 </div>
                 <div v-for="(song, index) in item.item.songs" :key="song.id" class="flex">
-                    <div class="position flex justify-center items-center text-center text-white font-bold text-2xl">{{
-                        index + 1 }}</div>
-                    <Song :track="song" :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying"
-                        :isFirstPlace="index === 0" class="w-full justify-around" @play="playSong" :type="'ranking'" />
+                    <div class="position flex justify-center items-center text-center text-white font-bold text-2xl">
+                        {{ index + 1 }}
+                    </div>
+
+                    <component :is="activeSong" :key="song.id" :track="song" :currentTrackId="songStatus.currentTrackId"
+                        :isPlaying="songStatus.isPlaying" @play="playSong" :type="'ranking'"
+                        :isFirstPlace="index === 0" class="w-full justify-around" />
                 </div>
             </template>
         </UAccordion>
@@ -36,11 +39,16 @@ export default {
             groupedSongs: [],
             mostVotedSongs: [],
             toast: null,
-            itemsAccordion: []
+            itemsAccordion: [],
+            mobileDetector: this.$device.isMobile ? 1 : 0,
+            songComponent: {
+                0: resolveComponent('Song'),
+                1: resolveComponent('MobileSong'),
+            },
         }
     },
     created() {
-        if(this.store.getClassGroups().length === 0) {
+        if (this.store.getClassGroups().length === 0) {
             socket.emit("getGroups");
         }
         comManager.getBells();
@@ -108,7 +116,7 @@ export default {
                     if (groupedData[song.id]) {
                         groupedData[song.id].votes += song.votes;
                     } else {
-                        groupedData[song.id] = { id: song.id, votes: song.votes, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
+                        groupedData[song.id] = { id: song.id, votes: song.votes, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url, explicit: song.explicit};
                     }
                 });
                 const resultArray = Object.values(groupedData);
@@ -156,7 +164,10 @@ export default {
         },
         songStatus() {
             return this.store.getSongStatus();
-        }
+        },
+        activeSong() {
+            return this.songComponent[this.mobileDetector];
+        },
     }
 }
 </script>
