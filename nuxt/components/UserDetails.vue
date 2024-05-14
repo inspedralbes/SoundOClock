@@ -169,8 +169,13 @@ export default {
   <div v-if="user == null">
   </div>
   <div v-else class="user-details-container rounded-lg text-left p-4">
-    <div class="mb-10">
+    <div class="mb-8">
       <p class="text-5xl font-black">{{ user.name }}</p>
+      <span class="text-lg" >Mail: {{ user.email }}</span>
+      <div>
+        <span class="text-lg">Grups: </span>
+        <span v-for="(group,index) in user.groups" class="text-lg">{{ group.abbreviation+(index === user.groups.length-1?'':', ') }}</span>
+      </div>
     </div>
     <div class="flex flex-row gap-8 mb-4">
       <div class="w-1/2">
