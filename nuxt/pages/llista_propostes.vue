@@ -158,7 +158,7 @@
             <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
         </div>
         <div>
-            <Song :is="activeSong" v-for=" track in selectedSongs " :key="track.id" :track="track"
+            <Song :is="activeSong" v-for=" track in finalSongsList " :key="track.id" :track="track"
                 :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" :type="'selected'"
                 :bellId="track.bellId" />
         </div>
@@ -319,7 +319,6 @@ export default {
             serverResponse: null,
             toast: null,
             isReportLoading: false,
-            selectedSongs: [],
         }
     },
     created() {
@@ -361,9 +360,7 @@ export default {
             this.store.setClassGroups(data.allGroups);
             this.store.setCategories(data.allCategories);
         });
-        comManager.getSelectedSongs().then((data) => {
-            this.selectedSongs = data;
-        });
+        comManager.getSelectedSongs();
 
         socket.on('reportError', (data) => {
             this.modals.reportModal = false;
@@ -818,7 +815,10 @@ export default {
         },
         reportActive() {
             return this.reportSongData.options.some(option => option.value);
-        }
+        },
+        finalSongsList() {
+            return this.store.getFinalSongsList();
+        },
     },
 }
 

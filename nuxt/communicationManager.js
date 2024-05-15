@@ -232,9 +232,10 @@ async function getUserGroups() {
 }
 
 async function getSelectedSongs() {
+  const store = useAppStore();
   const response = await fetch(`${url}/getSelectedSongs`);
   const data = await response.json();
-  return data;
+  store.setFinalSongsList(data);
 }
 
 const comManager = {
