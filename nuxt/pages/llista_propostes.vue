@@ -91,7 +91,7 @@
                                 <div v-if="filteredSongs.length > 0" class="grid grid-cols-4 gap-x-2 gap-y-4">
                                     <div v-for="(group, index) in groupsAvailable"
                                         class="w-full flex items-center justify-center">
-                                        <button v-if="hasPropose(group.id)" @click="selectGroup(group.id)"
+                                        <button @click="selectGroup(group.id)"
                                             :title="hasPropose(group.id) ? `Fes clic per veure les cançons proposades d'aquest grup` : `No hi ha cap cançó proposada en aquest grup`"
                                             :class="filterGroup === group.id ? 'border-blue-600 text-blue-500' : ''"
                                             class="appearance-none p-2 w-full rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
@@ -783,16 +783,21 @@ export default {
             let groupsAvailable = [];
 
             if (this.filterBell === null) {
-                return this.classGroups;
+                groupsAvailable = this.classGroups;
             }
 
             if (this.filterBell) {
                 // get groups from bell
                 let b = this.bells.find(bell => bell.id === this.filterBell)
+
                 if (b) {
+                    // get groups that have a propose
                     groupsAvailable = b.groups;
                 }
             }
+
+            // filter groups that have a propose
+            groupsAvailable = groupsAvailable.filter((group) => this.hasPropose(group.id));
 
             return groupsAvailable;
         },
