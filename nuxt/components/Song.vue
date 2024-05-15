@@ -203,7 +203,7 @@ export default {
             if (type === 'title') {
                 return this.track.name.length > 20;
             } else if (type === 'artist') {
-                return this.artistList.length > 30;
+                return this.artistList.length > 26;
             }
         }
     },
@@ -308,19 +308,34 @@ export default {
 .text-marquee {
     display: inline-block;
     white-space: nowrap;
-    animation: scroll-text 10s linear infinite;
+    animation: scroll-text 10s ease-in infinite;
 }
 
 /* Keyframes for the scrolling animation using translateX */
 @keyframes scroll-text {
-    from {
-        transform: translateX(60%);
-        /* Start by moving from the right */
+    0%, 10% {
+        transform: translateX(0%);
+        opacity: 1;
     }
-
-    to {
-        transform: translateX(-100%);
-        /* Move all the way to the left */
+    10.01% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+    80% {
+        transform: translateX(-100%); /* The text scrolls left until out of view */
+        opacity: 1;
+    }
+    80.01% {
+        transform: translateX(100%); /* The text is instantly placed to the right of the screen */
+        opacity: 0;
+    }
+    90% {
+        transform: translateX(0%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
     }
 }
 </style>
