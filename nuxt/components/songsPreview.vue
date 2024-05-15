@@ -1,8 +1,9 @@
 <template>
-    <div class="bg-gray-400 min-w-40 h-20">
-        {{ bells.length }}
-        <div v-for="bell in bells">{{ bell.hour }}</div>
-        
+    <div class="bg-gray-400 min-w-40 h-80">
+        <div v-if="selectedSongs">
+            <div v-for="song in selectedSongs">{{ song }}</div>
+        </div>
+
     </div>
 </template>
 
@@ -20,7 +21,7 @@ export default {
     },
     async created() {
         // this.calculateNow();
-        // this.bells = await comManager.getSelectedSongs();
+        await comManager.getSelectedSongs();
         await comManager.getBells();
     },
     methods: {
@@ -53,23 +54,58 @@ export default {
 
             let showedBells = [];
             if (i > 0) {
-                showedBells.push(this.bells[i - 1]);
+                showedBells.push(this.bells[i - 1].id);
             }
 
-            showedBells.push(this.bells[i]);
+            showedBells.push(this.bells[i].id);
 
             if (i < this.bells.length - 1) {
-                showedBells.push(this.bells[i + 1]);
+                showedBells.push(this.bells[i + 1].id);
             }
 
             return showedBells;
+        },
+        getShowedSongs(bellsId) {
+
+            let showedSongs = [];
+            for (let i = 0; i < this.finalSongsList.length; i++) {
+                if (bellsId.includes(this.finalSongsList[i].bellId)) {
+                    showedSongs.push(this.finalSongsList[i])
+                }
+            }
+
+            console.log("SHOWED SONGS", showedSongs);
+            return showedSongs;
+        },
+        linkSongsWithBells(songs) {
+
+            for (let i = 0; i < songs.length; i++) {
+
+                for (let j = 0; j < this.bells.length; j++) {
+
+                    if (songs[i].bellId == this.bells[j].id) {
+                        songs[i].hour = this.bells[j].hour;
+                    }
+
+                }
+
+            }
+
+            songs.sort((a, b) => {
+                return a.hour.localeCompare(b.hour);
+            });
+
+            return songs;
+
         },
         calculateShowedBells() {
 
             const now = this.calculateNow();
             const currentBell = this.calculateCurrentBell(now);
-            this.showedBells =  this.getAdjacentBells(currentBell);
-            console.log("adjacentBells", this.showedBells);
+            const showedBellsId = this.getAdjacentBells(currentBell);
+            const showedSongs = this.getShowedSongs(showedBellsId);
+            this.selectedSongs = this.linkSongsWithBells(showedSongs);
+            
         }
 
     },
@@ -80,8 +116,10 @@ export default {
     },
     computed: {
         bells() {
-            // console.log(this.store.getBells());
             return this.store.getBells();
+        },
+        finalSongsList() {
+            return this.store.getFinalSongsList();
         }
     }
 }
