@@ -786,7 +786,7 @@ export default {
             let groupsAvailable = [];
 
             if (this.filterBell === null) {
-                return this.classGroups;
+                groupsAvailable = this.classGroups;
             }
 
             if (this.filterBell) {
@@ -795,10 +795,12 @@ export default {
 
                 if (b) {
                     // get groups that have a propose
-                    groupsAvailable = b.groups.filter((group) => this.hasPropose(group.id));
-
+                    groupsAvailable = b.groups;
                 }
             }
+
+            // filter groups that have a propose
+            groupsAvailable = groupsAvailable.filter((group) => this.hasPropose(group.id));
 
             return groupsAvailable;
         },
