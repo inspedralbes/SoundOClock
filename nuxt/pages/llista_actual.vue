@@ -1,6 +1,18 @@
 <template>
-    <div>
-        hello
+    <h2 class="text-4xl text-white text-center font-black mt-8 mb-4">LLISTA ACTUAL</h2>
+    <div v-if="loading">
+        <div class="w-screen mt-4 mb-5" v-if="loading">
+            <div class="mx-3 flex flex-col gap-5">
+                <USkeleton class="h-24 w-full" v-for="i in 8" />
+            </div>
+        </div>
+    </div>
+    <div v-else>
+        <div v-for="song in formattedSongs">
+            <component :is="activeSong" :key="song.song.id" :track="song.song"
+                :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying" @play="playSong"
+                :type="'selected'" class="w-full" :bellId="song.bellId" :isNext="nextBellId === song.bellId" />
+        </div>
     </div>
 </template>
 
@@ -13,10 +25,8 @@ export default {
         return {
             store: useAppStore(),
             loading: true,
-            groupedSongs: [],
-            mostVotedSongs: [],
-            toast: null,
-            itemsAccordion: [],
+            formattedSongs: [],
+            nextBellId: null,
             mobileDetector: this.$device.isMobile ? 1 : 0,
             songComponent: {
                 0: resolveComponent('Song'),
@@ -36,14 +46,57 @@ export default {
         bells: {
             handler: 'handleResults',
         },
-        finalList: {
+        finalSongsList: {
             handler: 'handleResults',
         },
     },
     methods: {
         handleResults() {
-            console.log('bells', this.bells)
-            console.log('finalSongsList', this.finalSongsList)
+            if (this.bells.length > 0 && this.finalSongsList.length > 0) {
+
+                // Get the song that will be played on each bell
+                const formattedSongs = this.bells.map(bell => {
+                    const song = this.finalSongsList.find(song => song.bellId === bell.id);
+                    return {
+                        bellId: bell.id,
+                        bellHour: bell.hour,
+                        groups: bell.groups,
+                        song: song,
+                    }
+                });
+
+                // Now get the next bell that will ring
+                this.nextBellId = this.findNextBell(formattedSongs);
+                this.formattedSongs = formattedSongs;
+                // this.loading = false;
+
+                // In 3 secs set loading to false
+                setTimeout(() => {
+                    this.loading = false;
+                }, 3000);
+            }
+        },
+        playSong(track) {
+            this.store.playTrack(track);
+        },
+        findNextBell(times) {
+            // Get the current time
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinutes = now.getMinutes();
+            const currentSeconds = now.getSeconds();
+
+            // Format current time as a string to compare with the array items
+            const currentTimeString = `${currentHour.toString().padStart(2, '0')}:${currentMinutes.toString().padStart(2, '0')}:${currentSeconds.toString().padStart(2, '0')}`;
+
+            // Filter the times array to only include times that are later than the current time
+            const futureTimes = times.filter(time => time.bellHour > currentTimeString);
+
+            // Find the earliest time that is still later than the current time
+            const nextTime = futureTimes.length > 0 ? futureTimes.reduce((a, b) => a.bellHour < b.bellHour ? a : b) : null;
+
+            // If there are no future times today, optionally find the earliest time as it will be the next day's time
+            return nextTime.bellId || times[0].bellId;
         },
     },
     computed: {
@@ -52,6 +105,12 @@ export default {
         },
         finalSongsList() {
             return this.store.getFinalSongsList();
+        },
+        songStatus() {
+            return this.store.getSongStatus();
+        },
+        activeSong() {
+            return this.songComponent[this.mobileDetector];
         },
     },
 }
