@@ -87,14 +87,12 @@ export default {
             this.$emit('vote', this.track);
         },
         isOverflowing(text) {
-            let nameLength = 0;
             if (text === 1) {
-                nameLength = this.track.name ? this.track.name.length : this.track.name.length;
-                return nameLength > 10;
+                return this.track.name.length > 10;
             } else {
+                let nameLength = 0;
                 if (this.track.artists) {
                     for (const artist of this.track.artists) {
-
                         nameLength += artist.name.length;
                     }
                     return nameLength > 20;
@@ -104,9 +102,6 @@ export default {
             }
         }
     },
-    computed: {
-
-    }
 }
 </script>
 

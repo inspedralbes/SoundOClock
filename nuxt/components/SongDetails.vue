@@ -11,6 +11,7 @@ export default {
       notReadReports: 0,
       modals: {
         addSongToBlacklist: false,
+        eraseSong: false,
       },
     }
   },
@@ -23,12 +24,18 @@ export default {
     },
   },
   methods: {
-    deleteSong() {
+    eraseSong() {
+      this.modals.eraseSong = true;
+    },
+    submitEraseSongData() {
+      socket.emit('deleteSong', this.store.getUser().token, this.song.id, false);
+    },
+    banSong() {
       this.modals.addSongToBlacklist = true;
     },
-    submitData() {
+    submitBanSongData() {
       this.modals.addSongToBlacklist = false
-      socket.emit('deleteSong', this.store.getUser().token, this.song.id);
+      socket.emit('deleteSong', this.store.getUser().token, this.song.id, true);
     },
     handleSwitch(reportId, value) {
 
@@ -98,8 +105,12 @@ export default {
           <p class="text-5xl font-black">{{ song.name }}</p>
           <p class="text-3xl">{{ song.artists.map(artist => artist.name).join(', ') }}</p>
         </div>
-        <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          @click="deleteSong(song)">AFEGIR A LA LLISTA NEGRA</button>
+        <div class="flex flex-row gap-3">
+          <button class="w-fit bg-red-200 hover:bg-red-400 text-black  font-bold py-2 px-4 rounded"
+            @click="eraseSong(song)">ELIMINAR DE CANÇONS PROPOSADES</button>
+          <button class="w-fit bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            @click="banSong(song)">AFEGIR A LA LLISTA NEGRA</button>
+        </div>
       </div>
     </div>
     <p class="mb-4 text-xl">CANÇÓ PROPOSADA PER: {{ song.user.name }}</p>
@@ -144,7 +155,7 @@ export default {
         <template #description>
           <div class="mt-2 flex gap-2">
             <UButton size="md" color="red" @click="modals.addSongToBlacklist = false">Enrere</UButton>
-            <UButton size="md" color="primary" @click="submitData">Continuar</UButton>
+            <UButton size="md" color="primary" @click="submitBanSongData">Continuar</UButton>
           </div>
         </template>
       </UAlert>
@@ -152,6 +163,17 @@ export default {
         @click="modals.addSongToBlacklist = false" />
     </div>
   </UModal>
+
+  <ModularModal :open="modals.eraseSong" type="error" msg="Eliminar" title="Eliminar de la llista de cançons proposades"
+    @confirm="submitEraseSongData()" @close="modals.eraseSong = false">
+    <template #title>
+      <h2>Eliminar de la llista de cançons proposades</h2>
+    </template>
+    <template #content>
+      <p>Segur que vols eliminar <span class="font-bold">{{ song.name }}</span> de <span class="font-bold">{{
+        song.artists.map(artist => artist.name).join(', ') }}</span> de la llista de cançons proposades?</p>
+    </template>
+  </ModularModal>
 
   <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
 </template>
