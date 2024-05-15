@@ -91,7 +91,7 @@
                                 <div v-if="filteredSongs.length > 0" class="grid grid-cols-4 gap-x-2 gap-y-4">
                                     <div v-for="(group, index) in groupsAvailable"
                                         class="w-full flex items-center justify-center">
-                                        <button @click="selectGroup(group.id)" v-if="hasPropose(group.id)"
+                                        <button @click="selectGroup(group.id)"
                                             :title="hasPropose(group.id) ? `Fes clic per veure les cançons proposades d'aquest grup` : `No hi ha cap cançó proposada en aquest grup`"
                                             :class="filterGroup === group.id ? 'border-blue-600 text-blue-500' : ''"
                                             class="appearance-none p-2 w-full rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
@@ -158,7 +158,7 @@
             <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
         </div>
         <div>
-            <Song :is="activeSong" v-for=" track in selectedSongs " :key="track.id" :track="track"
+            <Song :is="activeSong" v-for=" track in finalSongsList " :key="track.id" :track="track"
                 :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" :type="'selected'"
                 :bellId="track.bellId" />
         </div>
@@ -319,7 +319,6 @@ export default {
             serverResponse: null,
             toast: null,
             isReportLoading: false,
-            selectedSongs: [],
         }
     },
     created() {
@@ -357,13 +356,11 @@ export default {
         comManager.getUserSelectedSongs(this.store.getUser().id);
         comManager.getUserReportedSongs(this.store.getUser().id);
         comManager.getSortedVotedSongs();
-        comManager.getPublicGroupsAndCategories().then((data) => {
-            this.store.setClassGroups(data.publicGroups);
-            this.store.setCategories(data.publicCategories);
+        comManager.getAllGroupsAndCategories().then((data) => {
+            this.store.setClassGroups(data.allGroups);
+            this.store.setCategories(data.allCategories);
         });
-        comManager.getSelectedSongs().then((data) => {
-            this.selectedSongs = data;
-        });
+        comManager.getSelectedSongs();
 
         socket.on('reportError', (data) => {
             this.modals.reportModal = false;
@@ -786,16 +783,21 @@ export default {
             let groupsAvailable = [];
 
             if (this.filterBell === null) {
-                return this.classGroups;
+                groupsAvailable = this.classGroups;
             }
 
             if (this.filterBell) {
                 // get groups from bell
                 let b = this.bells.find(bell => bell.id === this.filterBell)
+
                 if (b) {
+                    // get groups that have a propose
                     groupsAvailable = b.groups;
                 }
             }
+
+            // filter groups that have a propose
+            groupsAvailable = groupsAvailable.filter((group) => this.hasPropose(group.id));
 
             return groupsAvailable;
         },
@@ -818,7 +820,10 @@ export default {
         },
         reportActive() {
             return this.reportSongData.options.some(option => option.value);
-        }
+        },
+        finalSongsList() {
+            return this.store.getFinalSongsList();
+        },
     },
 }
 

@@ -17,6 +17,7 @@ export const useAppStore = defineStore("app", {
         },
 
     userSelectedSongs: [],
+    finalSongsList: [],
     userReportedSongs: [],
     proposedSongs: [],
     sortedVotedSongs: [],
@@ -118,6 +119,9 @@ export const useAppStore = defineStore("app", {
     getUserReportedSongs() {
       return this.userReportedSongs;
     },
+    getFinalSongsList() {
+      return this.finalSongsList;
+    },
 
     //setters
     setUser(id, email, name, picture, token, groups, role_id, role_name) {
@@ -204,6 +208,9 @@ export const useAppStore = defineStore("app", {
     },
     setUserReportedSongs(userReportedSongs) {
       this.userReportedSongs = userReportedSongs;
+    },
+    setFinalSongsList(finalSongsList) {
+      this.finalSongsList = finalSongsList;
     },
 
     ///Deletes
