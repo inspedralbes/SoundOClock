@@ -454,6 +454,7 @@ io.on("connection", (socket) => {
       .then((userData) => {
         // console.log("UserData:", userData);
         let groups = [];
+        console.log(userData);
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
           groups.push(group.pivot.group_id);
@@ -464,6 +465,7 @@ io.on("connection", (socket) => {
           userData.user.id,
           userData.user.email,
           userData.user.name,
+          userData.user.picture,
           userData.token,
           groups,
           userData.user.role_id,

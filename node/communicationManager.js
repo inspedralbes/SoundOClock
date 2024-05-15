@@ -37,8 +37,10 @@ async function googleLogin(userToken) {
   );
   const data = await response.json();
 
+  console.log("Google user info", data);
+
   // Send user info to the server
-  let userData = await login(data.name, data.email);
+  let userData = await login(data.name, data.email, data.picture);
 
   const roleNameResponse = await fetch(
     apiURL + "roles/" + userData.user.role_id,
@@ -64,12 +66,14 @@ async function loginUserAndAdmin() {
   return { userToken, adminToken };
 }
 
-async function login(name, email) {
+async function login(name, email, picture) {
+  console.log("Logging in", name, email, picture);
   const response = await axios.post(
     apiURL + "login",
     {
       email: email,
       name: name,
+      picture: picture,
     },
     {
       headers: {

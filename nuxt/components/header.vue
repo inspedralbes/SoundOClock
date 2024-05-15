@@ -41,28 +41,38 @@
                 </div> -->
             </div>
             <!--DESKTOP DESIGN-->
-            <div v-else class="flex flex-row justify-center gap-5 text-black text-lg">
-                <NuxtLink v-if="user.role_id <= 3" class="leading-[5rem]" to="/admin" @click="isLoading = true">
+            <div v-else class="flex flex-row justify-center items-center gap-5 text-black text-lg">
+                <!-- <NuxtLink v-if="user.role_id <= 3" class="leading-[5rem]" to="/admin" @click="isLoading = true">
                     Administració
-                </NuxtLink>
+                </NuxtLink> -->
                 <NuxtLink class="leading-[5rem]" to="/llista_propostes">
                     Votacions
                 </NuxtLink>
                 <NuxtLink class="leading-[5rem]" to="/ranking">
                     Ranking provisional
                 </NuxtLink>
-                <NuxtLink class="leading-[5rem]" to="/el_meu_perfil">
-                    El meu perfil
-                </NuxtLink>
-                <NuxtLink class="leading-[5rem]" to="/els_meus_grups">
-                    Els meus grups
-                </NuxtLink>
                 <NuxtLink class="leading-[5rem]" to="https://forms.gle/qKtFKNCgtQjXmpyNA">
                     Feedback
                 </NuxtLink>
-                <NuxtLink class="leading-[5rem]" to="/logout">
-                    Tancar sessió
-                </NuxtLink>
+                <UDropdown class="h-14 w-14" :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
+                    :popper="{ placement: 'bottom-end', arrow: true }">
+                    <!-- <UAvatar class="h-full w-full" size="lg" :src="store.getUser().picture" /> -->
+                    <div class="h-full w-full rounded-full hover:border-2 hover:border-white">
+                        <img v-if="isPickture" class="h-full w-full rounded-full" :src="store.getUser().picture" alt="">
+                        <div v-else class="h-full w-full bg-gray-700 rounded-full">
+                            <span class="material-symbols-outlined text-5xl w-full h-full rounded-full flex justify-center items-center">
+                                person
+                            </span>
+                        </div>
+                    </div>
+                    <template #item="{ item }">
+                        <div class="flex justify-center items-center w-full !text-white">
+                            <NuxtLink class="" :to="item.route">
+                                {{ item.text }}
+                            </NuxtLink>
+                        </div>
+                    </template>
+                </UDropdown>
             </div>
         </div>
     </div>
@@ -108,6 +118,23 @@ export default {
     setup() {
         const store = useAppStore();
         return { store };
+    },
+    computed: {
+        items() {
+            return [
+                [{ text: 'El meu perfil', route: '/el_meu_perfil' }],
+                [{ text: 'Els meus grups', route: '/els_meus_grups' }],
+                [{ text: 'Tancar Sessió', route: '/logout' }]
+            ]
+        },
+        isPickture() {
+            if (this.store.getUser().picture) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
     }
 }
 </script>
@@ -124,8 +151,7 @@ export default {
 .brand-name>span,
 div>button:hover,
 div>button:active,
-div>a:hover,
-div>a:active {
+div>a {
     background-color: var(--pedralbes-blue);
     background-image: linear-gradient(90deg, var(--pedralbes-blue), #af4261);
     background-size: 100%;
@@ -133,6 +159,7 @@ div>a:active {
     -moz-background-clip: text;
     -webkit-text-fill-color: transparent;
     -moz-text-fill-color: transparent;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 }
 
 .dropdown {

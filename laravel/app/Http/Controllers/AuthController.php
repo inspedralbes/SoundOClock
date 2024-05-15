@@ -55,6 +55,7 @@ class AuthController extends Controller
         $fields = $request->validate([
             'email' => 'required|string',
             'name' => 'required|string',
+            'picture' => 'string',
         ]);
 
         // check if mail exists
@@ -73,6 +74,7 @@ class AuthController extends Controller
             $user = User::create([
                 'email' => $fields['email'],
                 'name' => $fields['name'],
+                'picture' => $fields['picture'],
                 'role_id' => $role,
             ]);
         }

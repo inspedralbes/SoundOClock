@@ -64,7 +64,6 @@ export default {
                     headers: authOptions.headers
                 });
                 googleData = responseToken.data;
-                console.log('Google', googleData);
                 socket.emit('googleLogin', googleData.access_token);
             } catch (e) {
                 console.error('Error during Google authentication:', e);
