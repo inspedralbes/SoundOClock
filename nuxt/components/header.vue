@@ -41,7 +41,10 @@
                 </div> -->
             </div>
             <!--DESKTOP DESIGN-->
-            <div v-else class="flex flex-row justify-center gap-5 text-black text-lg">
+            <div v-else class="flex flex-row justify-center gap-3 text-black text-lg">
+                <NuxtLink class="leading-[5rem]" to="/llista_final">
+                    Llista final
+                </NuxtLink>
                 <NuxtLink v-if="user.role_id <= 3" class="leading-[5rem]" to="/admin" @click="isLoading = true">
                     Administració
                 </NuxtLink>

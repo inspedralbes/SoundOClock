@@ -41,6 +41,7 @@ export default {
         if (this.store.getFinalSongsList().length === 0) {
             comManager.getSelectedSongs();
         }
+        this.handleResults();
     },
     watch: {
         bells: {
@@ -91,7 +92,7 @@ export default {
             const nextTime = futureTimes.length > 0 ? futureTimes.reduce((a, b) => a.bellHour < b.bellHour ? a : b) : null;
 
             // If there are no future times today, optionally find the earliest time as it will be the next day's time
-            return nextTime.bellId || times[0].bellId;
+            return (nextTime ? nextTime.bellId : nextTime) || times[0].bellId;
         },
     },
     computed: {
