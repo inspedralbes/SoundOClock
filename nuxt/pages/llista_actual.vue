@@ -68,12 +68,7 @@ export default {
                 // Now get the next bell that will ring
                 this.nextBellId = this.findNextBell(formattedSongs);
                 this.formattedSongs = formattedSongs;
-                // this.loading = false;
-
-                // In 3 secs set loading to false
-                setTimeout(() => {
-                    this.loading = false;
-                }, 3000);
+                this.loading = false;
             }
         },
         playSong(track) {
