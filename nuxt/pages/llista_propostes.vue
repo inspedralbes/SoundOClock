@@ -792,10 +792,10 @@ export default {
             if (this.filterBell) {
                 // get groups from bell
                 let b = this.bells.find(bell => bell.id === this.filterBell)
+
                 if (b) {
-                    groupsAvailable = b.groups;
-                    // v-if="hasPropose(group.id)"
-                    
+                    // get groups that have a propose
+                    groupsAvailable = b.groups.filter((group) => this.hasPropose(group.id));
 
                 }
             }
