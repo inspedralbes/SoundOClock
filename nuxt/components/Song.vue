@@ -31,7 +31,8 @@
         <div class="flex-row w-3/5 flex justify-between items-center"
             :class="{ 'border-gray-800': isFirstPlace, 'border-b border-solid border-gray-300 px-2 pb-2': type !== 'admin', 'w-9/12': type === 'admin_set_song', 'w-9/12': type === 'admin' }">
             <div class="flex flex-col w-[80%] items-start marquee-container">
-                <p class="font-bold text-base uppercase" :class="{ 'text-marquee': isOverflowing('title') && type === 'admin' }">
+                <p class="font-bold text-base uppercase"
+                    :class="{ 'text-marquee': isOverflowing('title') && type === 'admin' }">
                     {{ track.name }}
                 </p>
                 <div class="flex flex-row items-center text-sm py-1">
@@ -44,7 +45,10 @@
                 </div>
                 <p v-if="type === 'vote' || type === 'admin'" class="text-sm">Vots: {{ track.totalVotes }}</p>
                 <p v-if="type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
-                <UBadge color="indigo" variant="soft" v-if="type === 'selected'">{{ getBellHour(bellId) }}</UBadge>
+                <div class="flex gap-3">
+                    <UBadge color="indigo" variant="soft" v-if="type === 'selected'">{{ getBellHour(bellId) }}</UBadge>
+                    <UBadge color="yellow" variant="soft" v-if="isNext"> Següent </UBadge>
+                </div>
             </div>
             <button @click="playTrack(track)" v-if="!songWaitingToPlay || songWaitingToPlay != track.id">
                 <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
@@ -132,6 +136,10 @@ export default {
         bellId: {
             type: String,
             default: null
+        },
+        isNext: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
