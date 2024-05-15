@@ -42,11 +42,11 @@
             </div>
             <!--DESKTOP DESIGN-->
             <div v-else class="flex flex-row justify-center items-center gap-5 text-black text-lg">
-                <NuxtLink class="leading-[5rem]" to="/llista_final">
-                    Llista final
-                </NuxtLink>
                 <NuxtLink v-if="user.role_id <= 3" class="leading-[5rem]" to="/admin" @click="isLoading = true">
                     Administració
+                </NuxtLink>
+                <NuxtLink class="leading-[5rem]" to="/llista_final">
+                    Llista final
                 </NuxtLink>
                 <NuxtLink class="leading-[5rem]" to="/llista_propostes">
                     Votacions
@@ -61,7 +61,7 @@
                     :popper="{ placement: 'bottom-end', arrow: true }">
                     <!-- <UAvatar class="h-full w-full" size="lg" :src="store.getUser().picture" /> -->
                     <div class="h-full w-full rounded-full hover:border-2 hover:border-white">
-                        <img v-if="isPickture" class="h-full w-full rounded-full" :src="store.getUser().picture" alt="">
+                        <img v-if="isPicture" class="h-full w-full rounded-full" :src="store.getUser().picture" alt="">
                         <div v-else class="h-full w-full bg-gray-700 rounded-full">
                             <span
                                 class="material-symbols-outlined text-5xl w-full h-full rounded-full flex justify-center items-center">
@@ -70,8 +70,8 @@
                         </div>
                     </div>
                     <template #item="{ item }">
-                        <div class="flex justify-center items-center w-full !text-white">
-                            <NuxtLink class="" :to="item.route">
+                        <div class="flex justify-center items-center w-full">
+                            <NuxtLink class="text-white" :to="item.route">
                                 {{ item.text }}
                             </NuxtLink>
                         </div>
@@ -131,7 +131,7 @@ export default {
                 [{ text: 'Tancar Sessió', route: '/logout' }]
             ]
         },
-        isPickture() {
+        isPicture() {
             if (this.store.getUser().picture) {
                 return true;
             } else {
@@ -152,10 +152,7 @@ export default {
     color: black;
 }
 
-.brand-name>span,
-div>button:hover,
-div>button:active,
-div>a {
+.brand-name>span {
     background-color: var(--pedralbes-blue);
     background-image: linear-gradient(90deg, var(--pedralbes-blue), #af4261);
     background-size: 100%;
