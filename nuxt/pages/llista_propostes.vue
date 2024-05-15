@@ -357,9 +357,9 @@ export default {
         comManager.getUserSelectedSongs(this.store.getUser().id);
         comManager.getUserReportedSongs(this.store.getUser().id);
         comManager.getSortedVotedSongs();
-        comManager.getPublicGroupsAndCategories().then((data) => {
-            this.store.setClassGroups(data.publicGroups);
-            this.store.setCategories(data.publicCategories);
+        comManager.getAllGroupsAndCategories().then((data) => {
+            this.store.setClassGroups(data.allGroups);
+            this.store.setCategories(data.allCategories);
         });
         comManager.getSelectedSongs().then((data) => {
             this.selectedSongs = data;
