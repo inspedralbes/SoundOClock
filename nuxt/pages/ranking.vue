@@ -17,8 +17,8 @@
                     </div>
 
                     <component :is="activeSong" :key="song.id" :track="song" :currentTrackId="songStatus.currentTrackId"
-                        :isPlaying="songStatus.isPlaying" @play="playSong" :type="'ranking'"
-                        :isFirstPlace="index === 0" class="w-full justify-around" />
+                        :isPlaying="songStatus.isPlaying" @play="playSong" :type="'ranking'" :isFirstPlace="index === 0"
+                        class="w-full justify-around" />
                 </div>
             </template>
         </UAccordion>
@@ -49,7 +49,10 @@ export default {
     },
     created() {
         if (this.store.getClassGroups().length === 0) {
-            socket.emit("getGroups");
+            comManager.getAllGroupsAndCategories().then((data) => {
+                this.store.setClassGroups(data.allGroups);
+                this.store.setCategories(data.allCategories);
+            });
         }
         comManager.getBells();
         comManager.getSortedVotedSongs();
@@ -116,7 +119,7 @@ export default {
                     if (groupedData[song.id]) {
                         groupedData[song.id].votes += song.votes;
                     } else {
-                        groupedData[song.id] = { id: song.id, votes: song.votes, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url, explicit: song.explicit};
+                        groupedData[song.id] = { id: song.id, votes: song.votes, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url, explicit: song.explicit };
                     }
                 });
                 const resultArray = Object.values(groupedData);
