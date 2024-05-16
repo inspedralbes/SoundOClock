@@ -9,7 +9,7 @@
     </div>
     <div v-else>
         <div v-for="song in formattedSongs">
-            <component :is="activeSong" :key="song.song.id" :track="song.song"
+            <component :is="activeSong" :key="song.song.id" :track="song.song" v-if="song.song"
                 :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying" @play="playSong"
                 :type="'selected'" class="w-full" :bellId="song.bellId" :isNext="nextBellId === song.bellId" />
         </div>
