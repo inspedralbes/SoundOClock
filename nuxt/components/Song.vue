@@ -66,7 +66,12 @@
                 </span>
             </button>
             <button @click="proposeSong(track)"
-                v-if="(type === 'propose' || type === 'admin_set_song') && (!track.loading && !track.proposed)">
+                v-if="(type === 'propose' || type === 'admin_set_song') && (!track.loading && !track.proposed && !track.explicit)">
+                <span class="material-symbols-rounded text-4xl">
+                    add_circle
+                </span>
+            </button>
+            <button v-else-if="track.explicit" @click="proposeSongExplicitBlock()">
                 <span class="material-symbols-rounded text-4xl">
                     add_circle
                 </span>
@@ -95,6 +100,24 @@
             </button>
         </div>
     </div>
+    <UModal v-model="modals.explicitBlock" class="z-[9999]">
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center justify-between">
+                    <div class="flex flex-row items-center">
+                        <span class="material-symbols-rounded text-[2rem] text-red-500 mr-4">
+                            error
+                        </span>
+                        <h2 class="text-xl font-bold">{{ postedSongStatus.title }}</h2>
+                    </div>
+                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                        @click="modals.proposeSongError = false" />
+                </div>
+            </template>
+
+            {{ postedSongStatus.message }}
+        </UCard>
+    </UModal>
 </template>
 
 <script>
@@ -149,6 +172,10 @@ export default {
             userSelectedSongs: computed(() => this.store.userSelectedSongs),
             userReportedSongs: computed(() => this.store.userReportedSongs),
             bells: computed(() => this.store.bells),
+            modals: {
+                explicitBlock: false,
+                explicitAlert: false,
+            }
         }
     },
     methods: {
@@ -205,6 +232,9 @@ export default {
             } else if (type === 'artist') {
                 return this.artistList.length > 26;
             }
+        },
+        proposeSongExplicitBlock() {
+            this.modals.explicitBlock = true;
         }
     },
     computed: {
@@ -313,26 +343,35 @@ export default {
 
 /* Keyframes for the scrolling animation using translateX */
 @keyframes scroll-text {
-    0%, 10% {
+
+    0%,
+    10% {
         transform: translateX(0%);
         opacity: 1;
     }
+
     10.01% {
         transform: translateX(0%);
         opacity: 1;
     }
+
     80% {
-        transform: translateX(-100%); /* The text scrolls left until out of view */
+        transform: translateX(-100%);
+        /* The text scrolls left until out of view */
         opacity: 1;
     }
+
     80.01% {
-        transform: translateX(100%); /* The text is instantly placed to the right of the screen */
+        transform: translateX(100%);
+        /* The text is instantly placed to the right of the screen */
         opacity: 0;
     }
+
     90% {
         transform: translateX(0%);
         opacity: 0;
     }
+
     100% {
         transform: translateX(0%);
         opacity: 1;
