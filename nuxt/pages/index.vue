@@ -33,6 +33,8 @@
             </svg>
         </button>
 
+        <!-- <SongsPreview></SongsPreview> -->
+
         <div class="circle"></div>
         <div class="circle min"></div>
 
