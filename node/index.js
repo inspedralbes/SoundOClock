@@ -12,6 +12,7 @@ import {
   ReportSong,
   SelectedSong,
   ReportUser,
+  BellsGroupsTemplate,
 } from "./models.js";
 import axios from "axios";
 import minimist from "minimist";
@@ -399,6 +400,36 @@ app.get("/userGroups/:userToken", async (req, res) => {
     );
 
     res.json(userGroupsWithReports);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// GROUP BELLS TEMPLATE
+
+app.post('/bellsGroupsTemplate', async (req, res) => {
+  try {
+    const template = new BellsGroupsTemplate(req.body.template);
+    await template.save();
+    res.json({ status: 'success' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get('/bellsGroupsTemplate', async (req, res) => {
+  try {
+    const templates = await BellsGroupsTemplate.find();
+    res.json(templates);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.delete('/bellsGroupsTemplate/:id', async (req, res) => {
+  try {
+    await BellsGroupsTemplate.findByIdAndDelete(req.params.id);
+    res.json({ status: 'success' });
   } catch (err) {
     res.status(500).send(err);
   }

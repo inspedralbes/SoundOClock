@@ -45,10 +45,16 @@ const reportUserSchema = new mongoose.Schema({
   isRead: Boolean,
 });
 
+const bellsGroupsTemplate = new mongoose.Schema({
+  name: String,
+  bellsGroups: [Object],
+})
+
 const VotingRecord = mongoose.model('VotingRecord', votingRecordSchema);
 const Song = mongoose.model('Song', songSchema);
 const ReportSong = mongoose.model('ReportSong', reportSongSchema);
 const SelectedSong = mongoose.model('SelectedSong', selectedSongSchema);
 const ReportUser = mongoose.model('ReportUser', reportUserSchema);
+const BellsGroupsTemplate = mongoose.model('BellsGroupsTemplate', bellsGroupsTemplate);
 
-export { Song, VotingRecord, ReportSong, SelectedSong, ReportUser }
+export { Song, VotingRecord, ReportSong, SelectedSong, ReportUser, BellsGroupsTemplate }
