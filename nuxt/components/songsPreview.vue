@@ -1,12 +1,12 @@
 <template>
-    <div class="mt-8 w-[85%] h-fit z-[999]">
+    <div class="w-[85%] h-fit z-[999]">
         <div v-if="selectedSongs">
             <!-- <div v-for="song in selectedSongs">{{ song }}</div> -->
 
             <div v-for="song in selectedSongs">
                 <component :is="activeSong" :key="song.id" :track="song"
                     :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying" @play="playSong"
-                    :type="'selected'" class="w-full" :bellId="song.bellId"/>
+                    :type="'selected'" class="w-full" :bellId="song.bellId" :isNext="nextBellId === song.bellId"/>
             </div>
         </div>
 
@@ -23,6 +23,7 @@ export default {
             store: useAppStore(),
             showedBells: null,
             selectedSongs: null,
+            nextBellId: null,
             mobileDetector: this.$device.isMobile ? 1 : 0,
             songComponent: {
                 0: resolveComponent('Song'),
@@ -116,7 +117,20 @@ export default {
             const showedBellsId = this.getAdjacentBells(currentBell);
             const showedSongs = this.getShowedSongs(showedBellsId);
             this.selectedSongs = this.linkSongsWithBells(showedSongs);
+            this.nextBellId = this.findNextBell(now, this.selectedSongs);
 
+        },
+        findNextBell(now, songs) {
+
+            let bellId = null
+
+            for (let i = 0; i < songs.length; i++) {
+                if (songs[i].hour > now) {
+                   bellId = songs[i].bellId;
+                }
+            }
+
+            return bellId;
         },
         playSong(track) {
             this.store.playTrack(track);
