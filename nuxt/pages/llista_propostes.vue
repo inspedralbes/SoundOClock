@@ -6,8 +6,25 @@
 
 
         <!-- Barra de busqueda -->
-        <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
-            settings.theme }}</h1>
+        <div v-if="settings.theme" class="flex justify-center content-center my-8">
+            <h1 class="text-4xl smallCaps w-fit text-center">
+                {{ 'La temàtica és: ' + settings.theme }}
+            </h1>
+            <UDropdown v-if="settings.themeDesc" class="h-fit w-fit self-end right-0 top-1/2" :items="themeDesc"
+                :mode="dropdownMode" :ui="{ item: { disabled: 'cursor-text select-text' } }"
+                :popper="{ placement: 'bottom-end', arrow: true }">
+                <span class="material-symbols-rounded">
+                    arrow_drop_down
+                </span>
+                <template #item="{ item }">
+                    <div class="flex justify-center items-center z-50">
+                        <h2>
+                            {{ item.text }}
+                        </h2>
+                    </div>
+                </template>
+            </UDropdown>
+        </div>
         <div class="w-full flex justify-center items-center px-2 gap-2">
             <div class="relative w-[60%] text-center" :class="{ 'w-[90%]': $device.isMobile }">
                 <input type="text"
@@ -29,7 +46,7 @@
                     </button>
                 </Transition>
             </div>
-            <div class="dropdown relative z-50">
+            <div class="dropdown relative z-10">
 
                 <button
                     class="px-2 h-[38px] appearance-none flex items-center justify-center rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
@@ -824,6 +841,18 @@ export default {
         finalSongsList() {
             return this.store.getFinalSongsList();
         },
+        themeDesc() {
+            return [
+                [{ text: this.settings.themeDesc }]
+            ]
+        },
+        dropdownMode() {
+            if (this.mobileDetector == 1) {
+                return 'click';
+            } else {
+                return 'hover';
+            }
+        }
     },
 }
 

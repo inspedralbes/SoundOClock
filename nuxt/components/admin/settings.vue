@@ -14,6 +14,16 @@
                         type="text" name="theme" v-model="settings.theme" />
                 </span>
             </div>
+            <div class="flex items-center justify-between w-full py-2 h-fit">
+                <label for="themeDesc" class="text-lg basis-1/2">
+                    Descripció de la temàtica (opcional)
+                </label>
+                <span class="basis-1/3 flex">
+                    <UTextarea class="ml-auto w-4/5 *:text-white" color="blue" variant="outline"
+                        placeholder="Descripcio de la Temàtica" type="text" name="themeDesc"
+                        v-model="settings.themeDesc" />
+                </span>
+            </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label class="text-lg " for="showExplicit">
                     No deixar que les cançons marcades com a explicites per spotify es mostrin a la llista per
@@ -146,6 +156,7 @@ export default {
                 letProposeExplicit: false,
                 alertExplicit: true,
                 theme: "",
+                themeDesc: "",
                 teacher_email_key: "",
                 student_email_key: "",
             },
