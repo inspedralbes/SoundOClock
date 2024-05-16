@@ -6,7 +6,7 @@
             <div v-for="song in selectedSongs">
                 <component :is="activeSong" :key="song.id" :track="song"
                     :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying" @play="playSong"
-                    :type="'selected'" class="w-full" :bellId="song.bellId" />
+                    :type="'selected'" class="w-full" :bellId="song.bellId"/>
             </div>
         </div>
 
