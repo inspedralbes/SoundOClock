@@ -1,87 +1,87 @@
 <template>
-    <div class="relative w-full h-24 rounded-lg overflow-hidden m-2 image-container">
-        <UBadge color="yellow" variant="solid" v-if="isNext" class="absolute z-10 bottom-0 end-0">
-            Següent
-        </UBadge>
-        <img :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'"
-            class="w-1/2 h-full object-cover object-center brightness-[30%]"
-            :class="{ 'opacity-100': type === 'admin' && isSelected, 'opacity-75': type === 'admin' && !isSelected }">
-        <div class="absolute inset-0 flex flex-row justify-center faded-background">
-            <div class="flex flex-row w-full justify-between p-2 items-center">
-                <div class="flex flex-col w-full overflow-hidden items-start marquee-container">
-                    <p class="font-bold text-2xl bg-opacity-60 uppercase overflow-hidden whitespace-nowrap"
-                        :class="{ 'text-marquee': isOverflowing('title') }">
-                        {{ track.name }}
-                    </p>
-                    <div class="flex items-center gap-2 text-sm marquee-container">
-                        <UBadge v-if="track.explicit" color="gray">E</UBadge>
-                        <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="artistList"
-                            :class="{ 'text-marquee': isOverflowing('artist') }">
-                            {{ artistList }}
-                        </span>
+    <div class="flex flex-row justify-center gap-3 m-2 rounded-l text-gray-200 border-b-2 border-gray-400"
+        :class="{ 'bg-yellow-200 text-gray-800': isFirstPlace, 'text-gray-800': isSelected, 'justify-between': type === 'admin_set_song', 'justify-stretch gap-5 m-0': type === 'admin' }">
+        <UChip size="3xl" color="red" v-if="numReports > 0 && type === 'admin'">
+            <template #content>
+                <div>{{ numReports }}</div>
+            </template>
+            <div class="relative flex items-align">
+                <img :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'"
+                    class="w-20 h-20 rounded-lg z-0">
+
+                <Transition name="playingFade">
+                    <div v-if="currentTrackId === track.id && isPlaying"
+                        class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-lg">
+                        <div class="loader"></div>
                     </div>
-                    <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.totalVotes }}
-                    </p>
-                    <p v-if="type === 'admin' || type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
-                    <UBadge color="indigo" variant="soft" v-if="type === 'selected'">{{ getBellHour(bellId) }}
-                    </UBadge>
+                </Transition>
+            </div>
+        </UChip>
+        <div class="relative w-full h-24 rounded-lg overflow-hidden" v-else>
+            <img :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'"
+                class="w-1/2 h-full object-cover object-center brightness-[40%]"
+                :class="{ 'opacity-100': type === 'admin' && isSelected, 'opacity-75': type === 'admin' && !isSelected }">
+            <div class="absolute inset-0 flex flex-row justify-center faded-background">
+                <div class="flex flex-row w-full justify-between p-2 items-center">
+                    <div class="flex flex-col w-[70%] overflow-hidden items-start marquee-container">
+                        <p class="font-bold text-2xl bg-opacity-60 uppercase overflow-hidden whitespace-nowrap"
+                            :class="{ 'text-marquee': isOverflowing('title') }">
+                            {{ track.name }}
+                        </p>
+                        <div class="flex items-center gap-2 text-sm marquee-container">
+                            <UBadge v-if="track.explicit" color="black">E</UBadge>
+                            <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="artistList"
+                                :class="{ 'text-marquee': isOverflowing('artist') }">
+                                {{ artistList }}
+                            </span>
+                        </div>
+                        <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.totalVotes }}
+                        </p>
+                        <p v-if="type === 'admin' || type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
+                        <UBadge color="indigo" variant="soft" v-if="type === 'selected'">{{ getBellHour(bellId) }}
+                        </UBadge>
+                    </div>
+                    <button @click="playTrack(track)">
+                        <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
+                            pause
+                        </span>
+                        <span v-else class="material-symbols-rounded text-4xl">
+                            play_arrow
+                        </span>
+                    </button>
+                    <button v-if="type === 'vote'" @click="report(track)">
+                        <span class="material-symbols-rounded text-4xl"
+                            :class="{ 'text-red-400': isSongReported(track.id) }">
+                            report
+                        </span>
+                    </button>
+                    <button @click="proposeSong(track)"
+                        v-if="type === 'propose' && (!track.loading && !track.proposed)">
+                        <span class="material-symbols-rounded text-4xl">
+                            add_circle
+                        </span>
+                    </button>
+                    <div v-if="track.loading || (isLoadingVote.state && isLoadingVote.selectedSong == track.id)"
+                        class="loader-track"></div>
+                    <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
+                        task_alt
+                    </span>
+                    <button v-if="type === 'vote' && !(isLoadingVote.state && isLoadingVote.selectedSong == track.id)"
+                        @click="vote(track.id)">
+                        <span
+                            :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id) }">
+                            thumb_up
+                        </span>
+                    </button>
+                    <div v-if="type === 'admin'" class="mx-2">
+                        <input type="checkbox" name="selected" id="selected" :checked="isSelected"
+                            @change="e => setSelected(e, bell.id, track.id)" class="h-6 w-6">
+                    </div>
                 </div>
-                <button @click="playTrack(track)" v-if="!songWaitingToPlay || songWaitingToPlay != track.id">
-                    <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
-                        pause
-                    </span>
-                    <span v-else class="material-symbols-rounded text-4xl">
-                        play_arrow
-                    </span>
-                </button>
-                <div v-if="songWaitingToPlay == track.id" class="loader-track">
-                </div>
-                <button v-if="type === 'vote'" @click="report(track)">
-                    <span class="material-symbols-rounded text-4xl"
-                        :class="{ 'text-red-400': isSongReported(track.id) }">
-                        report
-                    </span>
-                </button>
-                <button @click="proposeSong(track)"
-                    v-if="(type === 'propose' || type === 'admin_set_song') && (!track.loading && !track.proposed)">
-                    <span class="material-symbols-rounded text-4xl">
-                        add_circle
-                    </span>
-                </button>
-                <div v-if="track.loading || (isLoadingVote.state && isLoadingVote.selectedSong == track.id)"
-                    class="loader-track">
-                </div>
-                <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
-                    task_alt
-                </span>
-                <button v-if="type === 'vote' && !(isLoadingVote.state && isLoadingVote.selectedSong == track.id)"
-                    @click="vote(track.id)">
-                    <span
-                        :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id) }">
-                        thumb_up
-                    </span>
-                </button>
-                <button v-if="type === 'unBan'" @click="unBan(track)">
-                    <span class="material-symbols-outlined options-span">
-                        unarchive
-                    </span>
-                </button>
-                <button v-if="type === 'admin' && isReported" @click="unBan(track)" class="ml-2">
-                    <span class="material-symbols-rounded options-span text-3xl">
-                        warning
-                    </span>
-                </button>
             </div>
         </div>
     </div>
-
-    <div class="w-full bg-white ml-2 border-b-2 border-gray-400"></div>
 </template>
-
-<!-- <template>
-
-</template> -->
-
 
 <script>
 import { useAppStore } from '@/stores/app';

@@ -154,7 +154,7 @@
             <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
         </div>
         <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
-        <TransitionGroup name="song-slide" mode="out-in" class="w-1/2" tag="div">
+        <TransitionGroup name="song-slide" mode="out-in" class="w-[70%]" tag="div">
             <component :is="activeSong" v-for=" track in filteredSongs " :key="track.id" :track="track"
                 :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
                 @report="report($event)" :type="getType(track.id)" />
@@ -323,7 +323,7 @@ export default {
             isPlaying: false,
             mobileDetector: this.$device.isMobile ? 1 : 0,
             songComponent: {
-                0: resolveComponent('Song2'),
+                0: resolveComponent('Song3'),
                 1: resolveComponent('MobileSong'),
             },
             activePlayer: {
