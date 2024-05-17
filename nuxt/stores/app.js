@@ -6,15 +6,15 @@ export const useAppStore = defineStore("app", {
       typeof window !== "undefined" && window.localStorage.getItem("user")
         ? JSON.parse(localStorage.getItem("user"))
         : {
-          id: 0,
-          email: "",
-          name: "",
-          picture: "",
-          groups: [],
-          token: null,
-          role_id: null,
-          role_name: null,
-        },
+            id: 0,
+            email: "",
+            name: "",
+            picture: "",
+            groups: [],
+            token: null,
+            role_id: null,
+            role_name: null,
+          },
 
     userSelectedSongs: [],
     finalSongsList: [],
@@ -81,7 +81,7 @@ export const useAppStore = defineStore("app", {
       return this.classGroups;
     },
     getCategories() {
-      return this.categories
+      return this.categories;
     },
     getOpenMenu() {
       return this.openMenu;
@@ -166,7 +166,7 @@ export const useAppStore = defineStore("app", {
       this.classGroups = classGroups;
     },
     setCategories(categories) {
-      this.categories = categories
+      this.categories = categories;
     },
     setOpenMenu(menuState) {
       this.openMenu = menuState;

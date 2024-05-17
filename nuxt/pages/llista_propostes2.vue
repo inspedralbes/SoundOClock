@@ -1,11 +1,150 @@
 <template>
+    <img src="/img/fondo.png" alt="background" class="fixed inset-0 z-[-1] object-cover h-screen w-screen" />
+    <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
+        @report="report($event)" @propose="proposeSong($event)" />
+
     <div v-if="checkVotingState === 'vote'">
+        <div v-if="settings.theme" class="flex justify-center content-center my-8">
+            <h1 class="text-5xl smallCaps w-fit text-center">
+                {{ 'La temàtica és: ' + settings.theme }}
+            </h1>
+            <UDropdown v-if="settings.themeDesc" class="h-fit w-fit self-end right-0 top-1/2" :items="themeDesc"
+                :mode="dropdownMode" :ui="{ item: { disabled: 'cursor-text select-text' } }"
+                :popper="{ placement: 'bottom-end', arrow: true }">
+                <span class="material-symbols-rounded">
+                    arrow_drop_down
+                </span>
+                <template #item="{ item }">
+                    <div class="flex justify-center items-center z-50">
+                        <h2>
+                            {{ item.text }}
+                        </h2>
+                    </div>
+                </template>
+            </UDropdown>
+        </div>
+        <div class="w-[57%] ml-12 flex items-center gap-2" :class="{ 'w-[90%]': $device.isMobile }">
+            <div class="relative text-center w-full">
+                <input type="text"
+                    :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
+                    class="w-full h-10 py-2 pl-10 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500"
+                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
+                    @keydown.enter.prevent="acceptInput">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
+                    :class="{ 'text-base': $device.isMobile }">
+                    search
+                </span>
+                <Transition name="delete-fade">
+                    <button v-if="filter" @click="deleteSearch"
+                        class="absolute h-full inset-y-0 right-0 flex items-center justify-center mr-3">
+                        <span class="material-symbols-rounded p-1 hover:bg-gray-400/[.25] rounded-full"
+                            :class="{ 'text-base': $device.isMobile }">
+                            Close
+                        </span>
+                    </button>
+                </Transition>
+            </div>
+            <div class="dropdown relative z-10">
+                <button
+                    class="px-2 h-10 w-fit bg-[#2B2A33] flex items-center justify-center rounded-lg border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    id="buttonFilters" @click="isFiltersSlideOpen = !isFiltersSlideOpen"
+                    :class="{ 'w-[150px]': !$device.isMobile }">
+                    <span class="material-symbols-outlined text-white">
+                        tune
+                    </span>
+                </button>
+
+
+                <USlideover v-model="isFiltersSlideOpen" class="z-[9999]">
+                    <UCard class="flex flex-col flex-1"
+                        :ui="{ body: { base: 'flex-1', background: 'bg-stone-800', }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                        <Placeholder class="h-full" />
+                        <div class="flex items-center justify-between bg-stone-800 pb-1">
+                            <h3 class="text-2xl cursor-default font-semibold leading-6 text-gray-900 dark:text-white">
+                                FILTRES
+                            </h3>
+                            <button @click="isFiltersSlideOpen = false"
+                                class="h-8 w-8 flex items-center justify-center hover:bg-stone-600 rounded-full p-2">
+                                <span class="i-heroicons-x-mark-20-solid flex-shrink-0 h-5 w-5"
+                                    aria-hidden="true"></span>
+                            </button>
+                        </div>
+                        <hr>
+                        <div class="pt-3 pb-3">
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-xl cursor-default pb-2">
+                                    Hores
+                                </h1>
+                                <button @click="cleanFilters()" class="hover:font-semibold hover:text-blue-500"
+                                    :class="{ 'text-blue-500': filterBell == null }">
+                                    Totes
+                                </button>
+                            </div>
+                            <div v-if="bells" class="grid grid-cols-4 gap-x-2 gap-y-4">
+                                <div v-for="(bell, index) in bells" class="w-full flex items-center justify-center">
+                                    <button @click="selectBell(bell.id)" :title="formatTime(bell.hour)"
+                                        :class="filterBell === bell.id ? 'border-blue-600 text-blue-500' : ''"
+                                        class="appearance-none p-2 w-full rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
+                                        {{ formatTime(bell.hour) }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div v-if="classGroups.length > 0" class="pt-4">
+                            <div class="flex items-center justify-between pb-2">
+                                <h1 class="text-xl cursor-default">
+                                    Grups
+                                </h1>
+                                <button @click="selectGroup(null)" class="hover:font-semibold hover:text-blue-500"
+                                    :class="{ 'text-blue-500': filterGroup == null }">
+                                    Tots
+                                </button>
+                            </div>
+                            <div v-if="groupsAvailable.length > 0">
+                                <div v-if="filteredSongs.length > 0" class="grid grid-cols-4 gap-x-2 gap-y-4">
+                                    <div v-for="(group, index) in groupsAvailable"
+                                        class="w-full flex items-center justify-center">
+                                        <button @click="selectGroup(group.id)"
+                                            :title="hasPropose(group.id) ? `Fes clic per veure les cançons proposades d'aquest grup` : `No hi ha cap cançó proposada en aquest grup`"
+                                            :class="filterGroup === group.id ? 'border-blue-600 text-blue-500' : ''"
+                                            class="appearance-none p-2 w-full rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
+                                            {{ group.abbreviation }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    <div
+                                        class="cursor-default appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                                        Ningun grup a proposat ni votat en aquesta franja horària
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <div
+                                    class="cursor-default appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                                    No hi ha cap grup en aquesta franja horària
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else>
+                            loading...
+                        </div>
+
+                    </UCard>
+                </USlideover>
+
+            </div>
+        </div>
         <div class="fixed top-0 right-0 h-screen flex justify-center items-center overflow-hidden translate-x-[40%]">
-            <div class="w-3/5 flex justify-center items-center relative" :class="{ 'spin': isPlaying }">
-                <img src="/img/vinyl_mockup.png" alt="vinyl_mockup" class="z-10" />
+            <div class="w-3/4 flex justify-center items-center relative "
+                :class="[isPlaying ? 'spin' : '', 'transition-transform duration-500 ease-out']">
+                <img src="/img/vinyl_mockup.png" alt="vinyl_mockup" class="vinyl z-10" />
                 <Transition name="slide-images">
-                    <img :key="store.currentTrackPlaying.img" v-if="store.currentTrackPlaying"
-                        :src="store.currentTrackPlaying.img" :alt="store.currentTrackPlaying.name"
+                    <img :key="store.currentTrackPlaying.album ? store.currentTrackPlaying.album.images[0].url : store.currentTrackPlaying.img"
+                        v-if="store.currentTrackPlaying"
+                        :src="store.currentTrackPlaying.album ? store.currentTrackPlaying.album.images[0].url : store.currentTrackPlaying.img"
+                        :alt="store.currentTrackPlaying.name"
                         class="absolute inset-0 m-auto w-1/3 right-0 rounded-full" />
                 </Transition>
                 <Transition name="slide-images">
@@ -15,10 +154,36 @@
             </div>
         </div>
 
-        <TransitionGroup name="song-slide" mode="out-in" tag="div" class="w-[60%]">
-            <component :is="activeSong" v-for=" track in filteredSongs " :key="track.id" :track="track"
-                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
-                @report="report($event)" :type="getType(track.id)" />
+        <h2 class="m-2 ml-12 text-3xl font-bold mt-4">Cançons proposades</h2>
+        <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
+        <div v-if="songs.length === 0" class="mt-4 w-full">
+            <p class="ml-12 text-xl">Encara no s'ha proposat cap cançó.</p>
+            <p class="ml-12 mx-4">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile">
+                cercant a
+                la barra de búsqueda.</p>
+        </div>
+
+        <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4 w-full">
+            <p class="ml-12 text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
+            <p class="ml-12 mx-4">Comparteix la teva proposta buscant ara mateix!</p>
+        </div>
+
+        <!-- CANCIONES PROPUESTAS -->
+        <TransitionGroup name="song-slide" mode="out-in">
+            <div class="w-[60%] mb-4" v-for="track in filteredSongs" :key="track.id">
+                <component :is="activeSong" :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying"
+                    @play="playTrack" @vote="vote($event)" @report="report($event)" :type="getType(track.id)" />
+            </div>
+        </TransitionGroup>
+
+        <!-- CANCIONES PARA PROPONER -->
+        <Transition name="song-slide">
+            <h2 v-if="spotifySongs.length > 0" class="ml-12 text-3xl font-bold mt-10">Resultats de la cerca</h2>
+        </Transition>
+        <TransitionGroup tag="div" class="w-[60%]" mode="out-in" name="song-slide">
+            <component :is="activeSong" v-for=" track in spotifySongs " :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
+                :type="getType(track.id)" />
         </TransitionGroup>
     </div>
     <div v-if="checkVotingState === 'mod'">
@@ -176,7 +341,7 @@ export default {
                 1: resolveComponent('MobileSong'),
             },
             activePlayer: {
-                0: resolveComponent('ModularPlayer'),
+                0: resolveComponent('ModularPlayer2'),
                 1: resolveComponent('MobilePlayer'),
             },
             serverResponse: null,
@@ -834,6 +999,10 @@ export default {
     /* Ocultamos los botones de la barra de desplazamiento */
 }
 
+.vinyl {
+    filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.1));
+}
+
 .song-slide-enter-active,
 .song-slide-leave-active,
 .song-slide-move {
@@ -870,6 +1039,6 @@ export default {
 .slide-images-enter-from,
 .slide-images-leave-to {
     opacity: 0;
-    transform: translateX(100%);
+    transform: rotate(360deg);
 }
 </style>
