@@ -23,6 +23,7 @@ class Setting extends Model
         'letProposeExplicit',
         'alertExplicit',
         'theme',
+        'themeDesc',
         'teacher_email_key',
         'student_email_key'
     ];

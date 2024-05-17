@@ -24,8 +24,8 @@
                     <select name="curs" id="curs" :disabled="!selectedCategoryId" v-model="selectedGroups"
                         class="w-80 p-3 rounded border-slate-400 border-2">
                         <option value="">-- Escull el teu curs --</option>
-                        <option :value="course.id" v-for="course in availableCourses" :key="course">{{ course.abbreviation
-                        }}
+                        <option :value="course.id" v-for="course in availableCourses" :key="course">
+                            {{ course.abbreviation }}
                         </option>
                     </select>
                 </div>
@@ -36,7 +36,8 @@
                     <div class="flex flex-col justify-center mb-5">
                         <label for="grup">Grup:</label>
                         <USelectMenu class="w-full" v-model="selectedCategoryId" :options="categories"
-                            option-attribute="abbreviation" value-attribute="id" placeholder="-- Escull el teu grup --" />
+                            option-attribute="abbreviation" value-attribute="id"
+                            placeholder="-- Escull el teu grup --" />
                     </div>
                     <div class="flex flex-col justify-center mb-10">
                         <label for="curs">Curs:</label>
@@ -46,11 +47,13 @@
                     </div>
                     <div>
                         <h3 class="mb-3">CURSOS SELECCIONATS</h3>
-                        <div v-if="!selectedGroups.length > 0" class="text-center">Encara no has seleccionat cap curs</div>
+                        <div v-if="!selectedGroups.length > 0" class="text-center">Encara no has seleccionat cap curs
+                        </div>
                         <div v-else class="flex flex-row flex-wrap gap-3">
                             <div v-for="group in selectedGroups"
-                                class="w-fit px-3 py-2 bg-[#999] grow text-center rounded-full">{{
-                                    group.abbreviation }}</div>
+                                class="w-fit px-3 py-2 bg-[#999] grow text-center rounded-full">
+                                {{ group.abbreviation }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -127,7 +130,7 @@ export default {
             } else {
                 groups = this.formatGroupsId();
             }
-        
+
             let userId = this.store.getUser().id;
             let userToken = this.store.getUser().token;
             comManager.setUserGroups(userId, groups, userToken).then((data) => {
@@ -150,7 +153,7 @@ export default {
             return groupsId;
         },
         checkCorrectOptions() {
-            if (this.user.role_id === 5 ) {
+            if (this.user.role_id === 5) {
                 return !this.selectedGroups || !this.selectedCategoryId;
             } else {
                 return !this.selectedGroups.length > 0 || !this.selectedCategoryId;

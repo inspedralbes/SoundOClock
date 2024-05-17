@@ -6,12 +6,16 @@
             </span>
             <span>Administració</span>
         </NuxtLink>
+        <NuxtLink class="px-4 py-4 flex align-center gap-3" to="/llista_final" @click="close()">
+            <UIcon name="i-heroicons-musical-note-16-solid text-[2rem]" />
+            <span>Llista Final</span>
+        </NuxtLink>
         <NuxtLink class="px-4 py-4 flex align-center gap-3" to="/llista_propostes" @click="close()">
             <UIcon name="i-heroicons-hand-thumb-up-16-solid text-[2rem]" />
             <span>Votacions</span>
         </NuxtLink>
         <NuxtLink class="px-4 py-4 flex align-center gap-3" to="/ranking" @click="close()">
-            <UIcon name="i-heroicons-musical-note-16-solid text-[2rem]" />
+            <UIcon name="i-heroicons-trophy-16-solid text-[2rem]" />
             <span>Ranking provisional</span>
         </NuxtLink>
         <NuxtLink class="px-4 py-4 flex align-center gap-3" to="/el_meu_perfil" @click="close()">

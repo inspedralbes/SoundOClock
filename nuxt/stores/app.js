@@ -6,16 +6,18 @@ export const useAppStore = defineStore("app", {
       typeof window !== "undefined" && window.localStorage.getItem("user")
         ? JSON.parse(localStorage.getItem("user"))
         : {
-            id: 0,
-            email: "",
-            name: "",
-            groups: [],
-            token: null,
-            role_id: null,
-            role_name: null,
-          },
+          id: 0,
+          email: "",
+          name: "",
+          picture: "",
+          groups: [],
+          token: null,
+          role_id: null,
+          role_name: null,
+        },
 
     userSelectedSongs: [],
+    finalSongsList: [],
     userReportedSongs: [],
     proposedSongs: [],
     sortedVotedSongs: [],
@@ -117,12 +119,16 @@ export const useAppStore = defineStore("app", {
     getUserReportedSongs() {
       return this.userReportedSongs;
     },
+    getFinalSongsList() {
+      return this.finalSongsList;
+    },
 
     //setters
-    setUser(id, email, name, token, groups, role_id, role_name) {
+    setUser(id, email, name, picture, token, groups, role_id, role_name) {
       this.user.id = id;
       this.user.email = email;
       this.user.name = name;
+      this.user.picture = picture;
       this.user.groups = groups;
       this.user.token = token;
       this.user.role_id = role_id;
@@ -202,6 +208,9 @@ export const useAppStore = defineStore("app", {
     },
     setUserReportedSongs(userReportedSongs) {
       this.userReportedSongs = userReportedSongs;
+    },
+    setFinalSongsList(finalSongsList) {
+      this.finalSongsList = finalSongsList;
     },
 
     ///Deletes

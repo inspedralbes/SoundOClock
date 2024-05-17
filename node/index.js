@@ -12,6 +12,7 @@ import {
   ReportSong,
   SelectedSong,
   ReportUser,
+  BellsGroupsTemplate,
 } from "./models.js";
 import axios from "axios";
 import minimist from "minimist";
@@ -406,6 +407,36 @@ app.get("/userGroups/:userToken", async (req, res) => {
   }
 });
 
+// GROUP BELLS TEMPLATE
+
+app.post('/bellsGroupsTemplate', async (req, res) => {
+  try {
+    const template = new BellsGroupsTemplate(req.body.template);
+    await template.save();
+    res.json({ status: 'success' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get('/bellsGroupsTemplate', async (req, res) => {
+  try {
+    const templates = await BellsGroupsTemplate.find();
+    res.json(templates);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.delete('/bellsGroupsTemplate/:id', async (req, res) => {
+  try {
+    await BellsGroupsTemplate.findByIdAndDelete(req.params.id);
+    res.json({ status: 'success' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {
@@ -456,6 +487,7 @@ io.on("connection", (socket) => {
       .then((userData) => {
         // console.log("UserData:", userData);
         let groups = [];
+        console.log(userData);
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
           groups.push(group.pivot.group_id);
@@ -466,6 +498,7 @@ io.on("connection", (socket) => {
           userData.user.id,
           userData.user.email,
           userData.user.name,
+          userData.user.picture,
           userData.token,
           groups,
           userData.user.role_id,
