@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-row justify-center gap-3 m-2 rounded-l text-gray-200 border-b-2 border-gray-400"
+    <div class="flex flex-row justify-center gap-3 m-2 rounded-l text-gray-200 border-l-2 border-b-2 border-gray-400"
         :class="{ 'bg-yellow-200 text-gray-800': isFirstPlace, 'text-gray-800': isSelected, 'justify-between': type === 'admin_set_song', 'justify-stretch gap-5 m-0': type === 'admin' }">
         <UChip size="3xl" color="red" v-if="numReports > 0 && type === 'admin'">
             <template #content>
