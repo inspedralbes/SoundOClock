@@ -592,6 +592,7 @@ export default {
                 if (this.isPlaying) {
                     this.currentTrack.pause();
                     this.isPlaying = false;
+                    cancelAnimationFrame(this.store.player.animationFrameId);
                     store.deleteCurrentTrackPlaying();
                 } else {
                     this.currentTrack.load();
@@ -605,6 +606,7 @@ export default {
                     if (this.isPlaying) {
                         this.currentTrack.pause();
                         this.isPlaying = false;
+                        cancelAnimationFrame(this.store.player.animationFrameId);
                         store.deleteCurrentTrackPlaying();
                     }
                     this.currentTrack = new Audio(track.preview_url);
@@ -622,9 +624,22 @@ export default {
         },
         updateProgress() {
             if (this.currentTrack) {
-                this.currentTrack.addEventListener('timeupdate', () => {
-                    this.store.player.progressBar = (this.currentTrack.currentTime / this.currentTrack.duration) * 100;
+                const update = () => {
+                    const currentTime = this.currentTrack.currentTime;
+                    const duration = this.currentTrack.duration;
+                    this.store.player.progressBar = (currentTime / duration) * 100;
+                    this.store.player.currentTime = this.formatSeconds(currentTime);
+                    this.store.player.duration = this.formatSeconds(duration);
+                    this.store.player.animationFrameId = requestAnimationFrame(update);
+                }
+                this.currentTrack.addEventListener('play', update);
+                this.currentTrack.addEventListener('pause', () => cancelAnimationFrame(this.animationFrameId));
+                this.currentTrack.addEventListener('ended', () => {
+                    this.store.player.progressBar = 0; // Reset progress if needed
+                    this.store.player.currentTime = this.formatSeconds(0);
+                    this.store.player.duration = this.formatSeconds(this.currentTrack.duration);
                 });
+                update(); // Start the update loop
             }
         },
         proposeSong(track) {
@@ -704,6 +719,12 @@ export default {
 
             // Return the two arrays concatenated
             return filterVotes.concat(bells);
+        },
+        formatSeconds(seconds) {
+            const roundedSeconds = Math.round(seconds);
+            const minutes = Math.floor(roundedSeconds / 60);
+            const secs = roundedSeconds % 60;
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
 

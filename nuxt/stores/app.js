@@ -48,6 +48,9 @@ export const useAppStore = defineStore("app", {
     settings: {},
     player: {
       progressBar: 0,
+      animationFrameId: null,
+      currentTime: 0,
+      duration: 0,
     },
   }),
   persist: {
