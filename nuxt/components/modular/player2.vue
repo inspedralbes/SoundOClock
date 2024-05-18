@@ -1,54 +1,61 @@
 <template>
     <Transition name="player-slide">
         <div v-if="track != null" class="w-full fixed bottom-0 bg-white z-20">
-            <p class="text-black">{{ store.player.currentTime }} / {{ store.player.duration }}</p>
-            <div class="flex flex-row items-center">
-                <img class="rounded-full w-24 m-4 ml-12" :src="track.album ? track.album.images[0].url : track.img"
-                    alt="Album Image">
-                <div class="overflow-hidden">
-                    <h3 class="text-lg font-semibold text-gray-800 uppercase whitespace-nowrap overflow-hidden ">
-                        {{ track.name }}
-                    </h3>
-                    <p class="text-gray-700 whitespace-nowrap overflow-hidden">
-                        <span v-if="track.artists" v-for="(artist, index) in track.artists" :key="index">
-                            <span v-if="index !== 0">, </span>
-                            {{ artist.name }}
-                        </span>
-                        <span v-else>{{ track.artist }}</span>
-                    </p>
-                </div>
-                <div class="flex flex-row items-center">
-                    <button v-if="type === 'vote'" class="m-2" @click="report">
-                        <span class="material-symbols-rounded text-4xl text-gray-700">
-                            report
-                        </span>
-                    </button>
-                    <button class="m-2" @click="pause">
-                        <span class="material-symbols-rounded text-4xl text-gray-700">
-                            pause
-                        </span>
-                    </button>
-                    <button v-if="type === 'vote' && !isLoadingVote.state" class="m-2" @click="vote">
-                        <span class="material-symbols-rounded text-4xl text-gray-700">
-                            thumb_up
-                        </span>
-                    </button>
-                    <button v-if="type === 'propose' && (!track.loading && !track.proposed)" class="m-2"
-                        @click="propose">
-                        <span class="material-symbols-rounded text-4xl text-gray-700">
-                            add_circle
-                        </span>
-                    </button>
-                    <div v-if="track.loading || isLoadingVote.state" class="loader-track"></div>
-                    <div v-if="type === 'propose' && (track.proposed)" class="m-2">
-                        <span class="material-symbols-rounded text-4xl text-gray-700">
-                            task_alt
-                        </span>
+            <div class="flex flex-row">
+                <div class="flex flex-row items-center w-1/5 overflow-hidden">
+                    <img class="rounded-full w-24 m-4 ml-12" :src="track.album ? track.album.images[0].url : track.img"
+                        alt="Album Image">
+                    <div class="overflow-hidden">
+                        <h3 class="text-lg font-semibold text-gray-800 uppercase whitespace-nowrap overflow-hidden"
+                            :class="{ 'text-marquee': isOverflowing('title') }">
+                            {{ track.name }}
+                        </h3>
+                        <p class="text-gray-700 whitespace-nowrap overflow-hidden">
+                            <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="artistList"
+                                :class="{ 'text-marquee': isOverflowing('artist') }">
+                                {{ artistList }}
+                            </span>
+                        </p>
                     </div>
                 </div>
-            </div>
-            <div class="w-full h-2 bg-gray-300">
-                <div class="h-full bg-green-500" :style="{ width: progressBar + '%' }"></div>
+                <div class="flex flex-col justify-center w-3/5">
+                    <div class="flex flex-row w-full justify-center items-center">
+                        <button v-if="type === 'vote'" class="m-2" @click="report">
+                            <span class="material-symbols-rounded text-4xl text-gray-700">
+                                report
+                            </span>
+                        </button>
+                        <button class="m-2" @click="pause">
+                            <span class="material-symbols-rounded text-4xl text-gray-700">
+                                pause
+                            </span>
+                        </button>
+                        <button v-if="type === 'vote' && !isLoadingVote.state" class="m-2" @click="vote">
+                            <span class="material-symbols-rounded text-4xl text-gray-700">
+                                thumb_up
+                            </span>
+                        </button>
+                        <button v-if="type === 'propose' && (!track.loading && !track.proposed)" class="m-2"
+                            @click="propose">
+                            <span class="material-symbols-rounded text-4xl text-gray-700">
+                                add_circle
+                            </span>
+                        </button>
+                        <div v-if="track.loading || isLoadingVote.state" class="loader-track"></div>
+                        <div v-if="type === 'propose' && (track.proposed)" class="m-2">
+                            <span class="material-symbols-rounded text-4xl text-gray-700">
+                                task_alt
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex flex-row justify-center items-center">
+                        <p class="text-black">{{ store.player.currentTime }}</p>
+                        <div class="w-full mx-4 h-2 bg-gray-300">
+                            <div class="h-full bg-blue-500" :style="{ width: progressBar + '%' }"></div>
+                        </div>
+                        <p class="text-black">{{ store.player.duration }}</p>
+                    </div>
+                </div>
             </div>
         </div>
     </Transition>
@@ -88,24 +95,28 @@ export default {
         vote() {
             this.$emit('vote', this.track);
         },
-        isOverflowing(text) {
-            if (text === 1) {
-                return this.track.name.length > 10;
-            } else {
-                let nameLength = 0;
-                if (this.track.artists) {
-                    for (const artist of this.track.artists) {
-                        nameLength += artist.name.length;
-                    }
-                    return nameLength > 20;
-                } else {
-                    return this.track.artist.length > 20;
-                }
+        isOverflowing(type) {
+            if (type === 'title') {
+                return this.track.name.length > 40;
+            } else if (type === 'artist') {
+                return this.artistList.length > 50;
             }
         }
     },
     computed: {
-
+        artistList() {
+            // Get the list of artists in a string
+            if (this.track.artists) {
+                let artistList = "";
+                this.track.artists.forEach((artist, index) => {
+                    if (index !== 0) {
+                        artistList += ", ";
+                    }
+                    artistList += artist.name;
+                });
+                return artistList;
+            }
+        }
     }
 }
 </script>
@@ -119,21 +130,6 @@ export default {
 .player-slide-enter-from,
 .player-slide-leave-to {
     transform: translateY(150%);
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(100%);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-.text-marquee {
-    white-space: nowrap;
-    animation: marquee 10s linear infinite;
 }
 
 .loader-track {
@@ -194,6 +190,49 @@ export default {
 
     100% {
         width: 50%;
+    }
+}
+
+.text-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scroll-text 10s ease-in infinite;
+}
+
+/* Keyframes for the scrolling animation using translateX */
+@keyframes scroll-text {
+
+    0%,
+    10% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+
+    10.01% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+
+    80% {
+        transform: translateX(-100%);
+        /* The text scrolls left until out of view */
+        opacity: 1;
+    }
+
+    80.01% {
+        transform: translateX(100%);
+        /* The text is instantly placed to the right of the screen */
+        opacity: 0;
+    }
+
+    90% {
+        transform: translateX(0%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
     }
 }
 </style>
