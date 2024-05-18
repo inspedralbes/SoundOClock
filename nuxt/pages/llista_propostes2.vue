@@ -598,6 +598,7 @@ export default {
                     this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
+                    this.updateProgress();
                 }
             } else {
                 if (track.preview_url != null) {
@@ -612,13 +613,20 @@ export default {
                     this.currentTrack.play();
                     this.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
+                    this.updateProgress();
                 } else {
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
                 }
             }
         },
-
+        updateProgress() {
+            if (this.currentTrack) {
+                this.currentTrack.addEventListener('timeupdate', () => {
+                    this.store.player.progressBar = (this.currentTrack.currentTime / this.currentTrack.duration) * 100;
+                });
+            }
+        },
         proposeSong(track) {
             track.loading = true;
             this.postedSongId = track.id;

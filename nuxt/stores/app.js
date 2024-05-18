@@ -46,6 +46,9 @@ export const useAppStore = defineStore("app", {
     loadingAdminComponent: null,
     blacklist: [],
     settings: {},
+    player: {
+      progressBar: 0,
+    },
   }),
   persist: {
     storage: persistedState.localStorage,

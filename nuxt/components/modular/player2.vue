@@ -45,7 +45,9 @@
                         </span>
                     </div>
                 </div>
-                <!-- <div class="bg-black w-1/2 h-2 fill"></div> -->
+            </div>
+            <div class="w-full h-2 bg-gray-300">
+                <div class="h-full bg-green-500" :style="{ width: progressBar + '%' }"></div>
             </div>
         </div>
     </Transition>
