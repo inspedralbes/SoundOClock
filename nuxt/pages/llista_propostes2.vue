@@ -625,15 +625,23 @@ export default {
         updateProgress() {
             if (this.currentTrack) {
                 const update = () => {
-                    const currentTime = this.currentTrack.currentTime;
-                    const duration = this.currentTrack.duration;
-                    this.store.player.progressBar = (currentTime / duration) * 100;
-                    this.store.player.currentTime = this.formatSeconds(currentTime);
-                    this.store.player.duration = this.formatSeconds(duration);
-                    this.store.player.animationFrameId = requestAnimationFrame(update);
+                    if (this.isPlaying) {
+                        const currentTime = this.currentTrack.currentTime;
+                        const duration = this.currentTrack.duration;
+                        this.store.player.progressBar = (currentTime / duration) * 100;
+                        this.store.player.currentTime = this.formatSeconds(currentTime);
+                        this.store.player.duration = this.formatSeconds(duration);
+                        this.store.player.animationFrameId = requestAnimationFrame(update);
+                    }
                 }
                 this.currentTrack.addEventListener('play', update);
-                this.currentTrack.addEventListener('pause', () => cancelAnimationFrame(this.animationFrameId));
+
+                this.currentTrack.addEventListener('pause', () => {
+                    this.store.player.progressBar = 0; // Reset progress if needed
+                    this.store.player.currentTime = this.formatSeconds(0);
+                    this.store.player.duration = this.formatSeconds(this.currentTrack.duration);
+                });
+
                 this.currentTrack.addEventListener('ended', () => {
                     this.store.player.progressBar = 0; // Reset progress if needed
                     this.store.player.currentTime = this.formatSeconds(0);
@@ -661,6 +669,7 @@ export default {
                     // date: track.album.release_date,
                     img: track.album.images[1].url,
                     preview_url: track.preview_url,
+                    link: track.external_urls.spotify,
                     explicit: track.explicit,
                     submitDate: new Date().toISOString(),
                     submittedBy: this.store.getUser().id,

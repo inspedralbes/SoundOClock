@@ -1,11 +1,12 @@
 <template>
     <Transition name="player-slide">
-        <div v-if="track != null" class="w-full fixed bottom-0 bg-white z-20">
-            <div class="flex flex-row">
-                <div class="flex flex-row items-center w-1/5 overflow-hidden">
+        <div v-if="track != null" class="w-full fixed bottom-0 bg-white z-20 opacity-80">
+            <div class="flex flex-row justify-between">
+                <div class="flex flex-row items-center w-[30%] overflow-hidden">
                     <img class="rounded-full w-24 m-4 ml-12" :src="track.album ? track.album.images[0].url : track.img"
                         alt="Album Image">
-                    <div class="overflow-hidden">
+                    <div class="overflow-hidden"
+                        :class="{ 'fader': isOverflowing('artist') || isOverflowing('title') }">
                         <h3 class="text-lg font-semibold text-gray-800 uppercase whitespace-nowrap overflow-hidden"
                             :class="{ 'text-marquee': isOverflowing('title') }">
                             {{ track.name }}
@@ -18,43 +19,53 @@
                         </p>
                     </div>
                 </div>
-                <div class="flex flex-col justify-center w-3/5">
-                    <div class="flex flex-row w-full justify-center items-center">
-                        <button v-if="type === 'vote'" class="m-2" @click="report">
-                            <span class="material-symbols-rounded text-4xl text-gray-700">
-                                report
-                            </span>
-                        </button>
-                        <button class="m-2" @click="pause">
-                            <span class="material-symbols-rounded text-4xl text-gray-700">
-                                pause
-                            </span>
-                        </button>
-                        <button v-if="type === 'vote' && !isLoadingVote.state" class="m-2" @click="vote">
-                            <span class="material-symbols-rounded text-4xl text-gray-700">
-                                thumb_up
-                            </span>
-                        </button>
-                        <button v-if="type === 'propose' && (!track.loading && !track.proposed)" class="m-2"
-                            @click="propose">
-                            <span class="material-symbols-rounded text-4xl text-gray-700">
-                                add_circle
-                            </span>
-                        </button>
-                        <div v-if="track.loading || isLoadingVote.state" class="loader-track"></div>
-                        <div v-if="type === 'propose' && (track.proposed)" class="m-2">
-                            <span class="material-symbols-rounded text-4xl text-gray-700">
-                                task_alt
-                            </span>
+                <div class="flex flex-col justify-center w-2/5 mr-[20%]">
+                    <div class="w-full flex items-center justify-center">
+                        <div class="flex flex-row w-1/2 justify-between items-center">
+                            <button v-if="type === 'vote'" class="m-2" @click="report">
+                                <span class="material-symbols-rounded text-4xl text-gray-700">
+                                    report
+                                </span>
+                            </button>
+                            <button class="m-2" @click="pause">
+                                <span class="material-symbols-rounded text-4xl text-gray-700">
+                                    pause
+                                </span>
+                            </button>
+                            <button v-if="type === 'vote' && !isLoadingVote.state" class="m-2" @click="vote">
+                                <span class="material-symbols-rounded text-4xl text-gray-700">
+                                    thumb_up
+                                </span>
+                            </button>
+                            <button v-if="type === 'propose' && (!track.loading && !track.proposed)" class="m-2"
+                                @click="propose">
+                                <span class="material-symbols-rounded text-4xl text-gray-700">
+                                    add_circle
+                                </span>
+                            </button>
+                            <div v-if="track.loading || isLoadingVote.state" class="loader-track"></div>
+                            <div v-if="type === 'propose' && (track.proposed)" class="m-2">
+                                <span class="material-symbols-rounded text-4xl text-gray-700">
+                                    task_alt
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <div class="flex flex-row justify-center items-center">
                         <p class="text-black">{{ store.player.currentTime }}</p>
-                        <div class="w-full mx-4 h-2 bg-gray-300">
+                        <div class="w-full mx-4 h-2 bg-gray-700">
                             <div class="h-full bg-blue-500" :style="{ width: progressBar + '%' }"></div>
                         </div>
-                        <p class="text-black">{{ store.player.duration }}</p>
+                        <p class="text-black">{{ isNaN(store.player.duration) ? '0:30' : store.player.duration }}</p>
                     </div>
+                </div>
+                <div class=" flex justify-center items-center mx-12">
+                    <a v-if="track.link || track.external_urls.spotify" class="h-fit w-fit"
+                        :href="track.link ? track.link : track.external_urls.spotify" target="_blank"
+                        rel="noopener noreferrer">
+                        <span class="material-symbols-rounded text-4xl text-gray-700">open_in_new
+                        </span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -97,7 +108,7 @@ export default {
         },
         isOverflowing(type) {
             if (type === 'title') {
-                return this.track.name.length > 40;
+                return this.track.name.length > 18;
             } else if (type === 'artist') {
                 return this.artistList.length > 50;
             }
@@ -234,5 +245,11 @@ export default {
         transform: translateX(0%);
         opacity: 1;
     }
+
+}
+
+.fader {
+    -webkit-mask-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 1)), to(rgba(0, 0, 0, 0)));
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 }
 </style>
