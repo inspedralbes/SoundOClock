@@ -30,7 +30,7 @@
                         </p>
                         <div class="fader w-full flex items-center gap-2 text-sm marquee-container">
                             <UBadge v-if="track.explicit" class="z-10" color="black">E</UBadge>
-                            <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="artistList"
+                            <span class="whitespace-nowrap" v-if="artistList"
                                 :class="{ 'text-marquee': isOverflowing('artist') }">
                                 {{ artistList }}
                             </span>
