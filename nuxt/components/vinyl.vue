@@ -15,7 +15,7 @@
                     :alt="store.currentTrackPlaying.name" class="absolute inset-0 m-auto w-1/3 right-0 rounded-full" />
             </Transition>
             <Transition name="slide-images">
-                <img v-if="!store.currentTrackPlaying" src="/img/soundoclock-logo.svg" alt="Placeholder"
+                <img v-if="!store.currentTrackPlaying" src="/img/soundoclock-logo.png" alt="Placeholder"
                     class="absolute inset-0 m-auto w-1/3 right-0 rounded-full" />
             </Transition>
         </div>

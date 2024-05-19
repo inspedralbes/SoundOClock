@@ -1,6 +1,6 @@
 <template>
     <Transition name="player-slide">
-        <div v-if="track != null" class="w-full fixed bottom-0 bg-white z-20 opacity-80">
+        <div v-if="track != null" class="w-full fixed bottom-0 bg-white z-20">
             <div class="flex flex-row justify-between">
                 <div class="flex flex-row items-center w-[30%] overflow-hidden">
                     <img class="rounded-full w-24 m-4 ml-12" :src="track.album ? track.album.images[0].url : track.img"

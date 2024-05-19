@@ -29,7 +29,7 @@
             <div class="relative text-center w-full">
                 <input type="text"
                     :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
-                    class="w-full h-10 py-2 pl-10 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500"
+                    class="w-full h-10 py-2 pl-10 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 bg-[#1F1F1F]"
                     :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
                     @keydown.enter.prevent="acceptInput">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
@@ -48,7 +48,7 @@
             </div>
             <div class="dropdown relative z-10">
                 <button
-                    class="px-2 h-10 w-fit bg-[#2B2A33] flex items-center justify-center rounded-lg border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-2 h-10 w-fit bg-[#1F1F1F] flex items-center justify-center rounded-lg border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
                     id="buttonFilters" @click="isFiltersSlideOpen = !isFiltersSlideOpen"
                     :class="{ 'w-[150px]': !$device.isMobile }">
                     <span class="material-symbols-outlined text-white">
