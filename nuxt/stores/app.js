@@ -51,6 +51,7 @@ export const useAppStore = defineStore("app", {
       animationFrameId: null,
       currentTime: 0,
       duration: 0,
+      isPlaying: false,
     },
   }),
   persist: {

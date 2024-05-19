@@ -5,14 +5,14 @@
                 <div class="flex flex-row items-center w-[30%] overflow-hidden">
                     <img class="rounded-full w-24 m-4 ml-12" :src="track.album ? track.album.images[0].url : track.img"
                         alt="Album Image">
-                    <div class="overflow-hidden"
+                    <div class="border-solid border-l-4 h-3/4 flex flex-col justify-center pl-2 border-gray-700 overflow-hidden"
                         :class="{ 'fader': isOverflowing('artist') || isOverflowing('title') }">
                         <h3 class="text-lg font-semibold text-gray-800 uppercase whitespace-nowrap overflow-hidden"
                             :class="{ 'text-marquee': isOverflowing('title') }">
                             {{ track.name }}
                         </h3>
                         <p class="text-gray-700 whitespace-nowrap overflow-hidden">
-                            <span class="overflow-hidden whitespace-nowrap text-ellipsis" v-if="artistList"
+                            <span class="overflow-hidden whitespace-nowrap" v-if="artistList"
                                 :class="{ 'text-marquee': isOverflowing('artist') }">
                                 {{ artistList }}
                             </span>

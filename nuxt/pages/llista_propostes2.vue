@@ -2,6 +2,8 @@
     <img src="/img/fondo.png" alt="background" class="fixed inset-0 z-[-1] object-cover h-screen w-screen" />
     <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
         @report="report($event)" @propose="proposeSong($event)" />
+    <Vinyl class="fixed top-0 right-0 h-screen flex justify-center items-center overflow-hidden translate-x-[40%]" />
+
 
     <div v-if="checkVotingState === 'vote'">
         <div v-if="settings.theme" class="flex justify-center content-center my-8">
@@ -136,23 +138,7 @@
 
             </div>
         </div>
-        <div class="fixed top-0 right-0 h-screen flex justify-center items-center overflow-hidden translate-x-[40%]">
-            <div class="w-3/4 flex justify-center items-center relative "
-                :class="[isPlaying ? 'spin' : '', 'transition-transform duration-500 ease-out']">
-                <img src="/img/vinyl_mockup.png" alt="vinyl_mockup" class="vinyl z-10" />
-                <Transition name="slide-images">
-                    <img :key="store.currentTrackPlaying.album ? store.currentTrackPlaying.album.images[0].url : store.currentTrackPlaying.img"
-                        v-if="store.currentTrackPlaying"
-                        :src="store.currentTrackPlaying.album ? store.currentTrackPlaying.album.images[0].url : store.currentTrackPlaying.img"
-                        :alt="store.currentTrackPlaying.name"
-                        class="absolute inset-0 m-auto w-1/3 right-0 rounded-full" />
-                </Transition>
-                <Transition name="slide-images">
-                    <img v-if="!store.currentTrackPlaying" src="/img/soundoclock-logo.svg" alt="Placeholder"
-                        class="absolute inset-0 m-auto w-1/3 right-0 rounded-full" />
-                </Transition>
-            </div>
-        </div>
+
 
         <h2 class="m-2 ml-12 text-3xl font-bold mt-4">Cançons proposades</h2>
         <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
@@ -592,12 +578,14 @@ export default {
                 if (this.isPlaying) {
                     this.currentTrack.pause();
                     this.isPlaying = false;
+                    this.store.player.isPlaying = false;
                     cancelAnimationFrame(this.store.player.animationFrameId);
                     store.deleteCurrentTrackPlaying();
                 } else {
                     this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    this.store.player.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
                     this.updateProgress();
                 }
@@ -606,6 +594,7 @@ export default {
                     if (this.isPlaying) {
                         this.currentTrack.pause();
                         this.isPlaying = false;
+                        this.store.player.isPlaying = false;
                         cancelAnimationFrame(this.store.player.animationFrameId);
                         store.deleteCurrentTrackPlaying();
                     }
@@ -614,6 +603,7 @@ export default {
                     this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    this.store.player.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
                     this.updateProgress();
                 } else {
@@ -759,6 +749,7 @@ export default {
             handler: function () {
                 this.currentTrack.onended = () => {
                     this.isPlaying = false;
+                    this.store.player.isPlaying = false;
                     this.store.deleteCurrentTrackPlaying();
                 }
             }
@@ -929,42 +920,6 @@ export default {
     animation: loader-dash4 1.5s ease-in-out infinite;
 }
 
-.spin {
-    animation: spin 4s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes loader-rotate4 {
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes loader-dash4 {
-    0% {
-        stroke-dasharray: 1, 200;
-        stroke-dashoffset: 0;
-    }
-
-    50% {
-        stroke-dasharray: 90, 200;
-        stroke-dashoffset: -35px;
-    }
-
-    100% {
-        stroke-dashoffset: -125px;
-    }
-}
-
 
 #buttonsFilterGroup {
     width: calc(60% + 150px);
@@ -1037,9 +992,6 @@ export default {
     /* Ocultamos los botones de la barra de desplazamiento */
 }
 
-.vinyl {
-    filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.1));
-}
 
 .song-slide-enter-active,
 .song-slide-leave-active,

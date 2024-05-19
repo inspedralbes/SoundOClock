@@ -1,7 +1,7 @@
 <template>
   <!-- <UContainer> -->
   <Header
-    v-if="$route.name !== 'index' && $route.name !== 'admin' && $route.name !== 'auth-callback-google' && $route.name !== 'escollirGrup' && $route.name !== 'llista_propostes2'">
+    v-if="$route.name !== 'index' && $route.name !== 'admin' && $route.name !== 'auth-callback-google' && $route.name !== 'escollirGrup' && $route.name !== 'llista_propostes2' && $route.name !== 'a'">
   </Header>
   <NuxtPage class="grow" />
   <!-- </UContainer> -->
