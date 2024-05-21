@@ -139,6 +139,8 @@
 
             </div>
         </div>
+
+
         <!-- Listado canciones propuestas -->
         <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
         <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
@@ -148,6 +150,7 @@
                 cercant a
                 la barra de búsqueda.</p>
         </div>
+
         <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4  w-full">
             <p class="text-center text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
             <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
@@ -337,16 +340,7 @@ export default {
     },
     created() {
         socket.on('searchResult', (results) => {
-            console.log("results", results, "length", results.length);
-            let handleSplicit = [];
-            if (this.settings.showExplicit) {
-                handleSplicit = results.filter(song => !song.explicit);
-                console.log("hadleSplicit", handleSplicit, "length", handleSplicit.length);
-                this.spotifySongs = handleSplicit.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
-            } else {
-                this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
-            }
-            console.log("spotifySongs", this.spotifySongs, "length", this.spotifySongs.length);
+            this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -613,7 +607,7 @@ export default {
                 }
             }
         },
-        
+
         proposeSong(track) {
             track.loading = true;
             this.postedSongId = track.id;
@@ -858,7 +852,7 @@ export default {
             } else {
                 return 'hover';
             }
-        },
+        }
     },
 }
 
