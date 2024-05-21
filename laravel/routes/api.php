@@ -10,6 +10,7 @@ use App\Http\Controllers\BellController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\GroupCategoryController;
 use App\Http\Controllers\UserGroupsController;
+use App\Http\Controllers\MailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,4 +92,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // User groups
     Route::get('/userGroups', [UserGroupsController::class, 'index']);
     Route::delete('/group/{group_id}/user/{user_id}', [UserGroupsController::class, 'delete']);
+
+    Route::post('/mail', [MailController::class, 'deletedSongEmail']);
 });

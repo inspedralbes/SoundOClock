@@ -1,8 +1,6 @@
 <template>
     <div class="w-[85%] h-fit z-[999]">
         <div v-if="selectedSongs">
-            <!-- <div v-for="song in selectedSongs">{{ song }}</div> -->
-
             <div v-for="song in selectedSongs">
                 <component :is="activeSong" :key="song.id" :track="song"
                     :currentTrackId="songStatus.currentTrackId" :isPlaying="songStatus.isPlaying" @play="playSong"
@@ -32,7 +30,6 @@ export default {
         }
     },
     async created() {
-        // this.calculateNow();
         await comManager.getSelectedSongs();
         await comManager.getBells();
     },
@@ -45,7 +42,6 @@ export default {
 
             // Convert current time to a comparable format (HH:MM)
             const currentTime = `${String(currentHour).padStart(2, '0')}:${String(currentMinutes).padStart(2, '0')}`;
-            console.log(currentTime)
             return currentTime;
         },
         calculateCurrentBell(now) {
@@ -86,7 +82,6 @@ export default {
                 }
             }
 
-            console.log("SHOWED SONGS", showedSongs);
             return showedSongs;
         },
         linkSongsWithBells(songs) {
