@@ -2,7 +2,7 @@
     <div v-if="checkVotingState === 'vote'">
         <!-- Reproductor -->
         <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
-            @report="report($event)" @propose="proposeSong($event)" />
+            @report="report($event)" @propose="proposeSongCheck($event)" />
 
 
         <!-- Barra de busqueda -->
@@ -189,8 +189,8 @@
     </Transition>
     <TransitionGroup tag="div" class="mb-20" name="song-slide">
         <component :is="activeSong" v-for=" track in spotifySongs " :key="track.id" :track="track"
-            :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
-            :type="getType(track.id)" />
+            :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
+            @propose="proposeSongCheck($event)" :type="getType(track.id)" />
     </TransitionGroup>
 
 
@@ -283,6 +283,27 @@
             {{ postedSongStatus.message }}
         </UCard>
     </UModal>
+
+    <UModal v-model="modals.blockEsplicit" class="z-[9999]">
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center justify-between">
+                    <div class="flex flex-row items-center">
+                        <span class="material-symbols-rounded text-[2rem] text-red-500 mr-4">
+                            error
+                        </span>
+                        <h2 class="text-xl font-bold">
+                            No es pot proposar aquesta cançó dagdgd
+                        </h2>
+                    </div>
+                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                        @click="modals.proposeSongError = false" />
+                </div>
+            </template>
+
+            asfasdf
+        </UCard>
+    </UModal>
 </template>
 
 <script>
@@ -299,6 +320,8 @@ export default {
                 alreadyVotedModal: false,
                 reportModal: false,
                 proposeSongError: false,
+                blockEsplicit: false,
+                alertEsplicit: false,
             },
             songs: computed(() => this.store.proposedSongs),
             spotifySongs: [],
@@ -340,7 +363,16 @@ export default {
     },
     created() {
         socket.on('searchResult', (results) => {
-            this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
+            console.log("results", results, "length", results.length);
+            let handleSplicit = [];
+            if (this.settings.showExplicit) {
+                handleSplicit = results.filter(song => !song.explicit);
+                console.log("hadleSplicit", handleSplicit, "length", handleSplicit.length);
+                this.spotifySongs = handleSplicit.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
+            } else {
+                this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
+            }
+            console.log("spotifySongs", this.spotifySongs, "length", this.spotifySongs.length);
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -605,6 +637,28 @@ export default {
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
                 }
+            }
+        },
+
+        isTrackEsplicit(track) {
+            console.log("check explicit", track.explicit);
+            if (track.explicit) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        proposeSongCheck(track) {
+            console.log("proposeSongCheck", track);
+            let isEsplicit = isTrackEsplicit(track);
+            console.log("isEsplicit", isEsplicit);
+            if (this.settings.blockEsplicit && isEsplicit) {
+                this.modals.blockEsplicit = true;
+            } else if (this.settings.alertEsplicit && isEsplicit) {
+                this.modals.alertEsplicit = true;
+            } else {
+                this.proposeSong(track);
             }
         },
 
