@@ -197,9 +197,10 @@
             <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
         </div>
         <div>
-            <Song :is="activeSong" v-for=" track in finalSongsList " :key="track.id" :track="track"
-                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" :type="'selected'"
-                :bellId="track.bellId" />
+            <div v-for="track in finalSongsList" :key="track.id" :class="{ 'w-[60%] mb-4': !$device.isMobile }">
+                <component :is="activeSong" :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying"
+                    @play="playTrack" :type="'selected'" :bellId="track.bellId" />
+            </div>
         </div>
     </div>
 
