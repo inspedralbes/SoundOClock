@@ -863,6 +863,9 @@ io.on("connection", (socket) => {
           message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.`,
         });
       } else {
+        // Send mail to the user that proposed the song
+        comManager.sendDeletedSongMail(userToken, song);
+
         // Notify the user that erased the song
         socket.emit("notifyServerResponse", {
           status: "success",
