@@ -425,6 +425,16 @@ app.post("/usersVotes", async (req, res) => {
   }
 });
 
+app.get("/user/:userId", async (req, res) => {
+  try {
+    const userToken = req.headers['authorization'].split(' ')[1];
+    let user = await comManager.showUser(userToken, req.params.userId);
+    res.json(user);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {

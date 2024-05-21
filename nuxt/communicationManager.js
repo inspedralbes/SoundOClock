@@ -254,6 +254,20 @@ async function getUsersVotes(songId, token){
   return data;
 }
 
+async function getUser(userId){
+  const store = useAppStore();
+  const response = await fetch(`${url}/user/${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${store.getUser().token}`,
+    },
+  });
+  const data = await response.json();
+  return data;
+}
+
 const comManager = {
   getUserSelectedSongs,
   getSongs,
@@ -274,6 +288,7 @@ const comManager = {
   getUserReportedSongs,
   getSelectedSongs,
   getUsersVotes,
+  getUser,
 };
 
 export default comManager;
