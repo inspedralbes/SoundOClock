@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Blacklist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\bannedSongEmail;
 
 class BlacklistController extends Controller
 {
@@ -116,7 +119,8 @@ class BlacklistController extends Controller
             'name' => 'required|string',
             'artists' => 'required|array',
             'img' => 'string',
-            'preview_url' => 'string'
+            'preview_url' => 'string',
+            'submittedBy' => 'required|integer',
         ]);
 
         Log::info('[DEBUG] Request data: ' . json_encode($request->all()));
@@ -136,6 +140,12 @@ class BlacklistController extends Controller
         $song->img = $request->img;
         $song->preview_url = $request->preview_url;
         $song->save();
+
+        // Find the user that proposed the song
+        $user = User::find($request->submittedBy);
+
+        // Send mail to the user that proposed the song
+        Mail::to($user->email)->send(new bannedSongEmail($user, $song)); 
 
         return response()->json($song, 201);
     }

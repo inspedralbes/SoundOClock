@@ -136,6 +136,7 @@ async function addSongToBlackList(token, song) {
       artists: song.artists,
       img: song.img,
       preview_url: song.preview_url,
+      submittedBy: song.submittedBy,
     }),
   });
   const jsonResponse = await response.json();
@@ -466,6 +467,17 @@ async function deleteUserFromGroup(token, group_id, user_id) {
   return jsonResponse;
 }
 
+async function sendDeletedSongMail(token, song) {
+  
+  const response = await axios.post(`${apiURL}mail`, song, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  console.log("SOOOONG response", response.data);
+  return response.data;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -500,6 +512,7 @@ const comManager = {
   createGroup,
   getUserGroups,
   deleteUserFromGroup,
+  sendDeletedSongMail,
 };
 
 export default comManager;
