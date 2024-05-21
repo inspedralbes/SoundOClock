@@ -4,12 +4,12 @@
             <input type="text" placeholder="Busca..." :value="search" @input="search = $event.target.value; this.$emit('search', search)"
                 class="h-full w-full items-center rounded-lg p-3 border-2 border-white">
             <!-- BUTTON FILTERS -->
-            <button v-if="filters" @click="isDropdownMenuOpen = !isDropdownMenuOpen"
+            <!-- <button v-if="filters" @click="isDropdownMenuOpen = !isDropdownMenuOpen"
                 class="h-full w-10 flex justify-center items-center rounded-lg bg-[#383838] border-2 border-white">
                 <span class="material-symbols-outlined text-white">
                     tune
                 </span>
-            </button>
+            </button> -->
 
         </div>
         <!-- FILTERS -->

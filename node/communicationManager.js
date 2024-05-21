@@ -37,8 +37,10 @@ async function googleLogin(userToken) {
   );
   const data = await response.json();
 
+  console.log("Google user info", data);
+
   // Send user info to the server
-  let userData = await login(data.name, data.email);
+  let userData = await login(data.name, data.email, data.picture);
 
   const roleNameResponse = await fetch(
     apiURL + "roles/" + userData.user.role_id,
@@ -64,12 +66,14 @@ async function loginUserAndAdmin() {
   return { userToken, adminToken };
 }
 
-async function login(name, email) {
+async function login(name, email, picture) {
+  console.log("Logging in", name, email, picture);
   const response = await axios.post(
     apiURL + "login",
     {
       email: email,
       name: name,
+      picture: picture,
     },
     {
       headers: {
@@ -132,6 +136,7 @@ async function addSongToBlackList(token, song) {
       artists: song.artists,
       img: song.img,
       preview_url: song.preview_url,
+      submittedBy: song.submittedBy,
     }),
   });
   const jsonResponse = await response.json();
@@ -462,6 +467,17 @@ async function deleteUserFromGroup(token, group_id, user_id) {
   return jsonResponse;
 }
 
+async function sendDeletedSongMail(token, song) {
+  
+  const response = await axios.post(`${apiURL}mail`, song, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  console.log("SOOOONG response", response.data);
+  return response.data;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -496,6 +512,7 @@ const comManager = {
   createGroup,
   getUserGroups,
   deleteUserFromGroup,
+  sendDeletedSongMail,
 };
 
 export default comManager;

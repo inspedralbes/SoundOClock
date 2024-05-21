@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('letProposeExplicit')->default(false);
             $table->boolean('alertExplicit')->default(true);
             $table->string('theme')->nullable();
+            $table->string('themeDesc')->nullable();
             $table->string('teacher_email_key')->nullable();
             $table->string('student_email_key')->nullable();
         });

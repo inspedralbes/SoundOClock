@@ -224,7 +224,7 @@ export default {
                     if (groupedData[song.id]) {
                         groupedData[song.id].votes += song.votes;
                     } else {
-                        groupedData[song.id] = { id: song.id, votes: song.votes, explicit: song.explicit, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
+                        groupedData[song.id] = { id: song.id, votes: song.votes, explicit: song.explicit, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url, link: song.link };
                     }
                 });
                 const resultArray = Object.values(groupedData);
@@ -287,7 +287,7 @@ export default {
                         break;
                     }
                 }
-                songs.push({ bellId: key, id: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url });
+                songs.push({ bellId: key, id: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url, link: song.link });
             }
 
             comManager.storeSelectedSongs(token, songs).then(() => {

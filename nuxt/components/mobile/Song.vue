@@ -1,7 +1,10 @@
 <template>
     <div class="w-full flex justify-center text-white">
         <div class="relative flex w-[95%] h-[100px] bg-gray-200 overflow-hidden rounded-lg border"
-            :class="{ 'mt-4': type !== 'admin', 'border-yellow-300': isFirstPlace }">
+            :class="{ 'mt-4': type !== 'admin', 'border-yellow-300': isFirstPlace || isNext }">
+            <UBadge color="yellow" variant="solid" v-if="isNext" class="absolute z-10 bottom-0 end-0">
+                Següent
+            </UBadge>
             <img class="w-full h-auto object-cover object-center brightness-50"
                 :class="{ 'opacity-100': type === 'admin' && isSelected, 'opacity-75': type === 'admin' && !isSelected }"
                 :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'">
@@ -23,6 +26,8 @@
                         <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.totalVotes }}
                         </p>
                         <p v-if="type === 'admin' || type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
+                        <UBadge color="indigo" variant="soft" v-if="type === 'selected'">{{ getBellHour(bellId) }}
+                        </UBadge>
                     </div>
                     <button @click="playTrack(track)">
                         <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
@@ -99,6 +104,14 @@ export default {
             type: Boolean,
             default: false
         },
+        bellId: {
+            type: String,
+            default: null
+        },
+        isNext: {
+            type: Boolean,
+            default: false
+        }
     },
     data() {
         return {
@@ -106,6 +119,7 @@ export default {
             isLoadingVote: computed(() => this.store.isLoadingVote),
             userSelectedSongs: computed(() => this.store.userSelectedSongs),
             userReportedSongs: computed(() => this.store.userReportedSongs),
+            bells: computed(() => this.store.bells),
         }
     },
     methods: {
@@ -140,11 +154,33 @@ export default {
         },
         isOverflowing(type) {
             if (type === 'title') {
-                return this.track.name.length > 25;
+                return this.track.name.length > 20;
             } else if (type === 'artist') {
-                return this.artistList.length > 30;
+                return this.artistList.length > 26;
             }
-        }
+        },
+        getBellHour(bellId) {
+            const bell = this.bells.find(bell => bell.id === bellId);
+
+            // Assuming the time is in HH:MM:SS format and for today's date
+            const [hours, minutes, seconds] = bell.hour.split(':');
+            const date = new Date();
+            date.setHours(parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10));
+
+            // Determine whether to show minutes based on their value
+            const options = {
+                hour: 'numeric',
+                hour12: true
+            };
+            if (parseInt(minutes, 10) !== 0) {
+                options.minute = '2-digit';  // Include minutes if they are non-zero
+            }
+
+            // Format the time in AM/PM format, possibly including minutes
+            const formattedTime = date.toLocaleTimeString('en-US', options);
+
+            return formattedTime;
+        },
     },
     computed: {
         artistList() {
@@ -246,19 +282,34 @@ export default {
 .text-marquee {
     display: inline-block;
     white-space: nowrap;
-    animation: scroll-text 10s linear infinite;
+    animation: scroll-text 10s ease-in infinite;
 }
 
 /* Keyframes for the scrolling animation using translateX */
 @keyframes scroll-text {
-    from {
-        transform: translateX(60%);
-        /* Start by moving from the right */
+    0%, 10% {
+        transform: translateX(0%);
+        opacity: 1;
     }
-
-    to {
-        transform: translateX(-100%);
-        /* Move all the way to the left */
+    10.01% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+    80% {
+        transform: translateX(-100%); /* The text scrolls left until out of view */
+        opacity: 1;
+    }
+    80.01% {
+        transform: translateX(100%); /* The text is instantly placed to the right of the screen */
+        opacity: 0;
+    }
+    90% {
+        transform: translateX(0%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
     }
 }
 </style>

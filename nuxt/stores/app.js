@@ -9,6 +9,7 @@ export const useAppStore = defineStore("app", {
             id: 0,
             email: "",
             name: "",
+            picture: "",
             groups: [],
             token: null,
             role_id: null,
@@ -16,6 +17,7 @@ export const useAppStore = defineStore("app", {
           },
 
     userSelectedSongs: [],
+    finalSongsList: [],
     userReportedSongs: [],
     proposedSongs: [],
     sortedVotedSongs: [],
@@ -44,6 +46,13 @@ export const useAppStore = defineStore("app", {
     loadingAdminComponent: null,
     blacklist: [],
     settings: {},
+    player: {
+      progressBar: 0,
+      animationFrameId: null,
+      currentTime: 0,
+      duration: 0,
+      isPlaying: false,
+    },
   }),
   persist: {
     storage: persistedState.localStorage,
@@ -117,12 +126,16 @@ export const useAppStore = defineStore("app", {
     getUserReportedSongs() {
       return this.userReportedSongs;
     },
+    getFinalSongsList() {
+      return this.finalSongsList;
+    },
 
     //setters
-    setUser(id, email, name, token, groups, role_id, role_name) {
+    setUser(id, email, name, picture, token, groups, role_id, role_name) {
       this.user.id = id;
       this.user.email = email;
       this.user.name = name;
+      this.user.picture = picture;
       this.user.groups = groups;
       this.user.token = token;
       this.user.role_id = role_id;
@@ -202,6 +215,9 @@ export const useAppStore = defineStore("app", {
     },
     setUserReportedSongs(userReportedSongs) {
       this.userReportedSongs = userReportedSongs;
+    },
+    setFinalSongsList(finalSongsList) {
+      this.finalSongsList = finalSongsList;
     },
 
     ///Deletes

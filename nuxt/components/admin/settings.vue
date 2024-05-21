@@ -14,6 +14,16 @@
                         type="text" name="theme" v-model="settings.theme" />
                 </span>
             </div>
+            <div class="flex items-center justify-between w-full py-2 h-fit">
+                <label for="themeDesc" class="text-lg basis-1/2">
+                    Descripció de la temàtica (opcional)
+                </label>
+                <span class="basis-1/3 flex">
+                    <UTextarea class="ml-auto w-4/5 *:text-white" color="blue" variant="outline"
+                        placeholder="Descripcio de la Temàtica" type="text" name="themeDesc"
+                        v-model="settings.themeDesc" />
+                </span>
+            </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label class="text-lg " for="showExplicit">
                     No deixar que les cançons marcades com a explicites per spotify es mostrin a la llista per
@@ -26,15 +36,16 @@
                 <label class="text-lg" for="letProposeExplicit">
                     No deixar que les cançons marcades com a explicites per spotify siguin proposades
                 </label>
-                <UToggle v-model="settings.letProposeExplicit" on-icon="i-heroicons-check-20-solid"
-                    off-icon="i-heroicons-x-mark-20-solid" color="sky" />
+                <UToggle v-model="settings.letProposeExplicit" :disabled="settings.showExplicit"
+                    on-icon="i-heroicons-check-20-solid" off-icon="i-heroicons-x-mark-20-solid" color="sky" />
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label class="text-lg" for="alertExplicit">
                     Alertar si una cançó marcada com a explicita per spotify es proposa
                 </label>
-                <UToggle v-model="settings.alertExplicit" on-icon="i-heroicons-check-20-solid"
-                    off-icon="i-heroicons-x-mark-20-solid" color="sky" />
+                <UToggle v-model="settings.alertExplicit"
+                    :disabled="settings.showExplicit || settings.letProposeExplicit"
+                    on-icon="i-heroicons-check-20-solid" off-icon="i-heroicons-x-mark-20-solid" color="sky" />
                 <!-- <ModularSwitch :value="settings.alertExplicit" :canSwitch=true
                     @input="handleSwitch('alertExplicit', $event)" class="w-16" /> -->
             </div>
@@ -146,6 +157,7 @@ export default {
                 letProposeExplicit: false,
                 alertExplicit: true,
                 theme: "",
+                themeDesc: "",
                 teacher_email_key: "",
                 student_email_key: "",
             },
@@ -158,8 +170,6 @@ export default {
     },
 
     computed: {
-
-
     },
 
     methods: {
@@ -295,7 +305,18 @@ export default {
         },
         isModInDays() {
             this.updateExpectedDayVote();
-        }
+        },
+        'settings.showExplicit'(newValue) {
+            if (newValue) {
+                this.settings.letProposeExplicit = false;
+                this.settings.alertExplicit = false;
+            }
+        },
+        'settings.letProposeExplicit'(newValue) {
+            if (newValue) {
+                this.settings.alertExplicit = false;
+            }
+        },
     }
 }
 
