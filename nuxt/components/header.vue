@@ -42,8 +42,8 @@
 
             <!--DESKTOP DESIGN-->
             <!--LOGO -->
-            <NuxtLink :to="'/llista_propostes'" class="h-14 w-14">
-                <img v-if="$device.isDesktopOrTablet" src="/img/soundoclock-logo-bw.png" alt="" class="h-full w-full">
+            <NuxtLink :to="'/llista_propostes'" class="h-14 w-14" v-if="$device.isDesktopOrTablet">
+                <img src="/img/soundoclock-logo-bw.png" alt="" class="h-full w-full">
             </NuxtLink>
             <!--LINKS -->
             <div v-if="$device.isDesktopOrTablet" class="flex flex-row justify-between items-center gap-8 text-lg">
