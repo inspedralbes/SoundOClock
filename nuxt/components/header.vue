@@ -42,7 +42,7 @@
 
             <!--DESKTOP DESIGN-->
             <!--LOGO -->
-            <NuxtLink :to="'/llista_propostes'" class="h-2/3">
+            <NuxtLink :to="'/llista_propostes'" class="h-14 w-14">
                 <img v-if="$device.isDesktopOrTablet" src="/img/soundoclock-logo-bw.png" alt="" class="h-full w-full">
             </NuxtLink>
             <!--LINKS -->
@@ -61,7 +61,7 @@
                 </NuxtLink>
             </div>
             <!-- PROFILE IMG -->
-            <div class="flex justify-center items-center h-2/3" v-if="$device.isDesktopOrTablet">
+            <div class="flex justify-center items-center h-14 w-14" v-if="$device.isDesktopOrTablet">
                 <UDropdown class="h-full w-full" :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                     :popper="{ placement: 'bottom-end', arrow: true }">
                     <div class="h-full w-full rounded-full hover:border-2 hover:border-white">

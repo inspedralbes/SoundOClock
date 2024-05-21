@@ -26,7 +26,7 @@
                 </template>
             </UDropdown>
         </div>
-        <div class="w-full flex items-center gap-2"
+        <div class="flex items-center gap-2"
             :class="{ 'w-[57%] ml-12': !$device.isMobile, 'px-3': $device.isMobile }">
             <div class="relative text-center w-full">
                 <input type="text"
