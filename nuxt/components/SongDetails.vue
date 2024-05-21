@@ -1,6 +1,7 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import { socket } from '../socket';
+import comManager from '../communicationManager';
 export default {
   name: 'SongDetails',
   props: {
@@ -13,10 +14,14 @@ export default {
         addSongToBlacklist: false,
         eraseSong: false,
       },
+      usersVotes: [],
     }
   },
   mounted() {
     this.countNotReadReports();
+    comManager.getUsersVotes(this.song.id, this.store.getUser().token).then((response) => {
+      this.usersVotes = response.users;
+    });
   },
   watch: {
     "song.reports": { // Each time song.reports change execute countNotReadReports() method
@@ -24,6 +29,9 @@ export default {
     },
   },
   methods: {
+    getUsersVotes() {
+      console.log(this.usersVotes);
+    },
     eraseSong() {
       this.modals.eraseSong = true;
     },
@@ -113,7 +121,10 @@ export default {
         </div>
       </div>
     </div>
-    <p class="mb-4 text-xl">CANÇÓ PROPOSADA PER: {{ song.user.name }}</p>
+    <div class="mb-1 flex flex-row justify-between">
+      <span class="text-xl">CANÇÓ PROPOSADA PER: {{ song.user.name }}</span>
+      <button class="text-xl w-fit text-white font-bold mr-4 p-1 pl-4 pr-4 rounded bg-blue-600" @click="getUsersVotes()">Usuaris que han votat</button>
+    </div>
     <div class="w-100 p-4 flex flex-col gap-2 bg-gray-400 rounded-lg grow">
       <div class="mb-2 flex flex-row justify-between items-center gap-2">
         <div class="flex flex-row items-center gap-2">

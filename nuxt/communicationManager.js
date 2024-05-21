@@ -238,6 +238,27 @@ async function getSelectedSongs() {
   store.setFinalSongsList(data);
 }
 
+async function getUsersVotes(songId, token){
+  console.log("songId", songId);
+  console.log("token", token);
+  console.log("url: ", url+"/usersVotes");
+
+  const response = await fetch(`${url}/usersVotes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      songId,
+      token,
+    }),
+  });
+  const data = await response.json();
+  return data;
+  
+}
+
 const comManager = {
   getUserSelectedSongs,
   getSongs,
@@ -257,6 +278,7 @@ const comManager = {
   getUserGroups,
   getUserReportedSongs,
   getSelectedSongs,
+  getUsersVotes,
 };
 
 export default comManager;
