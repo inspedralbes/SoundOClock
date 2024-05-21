@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-row justify-center gap-3 m-2 p-2 rounded text-gray-200"
-        :class="{ 'bg-yellow-200 text-gray-800': isFirstPlace, 'text-gray-800': isSelected, 'justify-between': type === 'admin_set_song', 'justify-stretch gap-5 m-0': type === 'admin' }">
+    <div class="flex flex-row justify-center gap-3 m-2 ml-12 rounded-xl text-gray-200 border-gray-400"
+        :class="{ 'bg-yellow-200': isFirstPlace, 'text-gray-800': isSelected, 'justify-between': type === 'admin_set_song', 'justify-stretch gap-5 m-0': type === 'admin' }">
         <UChip size="3xl" color="red" v-if="numReports > 0 && type === 'admin'">
             <template #content>
                 <div>{{ numReports }}</div>
@@ -17,83 +17,74 @@
                 </Transition>
             </div>
         </UChip>
-        <div class="relative flex items-align" v-else>
+        <div class="relative w-full h-24 rounded-lg overflow-hidden bg-black bg-opacity-20" v-else>
             <img :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'"
-                class="w-20 h-20 rounded-lg z-0">
+                class="w-1/2 h-full object-cover object-center brightness-[40%]"
+                :class="{ 'opacity-100': type === 'admin' && isSelected, 'opacity-75': type === 'admin' && !isSelected }">
+            <div class="absolute inset-0 flex flex-row justify-center">
+                <div class="flex flex-row w-full justify-between p-2 items-center">
+                    <div class="flex flex-col ml-2 w-3/5 overflow-hidden items-start marquee-container">
+                        <p class="font-bold text-2xl bg-opacity-60 uppercase overflow-hidden whitespace-nowrap"
+                            :class="{ 'text-marquee': isOverflowing('title') }">
+                            {{ track.name }}
+                        </p>
+                        <div class="fader w-full flex items-center gap-2 text-sm marquee-container">
+                            <UBadge v-if="track.explicit" class="z-10" color="black">E</UBadge>
+                            <span class="whitespace-nowrap" v-if="artistList"
+                                :class="{ 'text-marquee': isOverflowing('artist') }">
+                                {{ artistList }}
+                            </span>
+                        </div>
+                        <p v-if="type === 'vote'" class="text-sm">Vots: {{ track.totalVotes }}
+                        </p>
+                        <p v-if="type === 'admin' || type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
+                        <UBadge color="indigo" variant="soft" v-if="type === 'selected'">{{ getBellHour(bellId) }}
+                        </UBadge>
+                    </div>
+                    <div class="flex justify-between w-1/3 mr-2">
+                        <button @click="playTrack(track)">
+                            <span v-if="currentTrackId === track.id && isPlaying"
+                                class="material-symbols-rounded text-4xl">
+                                pause
+                            </span>
+                            <span v-else class="material-symbols-rounded text-4xl">
+                                play_arrow
+                            </span>
+                        </button>
+                        <button v-if="type === 'vote'" @click="report(track)">
+                            <span class="material-symbols-rounded text-4xl"
+                                :class="{ 'text-red-400': isSongReported(track.id) }">
+                                report
+                            </span>
+                        </button>
+                        <button @click="proposeSong(track)"
+                            v-if="type === 'propose' && (!track.loading && !track.proposed)">
+                            <span class="material-symbols-rounded text-4xl">
+                                add_circle
+                            </span>
+                        </button>
+                        <div v-if="track.loading || (isLoadingVote.state && isLoadingVote.selectedSong == track.id)"
+                            class="loader-track"></div>
+                        <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
+                            task_alt
+                        </span>
+                        <button
+                            v-if="type === 'vote' && !(isLoadingVote.state && isLoadingVote.selectedSong == track.id)"
+                            @click="vote(track.id)">
+                            <span
+                                :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id) }">
+                                thumb_up
+                            </span>
+                        </button>
+                    </div>
+                    <div v-if="type === 'admin'" class="mx-2">
+                        <input type="checkbox" name="selected" id="selected" :checked="isSelected"
+                            @change="e => setSelected(e, bell.id, track.id)" class="h-6 w-6">
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <Transition name="playingFade">
-                <div v-if="currentTrackId === track.id && isPlaying"
-                    class="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-lg">
-                    <div class="loader"></div>
-                </div>
-            </Transition>
-        </div>
-        <div class="flex-row w-3/5 flex justify-between items-center"
-            :class="{ 'border-gray-800': isFirstPlace, 'border-b border-solid border-gray-300 px-2 pb-2': type !== 'admin', 'w-9/12': type === 'admin_set_song', 'w-9/12': type === 'admin' }">
-            <div class="flex flex-col w-[80%] items-start marquee-container">
-                <p class="font-bold text-base uppercase"
-                    :class="{ 'text-marquee': isOverflowing('title') && type === 'admin' }">
-                    {{ track.name }}
-                </p>
-                <div class="flex flex-row items-center text-sm py-1">
-                    <UBadge v-if="track.explicit && !isSelected" color="black" class="mr-2">E</UBadge>
-                    <UBadge v-if="track.explicit && isSelected" color="white" class="mr-2">E</UBadge>
-                    <span class="overflow-hidden whitespace-nowrap" v-if="artistList"
-                        :class="{ 'text-marquee': isOverflowing('artist') && type === 'admin' }">
-                        {{ artistList }}
-                    </span>
-                </div>
-                <p v-if="type === 'vote' || type === 'admin'" class="text-sm">Vots: {{ track.totalVotes }}</p>
-                <p v-if="type === 'ranking'" class="text-sm">Vots: {{ track.votes }}</p>
-                <div class="flex gap-3">
-                    <UBadge color="indigo" variant="soft" v-if="type === 'selected'">{{ getBellHour(bellId) }}</UBadge>
-                    <UBadge color="yellow" variant="soft" v-if="isNext"> Següent </UBadge>
-                </div>
-            </div>
-            <button @click="playTrack(track)" v-if="!songWaitingToPlay || songWaitingToPlay != track.id">
-                <span v-if="currentTrackId === track.id && isPlaying" class="material-symbols-rounded text-4xl">
-                    pause
-                </span>
-                <span v-else class="material-symbols-rounded text-4xl">
-                    play_arrow
-                </span>
-            </button>
-            <div v-if="songWaitingToPlay == track.id" class="loader-track">
-            </div>
-            <button v-if="type === 'vote'" @click="report(track)">
-                <span class="material-symbols-rounded text-4xl" :class="{ 'text-red-400': isSongReported(track.id) }">
-                    report
-                </span>
-            </button>
-            <button @click="proposeSong(track)"
-                v-if="(type === 'propose' || type === 'admin_set_song') && (!track.loading && !track.proposed)">
-                <span class="material-symbols-rounded text-4xl">
-                    add_circle
-                </span>
-            </button>
-            <div v-if="track.loading || (isLoadingVote.state && isLoadingVote.selectedSong == track.id)"
-                class="loader-track">
-            </div>
-            <span v-if="track.proposed" class="material-symbols-rounded text-4xl">
-                task_alt
-            </span>
-            <button v-if="type === 'vote' && !(isLoadingVote.state && isLoadingVote.selectedSong == track.id)"
-                @click="vote(track.id)">
-                <span :class="{ 'material-symbols-rounded text-4xl': true, 'text-blue-500': isSongVoted(track.id) }">
-                    thumb_up
-                </span>
-            </button>
-            <button v-if="type === 'unBan'" @click="unBan(track)">
-                <span class="material-symbols-outlined options-span">
-                    unarchive
-                </span>
-            </button>
-            <button v-if="type === 'admin' && isReported" @click="unBan(track)" class="ml-2">
-                <span class="material-symbols-rounded options-span text-3xl">
-                    warning
-                </span>
-            </button>
-        </div>
     </div>
 </template>
 
@@ -201,9 +192,9 @@ export default {
         },
         isOverflowing(type) {
             if (type === 'title') {
-                return this.track.name.length > 20;
+                return this.track.name.length > 40;
             } else if (type === 'artist') {
-                return this.artistList.length > 26;
+                return this.artistList.length > 50;
             }
         }
     },
@@ -269,6 +260,7 @@ export default {
 /* HTML: <div class="loader"></div> */
 .loader-track {
     width: 35px;
+    height: 35px;
     padding: 8px;
     aspect-ratio: 1;
     border-radius: 50%;
@@ -313,29 +305,44 @@ export default {
 
 /* Keyframes for the scrolling animation using translateX */
 @keyframes scroll-text {
-    0%, 10% {
+
+    0%,
+    10% {
         transform: translateX(0%);
         opacity: 1;
     }
+
     10.01% {
         transform: translateX(0%);
         opacity: 1;
     }
+
     80% {
-        transform: translateX(-100%); /* The text scrolls left until out of view */
+        transform: translateX(-100%);
+        /* The text scrolls left until out of view */
         opacity: 1;
     }
+
     80.01% {
-        transform: translateX(100%); /* The text is instantly placed to the right of the screen */
+        transform: translateX(100%);
+        /* The text is instantly placed to the right of the screen */
         opacity: 0;
     }
+
     90% {
         transform: translateX(0%);
         opacity: 0;
     }
+
     100% {
         transform: translateX(0%);
         opacity: 1;
     }
+}
+
+img,
+.fader {
+    -webkit-mask-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 1)), to(rgba(0, 0, 0, 0)));
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0) 90%);
 }
 </style>

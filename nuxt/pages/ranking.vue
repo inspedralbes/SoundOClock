@@ -11,7 +11,7 @@
                 <div v-if="item.item.songs.length == 0">
                     <UAlert title="No hi han cançons!" variant="outline" color="white" class="text-center" />
                 </div>
-                <div v-for="(song, index) in item.item.songs" :key="song.id" class="flex">
+                <div v-for="(song, index) in item.item.songs" :key="song.id" class="flex mr-5">
                     <div class="position flex justify-center items-center text-center text-white font-bold text-2xl">
                         {{ index + 1 }}
                     </div>
@@ -29,7 +29,6 @@
 
 import { useAppStore } from '@/stores/app';
 import comManager from '../../communicationManager';
-import { socket } from '../socket';
 
 export default {
     data() {

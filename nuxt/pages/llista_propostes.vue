@@ -1,13 +1,14 @@
 <template>
-    <div v-if="checkVotingState === 'vote'">
-        <!-- Reproductor -->
-        <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
-            @report="report($event)" @propose="proposeSongCheck($event)" />
+    <img src="/img/fondo.png" alt="background" class="fixed inset-0 z-[-1] object-cover h-screen w-screen" />
+    <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
+        @report="report($event)" @propose="proposeSong($event)" />
+    <Vinyl class="fixed top-0 right-0 h-screen flex justify-center items-center overflow-hidden translate-x-[40%]"
+        v-if="mobileDetector === 0" />
 
 
-        <!-- Barra de busqueda -->
+    <div v-if="checkVotingState === 'vote'" class="mb-4">
         <div v-if="settings.theme" class="flex justify-center content-center my-8">
-            <h1 class="text-4xl smallCaps w-fit text-center">
+            <h1 class="text-4xl smallCaps w-fit text-center z-50">
                 {{ 'La temàtica és: ' + settings.theme }}
             </h1>
             <UDropdown v-if="settings.themeDesc" class="h-fit w-fit self-end right-0 top-1/2" :items="themeDesc"
@@ -25,11 +26,12 @@
                 </template>
             </UDropdown>
         </div>
-        <div class="w-full flex justify-center items-center px-2 gap-2">
-            <div class="relative w-[60%] text-center" :class="{ 'w-[90%]': $device.isMobile }">
+        <div class="w-full flex items-center gap-2"
+            :class="{ 'w-[57%] ml-12': !$device.isMobile, 'px-3': $device.isMobile }">
+            <div class="relative text-center w-full">
                 <input type="text"
                     :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
-                    class="w-full h-[38px] py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                    class="w-full h-10 py-2 pl-10 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 bg-[#1F1F1F]"
                     :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
                     @keydown.enter.prevent="acceptInput">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
@@ -47,9 +49,8 @@
                 </Transition>
             </div>
             <div class="dropdown relative z-10">
-
                 <button
-                    class="px-2 h-[38px] appearance-none flex items-center justify-center rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-2 h-10 w-fit bg-[#1F1F1F] flex items-center justify-center rounded-lg border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
                     id="buttonFilters" @click="isFiltersSlideOpen = !isFiltersSlideOpen"
                     :class="{ 'w-[150px]': !$device.isMobile }">
                     <span class="material-symbols-outlined text-white">
@@ -141,25 +142,46 @@
         </div>
 
 
-        <!-- Listado canciones propuestas -->
-        <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
+        <h2 class="my-4 text-3xl font-bold"
+            :class="{ 'm-2 ml-12 mt-4': !$device.isMobile, 'text-center': $device.isMobile }">
+            Cançons proposades</h2>
         <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
         <div v-if="songs.length === 0" class="mt-4 w-full">
-            <p class="text-center text-xl">Encara no s'ha proposat cap cançó.</p>
-            <p class="text-center mx-4">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile">
+            <p class="text-xl" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Encara no s'ha
+                proposat
+                cap cançó.</p>
+            <p class="mx-4" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Anima't a compartir
+                la teva
+                proposta fent <br v-if="$device.isMobile">
                 cercant a
                 la barra de búsqueda.</p>
         </div>
 
-        <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4  w-full">
-            <p class="text-center text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
-            <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
+        <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4 w-full">
+            <p class="text-xl" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">No hi ha cap cançó
+                proposada amb aquesta cerca.</p>
+            <p class="mx-4" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Comparteix la teva
+                proposta
+                buscant ara mateix!</p>
         </div>
-        <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
+
+        <!-- CANCIONES PROPUESTAS -->
         <TransitionGroup name="song-slide" mode="out-in">
-            <component :is="activeSong" v-for=" track in filteredSongs " :key="track.id" :track="track"
-                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
-                @report="report($event)" :type="getType(track.id)" />
+            <div v-for="track in filteredSongs" :key="track.id" :class="{ 'w-[60%] mb-4': !$device.isMobile }">
+                <component :is="activeSong" :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying"
+                    @play="playTrack" @vote="vote($event)" @report="report($event)" :type="getType(track.id)" />
+            </div>
+        </TransitionGroup>
+
+        <!-- CANCIONES PARA PROPONER -->
+        <Transition name="song-slide">
+            <h2 v-if="spotifySongs.length > 0" class="text-3xl font-bold mt-10"
+                :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Resultats de la cerca</h2>
+        </Transition>
+        <TransitionGroup tag="div" mode="out-in" name="song-slide" :class="{ 'w-[60%]': !$device.isMobile }">
+            <component :is="activeSong" v-for=" track in spotifySongs " :key="track.id" :track="track"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
+                :type="getType(track.id)" />
         </TransitionGroup>
     </div>
     <div v-if="checkVotingState === 'mod'">
@@ -180,19 +202,6 @@
                 :bellId="track.bellId" />
         </div>
     </div>
-    <!-- </TransitionGroup> -->
-
-
-    <!-- Listado de canciones de Spotify -->
-    <Transition name="song-slide">
-        <h2 v-if="spotifySongs.length > 0" class="text-center text-3xl font-bold mt-10">Resultats de la cerca</h2>
-    </Transition>
-    <TransitionGroup tag="div" class="mb-20" name="song-slide">
-        <component :is="activeSong" v-for=" track in spotifySongs " :key="track.id" :track="track"
-            :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
-            @propose="proposeSongCheck($event)" :type="getType(track.id)" />
-    </TransitionGroup>
-
 
     <!-- Modales -->
     <!-- Modal que avisa que ya se han efectuado las 2 votaciones -->
@@ -650,18 +659,24 @@ export default {
                 if (this.isPlaying) {
                     this.currentTrack.pause();
                     this.isPlaying = false;
+                    this.store.player.isPlaying = false;
+                    cancelAnimationFrame(this.store.player.animationFrameId);
                     store.deleteCurrentTrackPlaying();
                 } else {
                     this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    this.store.player.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
+                    this.updateProgress();
                 }
             } else {
                 if (track.preview_url != null) {
                     if (this.isPlaying) {
                         this.currentTrack.pause();
                         this.isPlaying = false;
+                        this.store.player.isPlaying = false;
+                        cancelAnimationFrame(this.store.player.animationFrameId);
                         store.deleteCurrentTrackPlaying();
                     }
                     this.currentTrack = new Audio(track.preview_url);
@@ -669,11 +684,40 @@ export default {
                     this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    this.store.player.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
+                    this.updateProgress();
                 } else {
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
                 }
+            }
+        },
+        updateProgress() {
+            if (this.currentTrack) {
+                const update = () => {
+                    if (this.isPlaying) {
+                        const currentTime = this.currentTrack.currentTime;
+                        const duration = this.currentTrack.duration;
+                        this.store.player.progressBar = (currentTime / duration) * 100;
+                        this.store.player.currentTime = this.formatSeconds(currentTime);
+                        this.store.player.duration = this.formatSeconds(duration);
+                        this.store.player.animationFrameId = requestAnimationFrame(update);
+                    }
+                }
+                this.currentTrack.addEventListener('play', update);
+                this.currentTrack.addEventListener('pause', () => {
+                    this.store.player.progressBar = 0; // Reset progress if needed
+                    this.store.player.currentTime = this.formatSeconds(0);
+                    this.store.player.duration = this.formatSeconds(this.currentTrack.duration);
+                });
+
+                this.currentTrack.addEventListener('ended', () => {
+                    this.store.player.progressBar = 0; // Reset progress if needed
+                    this.store.player.currentTime = this.formatSeconds(0);
+                    this.store.player.duration = this.formatSeconds(this.currentTrack.duration);
+                });
+                update(); // Start the update loop
             }
         },
 
@@ -709,6 +753,7 @@ export default {
             }
         },
 
+
         proposeSong(track) {
             track.loading = true;
             this.postedSongId = track.id;
@@ -728,6 +773,7 @@ export default {
                     // date: track.album.release_date,
                     img: track.album.images[1].url,
                     preview_url: track.preview_url,
+                    link: track.external_urls.spotify,
                     explicit: track.explicit,
                     submitDate: new Date().toISOString(),
                     submittedBy: this.store.getUser().id,
@@ -786,6 +832,12 @@ export default {
 
             // Return the two arrays concatenated
             return filterVotes.concat(bells);
+        },
+        formatSeconds(seconds) {
+            const roundedSeconds = Math.round(seconds);
+            const minutes = Math.floor(roundedSeconds / 60);
+            const secs = roundedSeconds % 60;
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
 
@@ -811,6 +863,7 @@ export default {
             handler: function () {
                 this.currentTrack.onended = () => {
                     this.isPlaying = false;
+                    this.store.player.isPlaying = false;
                     this.store.deleteCurrentTrackPlaying();
                 }
             }
@@ -981,28 +1034,6 @@ export default {
     animation: loader-dash4 1.5s ease-in-out infinite;
 }
 
-@keyframes loader-rotate4 {
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes loader-dash4 {
-    0% {
-        stroke-dasharray: 1, 200;
-        stroke-dashoffset: 0;
-    }
-
-    50% {
-        stroke-dasharray: 90, 200;
-        stroke-dashoffset: -35px;
-    }
-
-    100% {
-        stroke-dashoffset: -125px;
-    }
-}
-
 
 #buttonsFilterGroup {
     width: calc(60% + 150px);
@@ -1075,6 +1106,7 @@ export default {
     /* Ocultamos los botones de la barra de desplazamiento */
 }
 
+
 .song-slide-enter-active,
 .song-slide-leave-active,
 .song-slide-move {
@@ -1100,5 +1132,17 @@ export default {
 
 .smallCaps {
     font-variant: small-caps;
+}
+
+.slide-images-enter-active,
+.slide-images-leave-active,
+.slide-images-move {
+    transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.slide-images-enter-from,
+.slide-images-leave-to {
+    opacity: 0;
+    transform: rotate(360deg);
 }
 </style>
