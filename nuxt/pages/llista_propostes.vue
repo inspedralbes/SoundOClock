@@ -1,7 +1,7 @@
 <template>
     <img src="/img/fondo.png" alt="background" class="fixed inset-0 z-[-1] object-cover h-screen w-screen" />
     <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
-        @report="report($event)" @propose="proposeSong($event)" />
+        @report="report($event)" @propose="proposeSongCheck($event)" />
     <Vinyl class="fixed top-0 right-0 h-screen flex justify-center items-center overflow-hidden translate-x-[40%]"
         v-if="mobileDetector === 0" />
 
@@ -180,7 +180,7 @@
         </Transition>
         <TransitionGroup tag="div" mode="out-in" name="song-slide" :class="{ 'w-[60%]': !$device.isMobile }">
             <component :is="activeSong" v-for=" track in spotifySongs " :key="track.id" :track="track"
-                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
+                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSongCheck($event)"
                 :type="getType(track.id)" />
         </TransitionGroup>
     </div>
