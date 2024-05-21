@@ -669,7 +669,7 @@ export default {
         },
         getItems() {
             let filterVotes = [
-                [{ label: "Natejar filtres", slot: "clean", icon: 'i-heroicons-tune-solid', click: this.cleanFilters, id: '' }],
+                [{ label: "Netejar filtres", slot: "clean", icon: 'i-heroicons-tune-solid', click: this.cleanFilters, id: '' }],
                 [{ label: "Més votades", icon: 'i-heroicons-chevron-double-up-solid', click: () => this.orderBy = 'votes-desc', id: 'votes-desc' }],
                 [{ label: "Menys votades", icon: 'i-heroicons-chevron-double-down-solid', click: () => this.orderBy = 'votes-asc', id: 'votes-asc' }]
             ]

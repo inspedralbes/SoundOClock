@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Ban;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\bannedUserEmail;
 
 class AuthController extends Controller
 {
@@ -240,6 +242,10 @@ class AuthController extends Controller
     
             // Confirmar la transacción si todo es exitoso
             DB::commit();
+
+            if ($ban) {
+                Mail::to($user->email)->send(new bannedUserEmail($user, $ban));
+            }
     
             return response()->json($user->load('bans'));
     
