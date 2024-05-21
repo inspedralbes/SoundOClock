@@ -405,24 +405,18 @@ app.get("/userGroups/:userToken", async (req, res) => {
 });
 
 app.post("/usersVotes", async (req, res) => {
-  console.log("SongId: ", req.body.songId);
-  console.log("token: ", req.body.token);
   try {
     const song = await Song.findOne({ id: req.body.songId });
     if(song) {
       // Find all users that voted for the song with the given id
       // el $in es para buscar en un array de valores (en este caso, en el array de votedSongs) si el valor song.id está presente
       let usersVotesMongo = await VotingRecord.find({ votedSongs: { $in: [song.id] } });
-      console.log('usersVotesMongo: ',usersVotesMongo);
 
       //get token from the request
       let token = req.body.token;
-      console.log('tokenMongo: ',token);
 
-      console.log('trying to get users votes');
       //get the users votes
       let usersVotes = await comManager.getUsersVotes(usersVotesMongo, token);
-      console.log('usersVotes: ',usersVotes);
       
       res.json(usersVotes);
     }

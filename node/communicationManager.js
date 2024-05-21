@@ -463,12 +463,6 @@ async function deleteUserFromGroup(token, group_id, user_id) {
 }
 
 async function getUsersVotes(users, token) {
-  console.log('fetch to: ', apiURL + `usersSearchInfo`);
-  console.log('users Var: ', JSON.stringify({users: users}));
-  console.log('token Var: ', token);
-
-  console.log('Is users an array?', Array.isArray(users));
-
   const response = await fetch(apiURL + `usersSearchInfo`, {
     method: "POST",
     headers: {
@@ -480,9 +474,7 @@ async function getUsersVotes(users, token) {
       users: users,
     }),
   });
-
   const jsonResponse = await response.json();
-  console.log('jsonResponse: ', jsonResponse);
   return jsonResponse;
 }
 

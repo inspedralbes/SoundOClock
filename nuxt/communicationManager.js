@@ -239,10 +239,6 @@ async function getSelectedSongs() {
 }
 
 async function getUsersVotes(songId, token){
-  console.log("songId", songId);
-  console.log("token", token);
-  console.log("url: ", url+"/usersVotes");
-
   const response = await fetch(`${url}/usersVotes`, {
     method: "POST",
     headers: {
@@ -256,7 +252,6 @@ async function getUsersVotes(songId, token){
   });
   const data = await response.json();
   return data;
-  
 }
 
 const comManager = {
