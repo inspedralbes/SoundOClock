@@ -2,7 +2,7 @@
     <div v-if="checkVotingState === 'vote'">
         <!-- Reproductor -->
         <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
-            @report="report($event)" @propose="proposeSong($event)" />
+            @report="report($event)" @propose="proposeSongCheck($event)" />
 
 
         <!-- Barra de busqueda -->
@@ -189,8 +189,8 @@
     </Transition>
     <TransitionGroup tag="div" class="mb-20" name="song-slide">
         <component :is="activeSong" v-for=" track in spotifySongs " :key="track.id" :track="track"
-            :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
-            :type="getType(track.id)" />
+            :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
+            @propose="proposeSongCheck($event)" :type="getType(track.id)" />
     </TransitionGroup>
 
 
@@ -283,6 +283,63 @@
             {{ postedSongStatus.message }}
         </UCard>
     </UModal>
+
+    <UModal v-model="modals.blockEsplicit" class="z-[9999]">
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center justify-between">
+                    <div class="flex flex-row items-center">
+                        <span @click="modals.blockEsplicit = false"
+                            class="material-symbols-rounded text-[2rem] text-red-500 mr-4">
+                            error
+                        </span>
+                        <h2 class="text-xl font-bold">
+                            No es pot proposar aquesta cançó
+                        </h2>
+                    </div>
+                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                        @click="modals.blockEsplicit = false" />
+                </div>
+            </template>
+            <p>
+                Des de moderació, s'ha decidit que no es pot proposar aquesta cançó perquè Spotify la té marcada com a
+                explícita.
+            </p>
+        </UCard>
+    </UModal>
+
+    <UModal v-model="modals.alertEsplicit" class="z-[9999]">
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center justify-between">
+                    <div class="flex flex-row items-center">
+                        <span @click="modals.alertEsplicit = false, proposeAlertHandler(false)"
+                            class="material-symbols-rounded text-[2rem] text-yellow-500 mr-4">
+                            warning
+                        </span>
+                        <h2 class="text-xl font-bold">
+                            Aquesta cançó conté contingut explícit!
+                        </h2>
+                    </div>
+                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                        @click="modals.alertEsplicit = false, proposeAlertHandler(false)" />
+                </div>
+            </template>
+            <p>
+                Aquesta cançó està marcada per Spotify com a explícita. Si et sembla adequada per sonar en un centre
+                educatiu, pots proposar-la. Tot i així, si moderació la considera inadequada, serà eliminada. Proposar
+                una cançó explícita inadequada pot comportar una sanció contundent.
+            </p>
+            <div class="flex justify-between">
+                <UButton @click="modals.alertEsplicit = false, proposeAlertHandler(false)" class="mt-4" color="green">
+                    Cancel·la
+                </UButton>
+                <UButton @click="modals.alertEsplicit = false, proposeAlertHandler(true)" color="red" class="mt-4">
+                    Proposa igualment
+                </UButton>
+            </div>
+        </UCard>
+    </UModal>
 </template>
 
 <script>
@@ -299,6 +356,8 @@ export default {
                 alreadyVotedModal: false,
                 reportModal: false,
                 proposeSongError: false,
+                blockEsplicit: false,
+                alertEsplicit: false,
             },
             songs: computed(() => this.store.proposedSongs),
             spotifySongs: [],
@@ -336,11 +395,21 @@ export default {
             serverResponse: null,
             toast: null,
             isReportLoading: false,
+            proposeAlertHandlerTrack: null,
         }
     },
     created() {
         socket.on('searchResult', (results) => {
-            this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
+            console.log("results", results, "length", results.length);
+            let handleSplicit = [];
+            if (this.settings.showExplicit) {
+                handleSplicit = results.filter(song => !song.explicit);
+                console.log("hadleSplicit", handleSplicit, "length", handleSplicit.length);
+                this.spotifySongs = handleSplicit.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
+            } else {
+                this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
+            }
+            console.log("spotifySongs", this.spotifySongs, "length", this.spotifySongs.length);
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -605,6 +674,38 @@ export default {
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
                 }
+            }
+        },
+
+        proposeAlertHandler(response) {
+            if (response) {
+                this.proposeSong(this.proposeAlertHandlerTrack);
+            }
+            this.proposeAlertHandlerTrack = null;
+        },
+
+        isTrackEsplicit(track) {
+            console.log("check explicit", track.explicit);
+            if (track.explicit) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        proposeSongCheck(track) {
+            console.log("proposeSongCheck", track);
+            let isEsplicit = this.isTrackEsplicit(track);
+            console.log("isEsplicit", isEsplicit);
+            if (this.settings.letProposeExplicit && isEsplicit) {
+                console.log("blockEsplicit", this.settings.blockEsplicit);
+                this.modals.blockEsplicit = true;
+            } else if (this.settings.alertExplicit && isEsplicit) {
+                console.log("alertEsplicit", this.settings.alertEsplicit);
+                this.modals.alertEsplicit = true;
+                this.proposeAlertHandlerTrack = track;
+            } else {
+                this.proposeSong(track);
             }
         },
 
