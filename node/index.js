@@ -13,6 +13,7 @@ import {
   SelectedSong,
   ReportUser,
   BellsGroupsTemplate,
+  ThemeModals,
 } from "./models.js";
 import axios from "axios";
 import minimist from "minimist";
@@ -429,6 +430,50 @@ app.get('/bellsGroupsTemplate', async (req, res) => {
 app.delete('/bellsGroupsTemplate/:id', async (req, res) => {
   try {
     await BellsGroupsTemplate.findByIdAndDelete(req.params.id);
+    res.json({ status: 'success' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get('/checkThemeModal/:theme/:userId', async (req, res) => {
+  const theme = req.params.theme;
+  const userId = parseInt(req.params.userId);
+
+  try {
+    const themeModal = await ThemeModals.findOne({ userId: userId });
+    if (!themeModal) {
+      return res.json({ status: 'success', showModal: true });
+    } else {
+      let modalShowed = themeModal.modalsShown.get(theme);
+      if (!modalShowed) {
+        return res.json({ status: 'success', showModal: true });
+      } else {
+        return res.json({ status: 'success', showModal: false });
+      }
+    }
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post('/acceptThemeTerms', async (req, res) => {
+  const theme = req.body.theme;
+  const userId = req.body.userId;
+
+  try {
+    const themeModal = await ThemeModals.findOne({ userId: userId });
+    console.log(themeModal)
+    if (!themeModal) {
+      const newThemeModal = new ThemeModals({
+        userId: userId,
+        modalsShown: new Map([[theme, true]])
+      });
+      await newThemeModal.save();
+    } else {
+      themeModal.modalsShown.set(theme, true);
+      await themeModal.save();
+    }
     res.json({ status: 'success' });
   } catch (err) {
     res.status(500).send(err);

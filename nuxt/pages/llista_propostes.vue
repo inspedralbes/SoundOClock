@@ -361,6 +361,48 @@
             </div>
         </UCard>
     </UModal>
+
+    <UModal v-model="modals.themeTerms" class="z-[9999]" prevent-close>
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center justify-between">
+                    <div class="flex flex-row items-center">
+                        <span class="material-symbols-rounded text-[2rem] text-blue-400 mr-4">
+                            info
+                        </span>
+                        <h2 class="text-xl font-bold">
+                            Nova temàtica!
+                        </h2>
+                    </div>
+                </div>
+            </template>
+
+            <div>
+                <p class="text-center mb-2">
+                    La nova temàtica d'aquesta setmana és <b>"{{ settings.theme }}"</b>.
+                </p>
+                <p>
+                    Accepta les següents condicions:
+                    <ol class="list-disc">
+                        <li class="ml-5">Les cançons proposades han de ser adequades per a tots els públics.</li>
+                        <li class="ml-5">Les cançons proposades han de ser adequades per a la temàtica actual</li>
+                        <li class="ml-5">Qualsevol comportament que vagi en contra de les regles de la aplicació i de l'Institut Pedralbes pot comportar una <b>sanció</b></li>
+                    </ol>
+                </p>
+            </div>
+
+            <template #footer>
+                <div class="w-full flex justify-center">
+                    <UButton @click="handleAcceptTerms()" v-if="!isTermsLoading" color="green" class="w-3/4 flex justify-center">
+                        Acceptar condicions
+                    </UButton>
+                    <UButton loading v-if="isTermsLoading" color="green" class="w-3/4 flex justify-center">
+                        Acceptar condicions
+                    </UButton>
+                </div>
+            </template>
+        </UCard>
+    </UModal>
 </template>
 
 <script>
@@ -379,6 +421,7 @@ export default {
                 proposeSongError: false,
                 blockEsplicit: false,
                 alertEsplicit: false,
+                themeTerms: false,
             },
             songs: computed(() => this.store.proposedSongs),
             spotifySongs: [],
@@ -418,6 +461,7 @@ export default {
             isReportLoading: false,
             isSettingsLoading: true,
             proposeAlertHandlerTrack: null,
+            isTermsLoading: false,
         }
     },
     created() {
@@ -469,6 +513,10 @@ export default {
             this.store.setCategories(data.allCategories);
         });
         comManager.getSelectedSongs();
+
+        if (this.store.getSettings()) {
+            this.handleSettings();
+        }
 
         socket.on('reportError', (data) => {
             this.modals.reportModal = false;
@@ -532,9 +580,26 @@ export default {
             }
         },
         handleSettings() {
-            if (this.store.getSettings && this.isSettingsLoading) {
-                this.isSettingsLoading = false;
+            let settings = this.store.getSettings();
+            if (settings && this.isSettingsLoading) {
+                comManager.checkThemeModal(settings.theme, this.store.getUser().id)
+                    .then((result) => {
+                        if (result.showModal) {
+                            this.modals.themeTerms = true;
+                        }
+                        this.isSettingsLoading = false;
+                    })
             }
+        },
+        handleAcceptTerms() {
+            let settings = this.store.getSettings();
+
+            this.isTermsLoading = true;
+            comManager.acceptThemeTerms(settings.theme, this.store.getUser().id)
+                .then(() => {
+                    this.isTermsLoading = false;
+                    this.modals.themeTerms = false;
+                })
         },
         fillMissingGroups(array) {
             let result = []
