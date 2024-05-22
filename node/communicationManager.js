@@ -474,8 +474,24 @@ async function sendDeletedSongMail(token, song) {
       Authorization: `Bearer ${token}`,
     },
   });
-  console.log("SOOOONG response", response.data);
   return response.data;
+}
+
+async function sendVoteReminderMail(usersVotedId) {
+
+  console.log("enter reminder mail response");
+  const response = await fetch(apiURL + "reminderMail", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      usersVotedId: usersVotedId,
+    }),
+  });
+  const jsonResponse = await response.json();
+  console.log("reminder mail response", jsonResponse);
 }
 
 const comManager = {
@@ -513,6 +529,7 @@ const comManager = {
   getUserGroups,
   deleteUserFromGroup,
   sendDeletedSongMail,
+  sendVoteReminderMail,
 };
 
 export default comManager;
