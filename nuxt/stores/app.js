@@ -45,7 +45,7 @@ export const useAppStore = defineStore("app", {
     serverResponse: null,
     loadingAdminComponent: null,
     blacklist: [],
-    settings: {},
+    settings: null,
     player: {
       progressBar: 0,
       animationFrameId: null,
@@ -128,6 +128,9 @@ export const useAppStore = defineStore("app", {
     },
     getFinalSongsList() {
       return this.finalSongsList;
+    },
+    getSettings() {
+      return this.settings;
     },
 
     //setters

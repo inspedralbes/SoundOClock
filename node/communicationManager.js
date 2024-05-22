@@ -478,6 +478,22 @@ async function sendDeletedSongMail(token, song) {
   return response.data;
 }
 
+async function getUsersVotes(users, token) {
+  const response = await fetch(apiURL + `usersSearchInfo`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "Bearer " + token,
+    },
+    body: JSON.stringify({
+      users: users,
+    }),
+  });
+  const jsonResponse = await response.json();
+  return jsonResponse;
+}
+
 const comManager = {
   getUserInfo,
   googleLogin,
@@ -512,6 +528,7 @@ const comManager = {
   createGroup,
   getUserGroups,
   deleteUserFromGroup,
+  getUsersVotes,
   sendDeletedSongMail,
 };
 

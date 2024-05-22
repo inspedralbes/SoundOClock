@@ -267,6 +267,36 @@ async function deleteBellsGroupsTemplate(id) {
   return data;
 }
 
+async function getUsersVotes(songId, token){
+  const response = await fetch(`${url}/usersVotes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      songId,
+      token,
+    }),
+  });
+  const data = await response.json();
+  return data;
+}
+
+async function getUser(userId){
+  const store = useAppStore();
+  const response = await fetch(`${url}/user/${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${store.getUser().token}`,
+    },
+  });
+  const data = await response.json();
+  return data;
+}
+
 const comManager = {
   getUserSelectedSongs,
   getSongs,
@@ -289,6 +319,8 @@ const comManager = {
   storeBellsGroupsTemplate,
   getBellsGroupsTemplate,
   deleteBellsGroupsTemplate,
+  getUsersVotes,
+  getUser,
 };
 
 export default comManager;
