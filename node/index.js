@@ -425,8 +425,8 @@ app.post("/usersVotes", async (req, res) => {
     res.status(500).send(err);
   }
 });
-// GROUP BELLS TEMPLATE
 
+// GROUP BELLS TEMPLATE
 app.post('/bellsGroupsTemplate', async (req, res) => {
   try {
     const template = new BellsGroupsTemplate(req.body.template);

@@ -494,35 +494,6 @@ async function getUsersVotes(users, token) {
   return jsonResponse;
 }
 
-
-async function getUsersVotes(users, token) {
-  const response = await fetch(apiURL + `usersSearchInfo`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: "Bearer " + token,
-    },
-    body: JSON.stringify({
-      users: users,
-    }),
-  });
-  const jsonResponse = await response.json();
-  return jsonResponse;
-}
-
-
-async function sendDeletedSongMail(token, song) {
-  
-  const response = await axios.post(`${apiURL}mail`, song, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  console.log("SOOOONG response", response.data);
-  return response.data;
-}
-
 const comManager = {
   getUserInfo,
   googleLogin,
