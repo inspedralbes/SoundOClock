@@ -267,6 +267,28 @@ async function deleteBellsGroupsTemplate(id) {
   return data;
 }
 
+async function checkThemeModal(theme, userId) {
+  const response = await fetch(`${url}/checkThemeModal/${theme}/${userId}`);
+  const data = await response.json();
+  return data;
+}
+
+async function acceptThemeTerms(theme, userId) {
+  const response = await fetch(`${url}/acceptThemeTerms`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      theme,
+      userId,
+    }),
+  });
+  const data = await response.json();
+  return data;
+}
+
 async function getUsersVotes(songId, token){
   const response = await fetch(`${url}/usersVotes`, {
     method: "POST",
@@ -319,6 +341,8 @@ const comManager = {
   storeBellsGroupsTemplate,
   getBellsGroupsTemplate,
   deleteBellsGroupsTemplate,
+  checkThemeModal,
+  acceptThemeTerms,
   getUsersVotes,
   getUser,
 };

@@ -53,6 +53,11 @@ const bellsGroupsTemplate = new mongoose.Schema({
   bellsGroups: [Object],
 });
 
+const themeModals = new mongoose.Schema({
+  userId: Number,
+  modalsShown: { type: Map, of: Boolean, default: new Map() },
+})
+
 const VotingRecord = mongoose.model("VotingRecord", votingRecordSchema);
 const Song = mongoose.model("Song", songSchema);
 const ReportSong = mongoose.model("ReportSong", reportSongSchema);
@@ -62,6 +67,7 @@ const BellsGroupsTemplate = mongoose.model(
   "BellsGroupsTemplate",
   bellsGroupsTemplate
 );
+const ThemeModals = mongoose.model("ThemeModals", themeModals);
 
 export {
   Song,
@@ -70,4 +76,5 @@ export {
   SelectedSong,
   ReportUser,
   BellsGroupsTemplate,
+  ThemeModals,
 };
