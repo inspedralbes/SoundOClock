@@ -7,7 +7,7 @@ import {
 
 async function task(socket) {
   cron.schedule(
-    "0 0 * * *",
+    "50 23 * * *",
     async () => {
       console.log("Fetching settings from server");
       const response = await comManager.getPublicSettings();
