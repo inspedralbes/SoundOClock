@@ -113,12 +113,33 @@ class GroupsController extends Controller
 
     // Add groups to the user
     public function addGroupsToUser(Request $request) {
+
         // Validate the request
         $validated = $request->validate([
             'user_id' => 'required|int|exists:users,id', // Validates the user_id exists in users table
             'groups' => 'required|array',
             'groups.*' => 'required|exists:groups,id' // Validates each group_id exists in groups table
         ]);
+
+        //find user by id
+        $user = User::find($request->user_id);
+
+        //validate if this user has a group
+        if($user->groups->count() > 0){
+                
+            //validate if user has permissions
+            if(
+                $user->role_id !== 1 && // Tech
+                $user->role_id !== 2 && // Admin
+                $user->role_id !== 3 && // Moderator
+                $user->role_id !== 4    // Professor
+                ){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'You do not have permissions.'
+                ], 404);
+            }
+        }
 
         $user_id = $validated["user_id"];
         $user = User::findOrFail($user_id);
