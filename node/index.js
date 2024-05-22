@@ -12,6 +12,7 @@ import {
   ReportSong,
   SelectedSong,
   ReportUser,
+  BellsGroupsTemplate,
 } from "./models.js";
 import axios from "axios";
 import minimist from "minimist";
@@ -420,6 +421,13 @@ app.post("/usersVotes", async (req, res) => {
       
       res.json(usersVotes);
     }
+// GROUP BELLS TEMPLATE
+
+app.post('/bellsGroupsTemplate', async (req, res) => {
+  try {
+    const template = new BellsGroupsTemplate(req.body.template);
+    await template.save();
+    res.json({ status: 'success' });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -430,6 +438,23 @@ app.get("/user/:userId", async (req, res) => {
     const userToken = req.headers['authorization'].split(' ')[1];
     let user = await comManager.showUser(userToken, req.params.userId);
     res.json(user);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+app.get('/bellsGroupsTemplate', async (req, res) => {
+  try {
+    const templates = await BellsGroupsTemplate.find();
+    res.json(templates);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.delete('/bellsGroupsTemplate/:id', async (req, res) => {
+  try {
+    await BellsGroupsTemplate.findByIdAndDelete(req.params.id);
+    res.json({ status: 'success' });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -485,6 +510,7 @@ io.on("connection", (socket) => {
       .then((userData) => {
         // console.log("UserData:", userData);
         let groups = [];
+        console.log(userData);
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
           groups.push(group.pivot.group_id);
@@ -495,6 +521,7 @@ io.on("connection", (socket) => {
           userData.user.id,
           userData.user.email,
           userData.user.name,
+          userData.user.picture,
           userData.token,
           groups,
           userData.user.role_id,
@@ -861,6 +888,9 @@ io.on("connection", (socket) => {
           message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.`,
         });
       } else {
+        // Send mail to the user that proposed the song
+        comManager.sendDeletedSongMail(userToken, song);
+
         // Notify the user that erased the song
         socket.emit("notifyServerResponse", {
           status: "success",

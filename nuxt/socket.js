@@ -42,8 +42,8 @@ socket.on("connect", () => {
     refreshAdminUsersView(data);
   });
 
-  socket.on("loginData", (id, mail, name, token, groups, roleId, roleName) => {
-    pinia.setUser(id, mail, name, token, groups, roleId, roleName);
+  socket.on("loginData", (id, mail, name, picture, token, groups, roleId, roleName) => {
+    pinia.setUser(id, mail, name, picture, token, groups, roleId, roleName);
     if (pinia.getUser().groups.length > 0) {
       navigateTo({ path: "/llista_propostes" });
     } else {
@@ -59,7 +59,7 @@ socket.on("connect", () => {
     pinia.deleteGroup(data.group_id);
   });
 
-  socket.on("groupUpdated", (data) => {});
+  socket.on("groupUpdated", (data) => { });
 
   socket.on("songPosted", (data) => {
     comManager.getSongs();
@@ -73,11 +73,11 @@ socket.on("connect", () => {
     pinia.setPostedSongStatus(data);
   });
 
-  socket.on("bellsGroupsRelationsUpdated", (data) => {});
+  socket.on("bellsGroupsRelationsUpdated", (data) => { });
 
-  socket.on("updateBellsGroupsRelationsError", (data) => {});
+  socket.on("updateBellsGroupsRelationsError", (data) => { });
 
-  socket.on("isReadReportStatusChanged", (data) => {});
+  socket.on("isReadReportStatusChanged", (data) => { });
 
   socket.on("userRoleUpdated", (data) => {
     refreshAdminUsersView(data);
@@ -105,9 +105,9 @@ socket.on("connect", () => {
     pinia.deleteProposedSongs();
   });
 
-  socket.on("userDeletedFromGroup", (data) => {});
+  socket.on("userDeletedFromGroup", (data) => { });
 
-  socket.on("disconnect", () => {});
+  socket.on("disconnect", () => { });
 
   // FUNCTIONS START
   function getUserSelectedSongs(id) {

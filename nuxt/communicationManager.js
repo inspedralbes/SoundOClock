@@ -238,6 +238,35 @@ async function getSelectedSongs() {
   store.setFinalSongsList(data);
 }
 
+async function storeBellsGroupsTemplate(template) {
+  const response = await fetch(`${url}/bellsGroupsTemplate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      template,
+    }),
+  });
+  const data = await response.json();
+  return data;
+}
+
+async function getBellsGroupsTemplate() {
+  const response = await fetch(`${url}/bellsGroupsTemplate`);
+  const data = await response.json();
+  return data;
+}
+
+async function deleteBellsGroupsTemplate(id) {
+  const response = await fetch(`${url}/bellsGroupsTemplate/${id}`, {
+    method: "DELETE",
+  });
+  const data = await response.json();
+  return data;
+}
+
 async function getUsersVotes(songId, token){
   const response = await fetch(`${url}/usersVotes`, {
     method: "POST",
@@ -287,6 +316,9 @@ const comManager = {
   getUserGroups,
   getUserReportedSongs,
   getSelectedSongs,
+  storeBellsGroupsTemplate,
+  getBellsGroupsTemplate,
+  deleteBellsGroupsTemplate,
   getUsersVotes,
   getUser,
 };
