@@ -408,7 +408,7 @@ app.get("/userGroups/:userToken", async (req, res) => {
 app.post("/usersVotes", async (req, res) => {
   try {
     const song = await Song.findOne({ id: req.body.songId });
-    if(song) {
+    if (song) {
       // Find all users that voted for the song with the given id
       // el $in es para buscar en un array de valores (en este caso, en el array de votedSongs) si el valor song.id está presente
       let usersVotesMongo = await VotingRecord.find({ votedSongs: { $in: [song.id] } });
@@ -418,9 +418,13 @@ app.post("/usersVotes", async (req, res) => {
 
       //get the users votes
       let usersVotes = await comManager.getUsersVotes(usersVotesMongo, token);
-      
+
       res.json(usersVotes);
     }
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
 // GROUP BELLS TEMPLATE
 
 app.post('/bellsGroupsTemplate', async (req, res) => {
