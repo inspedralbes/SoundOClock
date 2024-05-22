@@ -492,7 +492,6 @@ app.post('/acceptThemeTerms', async (req, res) => {
 
   try {
     const themeModal = await ThemeModals.findOne({ userId: userId });
-    console.log(themeModal)
     if (!themeModal) {
       const newThemeModal = new ThemeModals({
         userId: userId,
