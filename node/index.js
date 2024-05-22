@@ -546,6 +546,8 @@ obtenerActualizarTokenSpotify();
 let dirPC = null;
 let amountUsers = 0;
 
+fetchingCron.mailReminder();
+
 // Sockets
 io.on("connection", (socket) => {
   amountUsers++;
