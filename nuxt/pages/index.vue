@@ -33,7 +33,7 @@
             </svg>
         </button>
 
-        <!-- <SongsPreview class="absolute bottom-10"></SongsPreview> -->
+        <SongsPreview v-if="$device.isMobile" class="absolute bottom-10"></SongsPreview>
 
         <div class="circle"></div>
         <div class="circle min"></div>
