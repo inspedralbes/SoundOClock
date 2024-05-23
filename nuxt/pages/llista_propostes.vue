@@ -14,9 +14,10 @@
                 <h1 class="text-4xl smallCaps w-fit text-center z-50">
                     {{ 'La temàtica és: ' + settings.theme }}
                 </h1>
-                <UDropdown v-if="settings.themeDesc" class="h-fit w-fit self-end right-0 top-1/2" :items="themeDesc"
-                    :mode="dropdownMode" :ui="{ item: { disabled: 'cursor-text select-text' } }"
-                    :popper="{ placement: 'bottom-end', arrow: true }">
+
+                <UDropdown v-if="settings.themeDesc" class="h-fit w-fit self-end right-0 top-1/2 modifyChildWidth"
+                    :items="themeDesc" :ui="{ item: { disabled: 'cursor-text select-text' } }" :mode="dropdownMode"
+                    :popper="{ placement: 'bottom-end', arrow: false }">
                     <span class="material-symbols-rounded">
                         arrow_drop_down
                     </span>
@@ -1123,6 +1124,10 @@ export default {
 </script>
 
 <style scoped>
+.modifyChildWidth> :nth-child(2) {
+    width: 20rem !important;
+}
+
 #buttonsFilterGroup {
     width: calc(60% + 150px);
 }
