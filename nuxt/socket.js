@@ -16,6 +16,15 @@ socket.on("connect", () => {
 
   // getSongs();
 
+  if (window.localStorage.getItem("user")) {
+    pinia.setLoadingLogin(true);
+    console.log("login in socket.js");
+    let user = JSON.parse(window.localStorage.getItem("user"));
+    console.log(user.email, user.name);
+    socket.emit("login", user.email, user.name);
+  }
+
+
   socket.on("voteCasted", (data) => {
     comManager.getSongs();
     comManager.getSortedVotedSongs();
@@ -43,11 +52,15 @@ socket.on("connect", () => {
   });
 
   socket.on("loginData", (id, mail, name, picture, token, groups, roleId, roleName) => {
+    console.log("loginData recived" + id + mail + name + picture + token + groups + roleId + roleName);
     pinia.setUser(id, mail, name, picture, token, groups, roleId, roleName);
     if (pinia.getUser().groups.length > 0) {
       navigateTo({ path: "/llista_propostes" });
     } else {
       navigateTo({ path: "/escollirGrup" });
+    }
+    if (pinia.getLoadingLogin()) {
+      pinia.setLoadingLogin(false);
     }
   });
 

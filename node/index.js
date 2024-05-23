@@ -583,6 +583,14 @@ io.on("connection", (socket) => {
       });
   });
 
+  socket.on("login", async (email, name) => {
+    console.log("login", email, name);
+    let user = await comManager.login(name, email);
+    console.log("user", user);
+    console.log("loginData", user.user.id, user.user.email, user.user.name, user.user.picture, user.token, user.user.groups, user.user.role_id, user.user.role_name);
+    socket.emit("loginData", user.user.id, user.user.email, user.user.name, user.user.picture, user.token, user.user.groups, user.user.role_id, user.user.role_name);
+  });
+
   socket.on("updateProvisionalSelectedSongs", (bellId, songId) => {
     if (bellId && songId) {
       // If the song is already selected, unselect it

@@ -6,15 +6,15 @@ export const useAppStore = defineStore("app", {
       typeof window !== "undefined" && window.localStorage.getItem("user")
         ? JSON.parse(localStorage.getItem("user"))
         : {
-            id: 0,
-            email: "",
-            name: "",
-            picture: "",
-            groups: [],
-            token: null,
-            role_id: null,
-            role_name: null,
-          },
+          id: 0,
+          email: "",
+          name: "",
+          picture: "",
+          groups: [],
+          token: null,
+          role_id: null,
+          role_name: null,
+        },
 
     userSelectedSongs: [],
     finalSongsList: [],
@@ -44,6 +44,7 @@ export const useAppStore = defineStore("app", {
     roles: [],
     serverResponse: null,
     loadingAdminComponent: null,
+    loadingLogin: true,
     blacklist: [],
     settings: null,
     player: {
@@ -131,6 +132,9 @@ export const useAppStore = defineStore("app", {
     },
     getSettings() {
       return this.settings;
+    },
+    getLoadingLogin() {
+      return this.loadingLogin;
     },
 
     //setters
@@ -249,6 +253,9 @@ export const useAppStore = defineStore("app", {
     },
     setAdminSelectedUser(adminSelectedUser) {
       this.adminSelectedUser = adminSelectedUser;
+    },
+    setLoadingLogin(loadingLogin) {
+      this.loadingLogin = loadingLogin;
     },
 
     // Other

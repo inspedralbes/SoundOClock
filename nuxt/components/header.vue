@@ -85,7 +85,7 @@
         </div>
     </div>
 
-    <div v-if="isLoading" class="loader absolute w-screen h-screen">
+    <div v-if="isLoading" class="loader">
         <Loader />
     </div>
 
@@ -177,7 +177,7 @@ export default {
 }
 
 .loader {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     height: 100vh;
