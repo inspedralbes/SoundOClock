@@ -4,7 +4,7 @@
         <Loader />
     </div>
     <div v-if="!loading">
-        <div class="flex flex-col gap-3 ml-20 mr-8 mb-4">
+        <div class="flex flex-col gap-3 ml-20 mr-8 mb-20">
             <div class="groups-bells-container rounded-lg">
                 <div class="schedule-container text-white text-center gap-2 p-2">
                     <div v-for="(bell, index) in bells" class="item bg-gray-400 rounded-lg p-2 h-96 flex flex-col">

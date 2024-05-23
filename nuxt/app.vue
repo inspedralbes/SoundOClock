@@ -8,6 +8,26 @@
   <UNotifications />
 </template>
 
+<script>
+import { useAppStore } from '@/stores/app';
+
+export default {
+  data() {
+    return {
+      store: useAppStore()
+    }
+  },
+
+  computed: {
+    loading() {
+      return this.store.getLoadingLogin();
+    }
+  }
+
+}
+
+</script>
+
 <style>
 body {
   margin: 0;

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isSettingsLoading" class="w-screen h-screen">
+    <div v-if="isSettingsLoading || loginLoading" class="w-screen h-screen">
         <Loader />
     </div>
     <div v-else>
@@ -9,7 +9,7 @@
         <Vinyl class="fixed top-0 right-0 h-screen flex justify-center items-center overflow-hidden translate-x-[40%]"
             v-if="!$device.isMobile" />
 
-        <div v-if="checkVotingState === 'vote'" class="mb-4">
+        <div v-if="checkVotingState === 'vote'" class="mb-4" :class="{ '!mb-36': isPlaying }">
             <div v-if="settings.theme" class="flex justify-center content-center my-8">
                 <h1 class="text-4xl smallCaps w-fit text-center z-50">
                     {{ 'La temàtica és: ' + settings.theme }}
@@ -89,7 +89,8 @@
                                     </button>
                                 </div>
                                 <div v-if="bells" class="grid grid-cols-4 gap-x-2 gap-y-4">
-                                    <div v-for="(bell, index) in bells" class="w-full flex items-center justify-center">
+                                    <div v-for="(    bell, index    ) in     bells    "
+                                        class="w-full flex items-center justify-center">
                                         <button @click="selectBell(bell.id)" :title="formatTime(bell.hour)"
                                             :class="filterBell === bell.id ? 'border-blue-600 text-blue-500' : ''"
                                             class="appearance-none p-2 w-full rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
@@ -111,7 +112,7 @@
                                 </div>
                                 <div v-if="groupsAvailable.length > 0">
                                     <div v-if="filteredSongs.length > 0" class="grid grid-cols-4 gap-x-2 gap-y-4">
-                                        <div v-for="(group, index) in groupsAvailable"
+                                        <div v-for="(    group, index    ) in     groupsAvailable    "
                                             class="w-full flex items-center justify-center">
                                             <button @click="selectGroup(group.id)"
                                                 :title="hasPropose(group.id) ? `Fes clic per veure les cançons proposades d'aquest grup` : `No hi ha cap cançó proposada en aquest grup`"
@@ -164,7 +165,8 @@
             </div>
 
             <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4 w-full">
-                <p class="text-xl" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">No hi ha cap
+                <p class="text-xl" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">No hi ha
+                    cap
                     cançó
                     proposada amb aquesta cerca.</p>
                 <p class="mx-4" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Comparteix la
@@ -175,7 +177,8 @@
 
             <!-- CANCIONES PROPUESTAS -->
             <TransitionGroup name="song-slide" mode="out-in">
-                <div v-for="track in filteredSongs" :key="track.id" :class="{ 'w-[60%] mb-4': !$device.isMobile }">
+                <div v-for="    track     in     filteredSongs    " :key="track.id"
+                    :class="{ 'w-[60%] mb-4': !$device.isMobile }">
                     <component :is="activeSong" :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying"
                         @play="playTrack" @vote="vote($event)" @report="report($event)" :type="getType(track.id)" />
                 </div>
@@ -184,11 +187,12 @@
             <!-- CANCIONES PARA PROPONER -->
             <Transition name="song-slide">
                 <h2 v-if="spotifySongs.length > 0" class="text-3xl font-bold mt-10"
-                    :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Resultats de la cerca</h2>
+                    :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Resultats de la cerca
+                </h2>
             </Transition>
             <TransitionGroup tag="div" mode="out-in" name="song-slide" :class="{ 'w-[60%]': !$device.isMobile }">
-                <component :is="activeSong" v-for=" track in spotifySongs " :key="track.id" :track="track"
-                    :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
+                <component :is="activeSong" v-for="     track     in     spotifySongs     " :key="track.id"
+                    :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
                     @propose="proposeSongCheck($event)" :type="getType(track.id)" />
             </TransitionGroup>
         </div>
@@ -206,7 +210,8 @@
                 <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
             </div>
             <div>
-                <div v-for="track in finalSongsList" :key="track.id" :class="{ 'w-[60%] mb-4': !$device.isMobile }">
+                <div v-for="    track     in     finalSongsList    " :key="track.id"
+                    :class="{ 'w-[60%] mb-4': !$device.isMobile }">
                     <component :is="activeSong" :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying"
                         @play="playTrack" :type="'selected'" :bellId="track.bellId" />
                 </div>
@@ -253,7 +258,7 @@
 
             <p>Per quin motiu vols reportar la cançó <b>'{{ reportSongData.reportedSong.name }}'</b>?</p>
             <div class="flex flex-col mt-4">
-                <div v-for="option in reportSongData.options " class="flex flex-row mb-2">
+                <div v-for="    option     in     reportSongData.options     " class="flex flex-row mb-2">
                     <UCheckbox v-model="option.value">
                         <template #label>
                             <span>{{ option.label }}</span>
@@ -416,7 +421,7 @@ export default {
             serverResponse: null,
             toast: null,
             isReportLoading: false,
-            isSettingsLoading: true,
+            // isSettingsLoading: true,
             proposeAlertHandlerTrack: null,
         }
     },
@@ -453,8 +458,6 @@ export default {
                 console.error('No se encontró el script con el id "__NEXT_DATA__" en el HTML recibido');
             }
         });
-
-        socket.emit('getSettings', this.store.getUser().token);
 
     },
     mounted() {
@@ -529,11 +532,6 @@ export default {
             // Check if bells is loaded and set the mostVotedSongs
             if (this.bells.length > 0 && this.groupedSongs.length > 0) {
                 this.mostVotedSongsPerBell = this.getMostVotedSongs(this.bells);
-            }
-        },
-        handleSettings() {
-            if (this.store.getSettings && this.isSettingsLoading) {
-                this.isSettingsLoading = false;
             }
         },
         fillMissingGroups(array) {
@@ -892,9 +890,14 @@ export default {
         sortedVotedSongsByGroups: {
             handler: 'handleResults',
         },
-        settings: {
-            handler: 'handleSettings',
-        }
+        // settingsW: {
+        //     handler: function () {
+        //         if (this.store.getSettings() && this.isSettingsLoading) {
+        //             this.isSettingsLoading = false;
+        //         }
+        //     }
+        // }
+
     },
     computed: {
         filteredSongs() {
@@ -1026,6 +1029,19 @@ export default {
                 return 'click';
             } else {
                 return 'hover';
+            }
+        },
+        loginLoading() {
+            return this.store.getLoadingLogin();
+        },
+        // settingsW() {
+        //     return this.store.getSettings();
+        // },
+        isSettingsLoading() {
+            if (this.store.getSettings()) {
+                return false;
+            } else {
+                return true;
             }
         }
     },

@@ -42,19 +42,6 @@ async function googleLogin(userToken) {
   // Send user info to the server
   let userData = await login(data.name, data.email, data.picture);
 
-  const roleNameResponse = await fetch(
-    apiURL + "roles/" + userData.user.role_id,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${userData.token}`,
-      },
-    }
-  );
-  const roleNameData = await roleNameResponse.json();
-
-  userData.user.role_name = roleNameData.name;
-
   return userData;
 }
 
@@ -68,7 +55,7 @@ async function loginUserAndAdmin() {
 
 async function login(name, email, picture) {
   console.log("Logging in", name, email, picture);
-  const response = await axios.post(
+  let userData = await axios.post(
     apiURL + "login",
     {
       email: email,
@@ -82,7 +69,22 @@ async function login(name, email, picture) {
       },
     }
   );
-  return response.data;
+  console.log("userData.data", userData.data);
+  const roleNameResponse = await fetch(
+    apiURL + "roles/" + userData.data.user.role_id,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userData.data.token}`,
+      },
+    }
+  );
+
+  const roleNameData = await roleNameResponse.json();
+
+  userData.data.user.role_name = roleNameData.name;
+  console.log("userData.data", userData.data);
+  return userData.data;
 }
 
 async function logout(token) {
@@ -468,7 +470,7 @@ async function deleteUserFromGroup(token, group_id, user_id) {
 }
 
 async function sendDeletedSongMail(token, song) {
-  
+
   const response = await axios.post(`${apiURL}mail`, song, {
     headers: {
       Authorization: `Bearer ${token}`,
