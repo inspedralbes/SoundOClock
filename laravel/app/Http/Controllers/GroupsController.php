@@ -145,7 +145,14 @@ class GroupsController extends Controller
         $user = User::findOrFail($user_id);
 
         // Attach the groups to the user
-        $user->groups()->attach($validated["groups"]);
+        foreach ($validated["groups"] as $group_id) {
+            $group = Group::findOrFail($group_id);
+            // if group is already attached to the user, skip it
+            if ($user->groups->contains($group)) {
+                continue;
+            }
+            $user->groups()->attach($group);
+        }
     
         // Return the user with its groups
         return $user->load('groups');

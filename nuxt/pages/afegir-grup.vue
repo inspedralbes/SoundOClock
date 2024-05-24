@@ -71,7 +71,7 @@
                 <template #description>
                     <div class="mt-2 flex justify-between gap-2">
                         <UButton size="md" color="red" @click="modals.confirmChanges = false">Enrere</UButton>
-                        <UButton size="md" color="primary" @click="modals.confirmChanges = false; console.log('selectedGroups: ',selectedGroups)">Continuar</UButton>
+                        <UButton size="md" color="primary" :loading="storeGroupsLoading" @click="storeGroups()">Continuar</UButton>
                     </div>
                 </template>
             </UAlert>
@@ -108,7 +108,6 @@ export default {
             this.user.groups.forEach((group) => {
                 this.selectedGroups.push(this.groups.find((grup) => grup.id === group));
             });
-            console.log('selectedGroups: ', this.selectedGroups);
             this.loading = false;
         });
 
@@ -144,10 +143,14 @@ export default {
         },
         storeGroups() {
             this.storeGroupsLoading = true;
-            let groups = this.formatArray(this.selectedGroups);
 
-            comManager.storeGroups(groups).then(() => {
+            let userId = this.store.getUser().id;
+            let groups = this.formatArray(this.selectedGroups);
+            let userToken = this.store.getUser().token;
+            
+            comManager.setUserGroups(userId, groups, userToken).then(() => {
                 this.storeGroupsLoading = false;
+                this.modals.confirmChanges = false;
                 this.$router.push('/els_meus_grups');
             });
         }
