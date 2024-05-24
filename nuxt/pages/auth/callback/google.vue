@@ -1,6 +1,7 @@
 <template>
     <div class="w-screen h-screen">
-        <Loader />
+        <!-- <Loader /> -->
+        Callback de google
     </div>
 
 </template>
@@ -26,6 +27,9 @@ export default {
         console.log('Google callback')
         this.getURIparams();
         store.deleteUser();
+    },
+    mounted() {
+        console.log('Google callback mounted')
     },
     methods: {
         getURIparams() {
