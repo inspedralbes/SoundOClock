@@ -23,12 +23,13 @@ export default {
     },
     created() {
         const store = useAppStore();
-
+        console.log('Google callback')
         this.getURIparams();
         store.deleteUser();
     },
     methods: {
         getURIparams() {
+            console.log('getURIparams')
             if (process.client) {
                 const url = new URL(window.location.href);
                 this.code = url.searchParams.get('code');
@@ -43,7 +44,12 @@ export default {
             }
         },
         async fetchGoogle() {
-
+            console.log('fetchGoogle')
+            console.log('Code:', this.code);
+            console.log('State:', this.state);
+            console.log('Scope:', this.scope);
+            console.log('hd:', this.hd);
+            console.log('prompt:', this.prompt);
             let googleData = {};
             const authOptions = {
                 url: 'https://oauth2.googleapis.com/token',
