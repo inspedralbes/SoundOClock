@@ -73,13 +73,21 @@ class AuthController extends Controller
                 $role = 3;
             }
 
-            $user = User::create([
-                'email' => $fields['email'],
-                'name' => $fields['name'],
-                'picture' => $fields['picture'] ?? null,
-                'role_id' => $role,
-            ]);
-        } elseif ($user->picture == null && $fields['picture'] != null) {
+            if (!isset($fields['picture'])) {
+                $user = User::create([
+                    'email' => $fields['email'],
+                    'name' => $fields['name'],
+                    'role_id' => $role,
+                ]);
+            } else {
+                $user = User::create([
+                    'email' => $fields['email'],
+                    'name' => $fields['name'],
+                    'picture' => $fields['picture'],
+                    'role_id' => $role,
+                ]);
+            }
+        } elseif ($user->picture == null && isset($fields['picture'])) {
             $user->update([
                 'picture' => $fields['picture']
             ]);
