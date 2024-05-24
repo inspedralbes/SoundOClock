@@ -1,9 +1,10 @@
 <template>
   <!-- <UContainer> -->
   <Header
-    v-if="$route.name !== 'index' && $route.name !== 'admin' && $route.name !== 'auth-callback-google' && $route.name !== 'escollirGrup' && $route.name !== 'a'">
+    v-if="$route.name !== 'index' && $route.name !== 'admin' && $route.name !== 'auth-callback-google' && $route.name !== 'escollirGrup'">
   </Header>
-  <Loader v-if="loading && $route.name !== 'index'" class="w-screen h-screen grow" />
+  <Loader v-if="loading && $route.name !== 'index' && $route.name !== 'auth-callback-google'"
+    class="w-screen h-screen grow" />
   <NuxtPage v-else class="grow" />
   <!-- </UContainer> -->
   <UNotifications />
