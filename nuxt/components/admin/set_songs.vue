@@ -84,10 +84,10 @@
                 </Transition>
             </div>
             <div class="h-96 overflow-auto">
-                <Song v-for="song in spotifySongs" :key="song.id" :track="song" :currentTrackId="currentTrackId"
+                <SongAdmin v-for="song in spotifySongs" :key="song.id" :track="song" :currentTrackId="currentTrackId"
                     :isPlaying="isPlaying" @play="playTrack" :type="'admin_set_song'" @propose="addSong"
                     :songWaitingToPlay="songWaitingToPlay">
-                </Song>
+                </SongAdmin>
             </div>
         </div>
     </UModal>

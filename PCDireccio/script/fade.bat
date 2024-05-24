@@ -2,10 +2,10 @@
 setlocal enabledelayedexpansion
 
 rem Carpeta de origen
-set "input_folder=C:\Users\raule\Downloads\downloaded_songs\"
+set "input_folder=C:\Users\SoundO'Clock\preSongs\"
 
 rem Carpeta de destino
-set "output_folder=C:\Users\raule\Downloads\edited_songs\"
+set "output_folder=C:\Users\SoundO'Clock\Songs\"
 
 rem Bucle a través de todos los archivos mp3 en la carpeta de entrada
 for %%A in ("%input_folder%*.mp3") do (

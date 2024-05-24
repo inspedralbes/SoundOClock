@@ -289,7 +289,7 @@ async function acceptThemeTerms(theme, userId) {
   return data;
 }
 
-async function getUsersVotes(songId, token){
+async function getUsersVotes(songId, token) {
   const response = await fetch(`${url}/usersVotes`, {
     method: "POST",
     headers: {
@@ -305,7 +305,7 @@ async function getUsersVotes(songId, token){
   return data;
 }
 
-async function getUser(userId){
+async function getUser(userId) {
   const store = useAppStore();
   const response = await fetch(`${url}/user/${userId}`, {
     method: "GET",
@@ -317,6 +317,22 @@ async function getUser(userId){
   });
   const data = await response.json();
   return data;
+}
+
+async function downloadSongs() {
+  await fetch(`${url}/selectedSongs`)
+    .then(response => response.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'canciones.zip';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch((error) => console.error(error));
 }
 
 const comManager = {
@@ -345,6 +361,7 @@ const comManager = {
   acceptThemeTerms,
   getUsersVotes,
   getUser,
+  downloadSongs,
 };
 
 export default comManager;

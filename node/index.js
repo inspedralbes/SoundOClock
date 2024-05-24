@@ -1196,6 +1196,12 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("dirPCStatus", true);
   });
 
+  socket.on("restartPcReq", () => {
+    if (dirPC) {
+      io.to(dirPC).emit("restartPC");
+    }
+  });
+
   socket.on("sendBells", () => {
     if (dirPC) {
       io.to(dirPC).emit("executeSendBells");
