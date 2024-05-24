@@ -3,10 +3,10 @@
   <Header
     v-if="$route.name !== 'index' && $route.name !== 'admin' && $route.name !== 'auth-callback-google' && $route.name !== 'escollirGrup'">
   </Header>
-  <Loader
+  <!-- <Loader
     v-if="loading && $route.name !== 'index' && $route.name !== 'auth-callback-google' && $route.name !== 'escollirGrup'"
-    class="w-screen h-screen grow" />
-  <NuxtPage v-else class="grow" />
+    class="w-screen h-screen grow" /> -->
+  <NuxtPage class="grow" />
   <!-- </UContainer> -->
   <UNotifications />
 </template>
