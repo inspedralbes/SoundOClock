@@ -1,4 +1,5 @@
 <template>
+    <!-- <div v-if="isSettingsLoading || loginLoading" class="w-screen h-screen"> -->
     <div v-if="isSettingsLoading" class="w-screen h-screen">
         <Loader />
     </div>
