@@ -25,9 +25,12 @@
         </div>
         <div class="mt-20 w-2/4 mx-auto flex justify-between">
             <button class="rounded border-2 p-2 bg-green-500 hover:bg-green-700 w-1/4" @click="executeScript()">
-                Execute script
+                Colocar cançons
             </button>
-            <button class="rounded border-2 p-2 bg-green-500 hover:bg-green-700 w-1/4">
+            <button class="rounded border-2 p-2 bg-green-500 hover:bg-green-700 w-1/4" @click="restartPc()">
+                Reiniciar Maquina
+            </button>
+            <button class="rounded border-2 p-2 bg-green-500 hover:bg-green-700 w-1/4" @click="downloadSongs()">
                 Descarregar cançons
             </button>
         </div>
@@ -38,12 +41,15 @@
 
 import { socket } from '@/socket';
 
+import comManager from '@/communicationManager.js';
+
 
 export default {
     data() {
         return {
             pcStatus: false,
-            pcLogs: []
+            pcLogs: [],
+            toast: null,
         }
     },
     mounted() {
@@ -56,13 +62,17 @@ export default {
 
         socket.on('sendPcDirLogs', (data) => {
             let array = data.split('\n');
-            this.pcLogs.push(array);
+            // this.pcLogs.push(array);
+
+            this.pcLogs = this.pcLogs.concat(array);
 
             // Mover el scroll al final del contenedor de logs
             this.$nextTick(() => {
                 this.$refs.logContainer.scrollTop = this.$refs.logContainer.scrollHeight;
             });
         });
+
+        this.toast = useToast();
     },
     computed: {
         logs() {
@@ -71,7 +81,29 @@ export default {
     },
     methods: {
         executeScript() {
-            socket.emit('sendBells');
+            if (this.pcStatus) {
+                socket.emit('sendBells');
+            } else {
+                this.toast.add({
+                    title: 'ERROR!',
+                    description: 'El PC no està connectat',
+                    color: 'red',
+                });
+            }
+        },
+        restartPc() {
+            if (this.pcStatus) {
+                socket.emit('restartPcReq');
+            } else {
+                this.toast.add({
+                    title: 'ERROR!',
+                    description: 'El PC no està connectat',
+                    color: 'red',
+                });
+            }
+        },
+        downloadSongs() {
+            comManager.downloadSongs();
         },
         cleanLogs() {
             this.pcLogs = [];
