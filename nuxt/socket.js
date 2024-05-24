@@ -15,13 +15,13 @@ socket.on("connect", () => {
 
   // getSongs();
 
-  if (window.localStorage.getItem("user")) {
-    pinia.setLoadingLogin(true);
-    console.log("login in socket.js");
-    let user = JSON.parse(window.localStorage.getItem("user"));
-    console.log(user.email, user.name);
-    socket.emit("login", user.email, user.name);
-  }
+  // if (window.localStorage.getItem("user")) {
+  //   pinia.setLoadingLogin(true);
+  //   console.log("login in socket.js");
+  //   let user = JSON.parse(window.localStorage.getItem("user"));
+  //   console.log(user.email, user.name);
+  //   socket.emit("login", user.email, user.name);
+  // }
 
 
   socket.on("voteCasted", (data) => {
