@@ -25,6 +25,7 @@ async function getUserInfo(token) {
 }
 
 async function googleLogin(userToken) {
+  console.log("Google login", userToken);
   // Get user info from google
   const response = await fetch(
     "https://www.googleapis.com/oauth2/v1/userinfo",
@@ -36,7 +37,6 @@ async function googleLogin(userToken) {
     }
   );
   const data = await response.json();
-
   console.log("Google user info", data);
 
   // Send user info to the server
