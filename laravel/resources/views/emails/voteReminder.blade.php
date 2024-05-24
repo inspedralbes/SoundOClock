@@ -253,7 +253,7 @@
         </header>
         <section>
             <h1>Hola, {{ $user->name }}</h1>
-            <h2>Queden 24 hores per votar!</h2>
+            <h2>Queden 48 hores per votar!</h2>
             <p>Les votacions acaben el {{ $settings->end_vote }}. Encara pots proposar cançons que s'adeqüin a la temàtica {{ $settings->theme }} i votar les teves cançons preferides.</p>
             <button class="vote-button"><a href="https://timbre.inspedralbes.cat">Click aquí per votar!</a></button> 
         </section>

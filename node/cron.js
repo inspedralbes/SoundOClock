@@ -27,7 +27,7 @@ async function mailReminder() {
 
   // Subtract two days to the last date of voting
   const mailSendingDate = new Date(endVotingDate);
-  mailSendingDate.setDate(mailSendingDate.getDate() - 1);
+  mailSendingDate.setDate(mailSendingDate.getDate() - 2);
 
   // Extract the date components for scheduling
   const month = String(mailSendingDate.getMonth() + 1).padStart(2, '0');

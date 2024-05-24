@@ -40,6 +40,7 @@ const selectedSongSchema = new mongoose.Schema({
   preview_url: String,
   link: String,
   selectedDate: Date,
+  userId: Number,
 });
 
 const reportUserSchema = new mongoose.Schema({
