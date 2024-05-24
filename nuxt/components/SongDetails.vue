@@ -80,7 +80,6 @@ export default {
       // Ban user who proposed the song
       if (this.banSelected.userProposed != 'Sense ban') {
         userPropose.propose_banned_until = dateBanProposed;
-        console.log('userProposeBan: ', userPropose);
         socket.emit('banUser', this.store.getUser().token, userPropose);
       }
 
@@ -91,7 +90,6 @@ export default {
             user = userPropose;
           }
           user.vote_banned_until = dateBanVoted;
-          console.log('voteBan: ', user);
           socket.emit('banUser', this.store.getUser().token, user);
         });
       }
