@@ -18,7 +18,10 @@
                     </div>
                 </div>
                 <div class="mt-6">
-                    <span class="font-black">ELS MEUS GRUPS</span>
+                    <div class="flex flex-row justify-between">
+                        <span class="font-black">ELS MEUS GRUPS</span>
+                        <UButton v-if="userData.role_id != 5" class="hover:cursor-pointer" color="cyan" variant="outline" to="/afegir-grup" :ui="{ rounded: 'rounded-full' }" >Afegir-me grup</UButton>
+                    </div>
                     <div class="mt-2">
                         <div v-if="!userData.groups > 0" class="text-center">NO ESTÀS EN CAP GRUP</div>
                         <div v-else class="flex flex-row flex-wrap gap-3">
