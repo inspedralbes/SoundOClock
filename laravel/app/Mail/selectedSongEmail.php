@@ -10,8 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\User;
 
-
-class newThemeEmail extends Mailable
+class voteReminderEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -21,7 +20,7 @@ class newThemeEmail extends Mailable
     public $theme;
     public $selectedSongs;
     public $bells;
-
+    
     /**
      * Create a new message instance.
      */
@@ -41,12 +40,12 @@ class newThemeEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'S\'ha escollit una nova temàtica: ' . $this->theme .'!',
+            subject: 'La teva cançó ha sigut seleccionada!',
         );
     }
 
     public function build(){
-        return $this->view('emails.newTheme')->with(['user' => $this->user,'startingTime'=>$this->startingTime, 'endingTime' => $this->endingTime,'theme' => $this->theme, 'selectedSongs' => $this->selectedSongs,'bells' => $this->bells]);
+        return $this->view('emails.selectedSong')->with(['user' => $this->user,'startingTime'=>$this->startingTime, 'endingTime' => $this->endingTime,'theme' => $this->theme, 'selectedSongs' => $this->selectedSongs,'bells' => $this->bells]);
     }
 
 }

@@ -36,6 +36,7 @@ Route::get('/groupCategories', [GroupCategoryController::class, 'index']);
 Route::get('/groupCategoriesAll', [GroupCategoryController::class, 'indexAll']);
 Route::get('/allSettings', [SettingController::class, 'index']);
 Route::get('/bells', [BellController::class, 'index']);
+Route::post('/reminderMail', [MailController::class, 'reminderMail']);
 
 Route::get('/', function () {
     return response()->json(['message' => 'API Laravel 8'], 200);

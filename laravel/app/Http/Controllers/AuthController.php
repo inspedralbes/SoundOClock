@@ -57,7 +57,7 @@ class AuthController extends Controller
         $fields = $request->validate([
             'email' => 'required|string',
             'name' => 'required|string',
-            'picture' => 'string',
+            'picture' => 'sometimes|string',
         ]);
 
         // check if mail exists
@@ -73,11 +73,23 @@ class AuthController extends Controller
                 $role = 3;
             }
 
-            $user = User::create([
-                'email' => $fields['email'],
-                'name' => $fields['name'],
-                'picture' => $fields['picture'],
-                'role_id' => $role,
+            if (!isset($fields['picture'])) {
+                $user = User::create([
+                    'email' => $fields['email'],
+                    'name' => $fields['name'],
+                    'role_id' => $role,
+                ]);
+            } else {
+                $user = User::create([
+                    'email' => $fields['email'],
+                    'name' => $fields['name'],
+                    'picture' => $fields['picture'],
+                    'role_id' => $role,
+                ]);
+            }
+        } elseif ($user->picture == null && isset($fields['picture'])) {
+            $user->update([
+                'picture' => $fields['picture']
             ]);
         }
 
@@ -263,7 +275,7 @@ class AuthController extends Controller
             if ($ban) {
                 Mail::to($user->email)->send(new bannedUserEmail($user, $ban));
             }
-    
+
             return response()->json($user->load('bans'));
         } catch (\Exception $e) {
             // Deshacer la transacción en caso de error

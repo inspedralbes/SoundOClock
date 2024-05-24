@@ -3,10 +3,31 @@
   <Header
     v-if="$route.name !== 'index' && $route.name !== 'admin' && $route.name !== 'auth-callback-google' && $route.name !== 'escollirGrup' && $route.name !== 'a'">
   </Header>
-  <NuxtPage class="grow" />
+  <Loader v-if="loading" class="w-screen h-screen grow" />
+  <NuxtPage v-else class="grow" />
   <!-- </UContainer> -->
   <UNotifications />
 </template>
+
+<script>
+import { useAppStore } from '@/stores/app';
+
+export default {
+  data() {
+    return {
+      store: useAppStore()
+    }
+  },
+
+  computed: {
+    loading() {
+      return this.store.getLoadingLogin();
+    }
+  }
+
+}
+
+</script>
 
 <style>
 body {

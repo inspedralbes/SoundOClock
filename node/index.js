@@ -13,6 +13,7 @@ import {
   SelectedSong,
   ReportUser,
   BellsGroupsTemplate,
+  ThemeModals,
 } from "./models.js";
 import axios from "axios";
 import minimist from "minimist";
@@ -116,6 +117,7 @@ app.get("/sortedVotedSongs", async (req, res) => {
               explicit: "$explicit",
               preview_url: "$preview_url",
               votes: "$votesPerGroupArray.v",
+              submittedBy: "$submittedBy",
             },
           },
         },
@@ -337,6 +339,7 @@ app.post("/storeSelectedSongs", async (req, res) => {
 
     // Save the selected songs to mongo db
     const songs = req.body.songs;
+
     songs.forEach(async (song) => {
       await new SelectedSong({
         id: song.id,
@@ -346,6 +349,7 @@ app.post("/storeSelectedSongs", async (req, res) => {
         img: song.img,
         preview_url: song.preview_url,
         selectedDate: new Date(),
+        userId: song.userId,
       }).save();
     });
 
@@ -466,6 +470,49 @@ app.delete('/bellsGroupsTemplate/:id', async (req, res) => {
   }
 });
 
+app.get('/checkThemeModal/:theme/:userId', async (req, res) => {
+  const theme = req.params.theme;
+  const userId = parseInt(req.params.userId);
+
+  try {
+    const themeModal = await ThemeModals.findOne({ userId: userId });
+    if (!themeModal) {
+      return res.json({ status: 'success', showModal: true });
+    } else {
+      let modalShowed = themeModal.modalsShown.get(theme);
+      if (!modalShowed) {
+        return res.json({ status: 'success', showModal: true });
+      } else {
+        return res.json({ status: 'success', showModal: false });
+      }
+    }
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post('/acceptThemeTerms', async (req, res) => {
+  const theme = req.body.theme;
+  const userId = req.body.userId;
+
+  try {
+    const themeModal = await ThemeModals.findOne({ userId: userId });
+    if (!themeModal) {
+      const newThemeModal = new ThemeModals({
+        userId: userId,
+        modalsShown: new Map([[theme, true]])
+      });
+      await newThemeModal.save();
+    } else {
+      themeModal.modalsShown.set(theme, true);
+      await themeModal.save();
+    }
+    res.json({ status: 'success' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {
@@ -504,6 +551,8 @@ obtenerActualizarTokenSpotify();
 let dirPC = null;
 let amountUsers = 0;
 
+fetchingCron.mailReminder();
+
 // Sockets
 io.on("connection", (socket) => {
   amountUsers++;
@@ -537,6 +586,18 @@ io.on("connection", (socket) => {
       .catch((err) => {
         console.error(err);
       });
+  });
+
+  socket.on("login", async (email, name) => {
+    console.log("login", email, name);
+    try {
+      let user = await comManager.login(name, email);
+      console.log("user", user);
+      console.log("loginData", user.user.id, user.user.email, user.user.name, user.user.picture, user.token, user.user.groups, user.user.role_id, user.user.role_name);
+      socket.emit("loginData", user.user.id, user.user.email, user.user.name, user.user.picture, user.token, user.user.groups, user.user.role_id, user.user.role_name);
+    } catch (err) {
+      console.error(err);
+    }
   });
 
   socket.on("updateProvisionalSelectedSongs", (bellId, songId) => {
@@ -1138,6 +1199,12 @@ io.on("connection", (socket) => {
   socket.on("dirPC", () => {
     dirPC = socket.id;
     socket.broadcast.emit("dirPCStatus", true);
+  });
+
+  socket.on("restartPcReq", () => {
+    if (dirPC) {
+      io.to(dirPC).emit("restartPC");
+    }
   });
 
   socket.on("sendBells", () => {

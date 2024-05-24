@@ -16,27 +16,16 @@
                     <div class="brand-name text-3xl md:text-4xl font-bold">sound<span>o'clock</span></div>
                 </NuxtLink>
                 <!--PROFILE IMG -->
-                <div class="flex justify-center items-center">
-                    <UDropdown class="h-10 w-10" :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
-                        :popper="{ placement: 'bottom-end', arrow: true }">
-                        <div class="h-full w-full rounded-full hover:border-2 hover:border-white">
-                            <img v-if="isPicture" class="h-full w-full rounded-full" :src="store.getUser().picture"
-                                alt="">
-                            <div v-else class="h-full w-full bg-gray-700 rounded-full">
-                                <span
-                                    class="material-symbols-outlined text-5xl w-full h-full rounded-full flex justify-center items-center">
-                                    person
-                                </span>
-                            </div>
+                <div class="flex justify-center rounded-full items-center h-12 w-12">
+                    <div class="h-full w-full rounded-full hover:border-2 hover:border-white relative">
+                        <img class="h-full w-full rounded-full absolute z-50" :src="store.getUser().picture" alt="">
+                        <div class="h-full w-full bg-gray-700 rounded-full absolute z-20">
+                            <span
+                                class="material-symbols-outlined text-4xl w-full h-full rounded-full flex justify-center items-center">
+                                person
+                            </span>
                         </div>
-                        <template #item="{ item }">
-                            <div class="flex justify-center items-center w-full">
-                                <NuxtLink class="text-white" :to="item.route">
-                                    {{ item.text }}
-                                </NuxtLink>
-                            </div>
-                        </template>
-                    </UDropdown>
+                    </div>
                 </div>
             </div>
 
@@ -50,25 +39,27 @@
                 <NuxtLink v-if="user.role_id <= 3" class="leading-[5rem]" to="/admin" @click="isLoading = true">
                     Administració
                 </NuxtLink>
-                <NuxtLink class="leading-[5rem]" to="/llista_final" :class="{'text-blue-300': isRouteActive('llista_final')}">
+                <NuxtLink class="leading-[5rem]" to="/llista_final"
+                    :class="{ 'text-blue-300': isRouteActive('llista_final') }">
                     Llista final
                 </NuxtLink>
-                <NuxtLink class="leading-[5rem]" to="/llista_propostes" :class="{'text-blue-300': isRouteActive('llista_propostes')}">
+                <NuxtLink class="leading-[5rem]" to="/llista_propostes"
+                    :class="{ 'text-blue-300': isRouteActive('llista_propostes') }">
                     Votacions
                 </NuxtLink>
-                <NuxtLink class="leading-[5rem]" to="/ranking" :class="{'text-blue-300': isRouteActive('ranking')}">
+                <NuxtLink class="leading-[5rem]" to="/ranking" :class="{ 'text-blue-300': isRouteActive('ranking') }">
                     Ranking provisional
                 </NuxtLink>
             </div>
             <!-- PROFILE IMG -->
-            <div class="flex justify-center items-center h-14 w-14" v-if="$device.isDesktopOrTablet">
+            <div class="flex justify-center items-center" v-if="$device.isDesktopOrTablet">
                 <UDropdown class="h-full w-full" :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                     :popper="{ placement: 'bottom-end', arrow: true }">
-                    <div class="h-full w-full rounded-full hover:border-2 hover:border-white">
-                        <img v-if="isPicture" class="h-full w-full rounded-full" :src="store.getUser().picture" alt="">
-                        <div v-else class="h-full w-full bg-gray-700 rounded-full">
+                    <div class="h-14 w-14 rounded-full hover:border-2 hover:border-white relative border-2 border-black bg-transparent">
+                        <img class="h-auto w-auto rounded-full absolute z-50" :src="store.getUser().picture" alt="">
+                        <div class="h-full w-full bg-gray-700 rounded-full absolute z-20">
                             <span
-                                class="material-symbols-outlined text-5xl w-full h-full rounded-full flex justify-center items-center">
+                                class="material-symbols-outlined text-5xl w-full h-full bg-transparent rounded-full flex justify-center items-center">
                                 person
                             </span>
                         </div>
@@ -85,7 +76,7 @@
         </div>
     </div>
 
-    <div v-if="isLoading" class="loader absolute w-screen h-screen">
+    <div v-if="isLoading" class="loader">
         <Loader />
     </div>
 
@@ -134,14 +125,6 @@ export default {
                 [{ text: 'Tancar Sessió', route: '/logout' }]
             ]
         },
-        isPicture() {
-            if (this.store.getUser().picture) {
-                return true;
-            } else {
-                return false;
-            }
-
-        }
     }
 }
 </script>
@@ -177,7 +160,7 @@ export default {
 }
 
 .loader {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     height: 100vh;
