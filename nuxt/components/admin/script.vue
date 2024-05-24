@@ -25,10 +25,10 @@
         </div>
         <div class="mt-20 w-2/4 mx-auto flex justify-between">
             <button class="rounded border-2 p-2 bg-green-500 hover:bg-green-700 w-1/4" @click="executeScript()">
-                Colocar cançons
+                Col·locar cançons
             </button>
             <button class="rounded border-2 p-2 bg-green-500 hover:bg-green-700 w-1/4" @click="restartPc()">
-                Reiniciar Maquina
+                Reiniciar màquina
             </button>
             <button class="rounded border-2 p-2 bg-green-500 hover:bg-green-700 w-1/4" @click="downloadSongs()">
                 Descarregar cançons
