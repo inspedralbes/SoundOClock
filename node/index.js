@@ -115,6 +115,7 @@ app.get("/sortedVotedSongs", async (req, res) => {
               explicit: "$explicit",
               preview_url: "$preview_url",
               votes: "$votesPerGroupArray.v",
+              submittedBy: "$submittedBy",
             },
           },
         },
@@ -336,6 +337,7 @@ app.post("/storeSelectedSongs", async (req, res) => {
 
     // Save the selected songs to mongo db
     const songs = req.body.songs;
+
     songs.forEach(async (song) => {
       await new SelectedSong({
         id: song.id,
@@ -345,6 +347,7 @@ app.post("/storeSelectedSongs", async (req, res) => {
         img: song.img,
         preview_url: song.preview_url,
         selectedDate: new Date(),
+        userId: song.userId,
       }).save();
     });
 

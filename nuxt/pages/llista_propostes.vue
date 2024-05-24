@@ -30,8 +30,7 @@
                     </template>
                 </UDropdown>
             </div>
-            <div class="flex items-center gap-2"
-                :class="{ 'w-[57%] ml-12': !$device.isMobile, 'px-3': $device.isMobile }">
+            <div class="flex items-center gap-2" :class="{ 'w-[57%] ml-12': !$device.isMobile, 'px-3': $device.isMobile }">
                 <div class="relative text-center w-full">
                     <input type="text"
                         :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
@@ -68,8 +67,7 @@
                             :ui="{ body: { base: 'flex-1', background: 'bg-stone-800', }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
                             <Placeholder class="h-full" />
                             <div class="flex items-center justify-between bg-stone-800 pb-1">
-                                <h3
-                                    class="text-2xl cursor-default font-semibold leading-6 text-gray-900 dark:text-white">
+                                <h3 class="text-2xl cursor-default font-semibold leading-6 text-gray-900 dark:text-white">
                                     FILTRES
                                 </h3>
                                 <button @click="isFiltersSlideOpen = false"
@@ -192,8 +190,8 @@
                 </h2>
             </Transition>
             <TransitionGroup tag="div" mode="out-in" name="song-slide" :class="{ 'w-[60%]': !$device.isMobile }">
-                <component :is="activeSong" v-for="     track     in     spotifySongs     " :key="track.id"
-                    :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
+                <component :is="activeSong" v-for="     track     in     spotifySongs     " :key="track.id" :track="track"
+                    :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
                     @propose="proposeSongCheck($event)" :type="getType(track.id)" />
             </TransitionGroup>
         </div>
@@ -274,8 +272,7 @@
                         <UButton @click="modals.reportModal = false" variant="outline" class="px-4 py-2 text-sm">
                             Cancel·la
                         </UButton>
-                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive"
-                            disabled>
+                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive" disabled>
                             Reporta
                         </UButton>
                         <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm"
@@ -521,9 +518,9 @@ export default {
         });
         comManager.getSelectedSongs();
 
-        if (this.store.getSettings()) {
-            this.handleSettings();
-        }
+        // if (this.store.getSettings()) {
+        //     this.handleSettings();
+        // }
 
         socket.on('reportError', (data) => {
             this.modals.reportModal = false;
@@ -1112,7 +1109,15 @@ export default {
         //     return this.store.getSettings();
         // },
         isSettingsLoading() {
-            if (this.store.getSettings()) {
+            let settings = this.store.getSettings()
+            if (settings) {
+                comManager.checkThemeModal(settings.theme, this.store.getUser().id)
+                    .then((result) => {
+                        if (result.showModal) {
+                            this.modals.themeTerms = true;
+                        }
+                        // this.isSettingsLoading = false;
+                    })
                 return false;
             } else {
                 return true;
