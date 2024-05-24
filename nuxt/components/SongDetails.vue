@@ -20,7 +20,10 @@ export default {
         'Ban 3 mesos',
         'Ban 1 any'
       ],
-      BanSelected: 'Sense ban',
+      banSelected: {
+        userProposed: 'Sense ban',
+        userVoted: 'Sense ban',
+      }
     }
   },
   mounted() {
@@ -32,44 +35,71 @@ export default {
     },
   },
   methods: {
-    banUsers() {
+    async banUsers() {
 
-      if (this.BanSelected == 'Sense ban') return;
+      if (this.banSelected.userProposed == 'Sense ban' && this.banSelected.userVoted == 'Sense ban') return;
 
-      comManager.getUsersVotes(this.song.id, this.store.getUser().token).then((response) => {
-        let usersVotes = response.users;
 
-        let date
-        switch (this.BanSelected) {
-          case 'Ban 3 setmanes': // 3 weeks
-            date = new Date(Date.now() + 3 * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replace(/-/g, '-');
-            break;
-          case 'Ban 3 mesos': // 3 motnhs
-            date = new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0].replace(/-/g, '-');
-            break;
-          case 'Ban 1 any': // 1 year
-            date = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0].replace(/-/g, '-');
-            break;
-        }
+      let dateBanProposed;
+      switch (this.banSelected.userProposed) {
+        case 'Ban 3 setmanes': // 3 weeks
+          dateBanProposed = new Date(Date.now() + 3 * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+        case 'Ban 3 mesos': // 3 motnhs
+          dateBanProposed = new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+        case 'Ban 1 any': // 1 year
+          dateBanProposed = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+      }
 
-        // Ban user who proposed the song
-        comManager.getUser(this.song.user.id, this.store.getUser().token).then((response) => {
-          let user = response;
-          user.vote_banned_until = date;
+      let dateBanVoted;
+      switch (this.banSelected.userVoted) {
+        case 'Ban 3 setmanes': // 3 weeks
+          dateBanVoted = new Date(Date.now() + 3 * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+        case 'Ban 3 mesos': // 3 motnhs
+          dateBanVoted = new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+        case 'Ban 1 any': // 1 year
+          dateBanVoted = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+      }
+
+      let usersVotes;
+      await comManager.getUsersVotes(this.song.id, this.store.getUser().token).then((response) => {
+        usersVotes = response.users;
+      });
+
+      //find user who prosed song
+      let userPropose;
+      await comManager.getUser(this.song.user.id, this.store.getUser().token).then((response) => {
+        userPropose = response;
+      });
+
+      // Ban user who proposed the song
+      if (this.banSelected.userProposed != 'Sense ban') {
+        userPropose.propose_banned_until = dateBanProposed;
+        console.log('userProposeBan: ', userPropose);
+        socket.emit('banUser', this.store.getUser().token, userPropose);
+      }
+
+      // Ban users who voted the song
+      if (this.banSelected.userVoted != 'Sense ban') {
+        usersVotes.forEach((user) => {
+          if (user.id == userPropose.id) {
+            user = userPropose;
+          }
+          user.vote_banned_until = dateBanVoted;
+          console.log('voteBan: ', user);
           socket.emit('banUser', this.store.getUser().token, user);
         });
+      }
 
-        // Ban users who voted the song
-        usersVotes.forEach((user) => {
-          if (user.id != this.song.user.id) {
-            user.vote_banned_until = date;
-            socket.emit('banUser', this.store.getUser().token, user);
-          }
-        });
-      });
     },
     eraseSong() {
-      this.BanSelected = 'Sense ban';
+      this.banSelected.userProposed = 'Sense ban';
+      this.banSelected.userVoted = 'Sense ban';
       this.modals.eraseSong = true;
     },
     submitEraseSongData() {
@@ -78,7 +108,8 @@ export default {
       socket.emit('deleteSong', this.store.getUser().token, this.song.id, false);
     },
     banSong() {
-      this.BanSelected = 'Sense ban';
+      this.banSelected.userProposed = 'Sense ban';
+      this.banSelected.userVoted = 'Sense ban';
       this.modals.addSongToBlacklist = true;
     },
     submitBanSongData() {
@@ -205,12 +236,16 @@ export default {
         </template>
         <template #description>
           <div class="ml-auto mr-auto pt-1 pb-2">
-            <p class="pb-1">Banejar usuaris que han proposat/votat la canço</p>
-            <USelect v-model="BanSelected" :options="BanOptions" />
+            <p class="pb-1">Banejar usuari que ha proposat la canço</p>
+            <USelect v-model="this.banSelected.userProposed" :options="BanOptions" />
+          </div>
+          <div class="ml-auto mr-auto pt-1 pb-2">
+            <p class="pb-1">Banejar usuaris que han votat la canço</p>
+            <USelect v-model="this.banSelected.userVoted" :options="BanOptions" />
           </div>
           <div class="mt-2 flex justify-between gap-2">
-            <UButton size="md" color="primary" @click="submitBanSongData">Continuar</UButton>
             <UButton size="md" color="red" @click="modals.addSongToBlacklist = false">Enrere</UButton>
+            <UButton size="md" color="primary" @click="submitBanSongData">Continuar</UButton>
           </div>
         </template>
       </UAlert>
@@ -228,12 +263,16 @@ export default {
         </template>
         <template #description>
           <div class="ml-auto mr-auto pt-1 pb-2">
-            <p class="pb-1">Banejar usuaris que han proposat/votat la canço</p>
-            <USelect v-model="BanSelected" :options="BanOptions" />
+            <p class="pb-1">Banejar usuari que ha proposat la canço</p>
+            <USelect v-model="this.banSelected.userProposed" :options="BanOptions" />
+          </div>
+          <div class="ml-auto mr-auto pt-1 pb-2">
+            <p class="pb-1">Banejar usuaris que han votat la canço</p>
+            <USelect v-model="this.banSelected.userVoted" :options="BanOptions" />
           </div>
           <div class="mt-2 flex justify-between gap-2">
-            <UButton size="md" color="primary" @click="submitEraseSongData">Continuar</UButton>
             <UButton size="md" color="red" @click="modals.eraseSong = false">Enrere</UButton>
+            <UButton size="md" color="primary" @click="submitEraseSongData">Continuar</UButton>
           </div>
         </template>
       </UAlert>
