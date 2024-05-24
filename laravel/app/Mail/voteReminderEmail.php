@@ -33,7 +33,7 @@ class voteReminderEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Queden 24 hores per votar!',
+            subject: 'Queden 48 hores per votar!',
         );
     }
 

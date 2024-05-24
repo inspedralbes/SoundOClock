@@ -184,7 +184,7 @@ export default {
                 this.groupedSongs = result;
             }
             // Check if bells is loaded and set the mostVotedSongs
-            if (this.bells.length > 0 && this.groupedSongs && this.groupedSongs.length > 0) {
+            if (this.bells.length > 0 && this.groupedSongs) {
                 this.loading = false;
                 this.getMostVotedSongs(this.bells);
             }
@@ -224,7 +224,7 @@ export default {
                     if (groupedData[song.id]) {
                         groupedData[song.id].votes += song.votes;
                     } else {
-                        groupedData[song.id] = { id: song.id, votes: song.votes, explicit: song.explicit, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url, link: song.link };
+                        groupedData[song.id] = { id: song.id, votes: song.votes, explicit: song.explicit, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url, link: song.link, submittedBy: song.submittedBy };
                     }
                 });
                 const resultArray = Object.values(groupedData);
@@ -287,7 +287,7 @@ export default {
                         break;
                     }
                 }
-                songs.push({ bellId: key, id: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url, link: song.link });
+                songs.push({ bellId: key, id: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url, link: song.link, userId: song.submittedBy });
             }
 
             comManager.storeSelectedSongs(token, songs).then(() => {
