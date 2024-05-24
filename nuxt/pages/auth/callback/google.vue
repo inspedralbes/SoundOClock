@@ -1,7 +1,6 @@
 <template>
     <div class="w-screen h-screen">
-        <!-- <Loader /> -->
-        Callback de google
+        <Loader />
     </div>
 
 </template>
@@ -24,16 +23,13 @@ export default {
     },
     created() {
         const store = useAppStore();
-        console.log('Google callback')
         this.getURIparams();
         store.deleteUser();
     },
     mounted() {
-        console.log('Google callback mounted')
     },
     methods: {
         getURIparams() {
-            console.log('getURIparams')
             if (process.client) {
                 const url = new URL(window.location.href);
                 this.code = url.searchParams.get('code');
@@ -48,12 +44,6 @@ export default {
             }
         },
         async fetchGoogle() {
-            console.log('fetchGoogle')
-            console.log('Code:', this.code);
-            console.log('State:', this.state);
-            console.log('Scope:', this.scope);
-            console.log('hd:', this.hd);
-            console.log('prompt:', this.prompt);
             let googleData = {};
             const authOptions = {
                 url: 'https://oauth2.googleapis.com/token',
@@ -75,8 +65,6 @@ export default {
                     headers: authOptions.headers
                 });
                 googleData = responseToken.data;
-                console.log('GoogleData:', googleData);
-                console.log('Google token:', googleData.access_token);
                 socket.emit('googleLogin', googleData.access_token);
             } catch (e) {
                 console.error('Error during Google authentication:', e);
