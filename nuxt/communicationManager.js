@@ -232,9 +232,107 @@ async function getUserGroups() {
 }
 
 async function getSelectedSongs() {
+  const store = useAppStore();
   const response = await fetch(`${url}/getSelectedSongs`);
   const data = await response.json();
+  store.setFinalSongsList(data);
+}
+
+async function storeBellsGroupsTemplate(template) {
+  const response = await fetch(`${url}/bellsGroupsTemplate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      template,
+    }),
+  });
+  const data = await response.json();
   return data;
+}
+
+async function getBellsGroupsTemplate() {
+  const response = await fetch(`${url}/bellsGroupsTemplate`);
+  const data = await response.json();
+  return data;
+}
+
+async function deleteBellsGroupsTemplate(id) {
+  const response = await fetch(`${url}/bellsGroupsTemplate/${id}`, {
+    method: "DELETE",
+  });
+  const data = await response.json();
+  return data;
+}
+
+async function checkThemeModal(theme, userId) {
+  const response = await fetch(`${url}/checkThemeModal/${theme}/${userId}`);
+  const data = await response.json();
+  return data;
+}
+
+async function acceptThemeTerms(theme, userId) {
+  const response = await fetch(`${url}/acceptThemeTerms`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      theme,
+      userId,
+    }),
+  });
+  const data = await response.json();
+  return data;
+}
+
+async function getUsersVotes(songId, token) {
+  const response = await fetch(`${url}/usersVotes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      songId,
+      token,
+    }),
+  });
+  const data = await response.json();
+  return data;
+}
+
+async function getUser(userId) {
+  const store = useAppStore();
+  const response = await fetch(`${url}/user/${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${store.getUser().token}`,
+    },
+  });
+  const data = await response.json();
+  return data;
+}
+
+async function downloadSongs() {
+  await fetch(`${url}/selectedSongs`)
+    .then(response => response.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'canciones.zip';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch((error) => console.error(error));
 }
 
 const comManager = {
@@ -256,6 +354,14 @@ const comManager = {
   getUserGroups,
   getUserReportedSongs,
   getSelectedSongs,
+  storeBellsGroupsTemplate,
+  getBellsGroupsTemplate,
+  deleteBellsGroupsTemplate,
+  checkThemeModal,
+  acceptThemeTerms,
+  getUsersVotes,
+  getUser,
+  downloadSongs,
 };
 
 export default comManager;

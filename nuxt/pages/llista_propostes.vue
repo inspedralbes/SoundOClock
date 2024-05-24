@@ -1,180 +1,222 @@
 <template>
-    <div v-if="checkVotingState === 'vote'">
-        <!-- Reproductor -->
+    <div v-if="isSettingsLoading || loginLoading" class="w-screen h-screen">
+        <Loader />
+    </div>
+    <div v-else>
+        <img src="/img/fondo.png" alt="background" class="fixed inset-0 z-[-1] object-cover h-screen w-screen" />
         <component :is="activePlayer" :type="getType(currentTrackId)" @pause="playTrack($event)" @vote="vote($event.id)"
-            @report="report($event)" @propose="proposeSong($event)" />
+            @report="report($event)" @propose="proposeSongCheck($event)" />
+        <Vinyl class="fixed top-0 right-0 h-screen flex justify-center items-center overflow-hidden translate-x-[40%]"
+            v-if="!$device.isMobile" />
 
+        <div v-if="checkVotingState === 'vote'" class="mb-4" :class="{ '!mb-36': isPlaying }">
+            <div v-if="settings.theme" class="flex justify-center content-center my-8">
+                <h1 class="text-4xl smallCaps w-fit text-center z-50">
+                    {{ 'La temàtica és: ' + settings.theme }}
+                </h1>
 
-        <!-- Barra de busqueda -->
-        <h1 v-if="settings.theme" class="mx-auto text-4xl py-8 smallCaps w-full text-center">{{ 'La temàtica és: ' +
-            settings.theme }}</h1>
-        <div class="w-full flex justify-center items-center px-2 gap-2">
-            <div class="relative w-[60%] text-center" :class="{ 'w-[90%]': $device.isMobile }">
-                <input type="text"
-                    :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
-                    class="w-full h-[38px] py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
-                    :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
-                    @keydown.enter.prevent="acceptInput">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
-                    :class="{ 'text-base': $device.isMobile }">
-                    search
-                </span>
-                <Transition name="delete-fade">
-                    <button v-if="filter" @click="deleteSearch"
-                        class="absolute h-full inset-y-0 right-0 flex items-center justify-center mr-3">
-                        <span class="material-symbols-rounded p-1 hover:bg-gray-400/[.25] rounded-full"
-                            :class="{ 'text-base': $device.isMobile }">
-                            Close
+                <UDropdown v-if="settings.themeDesc" class="h-fit w-fit self-end right-0 top-1/2 modifyChildWidth"
+                    :items="themeDesc" :ui="{ item: { disabled: 'cursor-text select-text' } }" :mode="dropdownMode"
+                    :popper="{ placement: 'bottom-end', arrow: false }">
+                    <span class="material-symbols-rounded">
+                        arrow_drop_down
+                    </span>
+                    <template #item="{ item }">
+                        <div class="flex justify-center items-center z-50">
+                            <h2>
+                                {{ item.text }}
+                            </h2>
+                        </div>
+                    </template>
+                </UDropdown>
+            </div>
+            <div class="flex items-center gap-2" :class="{ 'w-[57%] ml-12': !$device.isMobile, 'px-3': $device.isMobile }">
+                <div class="relative text-center w-full">
+                    <input type="text"
+                        :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
+                        class="w-full h-10 py-2 pl-10 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 bg-[#1F1F1F]"
+                        :class="{ '!py-2 !text-sm': $device.isMobile }" v-model="filter" @input="handleInput"
+                        @keydown.enter.prevent="acceptInput">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 material-symbols-rounded"
+                        :class="{ 'text-base': $device.isMobile }">
+                        search
+                    </span>
+                    <Transition name="delete-fade">
+                        <button v-if="filter" @click="deleteSearch"
+                            class="absolute h-full inset-y-0 right-0 flex items-center justify-center mr-3">
+                            <span class="material-symbols-rounded p-1 hover:bg-gray-400/[.25] rounded-full"
+                                :class="{ 'text-base': $device.isMobile }">
+                                Close
+                            </span>
+                        </button>
+                    </Transition>
+                </div>
+                <div class="dropdown relative z-10">
+                    <button
+                        class="px-2 h-10 w-fit bg-[#1F1F1F] flex items-center justify-center rounded-lg border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        id="buttonFilters" @click="isFiltersSlideOpen = !isFiltersSlideOpen"
+                        :class="{ 'w-[150px]': !$device.isMobile }">
+                        <span class="material-symbols-outlined text-white">
+                            tune
                         </span>
                     </button>
-                </Transition>
-            </div>
-            <div class="dropdown relative z-50">
-
-                <button
-                    class="px-2 h-[38px] appearance-none flex items-center justify-center rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    id="buttonFilters" @click="isFiltersSlideOpen = !isFiltersSlideOpen"
-                    :class="{ 'w-[150px]': !$device.isMobile }">
-                    <span class="material-symbols-outlined text-white">
-                        tune
-                    </span>
-                </button>
 
 
-                <USlideover v-model="isFiltersSlideOpen" class="z-[9999]">
-                    <UCard class="flex flex-col flex-1"
-                        :ui="{ body: { base: 'flex-1', background: 'bg-stone-800', }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-                        <Placeholder class="h-full" />
-                        <div class="flex items-center justify-between bg-stone-800 pb-1">
-                            <h3 class="text-2xl cursor-default font-semibold leading-6 text-gray-900 dark:text-white">
-                                FILTRES
-                            </h3>
-                            <button @click="isFiltersSlideOpen = false"
-                                class="h-8 w-8 flex items-center justify-center hover:bg-stone-600 rounded-full p-2">
-                                <span class="i-heroicons-x-mark-20-solid flex-shrink-0 h-5 w-5"
-                                    aria-hidden="true"></span>
-                            </button>
-                        </div>
-                        <hr>
-                        <div class="pt-3 pb-3">
-                            <div class="flex items-center justify-between">
-                                <h1 class="text-xl cursor-default pb-2">
-                                    Hores
-                                </h1>
-                                <button @click="cleanFilters()" class="hover:font-semibold hover:text-blue-500"
-                                    :class="{ 'text-blue-500': filterBell == null }">
-                                    Totes
+                    <USlideover v-model="isFiltersSlideOpen" class="z-[9999]">
+                        <UCard class="flex flex-col flex-1"
+                            :ui="{ body: { base: 'flex-1', background: 'bg-stone-800', }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                            <Placeholder class="h-full" />
+                            <div class="flex items-center justify-between bg-stone-800 pb-1">
+                                <h3 class="text-2xl cursor-default font-semibold leading-6 text-gray-900 dark:text-white">
+                                    FILTRES
+                                </h3>
+                                <button @click="isFiltersSlideOpen = false"
+                                    class="h-8 w-8 flex items-center justify-center hover:bg-stone-600 rounded-full p-2">
+                                    <span class="i-heroicons-x-mark-20-solid flex-shrink-0 h-5 w-5"
+                                        aria-hidden="true"></span>
                                 </button>
                             </div>
-                            <div v-if="bells" class="grid grid-cols-4 gap-x-2 gap-y-4">
-                                <div v-for="(bell, index) in bells" class="w-full flex items-center justify-center">
-                                    <button @click="selectBell(bell.id)" :title="formatTime(bell.hour)"
-                                        :class="filterBell === bell.id ? 'border-blue-600 text-blue-500' : ''"
-                                        class="appearance-none p-2 w-full rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
-                                        {{ formatTime(bell.hour) }}
+                            <hr>
+                            <div class="pt-3 pb-3">
+                                <div class="flex items-center justify-between">
+                                    <h1 class="text-xl cursor-default pb-2">
+                                        Hores
+                                    </h1>
+                                    <button @click="cleanFilters()" class="hover:font-semibold hover:text-blue-500"
+                                        :class="{ 'text-blue-500': filterBell == null }">
+                                        Totes
                                     </button>
                                 </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div v-if="classGroups.length > 0" class="pt-4">
-                            <div class="flex items-center justify-between pb-2">
-                                <h1 class="text-xl cursor-default">
-                                    Grups
-                                </h1>
-                                <button @click="selectGroup(null)" class="hover:font-semibold hover:text-blue-500"
-                                    :class="{ 'text-blue-500': filterGroup == null }">
-                                    Tots
-                                </button>
-                            </div>
-                            <div v-if="groupsAvailable.length > 0">
-                                <div v-if="filteredSongs.length > 0" class="grid grid-cols-4 gap-x-2 gap-y-4">
-                                    <div v-for="(group, index) in groupsAvailable"
+                                <div v-if="bells" class="grid grid-cols-4 gap-x-2 gap-y-4">
+                                    <div v-for="(    bell, index    ) in     bells    "
                                         class="w-full flex items-center justify-center">
-                                        <button v-if="hasPropose(group.id)" @click="selectGroup(group.id)"
-                                            :title="hasPropose(group.id) ? `Fes clic per veure les cançons proposades d'aquest grup` : `No hi ha cap cançó proposada en aquest grup`"
-                                            :class="filterGroup === group.id ? 'border-blue-600 text-blue-500' : ''"
+                                        <button @click="selectBell(bell.id)" :title="formatTime(bell.hour)"
+                                            :class="filterBell === bell.id ? 'border-blue-600 text-blue-500' : ''"
                                             class="appearance-none p-2 w-full rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
-                                            {{ group.abbreviation }}
+                                            {{ formatTime(bell.hour) }}
                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div v-if="classGroups.length > 0" class="pt-4">
+                                <div class="flex items-center justify-between pb-2">
+                                    <h1 class="text-xl cursor-default">
+                                        Grups
+                                    </h1>
+                                    <button @click="selectGroup(null)" class="hover:font-semibold hover:text-blue-500"
+                                        :class="{ 'text-blue-500': filterGroup == null }">
+                                        Tots
+                                    </button>
+                                </div>
+                                <div v-if="groupsAvailable.length > 0">
+                                    <div v-if="filteredSongs.length > 0" class="grid grid-cols-4 gap-x-2 gap-y-4">
+                                        <div v-for="(    group, index    ) in     groupsAvailable    "
+                                            class="w-full flex items-center justify-center">
+                                            <button @click="selectGroup(group.id)"
+                                                :title="hasPropose(group.id) ? `Fes clic per veure les cançons proposades d'aquest grup` : `No hi ha cap cançó proposada en aquest grup`"
+                                                :class="filterGroup === group.id ? 'border-blue-600 text-blue-500' : ''"
+                                                class="appearance-none p-2 w-full rounded-full border border-gray-300 focus:outline-none hover:border-blue-500 text-center disabled:opacity-50 disabled:cursor-not-allowed">
+                                                {{ group.abbreviation }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div v-else>
+                                        <div
+                                            class="cursor-default appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                                            Ningun grup a proposat ni votat en aquesta franja horària
+                                        </div>
                                     </div>
                                 </div>
                                 <div v-else>
                                     <div
                                         class="cursor-default appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed">
-                                        Ningun grup a proposat ni votat en aquesta franja horària
+                                        No hi ha cap grup en aquesta franja horària
                                     </div>
                                 </div>
                             </div>
                             <div v-else>
-                                <div
-                                    class="cursor-default appearance-none pl-4 pr-4 p-2 text-center text-xl disabled:opacity-50 disabled:cursor-not-allowed">
-                                    No hi ha cap grup en aquesta franja horària
-                                </div>
+                                loading...
                             </div>
-                        </div>
-                        <div v-else>
-                            loading...
-                        </div>
 
-                    </UCard>
-                </USlideover>
+                        </UCard>
+                    </USlideover>
 
+                </div>
+            </div>
+
+
+            <h2 class="my-4 text-3xl font-bold"
+                :class="{ 'm-2 ml-12 mt-4': !$device.isMobile, 'text-center': $device.isMobile }">
+                Cançons proposades</h2>
+            <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
+            <div v-if="songs.length === 0" class="mt-4 w-full">
+                <p class="text-xl" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Encara no
+                    s'ha
+                    proposat
+                    cap cançó.</p>
+                <p class="mx-4" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Anima't a
+                    compartir
+                    la teva
+                    proposta fent <br v-if="$device.isMobile">
+                    cercant a
+                    la barra de búsqueda.</p>
+            </div>
+
+            <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4 w-full">
+                <p class="text-xl" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">No hi ha
+                    cap
+                    cançó
+                    proposada amb aquesta cerca.</p>
+                <p class="mx-4" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Comparteix la
+                    teva
+                    proposta
+                    buscant ara mateix!</p>
+            </div>
+
+            <!-- CANCIONES PROPUESTAS -->
+            <TransitionGroup name="song-slide" mode="out-in">
+                <div v-for="    track     in     filteredSongs    " :key="track.id"
+                    :class="{ 'w-[60%] mb-4': !$device.isMobile }">
+                    <component :is="activeSong" :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying"
+                        @play="playTrack" @vote="vote($event)" @report="report($event)" :type="getType(track.id)" />
+                </div>
+            </TransitionGroup>
+
+            <!-- CANCIONES PARA PROPONER -->
+            <Transition name="song-slide">
+                <h2 v-if="spotifySongs.length > 0" class="text-3xl font-bold mt-10"
+                    :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Resultats de la cerca
+                </h2>
+            </Transition>
+            <TransitionGroup tag="div" mode="out-in" name="song-slide" :class="{ 'w-[60%]': !$device.isMobile }">
+                <component :is="activeSong" v-for="     track     in     spotifySongs     " :key="track.id" :track="track"
+                    :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
+                    @propose="proposeSongCheck($event)" :type="getType(track.id)" />
+            </TransitionGroup>
+        </div>
+        <div v-if="checkVotingState === 'mod'">
+            <div>
+                <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}"
+                    finalitzada
+                </h2>
+                <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
             </div>
         </div>
-
-
-        <!-- Listado canciones propuestas -->
-        <h2 class="text-center text-3xl font-bold mt-4">Cançons proposades</h2>
-        <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
-        <div v-if="songs.length === 0" class="mt-4 w-full">
-            <p class="text-center text-xl">Encara no s'ha proposat cap cançó.</p>
-            <p class="text-center mx-4">Anima't a compartir la teva proposta fent <br v-if="$device.isMobile">
-                cercant a
-                la barra de búsqueda.</p>
-        </div>
-
-        <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4  w-full">
-            <p class="text-center text-xl">No hi ha cap cançó proposada amb aquesta cerca.</p>
-            <p class="text-center mx-4">Comparteix la teva proposta buscant ara mateix!</p>
-        </div>
-        <!-- <div class="w-full" v-if="filteredSongs.length > 0"> -->
-        <TransitionGroup name="song-slide" mode="out-in">
-            <component :is="activeSong" v-for=" track in filteredSongs " :key="track.id" :track="track"
-                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @vote="vote($event)"
-                @report="report($event)" :type="getType(track.id)" />
-        </TransitionGroup>
-    </div>
-    <div v-if="checkVotingState === 'mod'">
-        <div>
-            <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}" finalitzada
-            </h2>
-            <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
+        <div v-if="checkVotingState === 'none'" class="m-3">
+            <div>
+                <h2 class="text-center text-3xl font-bold mt-4">Cançons "{{ settings.theme }}"</h2>
+                <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
+            </div>
+            <div>
+                <div v-for="    track     in     finalSongsList    " :key="track.id"
+                    :class="{ 'w-[60%] mb-4': !$device.isMobile }">
+                    <component :is="activeSong" :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying"
+                        @play="playTrack" :type="'selected'" :bellId="track.bellId" />
+                </div>
+            </div>
         </div>
     </div>
-    <div v-if="checkVotingState === 'none'" class="m-3">
-        <div>
-            <h2 class="text-center text-3xl font-bold mt-4">Cançons "{{ settings.theme }}"</h2>
-            <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
-        </div>
-        <div>
-            <Song :is="activeSong" v-for=" track in selectedSongs " :key="track.id" :track="track"
-                :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" :type="'selected'"
-                :bellId="track.bellId" />
-        </div>
-    </div>
-    <!-- </TransitionGroup> -->
-
-
-    <!-- Listado de canciones de Spotify -->
-    <Transition name="song-slide">
-        <h2 v-if="spotifySongs.length > 0" class="text-center text-3xl font-bold mt-10">Resultats de la cerca</h2>
-    </Transition>
-    <TransitionGroup tag="div" class="mb-20" name="song-slide">
-        <component :is="activeSong" v-for=" track in spotifySongs " :key="track.id" :track="track"
-            :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack" @propose="proposeSong($event)"
-            :type="getType(track.id)" />
-    </TransitionGroup>
 
 
     <!-- Modales -->
@@ -215,7 +257,7 @@
 
             <p>Per quin motiu vols reportar la cançó <b>'{{ reportSongData.reportedSong.name }}'</b>?</p>
             <div class="flex flex-col mt-4">
-                <div v-for="option in reportSongData.options " class="flex flex-row mb-2">
+                <div v-for="    option     in     reportSongData.options     " class="flex flex-row mb-2">
                     <UCheckbox v-model="option.value">
                         <template #label>
                             <span>{{ option.label }}</span>
@@ -230,8 +272,7 @@
                         <UButton @click="modals.reportModal = false" variant="outline" class="px-4 py-2 text-sm">
                             Cancel·la
                         </UButton>
-                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive"
-                            disabled>
+                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive" disabled>
                             Reporta
                         </UButton>
                         <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm"
@@ -266,6 +307,108 @@
             {{ postedSongStatus.message }}
         </UCard>
     </UModal>
+
+    <UModal v-model="modals.blockEsplicit" class="z-[9999]">
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center justify-between">
+                    <div class="flex flex-row items-center">
+                        <span @click="modals.blockEsplicit = false"
+                            class="material-symbols-rounded text-[2rem] text-red-500 mr-4">
+                            error
+                        </span>
+                        <h2 class="text-xl font-bold">
+                            No es pot proposar aquesta cançó
+                        </h2>
+                    </div>
+                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                        @click="modals.blockEsplicit = false" />
+                </div>
+            </template>
+            <p>
+                Des de moderació, s'ha decidit que no es pot proposar aquesta cançó perquè Spotify la té marcada com a
+                explícita.
+            </p>
+        </UCard>
+    </UModal>
+
+    <UModal v-model="modals.alertEsplicit" class="z-[9999]">
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center justify-between">
+                    <div class="flex flex-row items-center">
+                        <span @click="modals.alertEsplicit = false, proposeAlertHandler(false)"
+                            class="material-symbols-rounded text-[2rem] text-yellow-500 mr-4">
+                            warning
+                        </span>
+                        <h2 class="text-xl font-bold">
+                            Aquesta cançó conté contingut explícit!
+                        </h2>
+                    </div>
+                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                        @click="modals.alertEsplicit = false, proposeAlertHandler(false)" />
+                </div>
+            </template>
+            <p>
+                Aquesta cançó està marcada per Spotify com a explícita. Si et sembla adequada per sonar en un centre
+                educatiu, pots proposar-la. Tot i així, si moderació la considera inadequada, serà eliminada. Proposar
+                una cançó explícita inadequada pot comportar una sanció contundent.
+            </p>
+            <div class="flex justify-between">
+                <UButton @click="modals.alertEsplicit = false, proposeAlertHandler(false)" class="mt-4" color="green">
+                    Cancel·la
+                </UButton>
+                <UButton @click="modals.alertEsplicit = false, proposeAlertHandler(true)" color="red" class="mt-4">
+                    Proposa igualment
+                </UButton>
+            </div>
+        </UCard>
+    </UModal>
+
+    <UModal v-model="modals.themeTerms" class="z-[9999]" prevent-close>
+        <UCard>
+            <template #header>
+                <div class="flex flex-row items-center justify-between">
+                    <div class="flex flex-row items-center">
+                        <span class="material-symbols-rounded text-[2rem] text-blue-400 mr-4">
+                            info
+                        </span>
+                        <h2 class="text-xl font-bold">
+                            Nova temàtica!
+                        </h2>
+                    </div>
+                </div>
+            </template>
+
+            <div>
+                <p class="text-center mb-2">
+                    La nova temàtica d'aquesta setmana és <b>"{{ settings.theme }}"</b>.
+                </p>
+                <p>
+                    Accepta les següents condicions:
+                <ol class="list-disc">
+                    <li class="ml-5">Les cançons proposades han de ser adequades per a tots els públics.</li>
+                    <li class="ml-5">Les cançons proposades han de ser adequades per a la temàtica actual</li>
+                    <li class="ml-5">Qualsevol comportament que vagi en contra de les regles de la aplicació i de
+                        l'Institut
+                        Pedralbes pot comportar una <b>sanció</b></li>
+                </ol>
+                </p>
+            </div>
+
+            <template #footer>
+                <div class="w-full flex justify-center">
+                    <UButton @click="handleAcceptTerms()" v-if="!isTermsLoading" color="green"
+                        class="w-3/4 flex justify-center">
+                        Acceptar condicions
+                    </UButton>
+                    <UButton loading v-if="isTermsLoading" color="green" class="w-3/4 flex justify-center">
+                        Acceptar condicions
+                    </UButton>
+                </div>
+            </template>
+        </UCard>
+    </UModal>
 </template>
 
 <script>
@@ -282,6 +425,9 @@ export default {
                 alreadyVotedModal: false,
                 reportModal: false,
                 proposeSongError: false,
+                blockEsplicit: false,
+                alertEsplicit: false,
+                themeTerms: false,
             },
             songs: computed(() => this.store.proposedSongs),
             spotifySongs: [],
@@ -319,12 +465,23 @@ export default {
             serverResponse: null,
             toast: null,
             isReportLoading: false,
-            selectedSongs: [],
+            // isSettingsLoading: true,
+            proposeAlertHandlerTrack: null,
+            isTermsLoading: false,
         }
     },
     created() {
         socket.on('searchResult', (results) => {
-            this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
+            console.log("results", results, "length", results.length);
+            let handleSplicit = [];
+            if (this.settings.showExplicit) {
+                handleSplicit = results.filter(song => !song.explicit);
+                console.log("hadleSplicit", handleSplicit, "length", handleSplicit.length);
+                this.spotifySongs = handleSplicit.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
+            } else {
+                this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
+            }
+            console.log("spotifySongs", this.spotifySongs, "length", this.spotifySongs.length);
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -347,8 +504,6 @@ export default {
             }
         });
 
-        socket.emit('getSettings', this.store.getUser().token);
-
     },
     mounted() {
         this.store.pauseTrack();
@@ -357,13 +512,15 @@ export default {
         comManager.getUserSelectedSongs(this.store.getUser().id);
         comManager.getUserReportedSongs(this.store.getUser().id);
         comManager.getSortedVotedSongs();
-        comManager.getPublicGroupsAndCategories().then((data) => {
-            this.store.setClassGroups(data.publicGroups);
-            this.store.setCategories(data.publicCategories);
+        comManager.getAllGroupsAndCategories().then((data) => {
+            this.store.setClassGroups(data.allGroups);
+            this.store.setCategories(data.allCategories);
         });
-        comManager.getSelectedSongs().then((data) => {
-            this.selectedSongs = data;
-        });
+        comManager.getSelectedSongs();
+
+        // if (this.store.getSettings()) {
+        //     this.handleSettings();
+        // }
 
         socket.on('reportError', (data) => {
             this.modals.reportModal = false;
@@ -425,6 +582,28 @@ export default {
             if (this.bells.length > 0 && this.groupedSongs.length > 0) {
                 this.mostVotedSongsPerBell = this.getMostVotedSongs(this.bells);
             }
+        },
+        // handleSettings() {
+        //     let settings = this.store.getSettings();
+        //     if (settings && this.isSettingsLoading) {
+        //         comManager.checkThemeModal(settings.theme, this.store.getUser().id)
+        //             .then((result) => {
+        //                 if (result.showModal) {
+        //                     this.modals.themeTerms = true;
+        //                 }
+        //                 this.isSettingsLoading = false;
+        //             })
+        //     }
+        // },
+        handleAcceptTerms() {
+            let settings = this.store.getSettings();
+
+            this.isTermsLoading = true;
+            comManager.acceptThemeTerms(settings.theme, this.store.getUser().id)
+                .then(() => {
+                    this.isTermsLoading = false;
+                    this.modals.themeTerms = false;
+                })
         },
         fillMissingGroups(array) {
             let result = []
@@ -567,18 +746,24 @@ export default {
                 if (this.isPlaying) {
                     this.currentTrack.pause();
                     this.isPlaying = false;
+                    this.store.player.isPlaying = false;
+                    cancelAnimationFrame(this.store.player.animationFrameId);
                     store.deleteCurrentTrackPlaying();
                 } else {
                     this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    this.store.player.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
+                    this.updateProgress();
                 }
             } else {
                 if (track.preview_url != null) {
                     if (this.isPlaying) {
                         this.currentTrack.pause();
                         this.isPlaying = false;
+                        this.store.player.isPlaying = false;
+                        cancelAnimationFrame(this.store.player.animationFrameId);
                         store.deleteCurrentTrackPlaying();
                     }
                     this.currentTrack = new Audio(track.preview_url);
@@ -586,13 +771,75 @@ export default {
                     this.currentTrack.load();
                     this.currentTrack.play();
                     this.isPlaying = true;
+                    this.store.player.isPlaying = true;
                     store.setCurrentTrackPlaying(track);
+                    this.updateProgress();
                 } else {
                     socket.emit('getHtmlSpotify', track.id);
                     this.isWaitingToPlay = true;
                 }
             }
         },
+        updateProgress() {
+            if (this.currentTrack) {
+                const update = () => {
+                    if (this.isPlaying) {
+                        const currentTime = this.currentTrack.currentTime;
+                        const duration = this.currentTrack.duration;
+                        this.store.player.progressBar = (currentTime / duration) * 100;
+                        this.store.player.currentTime = this.formatSeconds(currentTime);
+                        this.store.player.duration = this.formatSeconds(duration);
+                        this.store.player.animationFrameId = requestAnimationFrame(update);
+                    }
+                }
+                this.currentTrack.addEventListener('play', update);
+                this.currentTrack.addEventListener('pause', () => {
+                    this.store.player.progressBar = 0; // Reset progress if needed
+                    this.store.player.currentTime = this.formatSeconds(0);
+                    this.store.player.duration = this.formatSeconds(this.currentTrack.duration);
+                });
+
+                this.currentTrack.addEventListener('ended', () => {
+                    this.store.player.progressBar = 0; // Reset progress if needed
+                    this.store.player.currentTime = this.formatSeconds(0);
+                    this.store.player.duration = this.formatSeconds(this.currentTrack.duration);
+                });
+                update(); // Start the update loop
+            }
+        },
+
+        proposeAlertHandler(response) {
+            if (response) {
+                this.proposeSong(this.proposeAlertHandlerTrack);
+            }
+            this.proposeAlertHandlerTrack = null;
+        },
+
+        isTrackEsplicit(track) {
+            console.log("check explicit", track.explicit);
+            if (track.explicit) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        proposeSongCheck(track) {
+            console.log("proposeSongCheck", track);
+            let isEsplicit = this.isTrackEsplicit(track);
+            console.log("isEsplicit", isEsplicit);
+            if (this.settings.letProposeExplicit && isEsplicit) {
+                console.log("blockEsplicit", this.settings.blockEsplicit);
+                this.modals.blockEsplicit = true;
+            } else if (this.settings.alertExplicit && isEsplicit) {
+                console.log("alertEsplicit", this.settings.alertEsplicit);
+                this.modals.alertEsplicit = true;
+                this.proposeAlertHandlerTrack = track;
+            } else {
+                this.proposeSong(track);
+            }
+        },
+
 
         proposeSong(track) {
             track.loading = true;
@@ -613,6 +860,7 @@ export default {
                     // date: track.album.release_date,
                     img: track.album.images[1].url,
                     preview_url: track.preview_url,
+                    link: track.external_urls.spotify,
                     explicit: track.explicit,
                     submitDate: new Date().toISOString(),
                     submittedBy: this.store.getUser().id,
@@ -655,7 +903,7 @@ export default {
         },
         getItems() {
             let filterVotes = [
-                [{ label: "Natejar filtres", slot: "clean", icon: 'i-heroicons-tune-solid', click: this.cleanFilters, id: '' }],
+                [{ label: "Netejar filtres", slot: "clean", icon: 'i-heroicons-tune-solid', click: this.cleanFilters, id: '' }],
                 [{ label: "Més votades", icon: 'i-heroicons-chevron-double-up-solid', click: () => this.orderBy = 'votes-desc', id: 'votes-desc' }],
                 [{ label: "Menys votades", icon: 'i-heroicons-chevron-double-down-solid', click: () => this.orderBy = 'votes-asc', id: 'votes-asc' }]
             ]
@@ -671,6 +919,12 @@ export default {
 
             // Return the two arrays concatenated
             return filterVotes.concat(bells);
+        },
+        formatSeconds(seconds) {
+            const roundedSeconds = Math.round(seconds);
+            const minutes = Math.floor(roundedSeconds / 60);
+            const secs = roundedSeconds % 60;
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
 
@@ -696,6 +950,7 @@ export default {
             handler: function () {
                 this.currentTrack.onended = () => {
                     this.isPlaying = false;
+                    this.store.player.isPlaying = false;
                     this.store.deleteCurrentTrackPlaying();
                 }
             }
@@ -706,6 +961,14 @@ export default {
         sortedVotedSongsByGroups: {
             handler: 'handleResults',
         },
+        // settingsW: {
+        //     handler: function () {
+        //         if (this.store.getSettings() && this.isSettingsLoading) {
+        //             this.isSettingsLoading = false;
+        //         }
+        //     }
+        // }
+
     },
     computed: {
         filteredSongs() {
@@ -786,16 +1049,21 @@ export default {
             let groupsAvailable = [];
 
             if (this.filterBell === null) {
-                return this.classGroups;
+                groupsAvailable = this.classGroups;
             }
 
             if (this.filterBell) {
                 // get groups from bell
                 let b = this.bells.find(bell => bell.id === this.filterBell)
+
                 if (b) {
+                    // get groups that have a propose
                     groupsAvailable = b.groups;
                 }
             }
+
+            // filter groups that have a propose
+            groupsAvailable = groupsAvailable.filter((group) => this.hasPropose(group.id));
 
             return groupsAvailable;
         },
@@ -818,6 +1086,42 @@ export default {
         },
         reportActive() {
             return this.reportSongData.options.some(option => option.value);
+        },
+        finalSongsList() {
+            return this.store.getFinalSongsList();
+        },
+        themeDesc() {
+            return [
+                [{ text: this.settings.themeDesc }]
+            ]
+        },
+        dropdownMode() {
+            if (this.mobileDetector == 1) {
+                return 'click';
+            } else {
+                return 'hover';
+            }
+        },
+        loginLoading() {
+            return this.store.getLoadingLogin();
+        },
+        // settingsW() {
+        //     return this.store.getSettings();
+        // },
+        isSettingsLoading() {
+            let settings = this.store.getSettings()
+            if (settings) {
+                comManager.checkThemeModal(settings.theme, this.store.getUser().id)
+                    .then((result) => {
+                        if (result.showModal) {
+                            this.modals.themeTerms = true;
+                        }
+                        // this.isSettingsLoading = false;
+                    })
+                return false;
+            } else {
+                return true;
+            }
         }
     },
 }
@@ -825,49 +1129,9 @@ export default {
 </script>
 
 <style scoped>
-.loader {
-    max-height: 54px;
-    max-width: 54px;
+.modifyChildWidth> :nth-child(2) {
+    width: 20rem !important;
 }
-
-.loader>svg {
-    width: 3.25em;
-    transform-origin: center;
-    animation: loader-rotate4 2s linear infinite;
-}
-
-.loader>circle {
-    fill: none;
-    stroke: hsl(214, 97%, 59%);
-    stroke-width: 2;
-    stroke-dasharray: 1, 200;
-    stroke-dashoffset: 0;
-    stroke-linecap: round;
-    animation: loader-dash4 1.5s ease-in-out infinite;
-}
-
-@keyframes loader-rotate4 {
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes loader-dash4 {
-    0% {
-        stroke-dasharray: 1, 200;
-        stroke-dashoffset: 0;
-    }
-
-    50% {
-        stroke-dasharray: 90, 200;
-        stroke-dashoffset: -35px;
-    }
-
-    100% {
-        stroke-dashoffset: -125px;
-    }
-}
-
 
 #buttonsFilterGroup {
     width: calc(60% + 150px);
@@ -940,6 +1204,7 @@ export default {
     /* Ocultamos los botones de la barra de desplazamiento */
 }
 
+
 .song-slide-enter-active,
 .song-slide-leave-active,
 .song-slide-move {
@@ -965,5 +1230,17 @@ export default {
 
 .smallCaps {
     font-variant: small-caps;
+}
+
+.slide-images-enter-active,
+.slide-images-leave-active,
+.slide-images-move {
+    transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.slide-images-enter-from,
+.slide-images-leave-to {
+    opacity: 0;
+    transform: rotate(360deg);
 }
 </style>

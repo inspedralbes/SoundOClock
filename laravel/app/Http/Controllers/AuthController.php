@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Ban;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\bannedUserEmail;
 
 class AuthController extends Controller
 {
@@ -55,6 +57,7 @@ class AuthController extends Controller
         $fields = $request->validate([
             'email' => 'required|string',
             'name' => 'required|string',
+            'picture' => 'sometimes|string',
         ]);
 
         // check if mail exists
@@ -70,10 +73,23 @@ class AuthController extends Controller
                 $role = 3;
             }
 
-            $user = User::create([
-                'email' => $fields['email'],
-                'name' => $fields['name'],
-                'role_id' => $role,
+            if (!isset($fields['picture'])) {
+                $user = User::create([
+                    'email' => $fields['email'],
+                    'name' => $fields['name'],
+                    'role_id' => $role,
+                ]);
+            } else {
+                $user = User::create([
+                    'email' => $fields['email'],
+                    'name' => $fields['name'],
+                    'picture' => $fields['picture'],
+                    'role_id' => $role,
+                ]);
+            }
+        } elseif ($user->picture == null && isset($fields['picture'])) {
+            $user->update([
+                'picture' => $fields['picture']
             ]);
         }
 
@@ -163,6 +179,23 @@ class AuthController extends Controller
         return User::with('groups', 'bans')->get();
     }
 
+    public function indexUsers(Request $request)
+    {
+
+        // $request->validate([
+        //     'users' => 'required|array',
+        // ]);
+
+        // Obtener el array de IDs de usuarios desde la solicitud
+        $ids = $request->input('users.*.userId');
+
+        // Buscar los usuarios en base a los IDs proporcionados
+        $users = User::whereIn('id', $ids)->get();
+
+        // Devolver los usuarios como un array JSON
+        return response()->json(['users' => $users]);
+    }
+
     public function show($id)
     {
 
@@ -196,26 +229,26 @@ class AuthController extends Controller
                 'message' => 'No tienes permisos de administrador.'
             ], 404);
         }
-    
+
         // Buscar usuario
         $user = User::find($id);
-    
+
         if (!$user) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'El usuario no existe.'
             ], 404);
         }
-    
+
         // Iniciar la transacción
         DB::beginTransaction();
-    
+
         try {
             // Si el usuario está siendo suspendido...
             if (($request->input('vote_banned_until') !== null && $user->vote_banned_until != $request->input('vote_banned_until')) || ($request->input('propose_banned_until') !== null && $user->propose_banned_until != $request->input('propose_banned_until'))) {
                 // Crear un nuevo registro en la tabla bans
                 $ban = new Ban();
-    
+
                 if ($request->input('vote_banned_until') !== null && $user->vote_banned_until != $request->input('vote_banned_until')) {
                     $ban->forVoting = 1;
                     $ban->banned_until = $request->input('vote_banned_until');
@@ -223,28 +256,31 @@ class AuthController extends Controller
                     $ban->forVoting = 0;
                     $ban->banned_until = $request->input('propose_banned_until');
                 }
-    
+
                 $ban->banned_from = date("Y/m/d");
                 $ban->user_id = $user->id;
                 $ban->save();
             }
-    
+
             // Actualizar usuario
             $user->update([
                 'role_id' => $request->input('role_id'),
                 'vote_banned_until' => $request->input('vote_banned_until'),
                 'propose_banned_until' => $request->input('propose_banned_until'),
             ]);
-    
+
             // Confirmar la transacción si todo es exitoso
             DB::commit();
-    
+
+            if ($ban) {
+                Mail::to($user->email)->send(new bannedUserEmail($user, $ban));
+            }
+
             return response()->json($user->load('bans'));
-    
         } catch (\Exception $e) {
             // Deshacer la transacción en caso de error
             DB::rollback();
-    
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Se produjo un error. Transacción deshecha.',
@@ -253,5 +289,4 @@ class AuthController extends Controller
             ], 500);
         }
     }
-    
 }

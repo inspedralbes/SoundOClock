@@ -61,3 +61,6 @@ INSERT INTO `bells` (hour) VALUES
 
 INSERT INTO `bell_group` (bell_id, group_id) VALUES
 (1, 1), (1, 2), (1, 3), (1, 4), (2, 1), (2, 2),(2, 3), (3, 2), (3, 4), (4, 5), (5, 6);
+
+INSERT INTO `settings` (`start_vote`, `end_vote`, `start_moderation`, `end_moderation`, `theme`) VALUES
+ ('2024-05-15', '2024-05-31', '2024-06-01', '2024-06-02', 'Hola');

@@ -1,16 +1,17 @@
 import { io } from "socket.io-client";
-import { exec, execFile } from "child_process";
+import { exec, execFile, execSync } from "child_process";
 import fs from "fs";
 import yauzl from "yauzl"
 import path from 'path';
 
-// let url = "http://localhost:8080";
-let url = "http://timbre.inspedralbes.cat:8080";
+let url = "https://timbre.inspedralbes.cat/node";
 
-const socket = io(url);
+const socket = io("https://timbre.inspedralbes.cat", {
+    path: "/socket"
+});
 
-// const apiUrl = "http://localhost:8080/selectedSongs";
-const apiUrl = "http://timbre.inspedralbes.cat:8080/selectedSongs";
+const apiUrl = "https://timbre.inspedralbes.cat/node/selectedSongs";
+
 
 socket.on("connect", () => {
     console.log("Connected to the server");
@@ -19,8 +20,26 @@ socket.on("connect", () => {
     socket.on("executeSendBells", async () => {
         console.log("Executing script");
         socket.emit("getPcDirLogs", "Executant script");
-        await getFiles();
-        executeScript();
+        let resp = await getFiles();
+        if (!resp) {
+            console.log("Error getting files");
+            socket.emit("getPcDirLogs", "Error descarregant arxius");
+            return;
+        } else {
+            executeScript();
+        }
+    });
+
+    socket.on("restartPC", () => {
+        console.log("Restarting PC");
+        socket.emit("getPcDirLogs", "Reiniciant PC");
+        exec("shutdown -r -t 0", (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error restarting PC: ${error}`);
+                socket.emit("getPcDirLogs", "Error reiniciant PC");
+                return;
+            }
+        });
     });
 });
 
@@ -31,16 +50,27 @@ async function getFiles() {
         let zipData = await downloadZip(apiUrl);
         console.log('Handling ZIP data...');
         socket.emit("getPcDirLogs", "Manipulant ZIP...");
-        handleZipData(zipData);
-        console.log('Done handling ZIP data');
-        socket.emit("getPcDirLogs", "Manipulació ZIP completada");
+        try {
+            await handleZipData(zipData);
+        } catch (err) {
+            console.error('Error handling ZIP data:', err);
+        }
+        let resp = await addFade();
+        if (!resp) {
+            return false;
+        }
+        else {
+            console.log('Done handling ZIP data');
+            socket.emit("getPcDirLogs", "Manipulació de les cançons completada");
+            return true;
+        }
     } catch (err) {
         console.error('Error downloading ZIP:', err);
         socket.emit("getPcDirLogs", "Error descarregant ZIP");
     }
 }
 
-function downloadZip(url) {
+async function downloadZip(url) {
     return new Promise((resolve, reject) => {
         fetch(url)
             .then(response => {
@@ -64,55 +94,88 @@ function downloadZip(url) {
 }
 
 function handleZipData(zipData) {
-    console.log('Extracting ZIP...');
-    socket.emit("getPcDirLogs", "Extreient ZIP...");
-    const extractPath = "C:\\Users\\SoundO'Clock\\Songs"; // Replace with your desired path
-    console.log(zipData);
-    yauzl.fromBuffer(zipData, (err, zipFile) => {
-        if (err) {
-            console.error('Error reading ZIP:', err);
-            console.log('error');
-            socket.emit("getPcDirLogs", "Error llegint ZIP");
-            return;
-        }
-        zipFile.on('entry', (entry) => {
-            console.log('Extracting:', entry.fileName);
-            if (!entry.fileName.endsWith('/')) { // Ignore directories
-                const filePath = `${extractPath}/${entry.fileName}`;
-                zipFile.openReadStream(entry, function (err, readStream) {
-                    if (err) throw err;
-                    readStream.pipe(fs.createWriteStream(filePath)); // Extract and save file
-                });
+    return new Promise((resolve, reject) => {
+        console.log('Extracting ZIP...');
+        socket.emit("getPcDirLogs", "Extreient ZIP...");
+        const extractPath = "C:\\Users\\SoundO'Clock\\preSongs"; // Replace with your desired path
+        console.log(zipData);
+        yauzl.fromBuffer(zipData, (err, zipFile) => {
+            if (err) {
+                console.error('Error reading ZIP:', err);
+                console.log('error');
+                socket.emit("getPcDirLogs", "Error llegint ZIP");
+                reject(err);
+                return;
             }
-        });
-        zipFile.on('end', () => {
-            console.log('Files extracted successfully to:', extractPath);
-            socket.emit("getPcDirLogs", "Arxius extrets correctament");
+            zipFile.on('entry', (entry) => {
+                console.log('Extracting:', entry.fileName);
+                if (!entry.fileName.endsWith('/')) { // Ignore directories
+                    const filePath = `${extractPath}/${entry.fileName}`;
+                    zipFile.openReadStream(entry, function (err, readStream) {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        readStream.pipe(fs.createWriteStream(filePath)); // Extract and save file
+                    });
+                }
+            });
+            zipFile.on('end', () => {
+                console.log('Files extracted successfully to:', extractPath);
+                socket.emit("getPcDirLogs", "Arxius extrets correctament");
+                resolve();
+            });
         });
     });
 }
 
-function executeScript() {
-    // const startChromeCommand = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" "file:///C:/Users/SoundO'Clock/Desktop/script/ui.vision.html?direct=1&macro=Script"`;
-    // exec(startChromeCommand, (error, stdout, stderr) => {
-    //     if (error) {
-    //         console.error(`Error starting Chrome: ${error}`);
-    //         socket.emit("getPcDirLogs", "Error iniciant Chrome");
-    //         return;
-    //     }
-    // });
+async function addFade() {
+    console.log('Adding fade...');
+    socket.emit("getPcDirLogs", "Afegint efecte de suabitzat a les cançons...");
+    const batFilePath = "C:\\Users\\SoundO'Clock\\Desktop\\script\\fade.bat";
+    return new Promise((resolve, reject) => {
+        exec(`"${batFilePath}"`, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error executing .bat file: ${error}`);
+                socket.emit("getPcDirLogs", "Error afegint efecte de suavitzat");
+                resolve(false);
+            } else {
+                console.log(`.bat file executed successfully`);
+                console.log(stdout);
+                socket.emit("getPcDirLogs", "Efecte de suavitzat afegit correctament");
+                resolve(true);
+            }
+        });
+    });
+}
+
+
+async function executeScript() {
+    console.log("executing Script");
+    socket.emit("getPcDirLogs", "Executant script...");
+    const startChromeCommand = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" "file:///C:/Users/SoundO'Clock/Desktop/script/ui.vision.html?direct=1&macro=Script"`;
+
+    exec(startChromeCommand, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error starting Chrome: ${error}`);
+            socket.emit("getPcDirLogs", "Error iniciant Chrome");
+            return;
+        }
+    });
 
     // Wait for file to exist
     const filePath = "C:\\Users\\SoundO'Clock\\Desktop\\logs\\UIvisionLogs\\uivision_log.txt";
-    const intervalId = setInterval(() => {
+    fs.watchFile(filePath, (curr, prev) => {
         if (fs.existsSync(filePath)) {
-            clearInterval(intervalId);
+            console.log('File found');
+            socket.emit("getPcDirLogs", "Arxiu trobat");
+            fs.unwatchFile(filePath); // Stop watching the file
             handleFile(filePath);
         } else {
             console.log('Waiting for file...');
-            socket.emit("getPcDirLogs", "Esperant arxiu...");
+            socket.emit("getPcDirLogs", "Executant escript...");
         }
-    }, 5000);
+    });
 }
 
 function handleFile(filePath) {
@@ -140,7 +203,17 @@ function handleFile(filePath) {
     // Read file line by line
     const lines = fs.readFileSync(filePath, 'utf-8').split('\n').filter(Boolean);
     const depuredLines = lines.filter(line => line.includes('[error]') || line.includes('[echo]'));
-    socket.emit("getPcDirLogs", depuredLines);
+    depuredLines.forEach(line => {
+        socket.emit("getPcDirLogs", line);
+    });
+    if (depuredLines[depuredLines.length - 1].includes('CORRECTE')) {
+        console.log('cançons col·locades correctament');
+        socket.emit("getPcDirLogs", "Cançons col·locades correctament");
+    } else if (depuredLines[depuredLines.length - 1].includes('ERROR')) {
+        console.log('error al col·locar les cançons');
+        socket.emit("getPcDirLogs", "Error al col·locar les cançons");
+    }
+    console.log(depuredLines);
     fs.writeFileSync(depuredLogPath, depuredLines.join('\n'));
 
     // Move uivision_log.txt to LogsHistory and rename it

@@ -10,6 +10,7 @@ use App\Http\Controllers\BellController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\GroupCategoryController;
 use App\Http\Controllers\UserGroupsController;
+use App\Http\Controllers\MailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,7 @@ Route::get('/groupCategories', [GroupCategoryController::class, 'index']);
 Route::get('/groupCategoriesAll', [GroupCategoryController::class, 'indexAll']);
 Route::get('/allSettings', [SettingController::class, 'index']);
 Route::get('/bells', [BellController::class, 'index']);
+Route::post('/reminderMail', [MailController::class, 'reminderMail']);
 
 
 // Protected routes
@@ -48,6 +50,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/blacklist/{id}', [BlacklistController::class, 'destroy']);
     Route::get('/user/{id}', [AuthController::class, 'show']);
     Route::put('/user/{id}', [AuthController::class, 'update']);
+    Route::post('/usersSearchInfo', [AuthController::class, 'indexUsers']);
 
     // Groups routes
     Route::post('/groups', [GroupsController::class, 'store']);
@@ -88,4 +91,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // User groups
     Route::get('/userGroups', [UserGroupsController::class, 'index']);
     Route::delete('/group/{group_id}/user/{user_id}', [UserGroupsController::class, 'delete']);
+
+    Route::post('/mail', [MailController::class, 'deletedSongEmail']);
 });

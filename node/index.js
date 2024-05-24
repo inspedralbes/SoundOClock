@@ -12,6 +12,8 @@ import {
   ReportSong,
   SelectedSong,
   ReportUser,
+  BellsGroupsTemplate,
+  ThemeModals,
 } from "./models.js";
 import axios from "axios";
 import minimist from "minimist";
@@ -115,6 +117,7 @@ app.get("/sortedVotedSongs", async (req, res) => {
               explicit: "$explicit",
               preview_url: "$preview_url",
               votes: "$votesPerGroupArray.v",
+              submittedBy: "$submittedBy",
             },
           },
         },
@@ -336,6 +339,7 @@ app.post("/storeSelectedSongs", async (req, res) => {
 
     // Save the selected songs to mongo db
     const songs = req.body.songs;
+
     songs.forEach(async (song) => {
       await new SelectedSong({
         id: song.id,
@@ -345,6 +349,7 @@ app.post("/storeSelectedSongs", async (req, res) => {
         img: song.img,
         preview_url: song.preview_url,
         selectedDate: new Date(),
+        userId: song.userId,
       }).save();
     });
 
@@ -406,6 +411,108 @@ app.get("/userGroups/:userToken", async (req, res) => {
   }
 });
 
+app.post("/usersVotes", async (req, res) => {
+  try {
+    const song = await Song.findOne({ id: req.body.songId });
+    if (song) {
+      // Find all users that voted for the song with the given id
+      // el $in es para buscar en un array de valores (en este caso, en el array de votedSongs) si el valor song.id está presente
+      let usersVotesMongo = await VotingRecord.find({ votedSongs: { $in: [song.id] } });
+
+      //get token from the request
+      let token = req.body.token;
+
+      //get the users votes
+      let usersVotes = await comManager.getUsersVotes(usersVotesMongo, token);
+
+      res.json(usersVotes);
+    }
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// GROUP BELLS TEMPLATE
+app.post('/bellsGroupsTemplate', async (req, res) => {
+  try {
+    const template = new BellsGroupsTemplate(req.body.template);
+    await template.save();
+    res.json({ status: 'success' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/user/:userId", async (req, res) => {
+  try {
+    const userToken = req.headers['authorization'].split(' ')[1];
+    let user = await comManager.showUser(userToken, req.params.userId);
+    res.json(user);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+app.get('/bellsGroupsTemplate', async (req, res) => {
+  try {
+    const templates = await BellsGroupsTemplate.find();
+    res.json(templates);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.delete('/bellsGroupsTemplate/:id', async (req, res) => {
+  try {
+    await BellsGroupsTemplate.findByIdAndDelete(req.params.id);
+    res.json({ status: 'success' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get('/checkThemeModal/:theme/:userId', async (req, res) => {
+  const theme = req.params.theme;
+  const userId = parseInt(req.params.userId);
+
+  try {
+    const themeModal = await ThemeModals.findOne({ userId: userId });
+    if (!themeModal) {
+      return res.json({ status: 'success', showModal: true });
+    } else {
+      let modalShowed = themeModal.modalsShown.get(theme);
+      if (!modalShowed) {
+        return res.json({ status: 'success', showModal: true });
+      } else {
+        return res.json({ status: 'success', showModal: false });
+      }
+    }
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post('/acceptThemeTerms', async (req, res) => {
+  const theme = req.body.theme;
+  const userId = req.body.userId;
+
+  try {
+    const themeModal = await ThemeModals.findOne({ userId: userId });
+    if (!themeModal) {
+      const newThemeModal = new ThemeModals({
+        userId: userId,
+        modalsShown: new Map([[theme, true]])
+      });
+      await newThemeModal.save();
+    } else {
+      themeModal.modalsShown.set(theme, true);
+      await themeModal.save();
+    }
+    res.json({ status: 'success' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const headers = {
@@ -444,6 +551,8 @@ obtenerActualizarTokenSpotify();
 let dirPC = null;
 let amountUsers = 0;
 
+fetchingCron.mailReminder();
+
 // Sockets
 io.on("connection", (socket) => {
   amountUsers++;
@@ -451,11 +560,13 @@ io.on("connection", (socket) => {
   console.log("A user connected. Total users:", amountUsers);
 
   socket.on("googleLogin", (userToken) => {
+    console.log("googleLogin start");
     comManager
       .googleLogin(userToken)
       .then((userData) => {
         // console.log("UserData:", userData);
         let groups = [];
+        console.log(userData);
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
           groups.push(group.pivot.group_id);
@@ -466,6 +577,7 @@ io.on("connection", (socket) => {
           userData.user.id,
           userData.user.email,
           userData.user.name,
+          userData.user.picture,
           userData.token,
           groups,
           userData.user.role_id,
@@ -475,6 +587,18 @@ io.on("connection", (socket) => {
       .catch((err) => {
         console.error(err);
       });
+  });
+
+  socket.on("login", async (email, name) => {
+    console.log("login", email, name);
+    try {
+      let user = await comManager.login(name, email);
+      console.log("user", user);
+      console.log("loginData", user.user.id, user.user.email, user.user.name, user.user.picture, user.token, user.user.groups, user.user.role_id, user.user.role_name);
+      socket.emit("loginData", user.user.id, user.user.email, user.user.name, user.user.picture, user.token, user.user.groups, user.user.role_id, user.user.role_name);
+    } catch (err) {
+      console.error(err);
+    }
   });
 
   socket.on("updateProvisionalSelectedSongs", (bellId, songId) => {
@@ -832,6 +956,9 @@ io.on("connection", (socket) => {
           message: `La cançó ${bannedSong.name} ha sigut afegida a la llista negra.`,
         });
       } else {
+        // Send mail to the user that proposed the song
+        comManager.sendDeletedSongMail(userToken, song);
+
         // Notify the user that erased the song
         socket.emit("notifyServerResponse", {
           status: "success",
@@ -1073,6 +1200,12 @@ io.on("connection", (socket) => {
   socket.on("dirPC", () => {
     dirPC = socket.id;
     socket.broadcast.emit("dirPCStatus", true);
+  });
+
+  socket.on("restartPcReq", () => {
+    if (dirPC) {
+      io.to(dirPC).emit("restartPC");
+    }
   });
 
   socket.on("sendBells", () => {

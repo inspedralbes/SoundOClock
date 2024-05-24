@@ -21,6 +21,7 @@ class newThemeEmail extends Mailable
     public $theme;
     public $selectedSongs;
     public $bells;
+
     /**
      * Create a new message instance.
      */
@@ -33,7 +34,6 @@ class newThemeEmail extends Mailable
         $this->selectedSongs = $selectedSongs;
         $this->bells = $bells;
     }
-
 
     /**
      * Get the message envelope.

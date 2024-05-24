@@ -45,6 +45,8 @@ class SettingController extends Controller
             'moderationDuration' => 'integer',
             'start_moderation' => 'date|nullable',
             'end_moderation' => 'date|nullable',
+            'theme' => 'string' | 'nullable',
+            'themeDesc' => 'string' | 'nullable',
             'showExplicit' => 'boolean',
             'letProposeExplicit' => 'boolean',
             'alertExplicit' => 'boolean',
@@ -63,7 +65,7 @@ class SettingController extends Controller
 
 
         // dd($setting);
-        
+
         if ($setting === null) {
             return response()->json(['message' => 'No existe una configuración en la base de datos'], 404);
         }
@@ -89,15 +91,17 @@ class SettingController extends Controller
     {
         // Validar los datos de entrada
         $request->validate([
-            'settings.voteDuration' => 'integer',
-            'settings.start_vote' => 'date|nullable',
-            'settings.end_vote' => 'date|nullable',
-            'settings.moderationDuration' => 'integer',
-            'settings.start_moderation' => 'date|nullable',
-            'settings.end_moderation' => 'date|nullable',
-            'settings.showExplicit' => 'boolean',
-            'settings.letProposeExplicit' => 'boolean',
-            'settings.alertExplicit' => 'boolean',
+            'voteDuration' => 'integer',
+            'start_vote' => 'date|nullable',
+            'end_vote' => 'date|nullable',
+            'moderationDuration' => 'integer',
+            'start_moderation' => 'date|nullable',
+            'end_moderation' => 'date|nullable',
+            'theme' => 'string' | 'nullable',
+            'themeDesc' => 'string' | 'nullable',
+            'showExplicit' => 'boolean',
+            'letProposeExplicit' => 'boolean',
+            'alertExplicit' => 'boolean',
         ]);
 
         $settingArray = DB::select('SELECT * FROM settings LIMIT 1');
@@ -110,12 +114,12 @@ class SettingController extends Controller
             }
             return Setting::create($request->settings);
         }
-        
+
         if ($settingArray[0]->theme !== $request->settings['theme']) {
             $users = User::all();
             $bells = Bell::all();
             foreach ($users as $user) {
-            Mail::to($user->email)->send(new newThemeEmail($user, $request->settings['start_vote'], $request->settings['end_vote'], $request->settings['theme'], $request->selectedSongs, $bells));
+                Mail::to($user->email)->send(new newThemeEmail($user, $request->settings['start_vote'], $request->settings['end_vote'], $request->settings['theme'], $request->selectedSongs, $bells));
             }
         }
 
@@ -139,9 +143,8 @@ class SettingController extends Controller
         $setting = Setting::findOrFail($id);
         $setting->delete();
         return response()->json([
-            'status' => 'success',
-            'message' => 'Setting deleted successfully'
-        ]);
+            'message'=> 'Configuración eliminada correctamente',
+        ],200);
 
     }
 }

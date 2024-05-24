@@ -14,7 +14,7 @@ export default {
         const userToken = store.getUser().token;
 
         comManager.logout(userToken).then(() => {
-            store.setUser(0, "", "", null, []);
+            store.setUser(0, "", "", "", null, [], null, null);
             return navigateTo({ path: '/' });
         });
     }

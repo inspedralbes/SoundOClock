@@ -20,7 +20,7 @@
                         <button v-for="song in reportedSongs" @click="selectSong(song)"
                             class="flex flex-row justify-between items-center rounded-lg" :class="isSelected(song)">
 
-                            <Song :track="song" :currentTrackId="songStatus.currentTrackId"
+                            <SongAdmin :track="song" :currentTrackId="songStatus.currentTrackId"
                                 :isPlaying="songStatus.isPlaying" class="w-full justify-around" @play="playSong"
                                 :type="'admin'" :isSelected="selectedSong.id === song.id"
                                 :isReported="!areAllReportsRead(song)" />
@@ -32,7 +32,7 @@
                         <button v-for="song in nonReportedSongs" @click="selectSong(song)"
                             class="flex flex-row justify-between items-center rounded-lg" :class="isSelected(song)">
 
-                            <Song :track="song" :currentTrackId="songStatus.currentTrackId"
+                            <SongAdmin :track="song" :currentTrackId="songStatus.currentTrackId"
                                 :isPlaying="songStatus.isPlaying" class="w-full" @play="playSong"
                                 :type="'admin'" :isSelected="selectedSong.id === song.id"
                                 :isReported="!areAllReportsRead(song)" />

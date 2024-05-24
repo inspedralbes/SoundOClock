@@ -14,7 +14,7 @@
         <p class="text-white mt-3">Registra't o inicia sessió per començar</p>
 
         <button @click="loginGoogle"
-            class="flex justify-center items-center px-10 py-4 text-white bg-black font-bold cursor-pointer mt-5 border-2 border-white border-opacity-50 shadow-md rounded-full">
+            class="flex justify-center items-center px-10 py-4 text-white bg-black font-bold cursor-pointer mt-5 border-2 border-white border-opacity-50 shadow-md rounded-full z-[999]">
             <span class="mr-2">Inicia sessió amb</span>
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                 <path
@@ -32,6 +32,8 @@
                 <path d="M1 1h22v22H1z" fill="none" />
             </svg>
         </button>
+
+        <SongsPreview v-if="$device.isMobile" class="absolute bottom-10"></SongsPreview>
 
         <div class="circle"></div>
         <div class="circle min"></div>

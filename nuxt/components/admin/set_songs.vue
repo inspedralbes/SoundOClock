@@ -4,7 +4,7 @@
         <Loader />
     </div>
     <div v-if="!loading">
-        <div class="flex flex-col gap-3 ml-20 mr-8 mb-4">
+        <div class="flex flex-col gap-3 ml-20 mr-8 mb-20">
             <div class="groups-bells-container rounded-lg">
                 <div class="schedule-container text-white text-center gap-2 p-2">
                     <div v-for="(bell, index) in bells" class="item bg-gray-400 rounded-lg p-2 h-96 flex flex-col">
@@ -84,10 +84,10 @@
                 </Transition>
             </div>
             <div class="h-96 overflow-auto">
-                <Song v-for="song in spotifySongs" :key="song.id" :track="song" :currentTrackId="currentTrackId"
+                <SongAdmin v-for="song in spotifySongs" :key="song.id" :track="song" :currentTrackId="currentTrackId"
                     :isPlaying="isPlaying" @play="playTrack" :type="'admin_set_song'" @propose="addSong"
                     :songWaitingToPlay="songWaitingToPlay">
-                </Song>
+                </SongAdmin>
             </div>
         </div>
     </UModal>
@@ -184,7 +184,7 @@ export default {
                 this.groupedSongs = result;
             }
             // Check if bells is loaded and set the mostVotedSongs
-            if (this.bells.length > 0 && this.groupedSongs && this.groupedSongs.length > 0) {
+            if (this.bells.length > 0 && this.groupedSongs) {
                 this.loading = false;
                 this.getMostVotedSongs(this.bells);
             }
@@ -224,7 +224,7 @@ export default {
                     if (groupedData[song.id]) {
                         groupedData[song.id].votes += song.votes;
                     } else {
-                        groupedData[song.id] = { id: song.id, votes: song.votes, explicit: song.explicit, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url };
+                        groupedData[song.id] = { id: song.id, votes: song.votes, explicit: song.explicit, name: song.name, img: song.img, artists: song.artists, preview_url: song.preview_url, link: song.link, submittedBy: song.submittedBy };
                     }
                 });
                 const resultArray = Object.values(groupedData);
@@ -287,7 +287,7 @@ export default {
                         break;
                     }
                 }
-                songs.push({ bellId: key, id: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url });
+                songs.push({ bellId: key, id: this.isSelected[key], name: song.name, artists: song.artists, img: song.img, preview_url: song.preview_url, link: song.link, userId: song.submittedBy });
             }
 
             comManager.storeSelectedSongs(token, songs).then(() => {

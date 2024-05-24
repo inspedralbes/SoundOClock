@@ -1,6 +1,7 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import { socket } from '../socket';
+import comManager from '../communicationManager';
 export default {
   name: 'SongDetails',
   props: {
@@ -13,6 +14,16 @@ export default {
         addSongToBlacklist: false,
         eraseSong: false,
       },
+      BanOptions: [
+        'Sense ban',
+        'Ban 3 setmanes',
+        'Ban 3 mesos',
+        'Ban 1 any'
+      ],
+      banSelected: {
+        userProposed: 'Sense ban',
+        userVoted: 'Sense ban',
+      }
     }
   },
   mounted() {
@@ -24,17 +35,84 @@ export default {
     },
   },
   methods: {
+    async banUsers() {
+
+      if (this.banSelected.userProposed == 'Sense ban' && this.banSelected.userVoted == 'Sense ban') return;
+
+
+      let dateBanProposed;
+      switch (this.banSelected.userProposed) {
+        case 'Ban 3 setmanes': // 3 weeks
+          dateBanProposed = new Date(Date.now() + 3 * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+        case 'Ban 3 mesos': // 3 motnhs
+          dateBanProposed = new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+        case 'Ban 1 any': // 1 year
+          dateBanProposed = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+      }
+
+      let dateBanVoted;
+      switch (this.banSelected.userVoted) {
+        case 'Ban 3 setmanes': // 3 weeks
+          dateBanVoted = new Date(Date.now() + 3 * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+        case 'Ban 3 mesos': // 3 motnhs
+          dateBanVoted = new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+        case 'Ban 1 any': // 1 year
+          dateBanVoted = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0].replace(/-/g, '-');
+          break;
+      }
+
+      let usersVotes;
+      await comManager.getUsersVotes(this.song.id, this.store.getUser().token).then((response) => {
+        usersVotes = response.users;
+      });
+
+      //find user who prosed song
+      let userPropose;
+      await comManager.getUser(this.song.user.id, this.store.getUser().token).then((response) => {
+        userPropose = response;
+      });
+
+      // Ban user who proposed the song
+      if (this.banSelected.userProposed != 'Sense ban') {
+        userPropose.propose_banned_until = dateBanProposed;
+        socket.emit('banUser', this.store.getUser().token, userPropose);
+      }
+
+      // Ban users who voted the song
+      if (this.banSelected.userVoted != 'Sense ban') {
+        usersVotes.forEach((user) => {
+          if (user.id == userPropose.id) {
+            user = userPropose;
+          }
+          user.vote_banned_until = dateBanVoted;
+          socket.emit('banUser', this.store.getUser().token, user);
+        });
+      }
+
+    },
     eraseSong() {
+      this.banSelected.userProposed = 'Sense ban';
+      this.banSelected.userVoted = 'Sense ban';
       this.modals.eraseSong = true;
     },
     submitEraseSongData() {
+      this.modals.eraseSong = false;
+      this.banUsers();
       socket.emit('deleteSong', this.store.getUser().token, this.song.id, false);
     },
     banSong() {
+      this.banSelected.userProposed = 'Sense ban';
+      this.banSelected.userVoted = 'Sense ban';
       this.modals.addSongToBlacklist = true;
     },
     submitBanSongData() {
       this.modals.addSongToBlacklist = false
+      this.banUsers();
       socket.emit('deleteSong', this.store.getUser().token, this.song.id, true);
     },
     handleSwitch(reportId, value) {
@@ -113,7 +191,9 @@ export default {
         </div>
       </div>
     </div>
-    <p class="mb-4 text-xl">CANÇÓ PROPOSADA PER: {{ song.user.name }}</p>
+    <div class="mb-1 flex flex-row justify-between">
+      <span class="text-xl">CANÇÓ PROPOSADA PER: {{ song.user.name }}</span>
+    </div>
     <div class="w-100 p-4 flex flex-col gap-2 bg-gray-400 rounded-lg grow">
       <div class="mb-2 flex flex-row justify-between items-center gap-2">
         <div class="flex flex-row items-center gap-2">
@@ -153,7 +233,15 @@ export default {
           <span v-html="title" />
         </template>
         <template #description>
-          <div class="mt-2 flex gap-2">
+          <div class="ml-auto mr-auto pt-1 pb-2">
+            <p class="pb-1">Banejar usuari que ha proposat la canço</p>
+            <USelect v-model="this.banSelected.userProposed" :options="BanOptions" />
+          </div>
+          <div class="ml-auto mr-auto pt-1 pb-2">
+            <p class="pb-1">Banejar usuaris que han votat la canço</p>
+            <USelect v-model="this.banSelected.userVoted" :options="BanOptions" />
+          </div>
+          <div class="mt-2 flex justify-between gap-2">
             <UButton size="md" color="red" @click="modals.addSongToBlacklist = false">Enrere</UButton>
             <UButton size="md" color="primary" @click="submitBanSongData">Continuar</UButton>
           </div>
@@ -164,16 +252,32 @@ export default {
     </div>
   </UModal>
 
-  <ModularModal :open="modals.eraseSong" type="error" msg="Eliminar" title="Eliminar de la llista de cançons proposades"
-    @confirm="submitEraseSongData()" @close="modals.eraseSong = false">
-    <template #title>
-      <h2>Eliminar de la llista de cançons proposades</h2>
-    </template>
-    <template #content>
-      <p>Segur que vols eliminar <span class="font-bold">{{ song.name }}</span> de <span class="font-bold">{{
-        song.artists.map(artist => artist.name).join(', ') }}</span> de la llista de cançons proposades?</p>
-    </template>
-  </ModularModal>
+  <UModal v-model="modals.eraseSong">
+    <div>
+      <UAlert title="Estàs segur/a d'eliminar aquesta cançó?" icon="i-heroicons-exclamation-triangle-16-solid"
+        color="orange" variant="subtle" class="p-6">
+        <template #title="{ title }">
+          <span v-html="title" />
+        </template>
+        <template #description>
+          <div class="ml-auto mr-auto pt-1 pb-2">
+            <p class="pb-1">Banejar usuari que ha proposat la canço</p>
+            <USelect v-model="this.banSelected.userProposed" :options="BanOptions" />
+          </div>
+          <div class="ml-auto mr-auto pt-1 pb-2">
+            <p class="pb-1">Banejar usuaris que han votat la canço</p>
+            <USelect v-model="this.banSelected.userVoted" :options="BanOptions" />
+          </div>
+          <div class="mt-2 flex justify-between gap-2">
+            <UButton size="md" color="red" @click="modals.eraseSong = false">Enrere</UButton>
+            <UButton size="md" color="primary" @click="submitEraseSongData">Continuar</UButton>
+          </div>
+        </template>
+      </UAlert>
+      <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="absolute right-0 top-0"
+        @click="modals.eraseSong = false" />
+    </div>
+  </UModal>
 
   <ModularToast v-bind:serverResponse="serverResponse" time="10000" />
 </template>
