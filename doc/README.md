@@ -1,12 +1,33 @@
 # Documentació bàsica del projecte
-Alguns dels punts que han de quedar explicats:
- * Objectius
- * Arquitectura bàsica
-   * Tecnologies utilitzades
-   * Interrelació entre els diversos components
- * Com crees l'entorn de desenvolupament
- * Com desplegues l'aplicació a producció
- * Llistat d'endpoints de l'API de backend
-    * Rutes
-   * Exemples de JSON de peticó
-   * Exemples de JSON de resposta i els seus codis d'estat 200? 404?
+
+## Objectius
+
+[Sh'a de fer]
+
+## Arquitectura
+
+### Tecnologies utilitzades
+
+|Àmbit| Tecnologies|
+|-|-|
+|Frontend | Nuxt, Pinia, Nuxt UI, Local Storage, Socket IO|
+|Backend | Node, Express, Socket IO, MongoDB, Mongoose, Laravel, phpMyAdmin|
+
+
+
+### Interrelació de diversos components
+
+[Link al esquema de la arquitectura de la aplicació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/Arquitectura.png)
+
+
+## Guia Entorn de Desenvolupament
+
+[Link a la guia](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/Guia_Desenvolupament.md)
+
+## Guia Desplegament a Producció
+
+Link a la guia (s'ha de fer)
+
+## Llistat de Endpoints de l'API
+
+[Link al llistat de rutes API](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/Rutes_API.md).
