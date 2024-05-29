@@ -2,33 +2,25 @@
 
 ## Objectius
 
-[Sh'a de fer]
+Objectiu principal: 
+- Facilitar a l’equip docent la tria i l'edició de les cançons i donar veu als alumnes per que es posin les cançons que els hi agradaria escoltar
 
-## Arquitectura
+Objectius específics:
+- Permetre als usuaris proposar i votar cançons.
+- Desenvolupar un panell d'administració eficient per gestionar les propostes de cançons.
 
-### Tecnologies utilitzades
+## Presentació Resum
 
-| Àmbit   | Tecnologies                                                      |
-| -------- | ---------------------------------------------------------------- |
-| Frontend | Nuxt, Pinia, Nuxt UI, Local Storage, Socket IO                   |
-| Backend  | Node, Express, Socket IO, MongoDB, Mongoose, Laravel, phpMyAdmin |
+[Link a la presentació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/resum_2324_SoundOClock.pdf)
 
-### Interrelació de diversos components
+## Documentació Tècnica
 
-[Link al esquema de la arquitectura de la aplicació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/Arquitectura.png)
+[Link a la documentació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/tecnica_2324_SoundOClock.pdf)
 
-## Guia Entorn de Desenvolupament
+## Manual d'Usuari
 
-[Link a la guia](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/Guia_Desenvolupament.md)
+[Link al manual](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/I%20MANUAL%20D'USUARI.pdf)
 
-## Guia Desplegament a Producció
+## Planificació del projecte
 
-Link a la guia (s'ha de fer)
-
-## Llistat de Endpoints de l'API
-
-[Link al llistat de rutes API](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/Rutes_API.md).
-
-## Esquema Sockets
-
-[Link als esquemes dels Sockets](https://github.com/inspedralbes/tr3-soundoclock/tree/main/doc/sockets)
+[Link a la planificació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/B%20PLANIFICACI%C3%93.pdf)
