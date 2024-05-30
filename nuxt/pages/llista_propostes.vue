@@ -193,8 +193,8 @@
                 </h2>
             </Transition>
             <TransitionGroup tag="div" mode="out-in" name="song-slide" :class="{ 'w-[60%]': !$device.isMobile }">
-                <component :is="activeSong" v-for="     track in spotifySongs     " :key="track.id"
-                    :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
+                <component :is="activeSong" v-for="track in spotifySongs" :key="track.id" :track="track"
+                    :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
                     @propose="proposeSongCheck($event)" :type="getType(track.id)" />
             </TransitionGroup>
         </div>
@@ -476,16 +476,13 @@ export default {
     },
     created() {
         socket.on('searchResult', (results) => {
-            console.log("results", results, "length", results.length);
             let handleSplicit = [];
             if (this.settings.showExplicit) {
                 handleSplicit = results.filter(song => !song.explicit);
-                console.log("hadleSplicit", handleSplicit, "length", handleSplicit.length);
                 this.spotifySongs = handleSplicit.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
             } else {
                 this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
             }
-            console.log("spotifySongs", this.spotifySongs, "length", this.spotifySongs.length);
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -820,7 +817,6 @@ export default {
         },
 
         isTrackEsplicit(track) {
-            console.log("check explicit", track.explicit);
             if (track.explicit) {
                 return true;
             } else {
@@ -829,14 +825,10 @@ export default {
         },
 
         proposeSongCheck(track) {
-            console.log("proposeSongCheck", track);
             let isEsplicit = this.isTrackEsplicit(track);
-            console.log("isEsplicit", isEsplicit);
             if (this.settings.letProposeExplicit && isEsplicit) {
-                console.log("blockEsplicit", this.settings.blockEsplicit);
                 this.modals.blockEsplicit = true;
             } else if (this.settings.alertExplicit && isEsplicit) {
-                console.log("alertEsplicit", this.settings.alertEsplicit);
                 this.modals.alertEsplicit = true;
                 this.proposeAlertHandlerTrack = track;
             } else {
