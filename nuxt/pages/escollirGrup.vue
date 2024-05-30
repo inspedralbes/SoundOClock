@@ -1,71 +1,48 @@
 <template>
-    <div class="w-80 mx-auto mt-6">
-        <div class="title text-white text-center text-4xl font-bold my-5">
-            <h1>Escull el teu Grup:</h1>
-        </div>
-        <div v-if="loading" class="loading">
-            <Loader />
-        </div>
+    <div>
+        <div class="mt-6">
+            <div class="title text-white text-center text-4xl font-bold my-5">
+                <h1 v-if="user.role_id === 5">Escull el teu grup i el teu curs</h1>
+                <h1 v-else>Escull els teus grups i cursos</h1>
+                <h3 class="text-xl font-normal" v-if="user.role_id != 5">Si ets professor, moderador o administrador,
+                    pots
+                    triar diversos grups i
+                    diversos cursos</h3>
+            </div>
+            <div v-if="loading" class="loading">
+                <Loader />
+            </div>
 
-        <div v-else>
-            <div v-if="user.role_id === 5">
-                <div class="flex flex-col items-center justify-center mb-5">
-                    <label for="grup">Grup:</label>
-                    <select name="grup" id="grup" v-model="selectedCategoryId"
-                        class="w-80 p-3 rounded border-slate-400 border-2">
-                        <option value="">-- Escull el teu grup --</option>
-                        <option :value="category.id" v-for="category in categories" :key="category.id">
-                            {{ category.abbreviation }}
-                        </option>
-                    </select>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <label for="curs">Curs:</label>
-                    <select name="curs" id="curs" :disabled="!selectedCategoryId" v-model="selectedGroups"
-                        class="w-80 p-3 rounded border-slate-400 border-2">
-                        <option value="">-- Escull el teu curs --</option>
-                        <option :value="course.id" v-for="course in availableCourses" :key="course">
-                            {{ course.abbreviation }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div v-else>
-                <h2 class="text-xl text-center">Pots escollir més d'un curs</h2>
-                <div class="mt-4">
-                    <div class="flex flex-col justify-center mb-5">
-                        <label for="grup">Grup:</label>
-                        <USelectMenu class="w-full" v-model="selectedCategoryId" :options="categories"
-                            option-attribute="abbreviation" value-attribute="id"
-                            placeholder="-- Escull el teu grup --" />
+            <div v-else class="flex flex-col justify-center items-center">
+                <div class="w-1/2">
+                    <UDivider label="Grups" size="md" class="mt-8 mb-2" />
+                    <USelectMenu size="xl" searchable v-model="selectedCategories" :options="categories"
+                        option-attribute="abbreviation" :multiple="user.role_id != 5"
+                        placeholder="-- Selecciona els teus grups --" searchable-placeholder="Busca el teu grup..." />
+                    <div class="flex flex-wrap mt-2" v-if="user.role_id != 5">
+                        <UButton v-for="category in selectedCategories" color="black" :label="category.abbreviation"
+                            icon="i-heroicons-x-mark-20-solid" class="m-1 ml-0" @click="deleteCategory(category)">
+                        </UButton>
                     </div>
-                    <div class="flex flex-col justify-center mb-10">
-                        <label for="curs">Curs:</label>
-                        <USelectMenu class="w-full" :disabled="!selectedCategoryId" v-model="selectedGroups"
-                            :options="availableCourses" option-attribute="abbreviation"
-                            placeholder="-- Escull el teu curs --" multiple />
-                    </div>
-                    <div>
-                        <h3 class="mb-3">CURSOS SELECCIONATS</h3>
-                        <div v-if="!selectedGroups.length > 0" class="text-center">Encara no has seleccionat cap curs
-                        </div>
-                        <div v-else class="flex flex-row flex-wrap gap-3">
-                            <div v-for="group in selectedGroups"
-                                class="w-fit px-3 py-2 bg-[#999] grow text-center rounded-full">
-                                {{ group.abbreviation }}
-                            </div>
-                        </div>
+                    <UDivider label="Cursos" size="md" class="mt-8 mb-2" :disabled="selectedCategories.length <= 0" />
+                    <USelectMenu size="xl" searchable v-model="selectedGroups" :options="getGroups"
+                        option-attribute="abbreviation" :multiple="user.role_id != 5"
+                        placeholder="-- Selecciona els teus cursos --" searchable-placeholder="Busca el teu curs..." />
+                    <div class="flex flex-wrap mt-2" v-if="user.role_id != 5">
+                        <UButton v-for="group in selectedGroups" color="black" :label="group.abbreviation"
+                            icon="i-heroicons-x-mark-20-solid" class="m-1 ml-0" @click="deleteGroup(group)">
+                        </UButton>
                     </div>
                 </div>
-            </div>
-            <div class="mt-6 w-80">
-                <button @click="storeGroup" class="btn flex justify-center p-3 bg-green-600 rounded w-full"
-                    :disabled="checkCorrectOptions()">
-                    <span v-if="storeGroupsLoading" class="py-1">
-                        <Loader />
-                    </span>
-                    <span v-else>Següent</span>
-                </button>
+                <div class="mt-6 w-80">
+                    <button @click="storeGroup" class="btn flex justify-center p-3 bg-green-600 rounded w-full"
+                        :disabled="checkCorrectOptions()">
+                        <span v-if="storeGroupsLoading" class="py-1">
+                            <Loader />
+                        </span>
+                        <span v-else>Següent</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -87,7 +64,8 @@ export default {
             selectedCategoryId: '',
             selectedGroupId: '',
             storeGroupsLoading: false,
-            selectedGroups: null,
+            selectedGroups: [],
+            selectedCategories: [],
         }
     },
     mounted() {
@@ -117,26 +95,22 @@ export default {
         },
         user() {
             return this.store.getUser();
+        },
+        getGroups() {
+            if (this.user.role_id === 5) return this.selectedCategories.groups;
+            let groups = [];
+            groups = this.selectedCategories.flatMap(category => toRaw(category).groups);
+            return groups;
         }
     },
-
     methods: {
         storeGroup() {
             this.storeGroupsLoading = true;
-            let groups;
-
-            if (typeof this.selectedGroups === "number") {
-                groups = [this.selectedGroups]
-            } else {
-                groups = this.formatGroupsId();
-            }
-
+            let groups = this.selectedGroups.map(group => group.id);
             let userId = this.store.getUser().id;
             let userToken = this.store.getUser().token;
             comManager.setUserGroups(userId, groups, userToken).then((data) => {
                 this.storeGroupsLoading = false;
-                // Maybe in a future consider to retrieve the user groups from the DB (data variable)
-                // and store them in the store
 
                 this.store.setUserGroups(groups);
                 this.$router.push('/llista_propostes');
@@ -154,13 +128,39 @@ export default {
         },
         checkCorrectOptions() {
             if (this.user.role_id === 5) {
-                return !this.selectedGroups || !this.selectedCategoryId;
+                return !this.selectedGroups || !this.selectedCategories;
+                // return !this.selectedGroups || !this.selectedCategoryId;
             } else {
-                return !this.selectedGroups.length > 0 || !this.selectedCategoryId;
+                // return !this.selectedGroups.length > 0 || !this.selectedCategoryId;
+                return !this.selectedGroups.length > 0 || !this.selectedCategories.length > 0;
             }
-
         },
-    }
+        deleteCategory(category) {
+            this.selectedCategories = this.selectedCategories.filter((item) => item.id !== category.id);
+            this.selectedGroups = this.selectedGroups.filter((group) => group.category_id !== category.id);
+        },
+        deleteGroup(group) {
+            this.selectedGroups = this.selectedGroups.filter((item) => item.id !== group.id);
+        },
+        updateSelectedGroups() {
+            if (this.user.role_id === 5) this.selectedGroups = [];
+
+            const validGroups = this.getGroups;
+            this.selectedGroups = this.selectedGroups.filter(group =>
+                validGroups.some(validGroup => validGroup.id === group.id)
+            );
+        },
+
+    },
+    watch: {
+        selectedCategories: {
+            handler(newVal, oldVal) {
+                // Update selectedGroups based on the current selectedCategories
+                this.updateSelectedGroups();
+            },
+            deep: true,
+        },
+    },
 }
 </script>
 
@@ -182,5 +182,15 @@ export default {
 .btn:disabled {
     background-color: #999;
     cursor: not-allowed;
+}
+
+.appear-enter-active,
+.appear-leave-active {
+    transition: opacity 0.5s;
+}
+
+.appear-enter-from,
+.appear-leave-to {
+    opacity: 0;
 }
 </style>
