@@ -15,7 +15,7 @@ Objectius específics:
 
 ## Documentació Tècnica
 
-[Link a la documentació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/tecnica_2324_SoundOClock.pdf)
+[Link a la documentació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/Documentacio_Tecnica.pdf)
 
 ## Manual d'Usuari
 
