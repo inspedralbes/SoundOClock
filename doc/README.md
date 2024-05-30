@@ -1,12 +1,42 @@
 # Documentació bàsica del projecte
-Alguns dels punts que han de quedar explicats:
- * Objectius
- * Arquitectura bàsica
-   * Tecnologies utilitzades
-   * Interrelació entre els diversos components
- * Com crees l'entorn de desenvolupament
- * Com desplegues l'aplicació a producció
- * Llistat d'endpoints de l'API de backend
-    * Rutes
-   * Exemples de JSON de peticó
-   * Exemples de JSON de resposta i els seus codis d'estat 200? 404?
+
+## Objectius
+
+Objectiu principal: 
+- Facilitar a l’equip docent la tria i l'edició de les cançons i donar veu als alumnes per que es posin les cançons que els hi agradaria escoltar
+
+Objectius específics:
+- Permetre als usuaris proposar i votar cançons.
+- Desenvolupar un panell d'administració eficient per gestionar les propostes de cançons.
+
+## Presentació Resum
+
+[Link a la presentació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/resum_2324_SoundOClock.pdf)
+
+## Documentació Tècnica
+
+[Link a la documentació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/Documentacio_Tecnica.pdf)
+
+## Manual d'Usuari
+
+[Link al manual](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/I%20MANUAL%20D'USUARI.pdf)
+
+## Planificació del projecte
+
+[Link a la planificació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/B%20PLANIFICACI%C3%93.pdf)
+
+## Pitch
+
+[Link al pitch](https://drive.google.com/file/d/1z6l-2giClutrArK_DkhC3P9tWm7UwrBf/view?usp=drive_link)
+
+## Demo
+
+[Link a la demo](https://drive.google.com/file/d/1543woUbUey6t7w0lhd_7cvS5hgugDws3/view?usp=drive_link)
+
+## Presentació tècnica
+
+[Link a la presentació tècnica](https://drive.google.com/file/d/1RoSj4b98vgOnVYKDpTm2CvK4-P-lEnQ_/view?usp=drive_link)
+
+## Presentació comercial
+
+[Link a la presentació comercial](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/comercial_2324_SoundOClock.pdf)
