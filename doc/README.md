@@ -24,3 +24,11 @@ Objectius específics:
 ## Planificació del projecte
 
 [Link a la planificació](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/B%20PLANIFICACI%C3%93.pdf)
+
+## Pitch
+
+[Link al pitch](https://drive.google.com/file/d/1z6l-2giClutrArK_DkhC3P9tWm7UwrBf/view?usp=drive_link)
+
+## Demo
+
+[Link a la demo](https://drive.google.com/file/d/1543woUbUey6t7w0lhd_7cvS5hgugDws3/view?usp=drive_link)
