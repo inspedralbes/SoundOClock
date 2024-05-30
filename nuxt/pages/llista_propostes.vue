@@ -30,7 +30,8 @@
                     </template>
                 </UDropdown>
             </div>
-            <div class="flex items-center gap-2" :class="{ 'w-[57%] ml-12': !$device.isMobile, 'px-3': $device.isMobile }">
+            <div class="flex items-center gap-2"
+                :class="{ 'w-[57%] ml-12': !$device.isMobile, 'px-3': $device.isMobile }">
                 <div class="relative text-center w-full">
                     <input type="text"
                         :placeholder="settings.theme && settings.theme != '' ? 'La temàtica és: ' + settings.theme : 'Buscar...'"
@@ -67,7 +68,8 @@
                             :ui="{ body: { base: 'flex-1', background: 'bg-stone-800', }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
                             <Placeholder class="h-full" />
                             <div class="flex items-center justify-between bg-stone-800 pb-1">
-                                <h3 class="text-2xl cursor-default font-semibold leading-6 text-gray-900 dark:text-white">
+                                <h3
+                                    class="text-2xl cursor-default font-semibold leading-6 text-gray-900 dark:text-white">
                                     FILTRES
                                 </h3>
                                 <button @click="isFiltersSlideOpen = false"
@@ -88,7 +90,7 @@
                                     </button>
                                 </div>
                                 <div v-if="bells" class="grid grid-cols-4 gap-x-2 gap-y-4">
-                                    <div v-for="(    bell, index    ) in     bells    "
+                                    <div v-for="(    bell, index    ) in bells    "
                                         class="w-full flex items-center justify-center">
                                         <button @click="selectBell(bell.id)" :title="formatTime(bell.hour)"
                                             :class="filterBell === bell.id ? 'border-blue-600 text-blue-500' : ''"
@@ -111,7 +113,7 @@
                                 </div>
                                 <div v-if="groupsAvailable.length > 0">
                                     <div v-if="filteredSongs.length > 0" class="grid grid-cols-4 gap-x-2 gap-y-4">
-                                        <div v-for="(    group, index    ) in     groupsAvailable    "
+                                        <div v-for="(    group, index    ) in groupsAvailable    "
                                             class="w-full flex items-center justify-center">
                                             <button @click="selectGroup(group.id)"
                                                 :title="hasPropose(group.id) ? `Fes clic per veure les cançons proposades d'aquest grup` : `No hi ha cap cançó proposada en aquest grup`"
@@ -176,7 +178,7 @@
 
             <!-- CANCIONES PROPUESTAS -->
             <TransitionGroup name="song-slide" mode="out-in">
-                <div v-for="    track     in     filteredSongs    " :key="track.id"
+                <div v-for="    track in filteredSongs    " :key="track.id"
                     :class="{ 'w-[60%] mb-4': !$device.isMobile }">
                     <component :is="activeSong" :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying"
                         @play="playTrack" @vote="vote($event)" @report="report($event)" :type="getType(track.id)" />
@@ -190,7 +192,7 @@
                 </h2>
             </Transition>
             <TransitionGroup tag="div" mode="out-in" name="song-slide" :class="{ 'w-[60%]': !$device.isMobile }">
-                <component :is="activeSong" v-for="     track     in     spotifySongs     " :key="track.id" :track="track"
+                <component :is="activeSong" v-for="     track in spotifySongs     " :key="track.id" :track="track"
                     :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
                     @propose="proposeSongCheck($event)" :type="getType(track.id)" />
             </TransitionGroup>
@@ -209,7 +211,7 @@
                 <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
             </div>
             <div>
-                <div v-for="    track     in     finalSongsList    " :key="track.id"
+                <div v-for="    track in finalSongsList    " :key="track.id"
                     :class="{ 'w-[60%] mb-4': !$device.isMobile }">
                     <component :is="activeSong" :track="track" :currentTrackId="currentTrackId" :isPlaying="isPlaying"
                         @play="playTrack" :type="'selected'" :bellId="track.bellId" />
@@ -257,7 +259,7 @@
 
             <p>Per quin motiu vols reportar la cançó <b>'{{ reportSongData.reportedSong.name }}'</b>?</p>
             <div class="flex flex-col mt-4">
-                <div v-for="    option     in     reportSongData.options     " class="flex flex-row mb-2">
+                <div v-for="    option in reportSongData.options     " class="flex flex-row mb-2">
                     <UCheckbox v-model="option.value">
                         <template #label>
                             <span>{{ option.label }}</span>
@@ -272,7 +274,8 @@
                         <UButton @click="modals.reportModal = false" variant="outline" class="px-4 py-2 text-sm">
                             Cancel·la
                         </UButton>
-                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive" disabled>
+                        <UButton color="red" class="px-4 py-2 text-sm" v-if="!isReportLoading && !reportActive"
+                            disabled>
                             Reporta
                         </UButton>
                         <UButton @click="reportTrack" color="red" class="px-4 py-2 text-sm"
@@ -472,16 +475,13 @@ export default {
     },
     created() {
         socket.on('searchResult', (results) => {
-            console.log("results", results, "length", results.length);
             let handleSplicit = [];
             if (this.settings.showExplicit) {
                 handleSplicit = results.filter(song => !song.explicit);
-                console.log("hadleSplicit", handleSplicit, "length", handleSplicit.length);
                 this.spotifySongs = handleSplicit.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
             } else {
                 this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
             }
-            console.log("spotifySongs", this.spotifySongs, "length", this.spotifySongs.length);
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -816,7 +816,6 @@ export default {
         },
 
         isTrackEsplicit(track) {
-            console.log("check explicit", track.explicit);
             if (track.explicit) {
                 return true;
             } else {
@@ -825,14 +824,10 @@ export default {
         },
 
         proposeSongCheck(track) {
-            console.log("proposeSongCheck", track);
             let isEsplicit = this.isTrackEsplicit(track);
-            console.log("isEsplicit", isEsplicit);
             if (this.settings.letProposeExplicit && isEsplicit) {
-                console.log("blockEsplicit", this.settings.blockEsplicit);
                 this.modals.blockEsplicit = true;
             } else if (this.settings.alertExplicit && isEsplicit) {
-                console.log("alertEsplicit", this.settings.alertEsplicit);
                 this.modals.alertEsplicit = true;
                 this.proposeAlertHandlerTrack = track;
             } else {

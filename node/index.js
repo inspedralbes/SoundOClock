@@ -415,7 +415,9 @@ app.post("/usersVotes", async (req, res) => {
     if (song) {
       // Find all users that voted for the song with the given id
       // el $in es para buscar en un array de valores (en este caso, en el array de votedSongs) si el valor song.id está presente
-      let usersVotesMongo = await VotingRecord.find({ votedSongs: { $in: [song.id] } });
+      let usersVotesMongo = await VotingRecord.find({
+        votedSongs: { $in: [song.id] },
+      });
 
       //get token from the request
       let token = req.body.token;
@@ -431,11 +433,11 @@ app.post("/usersVotes", async (req, res) => {
 });
 
 // GROUP BELLS TEMPLATE
-app.post('/bellsGroupsTemplate', async (req, res) => {
+app.post("/bellsGroupsTemplate", async (req, res) => {
   try {
     const template = new BellsGroupsTemplate(req.body.template);
     await template.save();
-    res.json({ status: 'success' });
+    res.json({ status: "success" });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -443,14 +445,14 @@ app.post('/bellsGroupsTemplate', async (req, res) => {
 
 app.get("/user/:userId", async (req, res) => {
   try {
-    const userToken = req.headers['authorization'].split(' ')[1];
+    const userToken = req.headers["authorization"].split(" ")[1];
     let user = await comManager.showUser(userToken, req.params.userId);
     res.json(user);
   } catch (err) {
     res.status(500).send(err);
   }
 });
-app.get('/bellsGroupsTemplate', async (req, res) => {
+app.get("/bellsGroupsTemplate", async (req, res) => {
   try {
     const templates = await BellsGroupsTemplate.find();
     res.json(templates);
@@ -459,29 +461,29 @@ app.get('/bellsGroupsTemplate', async (req, res) => {
   }
 });
 
-app.delete('/bellsGroupsTemplate/:id', async (req, res) => {
+app.delete("/bellsGroupsTemplate/:id", async (req, res) => {
   try {
     await BellsGroupsTemplate.findByIdAndDelete(req.params.id);
-    res.json({ status: 'success' });
+    res.json({ status: "success" });
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-app.get('/checkThemeModal/:theme/:userId', async (req, res) => {
+app.get("/checkThemeModal/:theme/:userId", async (req, res) => {
   const theme = req.params.theme;
   const userId = parseInt(req.params.userId);
 
   try {
     const themeModal = await ThemeModals.findOne({ userId: userId });
     if (!themeModal) {
-      return res.json({ status: 'success', showModal: true });
+      return res.json({ status: "success", showModal: true });
     } else {
       let modalShowed = themeModal.modalsShown.get(theme);
       if (!modalShowed) {
-        return res.json({ status: 'success', showModal: true });
+        return res.json({ status: "success", showModal: true });
       } else {
-        return res.json({ status: 'success', showModal: false });
+        return res.json({ status: "success", showModal: false });
       }
     }
   } catch (err) {
@@ -489,7 +491,7 @@ app.get('/checkThemeModal/:theme/:userId', async (req, res) => {
   }
 });
 
-app.post('/acceptThemeTerms', async (req, res) => {
+app.post("/acceptThemeTerms", async (req, res) => {
   const theme = req.body.theme;
   const userId = req.body.userId;
 
@@ -498,14 +500,14 @@ app.post('/acceptThemeTerms', async (req, res) => {
     if (!themeModal) {
       const newThemeModal = new ThemeModals({
         userId: userId,
-        modalsShown: new Map([[theme, true]])
+        modalsShown: new Map([[theme, true]]),
       });
       await newThemeModal.save();
     } else {
       themeModal.modalsShown.set(theme, true);
       await themeModal.save();
     }
-    res.json({ status: 'success' });
+    res.json({ status: "success" });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -587,12 +589,19 @@ io.on("connection", (socket) => {
   });
 
   socket.on("login", async (email, name) => {
-    console.log("login", email, name);
     try {
       let user = await comManager.login(name, email);
-      console.log("user", user);
-      console.log("loginData", user.user.id, user.user.email, user.user.name, user.user.picture, user.token, user.user.groups, user.user.role_id, user.user.role_name);
-      socket.emit("loginData", user.user.id, user.user.email, user.user.name, user.user.picture, user.token, user.user.groups, user.user.role_id, user.user.role_name);
+      socket.emit(
+        "loginData",
+        user.user.id,
+        user.user.email,
+        user.user.name,
+        user.user.picture,
+        user.token,
+        user.user.groups,
+        user.user.role_id,
+        user.user.role_name
+      );
     } catch (err) {
       console.error(err);
     }
