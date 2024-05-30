@@ -32,3 +32,11 @@ Objectius específics:
 ## Demo
 
 [Link a la demo](https://drive.google.com/file/d/1543woUbUey6t7w0lhd_7cvS5hgugDws3/view?usp=drive_link)
+
+## Presentació tècnica
+
+[Link a la presentació tècnica](https://drive.google.com/file/d/1RoSj4b98vgOnVYKDpTm2CvK4-P-lEnQ_/view?usp=drive_link)
+
+## Presentació comercial
+
+[Link a la presentació comercial](https://github.com/inspedralbes/tr3-soundoclock/blob/main/doc/comercial_2324_SoundOClock.pdf)
