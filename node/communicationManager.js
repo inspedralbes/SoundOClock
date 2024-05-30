@@ -25,7 +25,6 @@ async function getUserInfo(token) {
 }
 
 async function googleLogin(userToken) {
-  console.log("Google login", userToken);
   // Get user info from google
   const response = await fetch(
     "https://www.googleapis.com/oauth2/v1/userinfo",
@@ -37,7 +36,6 @@ async function googleLogin(userToken) {
     }
   );
   const data = await response.json();
-  console.log("Google user info", data);
 
   // Send user info to the server
   let userData = await login(data.name, data.email, data.picture);
@@ -54,7 +52,6 @@ async function loginUserAndAdmin() {
 }
 
 async function login(name, email, picture) {
-  console.log("Logging in", name, email, picture);
   let userData = await axios.post(
     apiURL + "login",
     {
@@ -69,7 +66,6 @@ async function login(name, email, picture) {
       },
     }
   );
-  console.log("userData.data", userData.data);
   const roleNameResponse = await fetch(
     apiURL + "roles/" + userData.data.user.role_id,
     {
@@ -83,7 +79,6 @@ async function login(name, email, picture) {
   const roleNameData = await roleNameResponse.json();
 
   userData.data.user.role_name = roleNameData.name;
-  console.log("userData.data", userData.data);
   return userData.data;
 }
 
@@ -142,7 +137,6 @@ async function addSongToBlackList(token, song) {
     }),
   });
   const jsonResponse = await response.json();
-  console.log("POSTED SONG TO BLACKLIST", jsonResponse);
   return jsonResponse;
 }
 
@@ -470,7 +464,6 @@ async function deleteUserFromGroup(token, group_id, user_id) {
 }
 
 async function sendDeletedSongMail(token, song) {
-
   const response = await axios.post(`${apiURL}mail`, song, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -496,8 +489,6 @@ async function getUsersVotes(users, token) {
 }
 
 async function sendVoteReminderMail(usersVotedId) {
-
-  console.log("enter reminder mail response");
   const response = await fetch(apiURL + "reminderMail", {
     method: "POST",
     headers: {
@@ -509,7 +500,6 @@ async function sendVoteReminderMail(usersVotedId) {
     }),
   });
   const jsonResponse = await response.json();
-  console.log("reminder mail response", jsonResponse);
 }
 
 const comManager = {

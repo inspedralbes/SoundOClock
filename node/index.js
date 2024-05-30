@@ -562,13 +562,11 @@ io.on("connection", (socket) => {
   console.log("A user connected. Total users:", amountUsers);
 
   socket.on("googleLogin", (userToken) => {
-    console.log("googleLogin start");
     comManager
       .googleLogin(userToken)
       .then((userData) => {
-        // console.log("UserData:", userData);
+        console.log("UserData on socket.GoogleLogin:", userData);
         let groups = [];
-        console.log(userData);
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
           groups.push(group.pivot.group_id);

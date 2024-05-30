@@ -51,6 +51,7 @@ socket.on("connect", () => {
     "loginData",
     (id, mail, name, picture, token, groups, roleId, roleName) => {
       pinia.setUser(id, mail, name, picture, token, groups, roleId, roleName);
+      console.log("loginData", pinia.getUser());
       if (pinia.getUser().groups.length <= 0) {
         navigateTo({ path: "/escollirGrup" });
       }
