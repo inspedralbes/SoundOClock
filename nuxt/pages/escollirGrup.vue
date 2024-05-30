@@ -106,7 +106,12 @@ export default {
     methods: {
         storeGroup() {
             this.storeGroupsLoading = true;
-            let groups = this.selectedGroups.map(group => group.id);
+            let groups = [];
+            if (this.user.role_id === 5) {
+                groups = this.selectedGroups.id;
+            } else {
+                groups = this.selectedGroups.map(group => group.id);
+            }
             let userId = this.store.getUser().id;
             let userToken = this.store.getUser().token;
             comManager.setUserGroups(userId, groups, userToken).then((data) => {
