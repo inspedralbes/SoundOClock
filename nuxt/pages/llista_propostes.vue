@@ -11,7 +11,7 @@
 
         <div v-if="checkVotingState === 'vote'" class="mb-4" :class="{ '!mb-36': isPlaying }">
             <div v-if="settings.theme" class="flex justify-center content-center my-8">
-                <h1 class="text-4xl smallCaps w-fit text-center z-50">
+                <h1 class="text-4xl smallCaps w-fit z-50">
                     {{ 'La temàtica és: ' + settings.theme }}
                 </h1>
 
@@ -154,15 +154,9 @@
             <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
             <div v-if="songs.length === 0" class="mt-4 w-full">
                 <p class="text-xl" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Encara no
-                    s'ha
-                    proposat
-                    cap cançó.</p>
+                    s'ha proposat cap cançó.</p>
                 <p class="mx-4" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Anima't a
-                    compartir
-                    la teva
-                    proposta fent <br v-if="$device.isMobile">
-                    cercant a
-                    la barra de búsqueda.</p>
+                    compartir la teva proposta fent <br v-if="$device.isMobile"> cercant a la barra de búsqueda.</p>
             </div>
 
             <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4 w-full">
@@ -197,15 +191,7 @@
                     @propose="proposeSongCheck($event)" :type="getType(track.id)" />
             </TransitionGroup>
         </div>
-        <div v-if="checkVotingState === 'mod'">
-            <div>
-                <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}"
-                    finalitzada
-                </h2>
-                <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
-            </div>
-        </div>
-        <div v-if="checkVotingState === 'none'" class="m-3">
+        <div v-else class="m-3">
             <div>
                 <h2 class="text-3xl font-bold mt-4">La votació de "{{ settings.theme }}" ha finalitzat,
                     gràcies!
