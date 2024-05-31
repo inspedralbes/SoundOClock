@@ -184,8 +184,8 @@ async function getPlaylistSongs(id, token) {
   return jsonResponse;
 }
 
-async function searchSong(search, limit, token) {
-  let url = `https://api.spotify.com/v1/search?query=${search}&type=track&offset=0&limit=${limit}`;
+async function searchSong(search, limit, token, offset) {
+  let url = `https://api.spotify.com/v1/search?query=${search}&type=track&offset=${offset}&limit=${limit}`;
   let songs = await fetch(url, {
     headers: {
       Accept: "application/json",
@@ -470,7 +470,6 @@ async function deleteUserFromGroup(token, group_id, user_id) {
 }
 
 async function sendDeletedSongMail(token, song) {
-
   const response = await axios.post(`${apiURL}mail`, song, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -496,7 +495,6 @@ async function getUsersVotes(users, token) {
 }
 
 async function sendVoteReminderMail(usersVotedId) {
-
   console.log("enter reminder mail response");
   const response = await fetch(apiURL + "reminderMail", {
     method: "POST",

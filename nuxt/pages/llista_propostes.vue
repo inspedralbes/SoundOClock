@@ -190,6 +190,10 @@
                     :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
                     @propose="proposeSongCheck($event)" :type="getType(track.id)" />
             </TransitionGroup>
+            <div v-if="spotifySongs.length > 0" class="flex justify-center my-4 ml-12 w-[57%]">
+                <UButton size="lg" color="black" :loading="loadingMoreSongs" label="Carregar més cançons"
+                    @click="loadMoreSongs" />
+            </div>
         </div>
         <div v-else class="mb-4" :class="{ '!mb-36': isPlaying }">
             <div class="flex flex-col my-8 ml-12">
@@ -459,6 +463,8 @@ export default {
             // isSettingsLoading: true,
             proposeAlertHandlerTrack: null,
             isTermsLoading: false,
+            currentOffset: 0,
+            loadingMoreSongs: false,
         }
     },
     created() {
@@ -470,6 +476,17 @@ export default {
             } else {
                 this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
             }
+        });
+
+        socket.on('loadMoreSongsResult', (results) => {
+            let handleSplicit = [];
+            if (this.settings.showExplicit) {
+                handleSplicit = results.filter(song => !song.explicit);
+                this.spotifySongs = [...this.spotifySongs, ...handleSplicit.filter(song => !this.songs.some(existingSong => existingSong.id === song.id))];
+            } else {
+                this.spotifySongs = [...this.spotifySongs, ...results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id))];
+            }
+            this.loadingMoreSongs = false;
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -556,6 +573,7 @@ export default {
         this.store.deleteCurrentTrackPlaying();
         socket.off("voteError");
         socket.off("searchResult");
+        socket.off("loadMoreSongs")
         socket.off("sendHtmlSpotify");
         socket.off("sendSettings");
     },
@@ -666,11 +684,19 @@ export default {
             return formattedHour + ":" + minutes;
         },
         getSongs() {
+            let limit = 15;
+            this.currentOffset = 0;
             if (this.filter != '') {
-                socket.emit('searchSong', this.filter);
+                socket.emit('searchSong', this.filter, limit, this.currentOffset);
             } else {
                 this.spotifySongs = [];
             }
+        },
+        loadMoreSongs() {
+            let limit = 15;
+            this.currentOffset += limit;
+            socket.emit('loadMoreSongs', this.filter, limit, this.currentOffset);
+            this.loadingMoreSongs = true;
         },
         handleInput(event) {
             const value = event.target.value;

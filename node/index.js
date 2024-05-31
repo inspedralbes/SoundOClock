@@ -1106,11 +1106,18 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("searchSong", (search) => {
-    let limit = 15;
-    comManager.searchSong(search, limit, spotifyToken).then((data) => {
+  socket.on("searchSong", (search, limit, offset) => {
+    comManager.searchSong(search, limit, spotifyToken, offset).then((data) => {
       if (data) {
         socket.emit("searchResult", data.tracks.items);
+      }
+    });
+  });
+
+  socket.on("loadMoreSongs", (search, limit, offset) => {
+    comManager.searchSong(search, limit, spotifyToken, offset).then((data) => {
+      if (data) {
+        socket.emit("loadMoreSongsResult", data.tracks.items);
       }
     });
   });
