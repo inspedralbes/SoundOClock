@@ -53,7 +53,8 @@
                 <label for="theme" class="text-lg basis-1/5">
                     Duracio de la votacio
                 </label>
-                <span class="grow flex items-center justify-center">
+                <ModularUDatePicker></ModularUDatePicker>
+                <!-- <span class="grow flex items-center justify-center">
                     <UButtonGroup class="w-1/4" orientation="horizontal">
                         <UButton @click="handleSwitch('isVoteInDays', true)" class="w-1/2 *:mx-auto" label="Dies"
                             color="blue" :variant="isVoteInDays ? 'solid' : 'soft'" />
@@ -66,7 +67,7 @@
                     <UInput class="text-white" color="blue" type="number" name="theme"
                         v-model="settings.voteDuration" />
                     <p class="ml-2 text-lg">{{ showVoteDayExpected }}</p>
-                </span>
+                </span> -->
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label for="theme" class="text-lg basis-1/5">
