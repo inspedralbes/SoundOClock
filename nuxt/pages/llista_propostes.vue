@@ -208,8 +208,10 @@
         </div>
         <div v-if="checkVotingState === 'none'" class="m-3">
             <div>
-                <h2 class="text-center text-3xl font-bold mt-4">Cançons "{{ settings.theme }}"</h2>
-                <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
+                <h2 class="text-3xl font-bold mt-4">La votació de "{{ settings.theme }}" ha finalitzat,
+                    gràcies!
+                </h2>
+                <p>Aquestes son les cançons que estan sonant cada dia.</p>
             </div>
             <div>
                 <div v-for="    track in finalSongsList    " :key="track.id"
