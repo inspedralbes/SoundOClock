@@ -51,14 +51,14 @@
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label for="theme" class="text-lg basis-1/5">
-                    Duracio de la votacio
+                    Duració de la votacio
                 </label>
                 <UDateRangePicker :initialStartDate="formatDate(settings.start_vote)"
                     :initialEndDate="formatDate(settings.end_vote)" @rangeSelected="selectVotingRange($event)" />
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label for="theme" class="text-lg basis-1/5">
-                    Duracio de la moderació
+                    Duració de la moderació
                 </label>
                 <UDateRangePicker :initialStartDate="formatDate(settings.start_moderation)"
                     :initialEndDate="formatDate(settings.end_moderation)"
