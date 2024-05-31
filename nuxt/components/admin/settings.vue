@@ -53,7 +53,7 @@
                 <label for="theme" class="text-lg basis-1/5">
                     Duracio de la votacio
                 </label>
-                <ModularUDatePicker></ModularUDatePicker>
+                <!-- <UDateRangePicker></UDateRangePicker> -->
                 <!-- <span class="grow flex items-center justify-center">
                     <UButtonGroup class="w-1/4" orientation="horizontal">
                         <UButton @click="handleSwitch('isVoteInDays', true)" class="w-1/2 *:mx-auto" label="Dies"
