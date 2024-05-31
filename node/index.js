@@ -1305,7 +1305,7 @@ io.on("connection", (socket) => {
         settings = await comManager.getPublicSettings();
         myCache.set("settings", settings, DEFAULT_CACHE_TTL);
       }
-      io.emit("sendSettings", settings);
+      socket.emit("sendSettings", settings);
     } catch (err) {
       socket.emit("getSettingsError", {
         status: "error",

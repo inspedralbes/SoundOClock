@@ -140,6 +140,7 @@ export default {
             voteHasChanged: false,
             modHasChanged: false,
             unformattedEndingVote: null,
+            toast: null,
         };
     },
 
@@ -223,15 +224,32 @@ export default {
 
         socket.on('getSettingsError', (error) => {
             this.isLoading = false;
+            this.toast.add({
+                title: 'Error al carregar la configuració',
+                description: 'Hi ha hagut un error al carregar la configuració.',
+                color: 'red',
+            });
         });
 
         socket.on('settingsUpdated', (message) => {
             this.isWaiting = false;
+            this.toast.add({
+                title: 'Configuració guardada!',
+                description: 'La configuració ha estat guardada correctament.',
+                color: 'green',
+            });
         });
 
         socket.on('settingsUpdateError', (error) => {
             this.isWaiting = false;
+            this.toast.add({
+                title: 'Error al guardar la configuració',
+                description: 'Hi ha hagut un error al guardar la configuració.',
+                color: 'red',
+            });
         });
+
+        this.toast = useToast();
     },
 
     beforeUnmount() {
