@@ -11,8 +11,8 @@
             v-if="!$device.isMobile" />
 
         <div v-if="checkVotingState === 'vote'" class="mb-4" :class="{ '!mb-36': isPlaying }">
-            <div v-if="settings.theme" class="flex justify-center content-center my-8">
-                <h1 class="text-4xl smallCaps w-fit text-center z-50">
+            <div v-if="settings.theme" class="flex my-8 ml-12">
+                <h1 class="text-4xl smallCaps w-fit z-50">
                     {{ 'La temàtica és: ' + settings.theme }}
                 </h1>
 
@@ -155,15 +155,9 @@
             <!-- <TransitionGroup tag="div" class="mb-20" name="song-slide" mode="out-in"> -->
             <div v-if="songs.length === 0" class="mt-4 w-full">
                 <p class="text-xl" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Encara no
-                    s'ha
-                    proposat
-                    cap cançó.</p>
+                    s'ha proposat cap cançó.</p>
                 <p class="mx-4" :class="{ 'ml-12': !$device.isMobile, 'text-center': $device.isMobile }">Anima't a
-                    compartir
-                    la teva
-                    proposta fent <br v-if="$device.isMobile">
-                    cercant a
-                    la barra de búsqueda.</p>
+                    compartir la teva proposta fent <br v-if="$device.isMobile"> cercant a la barra de búsqueda.</p>
             </div>
 
             <div v-if="songs.length != 0 && filteredSongs.length === 0" class="mt-4 w-full">
@@ -197,19 +191,17 @@
                     :currentTrackId="currentTrackId" :isPlaying="isPlaying" @play="playTrack"
                     @propose="proposeSongCheck($event)" :type="getType(track.id)" />
             </TransitionGroup>
-        </div>
-        <div v-if="checkVotingState === 'mod'">
-            <div>
-                <h2 class="text-center text-3xl font-bold mt-4">Votació de la temàtica "{{ settings.theme }}"
-                    finalitzada
-                </h2>
-                <p class="text-center">Gràcies per participar. Ara estem en procés de moderació.</p>
+            <div v-if="spotifySongs.length > 0" class="flex justify-center my-4 ml-12 w-[57%]">
+                <UButton size="lg" color="black" :loading="loadingMoreSongs" label="Carregar més cançons"
+                    @click="loadMoreSongs" />
             </div>
         </div>
-        <div v-if="checkVotingState === 'none'" class="m-3">
-            <div>
-                <h2 class="text-center text-3xl font-bold mt-4">Cançons "{{ settings.theme }}"</h2>
-                <p class="text-center">Aquestes son les cançons que estan sonant cada dia.</p>
+        <div v-else class="mb-4" :class="{ '!mb-36': isPlaying }">
+            <div class="flex flex-col my-8 ml-12">
+                <h2 class="text-3xl font-bold mt-4 smallCaps">La votació de "{{ settings.theme }}" ha finalitzat,
+                    gràcies!
+                </h2>
+                <p>Aquestes son les cançons que estan sonant cada dia.</p>
             </div>
             <div>
                 <div v-for="    track in finalSongsList    " :key="track.id"
@@ -472,6 +464,8 @@ export default {
             // isSettingsLoading: true,
             proposeAlertHandlerTrack: null,
             isTermsLoading: false,
+            currentOffset: 0,
+            loadingMoreSongs: false,
         }
     },
     created() {
@@ -483,6 +477,17 @@ export default {
             } else {
                 this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
             }
+        });
+
+        socket.on('loadMoreSongsResult', (results) => {
+            let handleSplicit = [];
+            if (this.settings.showExplicit) {
+                handleSplicit = results.filter(song => !song.explicit);
+                this.spotifySongs = [...this.spotifySongs, ...handleSplicit.filter(song => !this.songs.some(existingSong => existingSong.id === song.id))];
+            } else {
+                this.spotifySongs = [...this.spotifySongs, ...results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id))];
+            }
+            this.loadingMoreSongs = false;
         });
 
         socket.on('sendHtmlSpotify', (htmlSpotify, songId) => {
@@ -569,6 +574,7 @@ export default {
         this.store.deleteCurrentTrackPlaying();
         socket.off("voteError");
         socket.off("searchResult");
+        socket.off("loadMoreSongs")
         socket.off("sendHtmlSpotify");
         socket.off("sendSettings");
     },
@@ -679,11 +685,19 @@ export default {
             return formattedHour + ":" + minutes;
         },
         getSongs() {
+            let limit = 15;
+            this.currentOffset = 0;
             if (this.filter != '') {
-                socket.emit('searchSong', this.filter);
+                socket.emit('searchSong', this.filter, limit, this.currentOffset);
             } else {
                 this.spotifySongs = [];
             }
+        },
+        loadMoreSongs() {
+            let limit = 15;
+            this.currentOffset += limit;
+            socket.emit('loadMoreSongs', this.filter, limit, this.currentOffset);
+            this.loadingMoreSongs = true;
         },
         handleInput(event) {
             const value = event.target.value;
