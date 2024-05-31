@@ -1,29 +1,52 @@
 <script setup lang="ts">
-import { sub, format, isSameDay, type Duration } from 'date-fns'
+import { add, format, isSameDay, type Duration } from 'date-fns'
+import { ref, defineEmits, watch, defineProps } from 'vue'
+
+// Define props
+const props = defineProps({
+    initialStartDate: {
+        type: Date,
+        default: () => new Date()
+    },
+    initialEndDate: {
+        type: Date,
+        default: () => add(new Date(), { days: 14 })
+    }
+})
+
+const emit = defineEmits(['rangeSelected'])
 
 const ranges = [
-    { label: 'Last 7 days', duration: { days: 7 } },
-    { label: 'Last 14 days', duration: { days: 14 } },
-    { label: 'Last 30 days', duration: { days: 30 } },
-    { label: 'Last 3 months', duration: { months: 3 } },
-    { label: 'Last 6 months', duration: { months: 6 } },
-    { label: 'Last year', duration: { years: 1 } }
+    { label: 'Pròxims 7 dies', duration: { days: 7 } },
+    { label: 'Pròxims 14 dies', duration: { days: 14 } },
+    { label: 'Pròxims 30 dies', duration: { days: 30 } },
+    { label: 'Pròxims 3 mesos', duration: { months: 3 } },
+    { label: 'Pròxims 6 mesos', duration: { months: 6 } },
+    { label: 'Pròxim any', duration: { years: 1 } }
 ]
-const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
+
+const selected = ref({
+    start: props.initialStartDate,
+    end: props.initialEndDate
+})
 
 function isRangeSelected(duration: Duration) {
-    return isSameDay(selected.value.start, sub(new Date(), duration)) && isSameDay(selected.value.end, new Date())
+    return isSameDay(selected.value.start, props.initialStartDate) && isSameDay(selected.value.end, add(props.initialStartDate, duration))
 }
 
 function selectRange(duration: Duration) {
-    selected.value = { start: sub(new Date(), duration), end: new Date() }
+    selected.value = { start: props.initialStartDate, end: add(props.initialStartDate, duration) }
 }
+
+watch(selected, (newVal) => {
+    emit('rangeSelected', newVal)
+}, { deep: true })
 </script>
 
 <template>
     <UPopover :popper="{ placement: 'bottom-start' }">
         <UButton icon="i-heroicons-calendar-days-20-solid">
-            {{ format(selected.start, 'd MMM, yyy') }} - {{ format(selected.end, 'd MMM, yyy') }}
+            {{ format(selected.start, 'd MMM, yyyy') }} - {{ format(selected.end, 'd MMM, yyyy') }}
         </UButton>
 
         <template #panel="{ close }">

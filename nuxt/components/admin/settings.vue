@@ -53,40 +53,16 @@
                 <label for="theme" class="text-lg basis-1/5">
                     Duracio de la votacio
                 </label>
-                <!-- <UDateRangePicker></UDateRangePicker> -->
-                <!-- <span class="grow flex items-center justify-center">
-                    <UButtonGroup class="w-1/4" orientation="horizontal">
-                        <UButton @click="handleSwitch('isVoteInDays', true)" class="w-1/2 *:mx-auto" label="Dies"
-                            color="blue" :variant="isVoteInDays ? 'solid' : 'soft'" />
-                        <UButton @click="handleSwitch('isVoteInDays', false)" class="w-1/2 *:mx-auto" label="Setmanes"
-                            color="blue" :variant="!isVoteInDays ? 'solid' : 'soft'" />
-                    </UButtonGroup>
-                </span>
-                <span class="basis-1/4 flex items-center">
-                    <p class="text-lg w-6/12">Fins al: </p>
-                    <UInput class="text-white" color="blue" type="number" name="theme"
-                        v-model="settings.voteDuration" />
-                    <p class="ml-2 text-lg">{{ showVoteDayExpected }}</p>
-                </span> -->
+                <UDateRangePicker :initialStartDate="formatDate(settings.start_vote)"
+                    :initialEndDate="formatDate(settings.end_vote)" @rangeSelected="selectVotingRange($event)" />
             </div>
             <div class="flex items-center justify-between w-full py-2 h-20">
                 <label for="theme" class="text-lg basis-1/5">
                     Duracio de la moderació
                 </label>
-                <span class="grow flex items-center justify-center">
-                    <UButtonGroup class="w-1/4" orientation="horizontal">
-                        <UButton @click="handleSwitch('isModInDays', true)" class="w-1/2 *:mx-auto" label="Dies"
-                            color="blue" :variant="isModInDays ? 'solid' : 'soft'" />
-                        <UButton @click="handleSwitch('isModInDays', false)" class="w-1/2 *:mx-auto" label="Setmanes"
-                            color="blue" :variant="!isModInDays ? 'solid' : 'soft'" />
-                    </UButtonGroup>
-                </span>
-                <span class="basis-1/4 flex items-center">
-                    <p class="text-lg w-6/12">Fins al: </p>
-                    <UInput class="text-white" color="blue" type="number" name="theme"
-                        v-model="settings.moderationDuration" />
-                    <p class="ml-2 text-lg">{{ showModDayExpected }}</p>
-                </span>
+                <UDateRangePicker :initialStartDate="formatDate(settings.start_moderation)"
+                    :initialEndDate="formatDate(settings.end_moderation)"
+                    @rangeSelected="selectModerationRange($event)" />
             </div>
         </div>
         <div v-if="!isLoading" class="flex align-center w-4/5 mx-auto basis-1/3">
@@ -148,7 +124,6 @@ export default {
                 showSave: false,
             },
             settings: {
-                voteDuration: 0,
                 start_vote: null,
                 end_vote: null,
                 moderationDuration: 0,
@@ -162,11 +137,9 @@ export default {
                 teacher_email_key: "",
                 student_email_key: "",
             },
-            minDate: null,
-            isVoteInDays: true,
-            isModInDays: true,
-            showVoteDayExpected: this.formatDate(new Date()),
-            showModDayExpected: this.formatDate(new Date()),
+            voteHasChanged: false,
+            modHasChanged: false,
+            unformattedEndingVote: null,
         };
     },
 
@@ -185,27 +158,8 @@ export default {
                 case 'alertExplicit':
                     this.settings.alertExplicit = value;
                     break;
-                case 'isVoteInDays':
-                    this.isVoteInDays = value;
-                    break;
-                case 'isModInDays':
-                    this.isModInDays = value;
-                    break;
             }
         },
-
-        daySetter(days, minDateDays) {
-            let initDate = new Date();
-            let endDate = new Date();
-            if (minDateDays != 0) {
-                initDate.setDate(initDate.getDate() + minDateDays + 1);
-            }
-            endDate.setDate(initDate.getDate() + days);
-            initDate = this.formatDateToLaravel(initDate);
-            endDate = this.formatDateToLaravel(endDate);
-            return { initDate, endDate };
-        },
-
         formatDateToLaravel(date) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -213,28 +167,27 @@ export default {
 
             return `${year}-${month}-${day}`;
         },
-        formatDate(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Sumamos 1 porque los meses van de 0 a 11
-            const day = String(date.getDate()).padStart(2, '0');
-
-            return `${day}-${month}-${year}`;
+        formatDate(dateString) {
+            // Separar el año, mes y día del string de fecha
+            const [year, month, day] = dateString.split('-');
+            // Crear un objeto de tipo Date usando los valores obtenidos
+            const dateObject = new Date(year, month - 1, day);
+            return dateObject; // Devolver el objeto Date
         },
         postConf(event) {
-            let setVoteDate = {};
-            let setModDate = {};
-            if (this.settings.voteDuration != 0) {
-                this.settings.voteDuration = this.isVoteInDays ? this.settings.voteDuration : this.settings.voteDuration * 7;
-                setVoteDate = this.daySetter(this.settings.voteDuration, 0);
-                this.settings.start_vote = setVoteDate.initDate;
-                this.settings.end_vote = setVoteDate.endDate;
-                if (this.settings.moderationDuration != 0) {
-                    this.settings.moderationDuration = this.isModInDays ? this.settings.moderationDuration : this.settings.moderationDuration * 7;
-                    setModDate = this.daySetter(this.settings.moderationDuration, this.settings.voteDuration);
-                    this.settings.start_moderation = setModDate.initDate;
-                    this.settings.end_moderation = setModDate.endDate;
-                }
-            }
+
+            // if (this.settings.voteDuration != 0) {
+            // this.settings.voteDuration = this.isVoteInDays ? this.settings.voteDuration : this.settings.voteDuration * 7;
+            // setVoteDate = this.daySetter(this.settings.voteDuration, 0);
+            // this.settings.start_vote = setVoteDate.initDate;
+            // this.settings.end_vote = setVoteDate.endDate;
+            // if (this.settings.moderationDuration != 0) {
+            //     this.settings.moderationDuration = this.isModInDays ? this.settings.moderationDuration : this.settings.moderationDuration * 7;
+            //     setModDate = this.daySetter(this.settings.moderationDuration, this.settings.voteDuration);
+            //     this.settings.start_moderation = setModDate.initDate;
+            //     this.settings.end_moderation = setModDate.endDate;
+            // }
+            // }
             this.isWaiting = true;
             this.modals.showSave = false;
 
@@ -246,18 +199,16 @@ export default {
                 // socket.emit('deleteModerations', this.store.getUser().token);
             }
         },
-        updateExpectedDayVote() {
-            const endDay = new Date();
-            const endModDay = new Date();
-            let duration = this.isVoteInDays ? this.settings.voteDuration : this.settings.voteDuration * 7;
-            let durationMod = this.isModInDays ? this.settings.moderationDuration : this.settings.moderationDuration * 7;
-            endDay.setDate(new Date().getDate() + duration);
-            endModDay.setDate(endDay.getDate() + durationMod);
-            const result = this.formatDate(endDay);
-            const resultMod = this.formatDate(endModDay);
-            this.showVoteDayExpected = result;
-            this.showModDayExpected = resultMod;
-        }
+        selectVotingRange(duration) {
+            this.voteHasChanged = true;
+            this.settings.start_vote = this.formatDateToLaravel(duration.start);
+            this.settings.end_vote = this.formatDateToLaravel(duration.end);
+        },
+        selectModerationRange(duration) {
+            this.modHasChanged = true;
+            this.settings.start_moderation = this.formatDateToLaravel(duration.start);
+            this.settings.end_moderation = this.formatDateToLaravel(duration.end);
+        },
     },
 
     mounted() {
@@ -295,18 +246,6 @@ export default {
         return { store };
     },
     watch: {
-        'settings.voteDuration'() {
-            this.updateExpectedDayVote();
-        },
-        isVoteInDays() {
-            this.updateExpectedDayVote();
-        },
-        'settings.moderationDuration'() {
-            this.updateExpectedDayVote();
-        },
-        isModInDays() {
-            this.updateExpectedDayVote();
-        },
         'settings.showExplicit'(newValue) {
             if (newValue) {
                 this.settings.letProposeExplicit = false;
