@@ -69,7 +69,7 @@
             <UButton @click="modals.showSave = true" :disabled="isWaiting"
                 class="w-1/4 flex justify-center align-center ml-auto" color="green" size="xl">
                 <p v-if="!isWaiting">
-                    Guardar configuracio
+                    Guardar configuració
                 </p>
                 <Loader v-else />
             </UButton>
