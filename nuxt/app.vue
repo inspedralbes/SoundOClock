@@ -20,7 +20,10 @@ export default {
     }
   },
   created() {
-    socket.on("borrarLocalStorage")
+    socket.on("borrarLocalStorage", () => {
+      localStorage.clear();
+      this.$router.push({ name: 'index' });
+    });
   },
   computed: {
     loading() {
