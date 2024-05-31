@@ -10,13 +10,13 @@
 </template>
 
 <script>
-import { useAppStore } from '@/stores/app';
+// import { useAppStore } from '@/stores/app';
 import { socket } from '@/socket';
 
 export default {
   data() {
     return {
-      store: useAppStore()
+      // store: useAppStore()
     }
   },
   created() {
@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     loading() {
-      return this.store.getLoadingLogin();
+      // return this.store.getLoadingLogin();
     }
   }
 

@@ -9,7 +9,7 @@
                     :class="[pcStatus ? 'bg-green-500' : 'bg-red-500']"></span>
             </div>
         </div>
-        <div class="mt-20 mx-auto bg-black h-96 w-2/4 rounded-xl relative" ref="logContainer">
+        <div class="mt-20 mx-auto bg-black h-96 w-2/4 rounded-xl relative " ref="logContainer">
             <div v-if="logs.length > 0" @click="cleanLogs" class="absolute top-2 right-6 cursor-pointer">
                 <span class="material-symbols-rounded">
                     delete
@@ -17,7 +17,7 @@
             </div>
             <div class="h-full w-full overflow-y-auto flex flex-col-reverse">
                 <div class="flex flex-col justify-end">
-                    <div v-for="log in logs" class="ml-2">
+                    <div v-for="log in logs" class="ml-2 terminal">
                         {{ log }}
                     </div>
                 </div>
@@ -115,3 +115,8 @@ export default {
     }
 }
 </script>
+<style>
+.terminal {
+    font-family: 'Courier New', Courier, monospace;
+}
+</style>
