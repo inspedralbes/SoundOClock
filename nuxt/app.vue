@@ -11,6 +11,7 @@
 
 <script>
 import { useAppStore } from '@/stores/app';
+import { socket } from '@/socket';
 
 export default {
   data() {
@@ -18,7 +19,9 @@ export default {
       store: useAppStore()
     }
   },
-
+  created() {
+    socket.on("borrarLocalStorage")
+  },
   computed: {
     loading() {
       return this.store.getLoadingLogin();

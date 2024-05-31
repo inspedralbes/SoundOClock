@@ -554,6 +554,7 @@ let amountUsers = 0;
 fetchingCron.mailReminder();
 
 // Sockets
+
 io.on("connection", (socket) => {
   amountUsers++;
   fetchingCron.task(socket);
@@ -1418,6 +1419,10 @@ io.on("connection", (socket) => {
 
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);
+  io.emit("borrarLocalStorage", () => {
+    console.log("Borrando local storage");
+    localStorage.clear();
+  });
 });
 
 function formatDate(date) {
