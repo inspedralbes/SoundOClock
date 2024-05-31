@@ -10,7 +10,7 @@
             v-if="!$device.isMobile" />
 
         <div v-if="checkVotingState === 'vote'" class="mb-4" :class="{ '!mb-36': isPlaying }">
-            <div v-if="settings.theme" class="flex justify-center content-center my-8">
+            <div v-if="settings.theme" class="flex my-8 ml-12">
                 <h1 class="text-4xl smallCaps w-fit z-50">
                     {{ 'La temàtica és: ' + settings.theme }}
                 </h1>
@@ -191,9 +191,9 @@
                     @propose="proposeSongCheck($event)" :type="getType(track.id)" />
             </TransitionGroup>
         </div>
-        <div v-else class="m-3">
-            <div>
-                <h2 class="text-3xl font-bold mt-4">La votació de "{{ settings.theme }}" ha finalitzat,
+        <div v-else class="mb-4" :class="{ '!mb-36': isPlaying }">
+            <div class="flex flex-col my-8 ml-12">
+                <h2 class="text-3xl font-bold mt-4 smallCaps">La votació de "{{ settings.theme }}" ha finalitzat,
                     gràcies!
                 </h2>
                 <p>Aquestes son les cançons que estan sonant cada dia.</p>
