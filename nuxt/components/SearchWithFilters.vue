@@ -1,7 +1,8 @@
 <template>
-    <div class="sticky top-0 h-10 w-full flex flex-col justify-center justify-between ml-auto mr-auto gap-1 mb-2">
+    <div class="sticky top-0 h-10 w-full flex flex-col justify-between ml-auto mr-auto gap-1 mb-2">
         <div class="flex flex-row gap-2 h-10">
-            <input type="text" placeholder="Busca..." :value="search" @input="search = $event.target.value; this.$emit('search', search)"
+            <input type="text" placeholder="Busca..." :value="search"
+                @input="search = $event.target.value; this.$emit('search', search)"
                 class="h-full w-full items-center rounded-lg p-3 border-2 border-white">
             <!-- BUTTON FILTERS -->
             <!-- <button v-if="filters" @click="isDropdownMenuOpen = !isDropdownMenuOpen"
@@ -25,7 +26,7 @@
                         @click="filterItems(filter.id), isDropdownMenuOpen = !isDropdownMenuOpen"
                         class="rounded-lg w-full p-1 hover:bg-black">
                         <button class="rounded-lg w-full p-1 hover:bg-black text-left">
-                            
+
                             {{ filterValue ? filterValue(filter) : filter }}
                         </button>
                     </li>
@@ -73,7 +74,6 @@ export default {
 </script>
 
 <style scoped>
-
 /* Estilos para la barra de desplazamiento en navegadores webkit (Chrome, Safari, etc.) dentro del contenedor #dropdown-menu */
 /* Estilos para la barra de desplazamiento vertical */
 #dropdown-menu::-webkit-scrollbar {

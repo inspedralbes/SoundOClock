@@ -238,6 +238,12 @@ async function getSelectedSongs() {
   store.setFinalSongsList(data);
 }
 
+async function getSelectedSongsOnLanding() {
+  const response = await fetch(`${url}/getSelectedSongs`);
+  const data = await response.json();
+  return data;
+}
+
 async function storeBellsGroupsTemplate(template) {
   const response = await fetch(`${url}/bellsGroupsTemplate`, {
     method: "POST",
@@ -321,13 +327,13 @@ async function getUser(userId) {
 
 async function downloadSongs() {
   await fetch(`${url}/selectedSongs`)
-    .then(response => response.blob())
-    .then(blob => {
+    .then((response) => response.blob())
+    .then((blob) => {
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
+      const a = document.createElement("a");
+      a.style.display = "none";
       a.href = url;
-      a.download = 'canciones.zip';
+      a.download = "canciones.zip";
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -354,6 +360,7 @@ const comManager = {
   getUserGroups,
   getUserReportedSongs,
   getSelectedSongs,
+  getSelectedSongsOnLanding,
   storeBellsGroupsTemplate,
   getBellsGroupsTemplate,
   deleteBellsGroupsTemplate,
