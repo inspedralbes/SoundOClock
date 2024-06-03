@@ -88,19 +88,12 @@ export default {
         }
     },
     computed: {
-        availableCourses() {
-            return this.groups.filter(group => {
-                return group.category_id === this.selectedCategoryId
-            })
-        },
         user() {
             return this.store.getUser();
         },
         getGroups() {
-            if (this.user.role_id === 5) return this.selectedCategories.groups;
-            let groups = [];
-            groups = this.selectedCategories.flatMap(category => toRaw(category).groups);
-            return groups;
+            if (this.user.role_id === 5) return this.selectedCategories.flatMap(category => category.groups) || [];
+            return this.selectedCategories.flatMap(category => toRaw(category).groups || []);
         }
     },
     methods: {
@@ -121,16 +114,6 @@ export default {
                 this.$router.push('/llista_propostes');
             });
         },
-        formatGroupsId() {
-
-            let groupsId = [];
-
-            for (let i = 0; i < this.selectedGroups.length; i++) {
-                groupsId.push(this.selectedGroups[i].id);
-            }
-
-            return groupsId;
-        },
         checkCorrectOptions() {
             if (this.user.role_id === 5) {
                 return !this.selectedGroups || !this.selectedCategories;
@@ -149,11 +132,14 @@ export default {
         },
         updateSelectedGroups() {
             if (this.user.role_id === 5) this.selectedGroups = [];
-
-            const validGroups = this.getGroups;
-            this.selectedGroups = this.selectedGroups.filter(group =>
-                validGroups.some(validGroup => validGroup.id === group.id)
-            );
+            const validGroups = this.getGroups || [];
+            if (Array.isArray(this.selectedGroups)) {
+                this.selectedGroups = this.selectedGroups.filter(group =>
+                    validGroups.some(validGroup => validGroup.id === group.id)
+                );
+            } else {
+                this.selectedGroups = [];
+            }
         },
 
     },
