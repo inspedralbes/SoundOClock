@@ -60,13 +60,15 @@
             </div>
         </div>
     </div>
-    <div v-else ref="scrollContainer" @scroll="handleScroll" class="overflow-y-scroll h-screen">
-        <div class="flex justify-between relative">
-            <img src="/img/soundoclock-logo.png" alt="SoundOClock Logo"
-                class="fixed top-0 translate-y-[-50%] opacity-25 z-[-1]">
-            <div class="h-screen w-full flex flex-col items-center">
-                <h1 class="text-5xl font-bold futura text-center mt-36 mb-2">SoundO'Clock</h1>
-                <p class="text-2xl font-sans text-center">El ritme del teu dia, a les teves mans</p>
+    <div v-else ref="scrollContainer" @scroll="handleScroll" class="h-screen overflow-hidden">
+        <div class="h-screen w-full flex flex-col justify-between">
+            <div class="m-2">
+                <h1 class="text-7xl font-bold futura text-left">Sound</h1>
+                <h1 class="text-7xl font-bold futura text-left">O'Clock</h1>
+            </div>
+            <div class="mx-2">
+                <p class="text-3xl font-sans">El ritme del teu dia,</p>
+                <p class="text-3xl font-sans">a les teves mans</p>
                 <button @click="loginGoogle"
                     class="flex flex-row gap-x-4 bg-white p-4 my-4 rounded-full hover:bg-gray-200 w-fit">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
@@ -87,12 +89,11 @@
                     <span class="text-black">Inicia sessió amb Google</span>
                 </button>
             </div>
-            <div class="z-[-1] h-screen flex flex-col justify-end items-end absolute bottom-0 transition-opacity">
-                <img src="/img/listening_boy2.png" alt="Vota la cançó"
-                    class="drop-shadow-xl text-white sombra-filtro relative">
-            </div>
         </div>
+        <img src="/img/listening_boy2.png" alt="Vota la cançó"
+            class="max-w-none fixed bottom-0 w-[600px] translate-x-[-20%] z-[-1]">
     </div>
+    <div class="fixed inset-0 z-[-4] object-cover h-screen w-screen bg-gradient-to-t from-black to-transparent"></div>
     <AnimatedGradient class="fixed inset-0 z-[-5] object-cover h-screen w-screen" />
 </template>
 
