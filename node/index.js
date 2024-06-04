@@ -1108,6 +1108,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("searchSong", (search, limit, offset) => {
+    if (!search) return;
+    if (!limit) limit = 10;
+    if (!offset) offset = 0;
+
     comManager.searchSong(search, limit, spotifyToken, offset).then((data) => {
       if (data) {
         socket.emit("searchResult", data.tracks.items);
