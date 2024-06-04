@@ -87,9 +87,9 @@
                     <span class="text-black">Inicia sessió amb Google</span>
                 </button>
             </div>
-            <div class="h-screen flex flex-col justify-end items-end absolute bottom-0 transition-opacity">
+            <div class="z-[-1] h-screen flex flex-col justify-end items-end absolute bottom-0 transition-opacity">
                 <img src="/img/listening_boy2.png" alt="Vota la cançó"
-                    class="drop-shadow-xl text-white sombra-filtro relative z-10">
+                    class="drop-shadow-xl text-white sombra-filtro relative">
             </div>
         </div>
     </div>
