@@ -25,26 +25,26 @@ export default {
 </script>
 
 <template>
-    <div class="px-[400px] h-[90vh]">
+    <div class="px-[400px] h-[90vh] text-white">
         <h2 class="text-4xl text-center font-black mt-12 mb-8">HISTORIAL DE SANCIONS</h2>
         <p class="text-5xl font-black mb-4">{{ user.name }}</p>
-        <div class="w-100 p-0 flex flex-col gap-2">
+        <div class="w-full flex flex-col gap-2">
             <p class="text-xl mb-2">SANCIONS PRÈVIES: {{ user.bans.length }}</p>
             <div class="h-[36rem] overflow-y-auto grow">
                 <table class="w-full">
-                    <thead>
-                        <tr class="text-center">
-                            <th class="w-3/5">SANCIÓ</th>
-                            <th class="w-1/5">DATA INICI</th>
-                            <th class="w-1/5">DATA FINAL</th>
+                    <thead class="bg-gray-300 text-black">
+                        <tr class="text-center  border-2 border-white-300">
+                            <th class="text-left w-3/5 p-4">SANCIÓ</th>
+                            <th class="w-1/5 p-4">DATA INICI</th>
+                            <th class="w-1/5 p-4">DATA FINAL</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr v-for="ban in user.bans">
-                            <td v-if="ban.forVoting" class="col-span-4">VOTAR CANÇONS</td>
-                            <td v-else class="col-span-4">PROPOSAR CANÇONS</td>
-                            <td class="text-center">{{ formatDate(ban.banned_from) }}</td>
-                            <td class="text-center">{{ formatDate(ban.banned_until) }}</td>
+                    <tbody class=" border-2 border-white-300">
+                        <tr v-for="ban in user.bans" class="">
+                            <td v-if="ban.forVoting" class="col-span-4 p-4">VOTAR CANÇONS</td>
+                            <td v-else class="col-span-4 p-4">PROPOSAR CANÇONS</td>
+                            <td class="text-center p-4">{{ formatDate(ban.banned_from) }}</td>
+                            <td class="text-center p-4">{{ formatDate(ban.banned_until) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -53,19 +53,4 @@ export default {
     </div>
 </template>
 
-<style scoped>
-.report-container {
-    background-color: rgb(56, 56, 56);
-}
-
-th {
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
-    padding: 1rem;
-}
-
-td {
-    border-bottom: 1px solid black;
-    padding: 1rem;
-}
-</style>
+<style scoped></style>
