@@ -1,14 +1,25 @@
 <template>
-    <UVerticalNavigation :links="links" :ui="{
-        wrapper: 'border-s border-gray-200 dark:border-gray-800 space-y-2',
-        base: 'group block border-s -ms-px leading-6 before:hidden',
-        padding: 'p-0 ps-4',
-        rounded: '',
-        font: '',
-        ring: '',
-        active: 'text-primary-500 dark:text-primary-400 border-current font-semibold',
-        inactive: 'border-transparent hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300'
-    }" />
+    <div class="p-2 my-2 w-1/6 fixed left-0 border-r-2 border-gray-300 overflow-y-auto"
+        style="height: calc(100vh - 1rem);">
+        <UAccordion :items="items" multiple color="sky" variant="solid" size="xl">
+            <template #usuaris>
+                <div class="mx-4">
+                    <UVerticalNavigation :links="links" :ui="{
+            label: 'text-xl',
+            wrapper: 'border-s border-gray-200 dark:border-gray-800 space-y-2',
+            base: 'group block border-s -ms-px leading-6 before:hidden',
+            padding: 'p-0 ps-4',
+            rounded: '',
+            font: '',
+            ring: '',
+            active: 'text-primary-500 dark:text-primary-400 border-current font-semibold',
+            inactive: 'border-transparent hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300'
+        }" />
+                </div>
+            </template>
+        </UAccordion>
+    </div>
+
 </template>
 
 <script>
@@ -34,6 +45,13 @@ export default {
                 {
                     label: 'Shortcuts',
                     to: '/getting-started/shortcuts'
+                }
+            ],
+            items: [
+                {
+                    label: 'Usuaris',
+                    icon: 'i-heroicons-user-group',
+                    slot: 'usuaris'
                 }
             ]
         };
