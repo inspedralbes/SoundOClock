@@ -5,7 +5,10 @@ config();
 
 let apiURL;
 
-if (process.env.NODE_ENV === "production") {
+if (
+  process.env.NODE_ENV === "production" ||
+  process.env.NODE_ENV === "preprod"
+) {
   apiURL = process.env.PRODUCTION_API_URL;
 } else if (process.env.NODE_ENV === "development") {
   apiURL = process.env.DEVELOPMENT_API_URL;
