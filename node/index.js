@@ -589,6 +589,28 @@ io.on("connection", (socket) => {
       });
   });
 
+  socket.on("publicLogin", () => {
+    comManager.tempLogin().then((userData) => {
+      let groups = [];
+      // Populate groups array with group_id
+      userData.user.groups.forEach((group) => {
+        groups.push(group.pivot.group_id);
+      });
+
+      socket.emit(
+        "loginData",
+        userData.user.id,
+        userData.user.email,
+        userData.user.name,
+        userData.user.picture,
+        userData.token,
+        groups,
+        userData.user.role_id,
+        userData.user.role_name
+      );
+    });
+  });
+
   socket.on("login", async (email, name) => {
     try {
       let user = await comManager.login(name, email);

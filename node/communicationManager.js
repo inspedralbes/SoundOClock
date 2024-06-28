@@ -1,6 +1,8 @@
 import fetch from "node-fetch";
 import axios from "axios";
 import { config } from "dotenv";
+import randomUser from "./randomUser.manager.js";
+
 config();
 
 let apiURL;
@@ -27,7 +29,11 @@ async function getUserInfo(token) {
   return jsonResponse;
 }
 
-async function tempLogin() {}
+async function tempLogin() {
+  const data = await randomUser.getUser();
+  let userData = await login(data.name, data.email, data.picture);
+  return userData;
+}
 
 async function googleLogin(userToken) {
   // Get user info from google
@@ -518,6 +524,7 @@ async function sendVoteReminderMail(usersVotedId) {
 const comManager = {
   getUserInfo,
   googleLogin,
+  tempLogin,
   loginUserAndAdmin,
   login,
   logout,

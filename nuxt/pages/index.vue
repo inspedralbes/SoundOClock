@@ -6,7 +6,7 @@
                     <h1 class="text-8xl font-bold futura">Sound</h1>
                     <h1 class="text-8xl font-bold futura">O'Clock</h1>
                     <p class="text-4xl font-sans">El ritme del teu dia, a les teves mans</p>
-                    <button @click="loginGoogle"
+                    <button @click="handleLogin"
                         class="flex flex-row gap-x-4 bg-white p-4 my-4 rounded-full hover:bg-gray-200">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                             <path
@@ -69,7 +69,7 @@
             <div class="mx-2">
                 <p class="text-3xl font-sans">El ritme del teu dia,</p>
                 <p class="text-3xl font-sans">a les teves mans</p>
-                <button @click="loginGoogle"
+                <button @click="handleLogin"
                     class="flex flex-row gap-x-4 bg-white p-4 my-4 rounded-full hover:bg-gray-200 w-fit">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                         <path
@@ -100,6 +100,7 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import comManager from '~/communicationManager';
+import { socket } from '@/socket';
 
 export default {
     data() {
@@ -129,6 +130,13 @@ export default {
         clearInterval(this.intervalId);
     },
     methods: {
+        handleLogin() {
+            if (this.$config.public.ENV === 'preprod') {
+                socket.emit('publicLogin')
+            } else {
+                this.loginGoogle();
+            }
+        },
         loginGoogle() {
             const clientId = this.$config.public.GOOGLE_CLIENT_ID; const
                 redirectUri = this.$config.public.GOOGLE_REDIRECT_URI; const state = this.generateRandomString(16);
