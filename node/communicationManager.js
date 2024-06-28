@@ -27,6 +27,8 @@ async function getUserInfo(token) {
   return jsonResponse;
 }
 
+async function tempLogin() {}
+
 async function googleLogin(userToken) {
   // Get user info from google
   const response = await fetch(
