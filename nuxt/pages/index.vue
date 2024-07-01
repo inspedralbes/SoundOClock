@@ -1,4 +1,7 @@
 <template>
+    <div v-if="loading" class="fixed h-screen w-screen top-0 bg-black z-50">
+        <Loader />
+    </div>
     <div v-if="!$device.isMobile" ref="scrollContainer" @scroll="handleScroll" class="overflow-y-scroll h-screen">
         <div class="flex justify-between relative">
             <div class="w-1/2 h-screen flex flex-col justify-between items-center">
@@ -109,6 +112,7 @@ export default {
             opacity: 1,
             selectedSongs: [],
             intervalId: null,
+            loading: false,
         }
     },
     async mounted() {
@@ -131,8 +135,11 @@ export default {
     },
     methods: {
         handleLogin() {
-            if (this.$config.public.ENV === 'preprod') {
+            let hola = true;
+            // if (this.$config.public.ENV === 'preprod') {
+            if (hola) {
                 socket.emit('publicLogin')
+                this.loading = true;
             } else {
                 this.loginGoogle();
             }
@@ -149,8 +156,8 @@ export default {
         generateRandomString(length) {
             let text = '';
             const possible = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; for (let i = 0; i <
-                length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)); } return
-            text;
+                length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }
+            return text;
         },
         handleScroll() {
             const scrollTop = this.$refs.scrollContainer.scrollTop;

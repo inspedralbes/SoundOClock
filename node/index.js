@@ -590,6 +590,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("publicLogin", () => {
+    socket.emit("publicLogin");
     comManager.tempLogin().then((userData) => {
       let groups = [];
       // Populate groups array with group_id

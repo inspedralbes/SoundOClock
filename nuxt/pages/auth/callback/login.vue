@@ -6,9 +6,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { socket } from '@/socket';
-import { useAppStore } from "@/stores/app";
 
 export default {
     data() {
@@ -17,7 +14,6 @@ export default {
         }
     },
     created() {
-        socket.emit('publicLogin');
     },
     methods: {
     },
@@ -26,6 +22,3 @@ export default {
 </script>
 
 <style scoped></style>
-
-<!-- LOADER CSS QUE ESTA TO WAPO -->
-<!-- https://uiverse.io/csozidev/curly-crab-48 -->
