@@ -553,6 +553,10 @@ obtenerActualizarTokenSpotify();
 let dirPC = null;
 let amountUsers = 0;
 
+if (process.env.NODE_ENV === "preprod") {
+  fetchingCron.clearDBs();
+}
+
 fetchingCron.mailReminder();
 
 // Sockets
@@ -587,6 +591,29 @@ io.on("connection", (socket) => {
       .catch((err) => {
         console.error(err);
       });
+  });
+
+  socket.on("publicLogin", () => {
+    socket.emit("publicLogin");
+    comManager.tempLogin().then((userData) => {
+      let groups = [];
+      // Populate groups array with group_id
+      userData.user.groups.forEach((group) => {
+        groups.push(group.pivot.group_id);
+      });
+
+      socket.emit(
+        "loginData",
+        userData.user.id,
+        userData.user.email,
+        userData.user.name,
+        userData.user.picture,
+        userData.token,
+        groups,
+        userData.user.role_id,
+        userData.user.role_name
+      );
+    });
   });
 
   socket.on("login", async (email, name) => {

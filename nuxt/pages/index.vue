@@ -1,4 +1,7 @@
 <template>
+    <div v-if="loading" class="fixed h-screen w-screen top-0 bg-black z-50">
+        <Loader />
+    </div>
     <div v-if="!$device.isMobile" ref="scrollContainer" @scroll="handleScroll" class="overflow-y-scroll h-screen">
         <div class="flex justify-between relative">
             <div class="w-1/2 h-screen flex flex-col justify-between items-center">
@@ -6,7 +9,7 @@
                     <h1 class="text-8xl font-bold futura">Sound</h1>
                     <h1 class="text-8xl font-bold futura">O'Clock</h1>
                     <p class="text-4xl font-sans">El ritme del teu dia, a les teves mans</p>
-                    <button @click="loginGoogle"
+                    <button @click="handleLogin"
                         class="flex flex-row gap-x-4 bg-white p-4 my-4 rounded-full hover:bg-gray-200">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                             <path
@@ -69,7 +72,7 @@
             <div class="mx-2">
                 <p class="text-3xl font-sans">El ritme del teu dia,</p>
                 <p class="text-3xl font-sans">a les teves mans</p>
-                <button @click="loginGoogle"
+                <button @click="handleLogin"
                     class="flex flex-row gap-x-4 bg-white p-4 my-4 rounded-full hover:bg-gray-200 w-fit">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                         <path
@@ -100,6 +103,7 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import comManager from '~/communicationManager';
+import { socket } from '@/socket';
 
 export default {
     data() {
@@ -108,6 +112,7 @@ export default {
             opacity: 1,
             selectedSongs: [],
             intervalId: null,
+            loading: false,
         }
     },
     async mounted() {
@@ -129,6 +134,14 @@ export default {
         clearInterval(this.intervalId);
     },
     methods: {
+        handleLogin() {
+            if (this.$config.public.ENV === 'preprod') {
+                socket.emit('publicLogin')
+                this.loading = true;
+            } else {
+                this.loginGoogle();
+            }
+        },
         loginGoogle() {
             const clientId = this.$config.public.GOOGLE_CLIENT_ID; const
                 redirectUri = this.$config.public.GOOGLE_REDIRECT_URI; const state = this.generateRandomString(16);
@@ -141,8 +154,8 @@ export default {
         generateRandomString(length) {
             let text = '';
             const possible = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; for (let i = 0; i <
-                length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)); } return
-            text;
+                length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }
+            return text;
         },
         handleScroll() {
             const scrollTop = this.$refs.scrollContainer.scrollTop;

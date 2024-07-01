@@ -172,7 +172,10 @@ jobs:
           sed -i "s#PRODUCTION_API_URL=#PRODUCTION_API_URL=$(echo "${{ secrets.PREPRODUCTION_API_URI }}")#g" .env
           sed -i "s#MONGO_USER=#MONGO_USER=$(echo "${{ secrets.MONGO_INITDB_ROOT_USERNAME }}")#g" .env
           sed -i "s#MONGO_PASSWORD=#MONGO_PASSWORD=$(echo "${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}")#g" .env
-
+          sed -i 's/DB_HOST=/DB_HOST=db/g' .env
+          sed -i 's/DB_DATABASE=/DB_DATABASE=soundoclock/g' .env
+          sed -i 's/DB_USERNAME=/DB_USERNAME=${{ secrets.DB_USERNAME }}/g' .env
+          sed -i 's#DB_PASSWORD=#DB_PASSWORD=${{ secrets.DB_PASSWORD }}#g' .env
           cd ${{ github.workspace }}
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "[ -d node ] && sudo rm -r node"
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PRE_USER }}@${{ secrets.PRE_HOST }} "mkdir node"
