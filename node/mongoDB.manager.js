@@ -24,7 +24,7 @@ mongoose
     `mongodb://${mongoUser}:${mongoPassword}@${host}:27017/soundoclock`,
     { authSource: "admin" }
   )
-  .then(() => console.log("MongoDB connected"))
+  .then(() => console.log("MongoDB connected in MongoDB.manager.js"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
 async function vaciarSong() {

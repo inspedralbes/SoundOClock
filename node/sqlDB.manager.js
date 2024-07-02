@@ -16,7 +16,7 @@ db.connect((err) => {
   if (err) {
     throw err;
   }
-  console.log("Conectado a la base de datos MySQL");
+  console.log("MySQL connected in sqlDB.manager.js");
 });
 
 // Función para vaciar la tabla bans
