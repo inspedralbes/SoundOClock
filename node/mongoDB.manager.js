@@ -12,16 +12,18 @@ import {
 
 dotenv.config();
 
+const argv = minimist(process.argv.slice(2));
+const host = argv.host || "mongodb";
 const mongoUser = process.env.MONGO_USER;
 const mongoPassword = process.env.MONGO_PASSWORD;
 
 mongoose
   .connect(
-    `mongodb://${mongoUser}:${mongoPassword}@mongodb:27017/soundoclock`,
-    { useNewUrlParser: true, useUnifiedTopology: true }
+    `mongodb://${mongoUser}:${mongoPassword}@${host}:27017/soundoclock`,
+    { authSource: "admin" }
   )
-  .then(() => console.log("Conectado a MongoDB"))
-  .catch((err) => console.error("Error al conectar con MongoDB:", err));
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // Función para vaciar la colección Song
 async function vaciarSong() {
