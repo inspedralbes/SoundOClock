@@ -69,11 +69,13 @@ async function clearDBs() {
     "0 0 * * *",
     async () => {
       console.log("Clearing databases");
-      // Clearing the SQL database
-      await sqlDB_Manager.vaciarTablas();
-
-      // Clearing the MongoDB database
-      await mongoDBManager.vaciarAllCollections();
+      try {
+        await sqlDB_Manager.vaciarTablas();
+        await mongoDBManager.vaciarAllCollections();
+        console.log("Databases cleared successfully");
+      } catch (error) {
+        console.error("Error clearing databases:", error);
+      }
     },
     {
       timezone: "Europe/Madrid",
