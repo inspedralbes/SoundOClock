@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import minimist from "minimist";
+
 import {
   Song,
   VotingRecord,
