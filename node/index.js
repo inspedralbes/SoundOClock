@@ -1,7 +1,11 @@
-import dotenv from "dotenv";
+import express from "express";
+import { createServer, get } from "http";
+import { Server } from "socket.io";
+import cors from "cors";
+import fetchingCron from "./cron.js";
 import mongoose from "mongoose";
-import minimist from "minimist";
-
+import comManager from "./communicationManager.js";
+import downloadsManager from "./downloadsManager.cjs";
 import {
   Song,
   VotingRecord,
@@ -11,8 +15,10 @@ import {
   BellsGroupsTemplate,
   ThemeModals,
 } from "./models.js";
-
-dotenv.config();
+import axios from "axios";
+import minimist from "minimist";
+import dotenv from "dotenv";
+import NodeCache from "node-cache";
 
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || "mongodb";
@@ -32,9 +38,7 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"],
   },
-  path: "/socket",
 });
-
 const port = 8080;
 const mongoUser = process.env.MONGO_USER;
 const mongoPassword = process.env.MONGO_PASSWORD;
@@ -47,96 +51,492 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Función para vaciar la colección Song
-async function vaciarSong() {
-  try {
-    await Song.deleteMany({});
-    console.log("Colección Song eliminada");
-  } catch (error) {
-    console.error("Error al eliminar colección Song:", error);
-    throw error;
-  }
-}
+const provisionalSelectedSongs = {};
 
-// Función para vaciar la colección VotingRecord
-async function vaciarVotingRecord() {
+// API routes
+app.get("/songs", async (req, res) => {
   try {
-    await VotingRecord.deleteMany({});
-    console.log("Colección VotingRecord eliminada");
-  } catch (error) {
-    console.error("Error al eliminar colección VotingRecord:", error);
-    throw error;
+    const songs = await Song.find();
+    res.json(songs);
+  } catch (err) {
+    res.status(500).send(err);
   }
-}
+});
 
-// Función para vaciar la colección ReportSong
-async function vaciarReportSong() {
+// Get voting records per user id
+app.get("/votingRecords/:userId", async (req, res) => {
   try {
-    await ReportSong.deleteMany({});
-    console.log("Colección ReportSong eliminada");
-  } catch (error) {
-    console.error("Error al eliminar colección ReportSong:", error);
-    throw error;
+    const votingRecord = await VotingRecord.findOne({
+      userId: req.params.userId,
+    });
+    res.json(votingRecord);
+  } catch (err) {
+    res.status(500).send(err);
   }
-}
+});
 
-// Función para vaciar la colección SelectedSong
-async function vaciarSelectedSong() {
+// Get reports per user id
+app.get("/reportSongs/:userId", async (req, res) => {
   try {
-    await SelectedSong.deleteMany({});
-    console.log("Colección SelectedSong eliminada");
-  } catch (error) {
-    console.error("Error al eliminar colección SelectedSong:", error);
-    throw error;
+    const reports = await ReportSong.find({ userId: req.params.userId });
+    res.json(reports);
+  } catch (err) {
+    res.status(500).send(err);
   }
-}
+});
 
-// Función para vaciar la colección ReportUser
-async function vaciarReportUser() {
+app.get("/sortedVotedSongs", async (req, res) => {
   try {
-    await ReportUser.deleteMany({});
-    console.log("Colección ReportUser eliminada");
-  } catch (error) {
-    console.error("Error al eliminar colección ReportUser:", error);
-    throw error;
+    const songs = await Song.aggregate([
+      {
+        // Convert the votesPerGroup map to an array of key-value pairs
+        $addFields: {
+          votesPerGroupArray: { $objectToArray: "$votesPerGroup" },
+        },
+      },
+      { $unwind: "$votesPerGroupArray" },
+      {
+        // Sort by group ID first (if needed to ensure group order) and then by votes descending
+        $sort: {
+          "votesPerGroupArray.k": 1,
+          "votesPerGroupArray.v": -1,
+        },
+      },
+      {
+        // Group by group ID and push the songs into an array
+        $group: {
+          _id: "$votesPerGroupArray.k",
+          songs: {
+            $push: {
+              id: "$id",
+              name: "$name",
+              artists: "$artists",
+              img: "$img",
+              explicit: "$explicit",
+              preview_url: "$preview_url",
+              votes: "$votesPerGroupArray.v",
+              submittedBy: "$submittedBy",
+            },
+          },
+        },
+      },
+      // Sort by group ID
+      { $sort: { _id: 1 } },
+      {
+        // Project the final result
+        $project: {
+          _id: 0,
+          group: "$_id",
+          songs: "$songs",
+        },
+      },
+    ]);
+    res.json(songs);
+  } catch (err) {
+    res.status(500).send(err);
   }
-}
+});
 
-// Función para vaciar la colección BellsGroupsTemplate
-async function vaciarBellsGroupsTemplate() {
+app.get("/reportSongs/:songId", async (req, res) => {
   try {
-    await BellsGroupsTemplate.deleteMany({});
-    console.log("Colección BellsGroupsTemplate eliminada");
-  } catch (error) {
-    console.error("Error al eliminar colección BellsGroupsTemplate:", error);
-    throw error;
+    const reports = await ReportSong.find({ songId: req.params.songId });
+    res.json(reports);
+  } catch (err) {
+    res.status(500).send(err);
   }
-}
+});
 
-// Función para vaciar la colección ThemeModals
-async function vaciarThemeModals() {
+app.get("/adminSongs/:userToken", async (req, res) => {
   try {
-    await ThemeModals.deleteMany({});
-    console.log("Colección ThemeModals eliminada");
-  } catch (error) {
-    console.error("Error al eliminar colección ThemeModals:", error);
-    throw error;
-  }
-}
+    // Query all proposed songs
+    const songs = await Song.find();
 
-// Función para vaciar todas las colecciones
-async function vaciarAllCollections() {
-  try {
-    await vaciarSong();
-    await vaciarVotingRecord();
-    await vaciarReportSong();
-    await vaciarSelectedSong();
-    await vaciarReportUser();
-    await vaciarBellsGroupsTemplate();
-    await vaciarThemeModals();
-    console.log(
-      "Todas las colecciones de MongoDB han sido vaciadas correctamente"
+    // Iterate through each song
+    const songsWithReports = await Promise.all(
+      songs.map(async (song) => {
+        // Find the reports associted to the song
+        const reports = await ReportSong.find({ songId: song.id });
+
+        // Find the user that proposed the song
+        const user = await comManager.showUser(
+          req.params.userToken,
+          song.submittedBy
+        );
+
+        // Transform the mongoose.Document into an object
+        song = song.toObject();
+
+        // Add reports and user associated to the song
+        song.reports = reports;
+        song.user = user;
+
+        return song;
+      })
     );
+
+    res.json(songsWithReports);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/users/:userToken", async (req, res) => {
+  try {
+    let users;
+
+    if (myCache.get("users")) {
+      users = myCache.get("users");
+    } else {
+      users = await comManager.getUsers(req.params.userToken);
+      myCache.set("users", users, DEFAULT_CACHE_TTL);
+    }
+
+    res.json(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/publicGroups", async (req, res) => {
+  try {
+    let groups;
+
+    if (myCache.get("groups")) {
+      groups = myCache.get("groups");
+    } else {
+      groups = await comManager.getPublicGroups();
+      myCache.set("groups", groups, DEFAULT_CACHE_TTL);
+    }
+
+    res.json(groups);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/publicCategories", async (req, res) => {
+  try {
+    let categories;
+
+    if (myCache.get("categories")) {
+      categories = myCache.get("categories");
+    } else {
+      categories = await comManager.getPublicCategories();
+      myCache.set("categories", categories, DEFAULT_CACHE_TTL);
+    }
+
+    res.json(categories);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/allGroupsAndCategories", async (req, res) => {
+  try {
+    let groupsAndCategories;
+
+    if (myCache.get("allGroupsAndCategories")) {
+      groupsAndCategories = myCache.get("allGroupsAndCategories");
+    } else {
+      groupsAndCategories = await comManager.getAllGroupsAndCategories();
+      myCache.set(
+        "allGroupsAndCategories",
+        groupsAndCategories,
+        DEFAULT_CACHE_TTL
+      );
+    }
+
+    res.json(groupsAndCategories);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post("/addGroupsToUser", async (req, res) => {
+  try {
+    myCache.del("users");
+    const response = await comManager.setUserGroups(
+      req.body.userId,
+      req.body.token,
+      req.body.groups
+    );
+    res.json(response);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+app.get("/bells/:userToken", async (req, res) => {
+  try {
+    let bells;
+
+    if (myCache.get("bells")) {
+      bells = myCache.get("bells");
+    } else {
+      bells = await comManager.getBells(req.params.userToken);
+      // console.log("bells", bells);
+      myCache.set("bells", bells, DEFAULT_CACHE_TTL);
+    }
+
+    res.json(bells);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post("/logout", async (req, res) => {
+  try {
+    let response = await comManager.logout(req.body.token);
+    res.json(response);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post("/userInfo", async (req, res) => {
+  try {
+    let response = await comManager.getUserInfo(req.body.token);
+    res.json(response);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post("/createGroupCategory", async (req, res) => {
+  try {
+    myCache.flushAll();
+
+    let response = await comManager.createGroupCategory(
+      req.body.token,
+      req.body.category
+    );
+    res.json(response);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post("/createGroup", async (req, res) => {
+  try {
+    myCache.flushAll();
+
+    let response = await comManager.createGroup(req.body.token, req.body.group);
+    res.json(response);
+  } catch (err) {
+    res.status(500).send;
+  }
+});
+
+app.post("/storeSelectedSongs", async (req, res) => {
+  try {
+    // Check that the user is authenticated with Laravel Sanctum and is not a student
+    let user = await comManager.getUserInfo(req.body.token);
+    if (!user.id || user.role_id >= 4) return;
+
+    // Remove all selected songs from the database
+    await SelectedSong.deleteMany({});
+
+    // Save the selected songs to mongo db
+    const songs = req.body.songs;
+
+    songs.forEach(async (song) => {
+      await new SelectedSong({
+        id: song.id,
+        bellId: song.bellId,
+        name: song.name,
+        artists: song.artists,
+        img: song.img,
+        preview_url: song.preview_url,
+        selectedDate: new Date(),
+        userId: song.userId,
+      }).save();
+    });
+
+    res.json({ status: "success" });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/selectedSongs", async (req, res) => {
+  try {
+    const selectedSongs = await SelectedSong.find({});
+    await downloadsManager.downloadSongs(selectedSongs);
+
+    const handleRequest = downloadsManager.getDownloadedSongs();
+    handleRequest(req, res); // Pass the req, res to the handler function
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/getSelectedSongs", async (req, res) => {
+  try {
+    const selectedSongs = await SelectedSong.find({});
+    res.json(selectedSongs);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/roles/:userToken", async (req, res) => {
+  try {
+    let roles = await comManager.getRoles(req.params.userToken);
+    res.json(roles);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/userGroups/:userToken", async (req, res) => {
+  try {
+    let userGroups = await comManager.getUserGroups(req.params.userToken);
+
+    // Iterate through each group
+    const userGroupsWithReports = await Promise.all(
+      userGroups.map(async (group) => {
+        // Find the reports associted to the group
+        const reports = await ReportUser.find({ groupId: group.id });
+
+        // Add reports associated to the group
+        group.reports = reports;
+        return group;
+      })
+    );
+
+    res.json(userGroupsWithReports);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post("/usersVotes", async (req, res) => {
+  try {
+    const song = await Song.findOne({ id: req.body.songId });
+    if (song) {
+      // Find all users that voted for the song with the given id
+      // el $in es para buscar en un array de valores (en este caso, en el array de votedSongs) si el valor song.id está presente
+      let usersVotesMongo = await VotingRecord.find({
+        votedSongs: { $in: [song.id] },
+      });
+
+      //get token from the request
+      let token = req.body.token;
+
+      //get the users votes
+      let usersVotes = await comManager.getUsersVotes(usersVotesMongo, token);
+
+      res.json(usersVotes);
+    }
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// GROUP BELLS TEMPLATE
+app.post("/bellsGroupsTemplate", async (req, res) => {
+  try {
+    const template = new BellsGroupsTemplate(req.body.template);
+    await template.save();
+    res.json({ status: "success" });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/user/:userId", async (req, res) => {
+  try {
+    const userToken = req.headers["authorization"].split(" ")[1];
+    let user = await comManager.showUser(userToken, req.params.userId);
+    res.json(user);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+app.get("/bellsGroupsTemplate", async (req, res) => {
+  try {
+    const templates = await BellsGroupsTemplate.find();
+    res.json(templates);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.delete("/bellsGroupsTemplate/:id", async (req, res) => {
+  try {
+    await BellsGroupsTemplate.findByIdAndDelete(req.params.id);
+    res.json({ status: "success" });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/checkThemeModal/:theme/:userId", async (req, res) => {
+  const theme = req.params.theme;
+  const userId = parseInt(req.params.userId);
+
+  try {
+    const themeModal = await ThemeModals.findOne({ userId: userId });
+    if (!themeModal) {
+      return res.json({ status: "success", showModal: true });
+    } else {
+      let modalShowed = themeModal.modalsShown.get(theme);
+      if (!modalShowed) {
+        return res.json({ status: "success", showModal: true });
+      } else {
+        return res.json({ status: "success", showModal: false });
+      }
+    }
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.post("/acceptThemeTerms", async (req, res) => {
+  const theme = req.body.theme;
+  const userId = req.body.userId;
+
+  try {
+    const themeModal = await ThemeModals.findOne({ userId: userId });
+    if (!themeModal) {
+      const newThemeModal = new ThemeModals({
+        userId: userId,
+        modalsShown: new Map([[theme, true]]),
+      });
+      await newThemeModal.save();
+    } else {
+      themeModal.modalsShown.set(theme, true);
+      await themeModal.save();
+    }
+    res.json({ status: "success" });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
+const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+const headers = {
+  "Content-Type": "application/x-www-form-urlencoded",
+};
+let spotifyToken = "";
+
+// Función para obtener y actualizar el token de Spotify
+async function obtenerActualizarTokenSpotify() {
+  try {
+    const response = await axios.post(
+      "https://accounts.spotify.com/api/token",
+      {
+        grant_type: "client_credentials",
+        client_id: spotifyClientId,
+        client_secret: spotifyClientSecret,
+      },
+      { headers }
+    );
+    if (response.data.access_token) {
+      spotifyToken = response.data.access_token;
+    } else {
+      console.error("No se pudo obtener el token de Spotify.");
+    }
   } catch (error) {
     console.error("Error al obtener el token de Spotify:", error);
   }
@@ -168,7 +568,9 @@ io.on("connection", (socket) => {
     comManager
       .googleLogin(userToken)
       .then((userData) => {
+        // console.log("UserData:", userData);
         let groups = [];
+        console.log(userData);
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
           groups.push(group.pivot.group_id);
