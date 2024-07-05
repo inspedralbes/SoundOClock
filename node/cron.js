@@ -66,8 +66,7 @@ async function mailReminder() {
 
 async function clearDBs() {
   cron.schedule(
-    // "0 0 * * *",
-    "*/5 * * * *",
+    "0 0 * * *",
     async () => {
       console.log("Clearing databases");
       try {
