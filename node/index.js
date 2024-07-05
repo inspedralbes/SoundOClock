@@ -564,6 +564,11 @@ io.on("connection", (socket) => {
   fetchingCron.task(socket);
   console.log("A user connected. Total users:", amountUsers);
 
+  if (process.env.NODE_ENV === "preprod") {
+    fetchingCron.clearDBs(socket);
+    io.emit("clearLocalStorage");
+  }
+
   socket.on("googleLogin", (userToken) => {
     comManager
       .googleLogin(userToken)

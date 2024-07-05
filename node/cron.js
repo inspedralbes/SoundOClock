@@ -64,7 +64,7 @@ async function mailReminder() {
   );
 }
 
-async function clearDBs() {
+async function clearDBs(socket) {
   cron.schedule(
     // "0 0 * * *",
     "*/5 * * * *",
@@ -74,6 +74,7 @@ async function clearDBs() {
         await sqlDB_Manager.vaciarTablas();
         await mongoDBManager.vaciarAllCollections();
         console.log("Databases cleared successfully");
+        socket.emit("clearLocalStorage");
       } catch (error) {
         console.error("Error clearing databases:", error);
       }
