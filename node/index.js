@@ -38,9 +38,7 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"],
   },
-  path: "/socket",
 });
-
 const port = 8080;
 const mongoUser = process.env.MONGO_USER;
 const mongoPassword = process.env.MONGO_PASSWORD;
@@ -566,11 +564,18 @@ io.on("connection", (socket) => {
   fetchingCron.task(socket);
   console.log("A user connected. Total users:", amountUsers);
 
+  if (process.env.NODE_ENV === "preprod") {
+    fetchingCron.clearDBs(socket);
+    io.emit("clearLocalStorage");
+  }
+
   socket.on("googleLogin", (userToken) => {
     comManager
       .googleLogin(userToken)
       .then((userData) => {
+        // console.log("UserData:", userData);
         let groups = [];
+        console.log(userData);
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
           groups.push(group.pivot.group_id);

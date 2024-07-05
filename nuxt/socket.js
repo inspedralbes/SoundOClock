@@ -116,6 +116,12 @@ socket.on("connect", () => {
     pinia.deleteProposedSongs();
   });
 
+  socket.on("clearLocalStorage", () => {
+    console.log("Clearing localStorage");
+    localStorage.clear();
+    navigateTo({ path: "/" });
+  });
+
   socket.on("userDeletedFromGroup", (data) => {});
 
   socket.on("disconnect", () => {});
