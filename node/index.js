@@ -551,10 +551,7 @@ obtenerActualizarTokenSpotify();
 let dirPC = null;
 let amountUsers = 0;
 
-if (process.env.NODE_ENV === "preprod") {
-  fetchingCron.clearDBs();
-}
-
+// Cron jobs
 fetchingCron.mailReminder();
 
 // Sockets
