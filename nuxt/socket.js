@@ -15,11 +15,18 @@ socket.on("connect", () => {
   const pinia = useAppStore();
 
   // getSongs();
+  socket.on("clearLocalStorage", () => {
+    console.log("Clearing localStorage");
+    localStorage.clear();
+    navigateTo({ path: "/" });
+  });
 
-  if (window.localStorage.getItem("user")) {
-    pinia.setLoadingLogin(true);
-    let user = JSON.parse(window.localStorage.getItem("user"));
-    socket.emit("login", user.email, user.name);
+  if (import.meta.env.VITE_APP_ENV != "preprod") {
+    if (window.localStorage.getItem("user")) {
+      pinia.setLoadingLogin(true);
+      let user = JSON.parse(window.localStorage.getItem("user"));
+      socket.emit("login", user.email, user.name);
+    }
   }
 
   socket.on("voteCasted", (data) => {
@@ -115,12 +122,6 @@ socket.on("connect", () => {
   socket.on("votesDeleted", (data) => {
     pinia.deleteCurrentTrackPlaying();
     pinia.deleteProposedSongs();
-  });
-
-  socket.on("clearLocalStorage", () => {
-    console.log("Clearing localStorage");
-    localStorage.clear();
-    navigateTo({ path: "/" });
   });
 
   socket.on("userDeletedFromGroup", (data) => {});
