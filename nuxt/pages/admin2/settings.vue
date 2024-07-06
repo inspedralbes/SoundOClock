@@ -3,7 +3,7 @@
         <div class="h-screen flex justify-center" v-if="isLoading">
             <Loader />
         </div>
-        <div v-else class="divide-y last:border-0 flex flex-col items-center justify-around grow m-4 basis-2/3">
+        <div v-else class="divide-y  flex flex-col items-center justify-around grow m-4 basis-2/3">
             <div class="flex items-center justify-between w-full h-20">
                 <label for="theme" class="text-lg basis-1/2">
                     Escull la temàtica
@@ -63,11 +63,13 @@
                     :initialEndDate="formatDate(settings.end_moderation)"
                     @rangeSelected="selectModerationRange($event)" />
             </div>
+
             <UButton v-if="!isWaiting" @click="modals.showSave = true" icon="i-heroicons-arrow-path-20-solid"
-                class="w-1/4 flex justify-center align-center ml-auto" color="green" size="xl">
+                class="!border-0 w-1/4 flex justify-center align-center ml-auto" color="green" size="xl">
                 Guardar configuració
             </UButton>
-            <UButton v-else class="w-1/4 flex justify-center align-center ml-auto" color="green" size="xl" loading>
+            <UButton v-else class="!border-0 w-1/4 flex justify-center align-center ml-auto" color="green" size="xl"
+                loading>
                 Guardant configuració...
             </UButton>
         </div>
