@@ -135,12 +135,14 @@ export default {
     },
     methods: {
         handleLogin() {
-            if (this.$config.public.ENV === 'preprod') {
-                socket.emit('publicLogin')
-                this.loading = true;
-            } else {
-                this.loginGoogle();
-            }
+            console.log('handleLogin');
+            socket.emit('publicLogin')
+            // if (this.$config.public.ENV === 'preprod') {
+            //     socket.emit('publicLogin')
+            //     this.loading = true;
+            // } else {
+            //     this.loginGoogle();
+            // }
         },
         loginGoogle() {
             const clientId = this.$config.public.GOOGLE_CLIENT_ID; const

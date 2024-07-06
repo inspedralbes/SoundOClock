@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { add, format, isSameDay, type Duration } from 'date-fns'
 import { es, ca } from 'date-fns/esm/locale';
-import { ref, defineEmits, watch, defineProps } from 'vue'
+import { ref, watch, defineProps } from 'vue'
 
 // Define props
 const props = defineProps({
@@ -48,7 +48,8 @@ watch(selected, (newVal) => {
     <UPopover :popper="{ placement: 'bottom-start' }">
         <UButton icon="i-heroicons-calendar-days-20-solid">
             {{ format(selected.start, 'd MMM, yyyy', { locale: ca }) }} - {{ format(selected.end, 'd MMM, yyyy', {
-                locale: ca }) }}
+                locale: ca
+            }) }}
         </UButton>
 
         <template #panel="{ close }">
