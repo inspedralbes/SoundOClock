@@ -64,16 +64,19 @@ async function mailReminder() {
   );
 }
 
-async function clearDBs() {
+async function clearDBs(socket) {
   cron.schedule(
     "0 0 * * *",
     async () => {
       console.log("Clearing databases");
-      // Clearing the SQL database
-      await sqlDB_Manager.vaciarTablas();
-
-      // Clearing the MongoDB database
-      await mongoDBManager.vaciarAllCollections();
+      try {
+        await sqlDB_Manager.vaciarTablas();
+        await mongoDBManager.vaciarAllCollections();
+        console.log("Databases cleared successfully");
+        socket.emit("clearLocalStorage");
+      } catch (error) {
+        console.error("Error clearing databases:", error);
+      }
     },
     {
       timezone: "Europe/Madrid",

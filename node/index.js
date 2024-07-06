@@ -551,10 +551,7 @@ obtenerActualizarTokenSpotify();
 let dirPC = null;
 let amountUsers = 0;
 
-if (process.env.NODE_ENV === "preprod") {
-  fetchingCron.clearDBs();
-}
-
+// Cron jobs
 fetchingCron.mailReminder();
 
 // Sockets
@@ -563,6 +560,11 @@ io.on("connection", (socket) => {
   amountUsers++;
   fetchingCron.task(socket);
   console.log("A user connected. Total users:", amountUsers);
+
+  if (process.env.NODE_ENV === "preprod") {
+    fetchingCron.clearDBs(socket);
+    io.emit("clearLocalStorage");
+  }
 
   socket.on("googleLogin", (userToken) => {
     comManager
