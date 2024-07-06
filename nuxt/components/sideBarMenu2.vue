@@ -24,12 +24,13 @@
             </UAccordion>
         </div>
         <div class="gap-y-4">
-            <UButton icon="i-heroicons-cog-6-tooth" class="w-full mb-1.5" size="xl" color="sky" variant="solid"
-                label="Configuració" :trailing="false" />
+            <UButton icon="i-heroicons-cog-6-tooth" class="w-full mb-1.5" size="xl"
+                :color="$route.name == 'admin2-settings' ? 'black' : 'sky'" variant="solid" label="Configuració"
+                :trailing="false" @click="$router.push('/admin2/settings')" />
             <UButton icon="i-heroicons-backward-solid" class="w-full mb-1.5" size="xl" color="sky" variant="ghost"
-                label="Tornar a Inici" :trailing="false" />
+                label="Tornar a Inici" :trailing="false" @click="$router.push('/llista_propostes')" />
             <UButton icon="i-heroicons-arrow-left-start-on-rectangle-solid" class="w-full mb-1.5" size="xl" color="sky"
-                variant="ghost" label="Sortir" :trailing="false" />
+                variant="ghost" label="Sortir" :trailing="false" @click="$router.push('/logout')" />
         </div>
     </div>
 </template>

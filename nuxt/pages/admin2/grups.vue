@@ -1,13 +1,13 @@
 <template>
     <ModularAdminLayout title="Gestió dels grups">
-        <div v-if="isLoading" class="flex flex-col mt-3">
+        <div v-if="isLoading" class="flex flex-col m-4">
             <USkeleton class="h-10 my-0.5 w-full" />
             <USkeleton class="h-10 my-0.5 w-full" />
             <USkeleton class="h-10 my-0.5 w-full" />
             <USkeleton class="h-10 my-0.5 w-full" />
             <USkeleton class="h-10 my-0.5 w-full" />
         </div>
-        <div class="mt-3" v-else>
+        <div class="m-4" v-else>
             <UAccordion color="sky" variant="soft" size="xl" :items="itemsAccordion">
                 <template #item="item">
                     <div class="grid titles mx-4 text-gray-200" v-if="item.item.groups.length > 0">

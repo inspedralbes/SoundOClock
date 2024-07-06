@@ -1,6 +1,6 @@
 <template>
     <ModularAdminLayout title="Gestió de la megafonía">
-        <div class="container mx-auto p-6">
+        <div class="m-4">
             <!-- PC Status -->
             <div class="flex justify-center items-center mb-8">
                 <div class="flex items-center space-x-2">
@@ -14,7 +14,7 @@
             <!-- Terminal -->
             <div class="bg-black rounded-xl shadow-lg overflow-hidden mb-8">
                 <div class="bg-gray-800 text-white p-3 flex justify-between items-center">
-                    <div class="flex items-center text-gray-500">
+                    <div class="flex items-center text-gray-500 terminal">
                         <span class="material-symbols-rounded mr-2">terminal</span>
                         <span class="text-base font-semibold">Terminal</span>
                     </div>
