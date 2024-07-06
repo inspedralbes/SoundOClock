@@ -1,8 +1,12 @@
 <template>
   <!-- <UContainer> -->
-  <Header
-    v-if="$route.name !== 'index' && $route.name !== 'admin' && $route.name !== 'admin2' && $route.name !== 'auth-callback-google' && $route.name !== 'escollirGrup' && $route.name !== 'a'">
+  <Header v-if="$route.name !== 'index' &&
+    $route.name !== 'admin' &&
+    !$route.name.startsWith('admin2') &&
+    $route.name !== 'auth-callback-google' &&
+    $route.name !== 'escollirGrup'">
   </Header>
+
   <!-- <Loader v-if="loading" class="w-screen h-screen grow" /> -->
   <NuxtPage class="grow" />
   <!-- </UContainer> -->

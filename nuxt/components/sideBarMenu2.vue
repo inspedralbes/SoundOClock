@@ -1,5 +1,5 @@
 <template>
-    <div class="ml-2 pr-2 my-2 w-1/6 fixed left-0 overflow-y-auto flex flex-col justify-between border-e border-gray-500"
+    <div class="ml-2 pr-2 my-2 w-1/6 fixed left-0 overflow-y-auto flex flex-col justify-between border-e border-gray-500 bg-[#1C1B22]"
         style="height: calc(100vh - 1rem);">
         <div>
             <div class="mb-4 w-full bg-white rounded-md">
@@ -70,14 +70,14 @@ export default {
                         // to: '/getting-started'
                     },
                     {
-                        label: 'Gestió de Megafonia',
-                        // to: '/getting-started'
+                        label: 'Gestió de la Megafonia',
+                        to: '/admin2/zsm_script'
                     },
                 ],
                 other_links: [
                     {
-                        label: 'Gestió de Grups',
-                        // to: '/getting-started/installation'
+                        label: 'Gestió dels Grups',
+                        to: '/admin2/grups'
                     },
                 ]
             },
