@@ -80,7 +80,6 @@ async function login(name, email, picture) {
       },
     }
   );
-  console.log("userData.data", userData.data);
   const roleNameResponse = await fetch(
     apiURL + "roles/" + userData.data.user.role_id,
     {
@@ -94,7 +93,6 @@ async function login(name, email, picture) {
   const roleNameData = await roleNameResponse.json();
 
   userData.data.user.role_name = roleNameData.name;
-  console.log("userData.data", userData.data);
   return userData.data;
 }
 

@@ -1,11 +1,7 @@
 <template>
     <ModularAdminLayout title="Gestió dels grups">
         <div v-if="isLoading" class="flex flex-col m-4">
-            <USkeleton class="h-10 my-0.5 w-full" />
-            <USkeleton class="h-10 my-0.5 w-full" />
-            <USkeleton class="h-10 my-0.5 w-full" />
-            <USkeleton class="h-10 my-0.5 w-full" />
-            <USkeleton class="h-10 my-0.5 w-full" />
+            <USkeleton v-for="i in 5" class="h-10 my-0.5 w-full" />
         </div>
         <div class="m-4" v-else>
             <UAccordion color="sky" variant="soft" size="xl" :items="itemsAccordion">
