@@ -1,10 +1,18 @@
 <template>
     <ModularAdminLayout title="Usuaris">
-        <div class="flex justify-between space-x-4 w-full">
-            <div class="">
-                <USkeleton v-for="i in 15" class="w-1/3" />
+        <div class="flex justify-between space-x-4 w-full" v-if="loading">
+            <div class="flex flex-col w-1/3 space-y-0.5">
+                <USkeleton v-for="i in 20" class="h-10" />
             </div>
-            <USkeleton class="h-96 w-1/3" />
+            <USkeleton class="h-auto w-2/3" />
+        </div>
+        <div v-else>
+            <div v-if="users.length === 0" class="w-full">
+                <p class="text-center text-xl">No hi ha cap usuari registrat a l'aplicació.</p>
+            </div>
+            <div v-else>
+                <UserDetails v-bind:user="currentSelectedUser" />
+            </div>
         </div>
         <!-- <div v-if="loading" class="loading">
             <Loader />
@@ -26,6 +34,7 @@
 <script>
 import { useAppStore } from '@/stores/app';
 import comManager from '../communicationManager';
+import UserDetails from '~/components/UserDetails.vue';
 
 export default {
     data() {
