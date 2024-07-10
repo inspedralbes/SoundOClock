@@ -35,19 +35,19 @@
             <!-- Action Buttons -->
             <div class="flex justify-center space-x-4">
                 <button
-                    class="flex items-center justify-center rounded border-2 p-3 bg-blue-500 hover:bg-blue-700 w-1/4 text-white transition-colors"
+                    class="flex items-center justify-center rounded p-3 bg-sky-500 hover:bg-blue-700 w-1/4 text-white transition-colors"
                     @click="executeScript()">
                     <span class="material-symbols-rounded mr-2">playlist_add</span>
                     Col·locar cançons
                 </button>
                 <button
-                    class="flex items-center justify-center rounded border-2 p-3 bg-red-500 hover:bg-red-700 w-1/4 text-white transition-colors"
+                    class="flex items-center justify-center rounded p-3 bg-red-500 hover:bg-red-700 w-1/4 text-white transition-colors"
                     @click="restartPc()">
                     <span class="material-symbols-rounded mr-2">refresh</span>
                     Reiniciar màquina
                 </button>
                 <button
-                    class="flex items-center justify-center rounded border-2 p-3 bg-green-500 hover:bg-green-700 w-1/4 text-white transition-colors"
+                    class="flex items-center justify-center rounded p-3 bg-primary-500 hover:bg-primary-700 w-1/4 text-white transition-colors"
                     @click="downloadSongs()">
                     <span class="material-symbols-rounded mr-2">cloud_download</span>
                     Descarregar cançons
