@@ -91,29 +91,26 @@
       @click="showBanHistory()">Historial de sancions</button>
   </div>
 
+  <UModal v-model="modals.noDateSelected" prevent-close>
+    <UAlert title="No hi ha cap data seleccionada" color="red" class="p-6">
+      <template #title="{ title }">
+        <div class="flex items-center justify-between mb-12">
+          <div class="flex items-center space-x-2">
+            <UIcon name="i-heroicons-exclamation-circle-16-solid" class="text-2xl" />
+            <span v-html="title" />
+          </div>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid text-right" class="-my-1"
+            @click="modals.noDateSelected = false" />
+        </div>
+      </template>
+      <template #description>
+        <p>Selecciona una franja de dates per poder bloquejar a l'usuari <span class="font-bold">{{ user.name
+            }}</span>.
+        </p>
+      </template>
+    </UAlert>
+  </UModal>
 
-  <ModularModal :open="modals.noDateSelected" type="error" title="No hi ha cap data seleccionada"
-    @close="modals.noDateSelected = false">
-    <template #title>
-      <h2>No hi ha cap data seleccionada</h2>
-    </template>
-    <template #content>
-      <p>Selecciona una franja de dates per poder bloquejar a l'usuari <span class="font-bold">{{ user.name }}</span>.
-      </p>
-    </template>
-  </ModularModal>
-
-  <ModularModal :open="modals.banUserVotingCapacity" type="error" msg="Limitar" title="Limitar votacions usuari"
-    @confirm="submitData(); this.toggleVotingBanUserCustomize = true;" @close="modals.banUserVotingCapacity = false">
-    <template #title>
-      <h2>Limitar capacitat de votar</h2>
-    </template>
-    <template #content>
-      <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> no pugui votar cançons fins el
-        <span class="font-bold">{{ formatDate(this.votingBannedUntil) }}?</span>
-      </p>
-    </template>
-  </ModularModal>
 
   <ModularModal :open="modals.unbanUserVotingCapacity" type="error" msg="Habilitar" title="Habilitar votacions usuari"
     @confirm="submitData()" @close="modals.unbanUserVotingCapacity = false">
@@ -122,18 +119,6 @@
     </template>
     <template #content>
       <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> pugui tornar a votar cançons?</p>
-    </template>
-  </ModularModal>
-
-  <ModularModal :open="modals.banUserProposingCapacity" type="error" msg="Limitar" title="Limitar propostes usuari"
-    @confirm="submitData(); this.toggleProposingBanUserCustomize = true;"
-    @close="modals.banUserProposingCapacity = false">
-    <template #title>
-      <h2>Limitar capacitat de proposar</h2>
-    </template>
-    <template #content>
-      <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> no pugui proposar cançons fins
-        el <span class="font-bold">{{ formatDate(this.proposingBannedUntil) }}?</span></p>
     </template>
   </ModularModal>
 
@@ -148,37 +133,118 @@
   </ModularModal>
 
   <!-- modal per banejar les votacions -->
-  <ModularModal :open="modals.banUserVotingWithDefaultOptions" type="error" msg="Limitar"
-    title="Limitar propostes usuari" @confirm="banUserVotingWithDefaultOptions(optionVotingBannedUntil)"
-    @close="modals.banUserVotingWithDefaultOptions = false; optionVotingBannedUntil = null">
-    <template #title>
-      <h2>Limitar capacitat de votar {{ optionVotingBannedUntil === 1 ? '3 setmanes' : optionVotingBannedUntil === 2 ?
-        '3 mesos' : '1 any' }}</h2>
-    </template>
-    <template #content>
+  <UModal v-model="modals.banUserVotingWithDefaultOptions" prevent-close>
+    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <UIcon name="i-heroicons-exclamation-circle-16-solid" class="text-2xl text-red-500" />
+            <h2>Limitar capacitat de votar {{ optionVotingBannedUntil === 1 ? '3 setmanes' : optionVotingBannedUntil ===
+              2 ?
+              '3 mesos' : '1 any' }}</h2>
+          </div>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+            @click="modals.banUserVotingWithDefaultOptions = false; optionVotingBannedUntil = null" />
+        </div>
+      </template>
+
       <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> no pugui votar cançons fins el
         <span class="font-bold">{{ getBanDate(optionVotingBannedUntil) }}?</span>
-
       </p>
-    </template>
-  </ModularModal>
+
+      <template #footer>
+        <div class="flex justify-end space-x-4">
+          <UButton color="gray" variant="ghost" @click="modals.banUserVotingWithDefaultOptions = false">Cancel·la
+          </UButton>
+          <UButton color="red" @click="banUserVotingWithDefaultOptions(optionVotingBannedUntil)">Limitar</UButton>
+        </div>
+      </template>
+    </UCard>
+  </UModal>
+
+  <UModal v-model="modals.banUserVotingCapacity" prevent-close>
+    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+      <template #header>
+        <div class="flex items-center justify-between">
+
+          <div class="flex items-center space-x-2">
+            <UIcon name="i-heroicons-exclamation-circle-16-solid" class="text-2xl text-red-500" />
+            <h2>Limitar capacitat de votar</h2>
+          </div>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+            @click="modals.banUserVotingCapacity = false" />
+        </div>
+      </template>
+
+      <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> no pugui votar cançons fins el
+        <span class="font-bold">{{ formatDate(this.votingBannedUntil) }}?</span>
+      </p>
+
+      <template #footer>
+        <div class="flex justify-end space-x-4">
+          <UButton color="gray" variant="ghost" @click="modals.banUserVotingCapacity = false">Cancel·la</UButton>
+          <UButton color="red" @click="submitData(); this.modals.banUserVotingCapacity = false;">Limitar</UButton>
+        </div>
+      </template>
+    </UCard>
+  </UModal>
 
   <!-- modal per banejar les propostes -->
-  <ModularModal :open="modals.banUserProposingWithDefaultOptions" type="error" msg="Limitar"
-    title="Limitar propostes usuari" @confirm="banUserProposingWithDefaultOptions(optionProposingBannedUntil)"
-    @close="modals.banUserProposingWithDefaultOptions = false; optionProposingBannedUntil = null">
-    <template #title>
-      <h2>Limitar capacitat de proposar {{ optionProposingBannedUntil === 1 ? '3 setmanes' : optionProposingBannedUntil
-        ===
-        2 ? '3 mesos' : '1 any' }}</h2>
-    </template>
-    <template #content>
+  <UModal v-model="modals.banUserProposingWithDefaultOptions" prevent-close>
+    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <UIcon name="i-heroicons-exclamation-circle-16-solid" class="text-2xl text-red-500" />
+            <h2>Limitar capacitat de proposar {{ optionProposingBannedUntil === 1 ? '3 setmanes' :
+              optionProposingBannedUntil
+                ===
+                2 ? '3 mesos' : '1 any' }}</h2>
+          </div>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+            @click="modals.banUserProposingWithDefaultOptions = false; optionProposingBannedUntil = null" />
+        </div>
+      </template>
+
       <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> no pugui votar cançons fins el
         <span class="font-bold">{{ getBanDate(optionProposingBannedUntil) }}?</span>
-
       </p>
-    </template>
-  </ModularModal>
+
+      <template #footer>
+        <div class="flex justify-end space-x-4">
+          <UButton color="gray" variant="ghost" @click="modals.banUserProposingWithDefaultOptions = false">Cancel·la
+          </UButton>
+          <UButton color="red" @click="banUserProposingWithDefaultOptions(optionProposingBannedUntil)">Limitar</UButton>
+        </div>
+      </template>
+    </UCard>
+  </UModal>
+
+  <UModal v-model="modals.banUserProposingCapacity" prevent-close>
+    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <UIcon name="i-heroicons-exclamation-circle-16-solid" class="text-2xl text-red-500" />
+            <h2>Limitar capacitat de proposar</h2>
+          </div>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+            @click="modals.banUserProposingCapacity = false" />
+        </div>
+      </template>
+
+      <p>Segur que vols que l'usuari <span class="font-bold">{{ user.name }}</span> no pugui proposar cançons fins
+        el <span class="font-bold">{{ formatDate(this.proposingBannedUntil) }}?</span></p>
+
+      <template #footer>
+        <div class="flex justify-end space-x-4">
+          <UButton color="gray" variant="ghost" @click="modals.banUserProposingCapacity = false">Cancel·la</UButton>
+          <UButton color="red" @click="submitData(); this.toggleProposingBanUserCustomize = true;">Limitar</UButton>
+        </div>
+      </template>
+    </UCard>
+  </UModal>
+
 
   <!-- Modal par habilitar VOTACIONS -->
   <ModularModal :open="modals.enableUserVotingWithDefaultOptions" type="error" msg="Habilitar"
@@ -341,6 +407,7 @@ export default {
           break;
       }
       this.user.vote_banned_until = date;
+      this.modals.banUserVotingWithDefaultOptions = false;
       socket.emit('banUser', this.store.getUser().token, this.user);
     },
     banUserProposingWithDefaultOptions(option) {
@@ -356,6 +423,7 @@ export default {
           date = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0].replace(/-/g, '-');
           break;
       }
+      this.modals.banUserProposingWithDefaultOptions = false;
       this.user.propose_banned_until = date;
       socket.emit('banUser', this.store.getUser().token, this.user);
     },
