@@ -1,5 +1,5 @@
 <template>
-    <ModularAdminLayout title="Usuaris">
+    <ModularAdminLayout title="Rols i permisos">
         <div class="flex justify-between space-x-4 w-full m-4" v-if="loading">
             <div class="flex flex-col w-1/3 space-y-0.5">
                 <USkeleton v-for="i in 20" class="h-10" />
@@ -39,13 +39,11 @@
                         v-if="filteredUsers.length != 0" v-for="user in filteredUsers" @click="selectUser(user)"
                         class="flex justify-between">
                         <p class="text-lg">{{ user.name }}</p>
-                        <UIcon v-if="user.vote_banned_until || user.propose_banned_until"
-                            name="i-heroicons-exclamation-circle-20-solid" class="w-10 h-10 text-red-500" />
                     </UButton>
                     <p v-if="filteredUsers.length === 0">No s'han trobat usuaris amb aquests filtres</p>
                 </div>
             </div>
-            <UserDetails v-bind:user="currentSelectedUser" />
+            <AdminUserRolesDetails v-bind:user="currentSelectedUser" />
         </div>
     </ModularAdminLayout>
 
@@ -112,22 +110,43 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import { useAppStore } from '@/stores/app';
-import comManager from '../communicationManager';
-import UserDetails from '~/components/UserDetails.vue';
+import comManager from '../../communicationManager';
+import { socket } from '@/socket';
 
 export default {
     data() {
+        const store = useAppStore();
         return {
-            // currentSelectedUser: null,
-            filter: "",
-            isDropdownMenuOpen: false,
-            classGroups: computed(() => this.store.getClassGroups()),
-            categories: computed(() => this.store.getCategories()),
-            users: computed(() => this.store.getUsersAdminView()),
+            classGroups: computed(() => store.getClassGroups()),
+            users: computed(() => store.getUsersAdminView()),
+            roles: computed(() => store.getRoles()),
             isFiltersSlideOpen: false,
             filterGroup: null,
             orderBy: '',
+            filter: '',
+        }
+    },
+    async created() {
+        if (this.store.getRoles().length <= 0 || this.store.getUsersAdminView().length <= 0) {
+            this.store.setLoadingAdminComponent(true);
+            await comManager.getRoles();
+            comManager.getUsers();
+        }
+
+        if (this.store.getUsersAdminView().length <= 0) {
+            this.store.setLoadingAdminComponent(true);
+            comManager.getUsers();
+            comManager.getAllGroupsAndCategories().then((data) => {
+                this.store.setClassGroups(data.allGroups);
+                this.store.setCategories(data.allCategories);
+            });
+        }
+    },
+    unmounted() {
+        if (this.users.length > 0) {
+            this.store.setAdminSelectedUser(this.users[0]);
         }
     },
     methods: {
@@ -135,7 +154,12 @@ export default {
             this.store.setAdminSelectedUser(selectedUser);
         },
         isSelected(user) {
-            return user == this.currentSelectedUser;
+            let style = "user-item--not-selected";
+            if (user.id == this.currentSelectedUser.id) {
+                style = "user-item--selected";
+            }
+
+            return style;
         },
         deleteSearch() {
             this.filter = '';
@@ -149,22 +173,12 @@ export default {
             this.filterGroup = groupId;
         }
     },
-    created() {
-        if (this.store.getUsersAdminView().length <= 0) {
-            this.store.setLoadingAdminComponent(true);
-            comManager.getUsers();
-            comManager.getAllGroupsAndCategories().then((data) => {
-                this.store.setClassGroups(data.allGroups);
-                this.store.setCategories(data.allCategories);
-            });
-        }
-    },
     computed: {
         loading() {
             return this.store.getLoadingAdminComponent();
         },
         currentSelectedUser() {
-            return this.store.getAdminSelectedUser();
+            return this.store.getAdminSelectedUser()
         },
         filteredUsers() {
             let filteredUsers = this.users;
@@ -204,7 +218,11 @@ export default {
 
             return filteredUsers;
         },
-
+    },
+    watch: {
+        // users: {
+        //     handler: 'refreshUsersList',
+        // },
     },
     setup() {
         const store = useAppStore();
@@ -213,14 +231,4 @@ export default {
 }
 </script>
 
-<style scoped>
-.delete-fade-enter-active,
-.delete-fade-leave-active {
-    transition: opacity 0.5s;
-}
-
-.delete-fade-enter-from,
-.delete-fade-leave-to {
-    opacity: 0;
-}
-</style>
+<style scoped></style>

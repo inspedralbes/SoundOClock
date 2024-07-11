@@ -50,7 +50,7 @@ export default {
                     },
                     {
                         label: 'Rols i permisos',
-                        // to: '/getting-started/installation'
+                        to: '/admin2/roles'
                     },
                 ],
                 songs_links: [

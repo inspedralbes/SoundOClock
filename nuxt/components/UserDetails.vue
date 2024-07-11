@@ -1,6 +1,6 @@
 <template>
   <div v-if="user == null"></div>
-  <div v-else class="bg-gray-200 rounded-lg p-6 space-y-6">
+  <div v-else class="bg-gray-200 rounded-lg p-6 space-y-6 w-full">
     <div class="text-center">
       <p class="text-4xl font-bold text-gray-900">{{ user.name }}</p>
       <p class="text-lg text-gray-600">{{ user.email }}</p>
