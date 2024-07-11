@@ -47,20 +47,6 @@
             </div>
             <UserDetails v-bind:user="currentSelectedUser" />
         </div>
-        <!-- <div v-if="loading" class="loading">
-            <Loader />
-        </div>
-        <div v-else>
-            <div v-if="users.length === 0" class="w-full">
-                <p class="text-center text-xl">No hi ha cap usuari registrat a l'aplicació.</p>
-            </div>
-            <div class="flex flex-row mt-8">
-
-                <div class="w-2/3 text-white text-center ml-4 mr-4">
-                    <UserDetails v-bind:user="currentSelectedUser" />
-                </div>
-            </div>
-        </div> -->
     </ModularAdminLayout>
 
     <!-- SLIDEOVER DE LOS FILTROS -->
@@ -68,7 +54,7 @@
         <UCard class="flex flex-col flex-1"
             :ui="{ body: { base: 'flex-1', background: 'bg-stone-800', }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
             <Placeholder class="h-full" />
-            <div class="bg-stone-800 p-4 rounded-lg shadow-md">
+            <div class="bg-stone-800 p-4 rounded-lg">
                 <div class="flex items-center justify-between pb-2 border-b border-gray-700">
                     <h3 class="text-2xl font-semibold text-white">
                         FILTRES

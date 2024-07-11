@@ -35,3 +35,7 @@ body {
     font-style: normal;
     font-display: swap;
 }
+
+.small-caps {
+    font-variant: small-caps;
+}
