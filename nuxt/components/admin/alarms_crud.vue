@@ -13,8 +13,8 @@
                         <div class="flex gap-3">
                             <UButton size="xl" class="flex justify-center hour-item px-5" color="blue"
                                 @click="modals.useTemplate = true">Utilitzar plantilla</UButton>
-                            <UButton size="xl" class="flex justify-center px-5" color="orange"
-                                @click="cleanGroups">Natejar Grups</UButton>
+                            <UButton size="xl" class="flex justify-center px-5" color="orange" @click="cleanGroups">
+                                Natejar Grups</UButton>
                             <input type="text" placeholder="Busca un grup..." :value="search"
                                 @input="search = $event.target.value;"
                                 class="col-span-4 h-full w-full items-center rounded-lg p-3 border-2 border-white">
@@ -388,6 +388,7 @@ export default {
         },
     },
 }
+// 
 </script>
 
 <style scoped>
