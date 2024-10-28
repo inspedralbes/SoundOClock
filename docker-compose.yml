@@ -1,7 +1,7 @@
 services:
   phpmyadmin:
     container_name: phpmyadmin
-    image: arm64v8/phpmyadmin
+    image: phpmyadmin/phpmyadmin # Cambiado a la imagen estándar
     restart: always
     environment:
       PMA_ABSOLUTE_URI: https://timbre.inspedralbes.cat/pma/
