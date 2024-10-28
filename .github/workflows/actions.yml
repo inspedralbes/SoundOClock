@@ -128,7 +128,7 @@ jobs:
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
   LARAVEL-DEPLOY:
-    needs: [FILL-DOCKER-COMPONENT]
+    needs: [FILL-DOCKER-COMPOSE]
     runs-on: ubuntu-latest
     steps:
       - name: Obtaining repository code
