@@ -136,6 +136,7 @@ jobs:
 
       - name: Laravel Deploy
         run: |
+          set -e  # Exit immediately if a command exits with a non-zero status
           echo "${{ secrets.SECRET_KEY }}" > ~/prod_key.pem
           chmod 600 ~/prod_key.pem
           cd laravel
@@ -146,11 +147,19 @@ jobs:
           sed -i 's#DB_PASSWORD=#DB_PASSWORD=${{ secrets.DB_PASSWORD }}#g' .env
           sed -i 's#MAIL_PASSWORD=#MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}#g' .env
           cd ${{ github.workspace }}
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "[ -d laravel ] && sudo rm -r laravel"
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "mkdir laravel"
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/* ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:laravel
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/.env ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:laravel
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "chmod -R 775 laravel/"
+
+          # Asegúrate de que el directorio existe y bórralo si es necesario
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets. PROD_HOST }} "if [ -d /home/ubuntu/laravel ]; then sudo rm -r /home/ubuntu/laravel; fi"
+
+          # Crea el directorio laravel
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets. PROD_HOST }} "mkdir -p /home/ubuntu/laravel"
+
+          # Copia los archivos al servidor
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/* ${{ secrets.PROD_USER }}@${{   secrets.PROD_HOST }}:/home/ubuntu/laravel || { echo 'SCP failed'; exit 1; }
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/.env ${{ secrets.PROD_USER }}@$  {{ secrets.PROD_HOST }}:/home/ubuntu/laravel || { echo 'SCP for .env failed'; exit 1; }
+
+          # Establece los permisos en el servidor remoto
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets. PROD_HOST }} "chmod -R 775 /home/ubuntu/laravel/"
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
   NODE-DEPLOY:
