@@ -27,6 +27,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('/hello', function () {
+    return response()->json(['message' => 'Hello, World!']);
+});
+
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/groups', [GroupsController::class, 'index']);
