@@ -720,7 +720,7 @@ io.on("connection", (socket) => {
       const newSong = new Song(songData);
       await newSong.save();
 
-      console.log("song posted");
+      console.log(`Song ${songData.id} posted by ${user.name}`);
 
       if (!votingRecord) {
         let userGroups = user.groups.map((group) => group.id);
