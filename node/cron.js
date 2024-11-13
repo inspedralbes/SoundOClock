@@ -1,9 +1,10 @@
 import cron from "node-cron";
 // import moment from 'moment';
 import comManager from "./communicationManager.js";
-import {
-  VotingRecord,
-} from "./models.js";
+import { VotingRecord } from "./models.js";
+
+import mongoDBManager from "./mongoDB.manager.js";
+import sqlDB_Manager from "./sqlDB.manager.js";
 
 async function task(socket) {
   cron.schedule(
@@ -20,7 +21,6 @@ async function task(socket) {
 }
 
 async function mailReminder() {
-
   // Fetching settings from server
   const response = await comManager.getPublicSettings();
   const endVotingDate = response.end_vote;
@@ -30,8 +30,8 @@ async function mailReminder() {
   mailSendingDate.setDate(mailSendingDate.getDate() - 2);
 
   // Extract the date components for scheduling
-  const month = String(mailSendingDate.getMonth() + 1).padStart(2, '0');
-  const day = String(mailSendingDate.getDate()).padStart(2, '0');
+  const month = String(mailSendingDate.getMonth() + 1).padStart(2, "0");
+  const day = String(mailSendingDate.getDate()).padStart(2, "0");
   const hour = 0; // Adjust the hour as needed
   const minute = 0; // Adjust the minute as needed
 
@@ -41,7 +41,6 @@ async function mailReminder() {
   cron.schedule(
     cronString,
     async () => {
-
       // GET THE USERS THAT ALREADY VOTED
 
       // Make a query to the mongo database to get all the voting records documents
@@ -65,8 +64,30 @@ async function mailReminder() {
   );
 }
 
+async function clearDBs(socket) {
+  cron.schedule(
+    "0 0 * * *",
+    async () => {
+      console.log("Clearing databases");
+      try {
+        await sqlDB_Manager.vaciarTablas();
+        await mongoDBManager.vaciarAllCollections();
+        console.log("Databases cleared successfully");
+        socket.emit("clearLocalStorage");
+      } catch (error) {
+        console.error("Error clearing databases:", error);
+      }
+    },
+    {
+      timezone: "Europe/Madrid",
+    }
+  );
+}
+
 const fetchingCron = {
-  task, mailReminder
+  task,
+  mailReminder,
+  clearDBs,
 };
 
 export default fetchingCron;

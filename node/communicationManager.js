@@ -1,11 +1,16 @@
 import fetch from "node-fetch";
 import axios from "axios";
 import { config } from "dotenv";
+import randomUser from "./randomUser.manager.js";
+
 config();
 
 let apiURL;
 
-if (process.env.NODE_ENV === "production") {
+if (
+  process.env.NODE_ENV === "production" ||
+  process.env.NODE_ENV === "preprod"
+) {
   apiURL = process.env.PRODUCTION_API_URL;
 } else if (process.env.NODE_ENV === "development") {
   apiURL = process.env.DEVELOPMENT_API_URL;
@@ -22,6 +27,12 @@ async function getUserInfo(token) {
   });
   const jsonResponse = await response.json();
   return jsonResponse;
+}
+
+async function tempLogin() {
+  const data = await randomUser.getUser();
+  let userData = await login(data.name, data.email, data.picture);
+  return userData;
 }
 
 async function googleLogin(userToken) {
@@ -506,6 +517,7 @@ async function sendVoteReminderMail(usersVotedId) {
 const comManager = {
   getUserInfo,
   googleLogin,
+  tempLogin,
   loginUserAndAdmin,
   login,
   logout,

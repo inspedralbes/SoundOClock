@@ -553,6 +553,7 @@ obtenerActualizarTokenSpotify();
 let dirPC = null;
 let amountUsers = 0;
 
+// Cron jobs
 fetchingCron.mailReminder();
 
 // Sockets
@@ -561,6 +562,11 @@ io.on("connection", (socket) => {
   amountUsers++;
   fetchingCron.task(socket);
   console.log("A user connected. Total users:", amountUsers);
+
+  if (process.env.NODE_ENV === "preprod") {
+    fetchingCron.clearDBs(socket);
+    io.emit("clearLocalStorage");
+  }
 
   socket.on("googleLogin", (userToken) => {
     comManager
@@ -587,6 +593,29 @@ io.on("connection", (socket) => {
       .catch((err) => {
         console.error(err);
       });
+  });
+
+  socket.on("publicLogin", () => {
+    socket.emit("publicLogin");
+    comManager.tempLogin().then((userData) => {
+      let groups = [];
+      // Populate groups array with group_id
+      userData.user.groups.forEach((group) => {
+        groups.push(group.pivot.group_id);
+      });
+
+      socket.emit(
+        "loginData",
+        userData.user.id,
+        userData.user.email,
+        userData.user.name,
+        userData.user.picture,
+        userData.token,
+        groups,
+        userData.user.role_id,
+        userData.user.role_name
+      );
+    });
   });
 
   socket.on("login", async (email, name) => {
@@ -689,7 +718,7 @@ io.on("connection", (socket) => {
       const newSong = new Song(songData);
       await newSong.save();
 
-      console.log("song posted");
+      console.log(`Song ${songData.id} posted by ${user.name}`);
 
       if (!votingRecord) {
         let userGroups = user.groups.map((group) => group.id);
