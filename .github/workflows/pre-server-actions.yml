@@ -20,7 +20,7 @@ jobs:
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
   FILL-DOCKER-COMPOSE:
-    # needs: [STOP-DOCKER]
+    needs: [STOP-DOCKER]
     runs-on: ubuntu-latest
     steps:
       - name: Obtaining repository code
