@@ -23,16 +23,6 @@ services:
       - ./mysql_data:/var/lib/mysql
       - ./mysql/dades.sql:/docker-entrypoint-initdb.d/dades.sql
 
-
-  phpmyadmin:
-    container_name: soundoclock_phpmyadmin
-    image: phpmyadmin/phpmyadmin
-    restart: always
-    ports:
-      - 9090:80
-    depends_on:
-      - db
-
   node:
     container_name: soundoclock_node
     image: node:20.11.1-bullseye-slim
@@ -45,7 +35,6 @@ services:
     command: sh -c "npm install && npm run start"
     depends_on:
       - db
-      - laravel
 
   laravel:
     container_name: soundoclock_laravel
@@ -101,3 +90,25 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongodb
     depends_on:
       - mongodb
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9091:9090"
+    networks:
+      - monitoring
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true
