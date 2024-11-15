@@ -49,7 +49,7 @@ services:
     depends_on:
       - db
 
- nuxt:
+  nuxt:
     container_name: soundoclock_nuxt
     image: node:20.11.1-bullseye-slim
     working_dir: /usr/src/app
@@ -108,7 +108,6 @@ services:
   #     - "9100:9100"
   #   networks:
   #     - monitoring
-
 # networks:
 #   monitoring:
 #     external: true
