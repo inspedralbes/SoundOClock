@@ -570,9 +570,7 @@ io.on("connection", (socket) => {
     comManager
       .googleLogin(userToken)
       .then((userData) => {
-        // console.log("UserData:", userData);
         let groups = [];
-        console.log(userData);
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
           groups.push(group.pivot.group_id);
@@ -662,7 +660,6 @@ io.on("connection", (socket) => {
       if (
         user.propose_banned_until > new Date().toISOString().substring(0, 10)
       ) {
-        console.log("postError Estàs bloquejat");
         socket.emit("postError", {
           status: "error",
           title: `Estàs bloquejat`,
@@ -678,7 +675,6 @@ io.on("connection", (socket) => {
 
       for (let i = 0; i < blacklistSongs.length; i++) {
         if (blacklistSongs[i].spotify_id == songData.id) {
-          console.log("postError Cançó no disponibl");
           socket.emit("postError", {
             status: "error",
             title: `Cançó no disponible`,
@@ -691,7 +687,6 @@ io.on("connection", (socket) => {
       // Check if the song already exists
       const existingSong = await Song.findOne({ id: songData.id });
       if (existingSong) {
-        console.log("postError Cançó ja proposada");
         socket.emit("postError", {
           status: "error",
           title: `Cançó ja proposada`,
@@ -703,7 +698,6 @@ io.on("connection", (socket) => {
       // Check if the user already submitted a song
       const votingRecord = await VotingRecord.findOne({ userId: user.id });
       if (votingRecord && votingRecord.submitted && user.role_id >= 4) {
-        console.log("postError Ja has proposat una cançó");
         socket.emit("postError", {
           status: "error",
           title: `Ja has proposat una cançó`,
@@ -798,7 +792,6 @@ io.on("connection", (socket) => {
 
       io.emit("songPosted", { status: "success", song: songData });
     } catch (err) {
-      console.log("postError Ja has proposat una cançó");
       socket.emit("postError", { status: "error", message: err.message });
       console.error("postError", err.message);
     }
@@ -965,7 +958,6 @@ io.on("connection", (socket) => {
     // Check that the user is authenticated with Laravel Sanctum and is an admin
     let user = await comManager.getUserInfo(userToken);
     if (!user.id || user.is_admin === 0) return;
-    console.log("song id", songId);
     myCache.del("blacklist");
     try {
       // Check if the song exists and delete it
@@ -1419,7 +1411,6 @@ io.on("connection", (socket) => {
         groupId,
         userId
       );
-      console.log("resposta", response);
 
       // Notify the user that has deleted the user from the group
       socket.emit("notifyServerResponse", {

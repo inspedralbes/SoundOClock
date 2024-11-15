@@ -65,3 +65,8 @@ INSERT INTO `bell_group` (bell_id, group_id) VALUES
 INSERT INTO `settings` (`start_vote`, `end_vote`, `start_moderation`, `end_moderation`, `theme`) VALUES
 ('{{start_vote}}', '{{end_vote}}', '{{start_moderation}}', '{{end_moderation}}', 'Pop-Rock');
 
+INSERT INTO `users` (`name`, `email`, `role_id`, `picture`, `email_verified_at`, `remember_token`, `created_at`, `updated_at`, `vote_banned_until`, `propose_banned_until`) VALUES
+('Raúl A22 Espinosa Gómez', 'a22rauespgom@inspedralbes.cat', 1, 'https://lh3.googleusercontent.com/a/ACg8ocIxkf20Ue3XZlAOrIxOM_h00pvhziKt-_Er-oB3asjQKgyMWg=s96-c', NULL, NULL, '2024-11-15 11:04:08', '2024-11-15 11:04:08', NULL, NULL),
+('Paco A22 Espinosa Gómez', 'a23rauespgom@inspedralbes.cat', 1, 'https://lh3.googleusercontent.com/a/ACg8ocIxkf20Ue3XZlAOrIxOM_h00pvhziKt-_Er-oB3asjQKgyMWg=s96-c', NULL, NULL, '2024-11-15 11:04:08', '2024-11-15 11:04:08', NULL, NULL),
+('Pepe A22 Espinosa Gómez', 'a24rauespgom@inspedralbes.cat', 1, 'https://lh3.googleusercontent.com/a/ACg8ocIxkf20Ue3XZlAOrIxOM_h00pvhziKt-_Er-oB3asjQKgyMWg=s96-c', NULL, NULL, '2024-11-15 11:04:08', '2024-11-15 11:04:08', NULL, NULL);
+

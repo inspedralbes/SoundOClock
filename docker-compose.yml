@@ -35,7 +35,7 @@ services:
     depends_on:
       - db
 
- laravel:
+  laravel:
     container_name: soundoclock_laravel
     build: ./laravel
     volumes:
@@ -48,7 +48,7 @@ services:
     depends_on:
       - db
 
- nuxt:
+  nuxt:
     container_name: soundoclock_nuxt
     image: node:20.11.1-bullseye-slim
     working_dir: /usr/src/app
