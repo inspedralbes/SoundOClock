@@ -4,7 +4,7 @@ services:
     image: phpmyadmin/phpmyadmin # Cambiado a la imagen estándar
     restart: always
     environment:
-      PMA_ABSOLUTE_URI: https://timbre.inspedralbes.cat/pma/
+      PMA_ABSOLUTE_URI: https://presound.daw.inspedralbes.cat/pma/
     ports:
       - 9090:80
     depends_on:
