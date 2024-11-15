@@ -91,24 +91,24 @@ services:
     depends_on:
       - mongodb
 
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9091:9090"
-    networks:
-      - monitoring
+  # prometheus:
+  #   image: prom/prometheus
+  #   container_name: prometheus
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   ports:
+  #     - "9091:9090"
+  #   networks:
+  #     - monitoring
 
-  node-exporter:
-    image: prom/node-exporter
-    container_name: node-exporter
-    ports:
-      - "9100:9100"
-    networks:
-      - monitoring
+  # node-exporter:
+  #   image: prom/node-exporter
+  #   container_name: node-exporter
+  #   ports:
+  #     - "9100:9100"
+  #   networks:
+  #     - monitoring
 
-networks:
-  monitoring:
-    external: true
+# networks:
+#   monitoring:
+#     external: true
