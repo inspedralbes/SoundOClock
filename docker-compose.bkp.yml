@@ -1,15 +1,14 @@
 services:
   phpmyadmin:
     container_name: phpmyadmin
-    image: phpmyadmin/phpmyadmin # Cambiado a la imagen estándar
+    image: phpmyadmin/phpmyadmin
     restart: always
     environment:
-      PMA_ABSOLUTE_URI: https://timbre.inspedralbes.cat/pma/
+      PMA_ABSOLUTE_URI: https://presound.daw.inspedralbes.cat/pma/
     ports:
       - 9090:80
     depends_on:
       - db
-
   db:
     container_name: soundoclock_db
     image: mysql:8.2.0
@@ -62,7 +61,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
     tmpfs:
       - /tmp
-    command: sh -c "node ./server/index.mjs -- --host=http://timbre.inspedralbes.cat:8080"
+    command: sh -c "node ./server/index.mjs -- --host=http://presound.daw.inspedralbes.cat:8080"
 
   mongodb:
     container_name: soundoclock_mongodb
@@ -87,6 +86,5 @@ services:
       ME_CONFIG_BASICAUTH_USERNAME:
       ME_CONFIG_BASICAUTH_PASSWORD:
       ME_CONFIG_MONGODB_SERVER: mongodb
-
     depends_on:
       - mongodb
