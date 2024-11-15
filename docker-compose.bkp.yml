@@ -49,7 +49,7 @@ services:
     depends_on:
       - db
 
- nuxt:
+  nuxt:
     container_name: soundoclock_nuxt
     image: node:20.11.1-bullseye-slim
     working_dir: /usr/src/app
@@ -62,7 +62,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
     tmpfs:
       - /tmp
-    command: sh -c "node ./server/index.mjs -- --host=http://presound.daw.inspedralbes.cat:8080"
+    command: sh -c "node ./server/index.mjs -- --host=http://timbre.inspedralbes.cat:8080"
 
   mongodb:
     container_name: soundoclock_mongodb
@@ -90,25 +90,3 @@ services:
 
     depends_on:
       - mongodb
-
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9091:9090"
-    networks:
-      - monitoring
-
-  node-exporter:
-    image: prom/node-exporter
-    container_name: node-exporter
-    ports:
-      - "9100:9100"
-    networks:
-      - monitoring
-
-networks:
-  monitoring:
-    external: true
