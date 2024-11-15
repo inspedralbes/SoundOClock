@@ -1,0 +1,113 @@
+services:
+  db:
+    container_name: soundoclock_db
+    image: mysql:8.2.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: soundoclock
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./mysql/dades.sql:/docker-entrypoint-initdb.d/dades.sql
+
+  phpmyadmin:
+    container_name: soundoclock_phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 9090:80
+    depends_on:
+      - db
+
+  node:
+    container_name: soundoclock_node
+    image: node:20.11.1-bullseye-slim
+    volumes:
+      - ./node:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 8080:8080
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - db
+
+  laravel:
+    container_name: soundoclock_laravel
+    build: ./laravel
+    volumes:
+      - ./laravel:/var/www/html
+    ports:
+      - 8000:8000
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+    command: /bin/sh -c "composer install && php artisan key:generate && chown -R www-data:www-data * && php artisan migrate --force && php artisan migrate:fresh --seed && php artisan serve --host=0.0.0.0 "
+    depends_on:
+      - db
+
+  nuxt:
+    container_name: soundoclock_nuxt
+    image: node:20.11.1-bullseye-slim
+    working_dir: /usr/src/app
+    volumes:
+      - ./nuxt:/usr/src/app
+    ports:
+      - 3000:3000
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    tmpfs:
+      - /tmp
+    command: sh -c "npm install && npm run dev"
+
+  mongodb:
+    container_name: soundoclock_mongodb
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: mongopassword
+    volumes:
+      - ./mongodb_data:/data/db
+
+  mongo-express:
+    container_name: soundoclock_mongo_express
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mongoadmin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongopassword
+      ME_CONFIG_BASICAUTH_USERNAME: mongoadmin
+      ME_CONFIG_BASICAUTH_PASSWORD: mongopassword
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    depends_on:
+      - mongodb
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9091:9090"
+    networks:
+      - monitoring
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true
