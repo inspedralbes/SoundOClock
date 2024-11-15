@@ -1,7 +1,7 @@
 services:
   phpmyadmin:
     container_name: phpmyadmin
-    image: phpmyadmin/phpmyadmin # Cambiado a la imagen estándar
+    image: phpmyadmin/phpmyadmin
     restart: always
     environment:
       PMA_ABSOLUTE_URI: https://presound.daw.inspedralbes.cat/pma/
@@ -9,7 +9,6 @@ services:
       - 9090:80
     depends_on:
       - db
-
   db:
     container_name: soundoclock_db
     image: mysql:8.2.0
@@ -87,6 +86,5 @@ services:
       ME_CONFIG_BASICAUTH_USERNAME:
       ME_CONFIG_BASICAUTH_PASSWORD:
       ME_CONFIG_MONGODB_SERVER: mongodb
-
     depends_on:
       - mongodb
