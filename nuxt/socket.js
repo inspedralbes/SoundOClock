@@ -14,6 +14,8 @@ export const socket = io(url);
 socket.on("connect", () => {
   const pinia = useAppStore();
 
+  console.log("Connected to server");
+
   // getSongs();
   socket.on("clearLocalStorage", () => {
     console.log("Clearing localStorage");

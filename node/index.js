@@ -595,11 +595,14 @@ io.on("connection", (socket) => {
 
   socket.on("publicLogin", () => {
     comManager.tempLogin().then((userData) => {
+      console.log("publicLogin", userData);
       let groups = [];
       // Populate groups array with group_id
       userData.user.groups.forEach((group) => {
         groups.push(group.pivot.group_id);
       });
+
+      console.log("Grupos:",groups)
 
       socket.emit(
         "loginData",

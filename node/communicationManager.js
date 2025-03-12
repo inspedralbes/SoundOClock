@@ -65,7 +65,6 @@ async function loginUserAndAdmin() {
 }
 
 async function login(name, email, picture) {
-  console.log("Logging in", name, email, picture);
   let userData = await axios.post(
     apiURL + "login",
     {
@@ -80,6 +79,7 @@ async function login(name, email, picture) {
       },
     }
   );
+
   const roleNameResponse = await fetch(
     apiURL + "roles/" + userData.data.user.role_id,
     {
