@@ -7,7 +7,7 @@
             </UBadge>
             <img class="w-full h-auto object-cover object-center brightness-50"
                 :class="{ 'opacity-100': type === 'admin' && isSelected, 'opacity-75': type === 'admin' && !isSelected }"
-                :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'">
+                :src="albumCover" :alt="track.name + '_img'">
 
             <div class="absolute inset-0 flex flex-row justify-center faded-background">
                 <div class="flex flex-row w-full justify-between p-2 items-center">
@@ -194,6 +194,17 @@ export default {
                     artistList += artist.name;
                 });
                 return artistList;
+            }
+        },
+        albumCover(){
+            if(this.track.album){
+                if(this.track.album.images.length > 0){
+                    return this.track.album.images[0].url;
+                }else{
+                    return '/img/cassete.png';
+                }
+            }else{
+                return this.track.img;
             }
         }
     }

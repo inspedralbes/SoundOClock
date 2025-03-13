@@ -471,12 +471,16 @@ export default {
     created() {
         socket.on('searchResult', (results) => {
             let handleSplicit = [];
+            results = results.filter(song => song.album.images.length > 0);
+
             if (this.settings.showExplicit) {
                 handleSplicit = results.filter(song => !song.explicit);
                 this.spotifySongs = handleSplicit.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
             } else {
                 this.spotifySongs = results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id));
             }
+
+            // console.log("Spotify songs", JSON.parse(JSON.stringify(this.spotifySongs)));
         });
 
         socket.on('loadMoreSongsResult', (results) => {
@@ -487,6 +491,7 @@ export default {
             } else {
                 this.spotifySongs = [...this.spotifySongs, ...results.filter(song => !this.songs.some(existingSong => existingSong.id === song.id))];
             }
+
             this.loadingMoreSongs = false;
         });
 
@@ -1037,7 +1042,6 @@ export default {
                 default:
                     break;
             }
-
             return filtered;
         },
         activeSong() {

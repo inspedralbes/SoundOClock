@@ -6,7 +6,7 @@
                 <div>{{ numReports }}</div>
             </template>
             <div class="relative flex items-align">
-                <img :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'"
+                <img :src="albumCover" :alt="track.name + '_img'"
                     class="w-20 h-20 rounded-lg z-0">
 
                 <Transition name="playingFade">
@@ -18,7 +18,7 @@
             </div>
         </UChip>
         <div class="relative w-full h-24 rounded-lg overflow-hidden bg-black bg-opacity-20" v-else>
-            <img :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'"
+            <img :src="albumCover" :alt="track.name + '_img'"
                 class="w-1/2 h-full object-cover object-center brightness-[40%]"
                 :class="{ 'opacity-100': type === 'admin' && isSelected, 'opacity-75': type === 'admin' && !isSelected }">
             <div class="absolute inset-0 flex flex-row justify-center">
@@ -142,6 +142,9 @@ export default {
             bells: computed(() => this.store.bells),
         }
     },
+    created() {
+        // console.log(JSON.parse(JSON.stringify(this.track)));
+    },
     methods: {
         playTrack(track) {
             this.$emit('play', track);
@@ -216,6 +219,17 @@ export default {
                     artistList += artist.name;
                 });
                 return artistList;
+            }
+        },
+        albumCover(){
+            if(this.track.album){
+                if(this.track.album.images.length > 0){
+                    return this.track.album.images[0].url;
+                }else{
+                    return '/img/cassete.png';
+                }
+            }else{
+                return this.track.img;
             }
         }
     }
