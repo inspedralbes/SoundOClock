@@ -3,7 +3,7 @@
         <div v-if="track != null" class="w-full fixed bottom-0 bg-white z-20">
             <div class="flex flex-row justify-between">
                 <div class="flex flex-row items-center w-[30%] overflow-hidden">
-                    <img class="rounded-full w-24 m-4 ml-12" :src="track.album ? track.album.images[0].url : track.img"
+                    <img class="rounded-full w-24 m-4 ml-12" :src="albumCover"
                         alt="Album Image">
                     <div class="border-solid border-l-4 h-3/4 flex flex-col justify-center pl-2 border-gray-700 overflow-hidden"
                         :class="{ 'fader': isOverflowing('artist') || isOverflowing('title') }">
@@ -126,6 +126,17 @@ export default {
                     artistList += artist.name;
                 });
                 return artistList;
+            }
+        },
+        albumCover(){
+            if(this.track.album){
+                if(this.track.album.images.length > 0){
+                    return this.track.album.images[0].url;
+                }else{
+                    return '/img/cassete.png';
+                }
+            }else{
+                return this.track.img;
             }
         }
     }

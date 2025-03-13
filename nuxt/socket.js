@@ -55,6 +55,10 @@ socket.on("connect", () => {
     refreshAdminUsersView(data);
   });
 
+  socket.on("test", (data) => {
+    console.log(data);
+  });
+
   socket.on(
     "loginData",
     (id, mail, name, picture, token, groups, roleId, roleName) => {

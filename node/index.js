@@ -572,7 +572,6 @@ io.on("connection", (socket) => {
       .then((userData) => {
         // console.log("UserData:", userData);
         let groups = [];
-        console.log(userData);
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
           groups.push(group.pivot.group_id);
@@ -596,7 +595,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("publicLogin", () => {
-    socket.emit("publicLogin");
+    socket.emit("test", "paco");
+    // socket.emit("publicLogin");
     comManager.tempLogin().then((userData) => {
       let groups = [];
       // Populate groups array with group_id

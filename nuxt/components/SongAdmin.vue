@@ -6,7 +6,7 @@
                 <div>{{ numReports }}</div>
             </template>
             <div class="relative flex items-align">
-                <img :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'"
+                <img :src="albumCover" :alt="track.name + '_img'"
                     class="w-20 h-20 rounded-lg z-0">
 
                 <Transition name="playingFade">
@@ -18,7 +18,7 @@
             </div>
         </UChip>
         <div class="relative flex items-align" v-else>
-            <img :src="track.album ? track.album.images[0].url : track.img" :alt="track.name + '_img'"
+            <img :src="albumCover" :alt="track.name + '_img'"
                 class="w-20 h-20 rounded-lg z-0">
 
             <Transition name="playingFade">
@@ -225,6 +225,17 @@ export default {
                     artistList += artist.name;
                 });
                 return artistList;
+            }
+        },
+        albumCover(){
+            if(this.track.album){
+                if(this.track.album.images.length > 0){
+                    return this.track.album.images[0].url;
+                }else{
+                    return '/img/cassete.png';
+                }
+            }else{
+                return this.track.img;
             }
         }
     }

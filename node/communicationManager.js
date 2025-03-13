@@ -48,8 +48,6 @@ async function googleLogin(userToken) {
   );
   const data = await response.json();
 
-  console.log("Google user info", data);
-
   // Send user info to the server
   let userData = await login(data.name, data.email, data.picture);
 
@@ -80,7 +78,6 @@ async function login(name, email, picture) {
       },
     }
   );
-  console.log("userData.data", userData.data);
   const roleNameResponse = await fetch(
     apiURL + "roles/" + userData.data.user.role_id,
     {
@@ -94,7 +91,6 @@ async function login(name, email, picture) {
   const roleNameData = await roleNameResponse.json();
 
   userData.data.user.role_name = roleNameData.name;
-  console.log("userData.data", userData.data);
   return userData.data;
 }
 
