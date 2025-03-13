@@ -1,6 +1,6 @@
 import dotenv, { config } from "dotenv";
-import sqlDB_Manager from "./sqlDB.manager";
-import mongoDBManager from "./mongoDB.manager";
+import mongoDBManager from "./mongoDB.manager.js";
+import sqlDB_Manager from "./sqlDB.manager.js";
 
 dotenv.config();
 

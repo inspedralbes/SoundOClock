@@ -9,7 +9,8 @@ let apiURL;
 
 if (
   process.env.NODE_ENV === "production" ||
-  process.env.NODE_ENV === "preprod"
+  process.env.NODE_ENV === "preprod" ||
+  process.env.NODE_ENV === "presound"
 ) {
   apiURL = process.env.PRODUCTION_API_URL;
 } else if (process.env.NODE_ENV === "development") {

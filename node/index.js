@@ -572,6 +572,7 @@ io.on("connection", (socket) => {
     comManager
       .googleLogin(userToken)
       .then((userData) => {
+        // console.log("UserData:", userData);
         let groups = [];
         // Populate groups array with group_id
         userData.user.groups.forEach((group) => {
@@ -596,7 +597,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("publicLogin", () => {
-    socket.emit("publicLogin");
+    socket.emit("test", "paco");
+    // socket.emit("publicLogin");
     comManager.tempLogin().then((userData) => {
       let groups = [];
       // Populate groups array with group_id

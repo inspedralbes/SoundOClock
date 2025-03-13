@@ -135,6 +135,7 @@ export default {
         socket.emit('updateProvisionalSelectedSongs', null, null);
 
         socket.on('searchResult', (results) => {
+            results = results.filter(song => song.album.images.length > 0);
             this.spotifySongs = results;
         });
 
