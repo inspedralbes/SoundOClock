@@ -135,7 +135,7 @@ export default {
     },
     methods: {
         handleLogin() {
-            if (this.$config.public.ENV === 'DEVELOPMENT') {
+            if (this.$config.public.ENV === 'preprod') {
                 socket.emit('publicLogin')
                 this.loading = true;
             } else {
